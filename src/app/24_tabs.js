@@ -2,7 +2,7 @@
 const TABS = ['today', 'map', 'tide', 'bite', 'log'];
 let TAB = 'today';
 // 오늘 탭의 작은 지도: 지도 탭의 같은 지도(캔버스)를 오늘 탭으로 옮겨 와 쓴다. 선택 포인트로 고정(이동·확대 안 됨), 조류와 단면선 긋기는 됨
-const TD_MAP_W = 4000;   // 오늘 탭 지도의 보이는 폭 (m)
+const TD_MAP_W = 1500;   // 오늘 탭 지도의 보이는 폭 (m)
 const secPanel = $('secWrap').closest('section'), STAGE_HOME = [stage.parentNode, stage.nextSibling], SEC_HOME = [secPanel.parentNode, secPanel.nextSibling];
 let mapView = null;      // 지도 탭에서 보던 위치 (오늘 탭에 다녀와도 그대로)
 function placeMap(today) {

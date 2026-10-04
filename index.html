@@ -56,7 +56,7 @@ body{font-family:var(--font-ui);font-size:14px;line-height:1.55}
 .stage canvas{position:absolute;inset:0;display:block}
 #ui{touch-action:none;cursor:crosshair}
 #ui.pan{cursor:grab}
-.warn{position:absolute;left:60px;top:26px;font-size:12px;color:var(--amber);background:rgba(6,15,19,.85);border:1px solid color-mix(in srgb,var(--amber) 40%,transparent);border-radius:4px;padding:4px 9px;max-width:calc(100% - 76px);pointer-events:none}
+.warn{position:absolute;left:12px;bottom:46px;font-size:11px;white-space:nowrap;color:var(--amber);background:rgba(6,15,19,.85);border:1px solid color-mix(in srgb,var(--amber) 40%,transparent);border-radius:4px;padding:4px 9px;max-width:calc(100% - 76px);pointer-events:none}
 .legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:10px;font-size:12px;color:var(--muted)}
 .bands{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
 .bands .b{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-data);font-size:10.5px;color:var(--fg)}
@@ -365,7 +365,7 @@ details.more[open] summary{margin-bottom:12px}
         <canvas id="base"></canvas>
         <canvas id="flow"></canvas>
         <canvas id="ui" aria-label="평면도: 드래그해서 단면선 지정"></canvas>
-        <div class="warn" id="warn" hidden>이 배율에서는 해안선이 실제와 수십 m 어긋날 수 있습니다</div>
+        <div class="warn" id="warn" hidden title="이 배율에서는 해안선이 실제와 수십 m 어긋날 수 있습니다">해안선 오차 수십 m</div>
       </div>
       <div class="legend">
         <span id="bandTitle">해안선에서 거리</span>
@@ -1736,6 +1736,17 @@ function drawIcon(g, kind, x, y, size, alpha = 1) {
   const o = iconSprite(kind, size); g.globalAlpha = alpha; g.drawImage(o.c, x - o.w / 2, y - o.w / 2, o.w, o.w); g.globalAlpha = 1;
 }
 
+// 크게 확대했을 때(1 px < 20 m) 아이콘이 해안을 가리지 않게, 바다 쪽으로 비켜 그릴 방향(화면 기준 단위 벡터)
+// 주변 12방향 30·60·100 px 지점이 바다인지 보고 바다 쪽 평균 방향을 쓴다. 사방이 바다거나 육지면 비키지 않는다.
+function seaDir(x, y) {
+  let vx = 0, vy = 0, sea = 0, n = 0;
+  for (const rr of [30, 60, 100]) for (let k = 0; k < 12; k++) {   // 작은 섬 한가운데 있는 항도 바다 쪽을 찾도록 100 px까지
+    const a = k / 12 * Math.PI * 2, ux = Math.cos(a), uy = Math.sin(a), [mx, my] = toM(x + ux * rr, y + uy * rr); n++;
+    if (!inLand(mx, my)) { vx += ux; vy += uy; sea++; }
+  }
+  const m = Math.hypot(vx, vy); if (sea < n * .08 || sea > n * .92 || m < 1e-6) return null;
+  return [vx / m, vy / m];
+}
 /* ── 지도 위 관측소 표시 ─────────────────────────────── */
 let stHits = [];
 function drawStations() {
@@ -1744,7 +1755,7 @@ function drawStations() {
   const gpp = 1 / pxPerGround();
   const order = POINTS.map((p, i) => i).sort((a, b) => (a === S.pt ? -1 : b === S.pt ? 1 : portPri(POINTS[a].type) - portPri(POINTS[b].type)));
   for (const i of order) {
-    const st = POINTS[i], [x, y] = toS(st.mx, st.my); if (x < -20 || y < -20 || x > cw + 20 || y > ch + 20) continue;
+    const st = POINTS[i]; let [x, y] = toS(st.mx, st.my); if (x < -20 || y < -20 || x > cw + 20 || y > ch + 20) continue;
     if (i !== S.pt && !S.layers[st.kind === 'rock' ? 'rock' : 'port']) continue;
     const sel = i === S.pt, rock = st.kind === 'rock';
     // 축척에 따라 보여 줄 것을 줄인다: 넓게 볼수록 큰 항만, 확대할수록 작은 항·갯바위까지
@@ -1754,17 +1765,36 @@ function drawStations() {
       if (gpp > 600 ? rock || pr > 0 : gpp > 250 ? (rock ? st.access !== 'car' : pr > 1) : gpp > 80 ? (!rock && pr > 2) : false) continue;
     }
     const size = sel ? 24 : gpp > 600 ? 11 : gpp > 250 ? 13 : gpp > 80 ? 15 : 18;
+    const x0 = x, y0 = y, dir = gpp < 20 ? seaDir(x0, y0) : null;   // 크게 확대하면 아이콘을 바다 쪽으로 비켜 그림
+    if (dir) {
+      const off = size * .5 + 16;
+      // 단면선(A–B)이 있으면, 아이콘이 그 선을 가리지 않는 쪽으로 방향을 틀어 본다 (바다 쪽 → ±50° → ±90°)
+      let best = dir;
+      if (S.A && S.B) {
+        const [ax, ay] = toS(...S.A), [bx, by] = toS(...S.B), dseg = (px, py) => { const vx = bx - ax, vy = by - ay, L = vx * vx + vy * vy || 1, t = clamp(((px - ax) * vx + (py - ay) * vy) / L, 0, 1); return Math.hypot(px - ax - t * vx, py - ay - t * vy); };
+        let bd = -1;
+        for (const deg of [0, 50, -50, 90, -90, 135, -135]) {
+          const c = Math.cos(deg * D2R), sn = Math.sin(deg * D2R), d2 = [dir[0] * c - dir[1] * sn, dir[0] * sn + dir[1] * c], dd = dseg(x0 + d2[0] * off, y0 + d2[1] * off);
+          if (dd > size * .9) { best = d2; break; }
+          if (dd > bd) { bd = dd; best = d2; }
+        }
+      }
+      x = x0 + best[0] * off; y = y0 + best[1] * off; dir[0] = best[0]; dir[1] = best[1];
+      bctx.strokeStyle = 'rgba(220,237,239,.75)'; bctx.lineWidth = 1.2; bctx.beginPath(); bctx.moveTo(x0, y0); bctx.lineTo(x - dir[0] * size * .5, y - dir[1] * size * .5); bctx.stroke();
+      bctx.fillStyle = rock ? '#f0a35e' : '#4fe3d3'; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.lineWidth = 1.5; bctx.beginPath(); bctx.arc(x0, y0, 3, 0, 7); bctx.fill(); bctx.stroke();   // 실제 위치 점
+    }
     if (sel) { bctx.fillStyle = 'rgba(79,227,211,.25)'; bctx.strokeStyle = '#4fe3d3'; bctx.lineWidth = 2; bctx.beginPath(); bctx.arc(x, y, size * .72, 0, 7); bctx.fill(); bctx.stroke(); }
     // 갯바위 접근: 차량·도보는 진하게, 확인 필요는 조금 흐리게, 배로만은 흐리게
     drawIcon(bctx, rock ? 'rock' : 'port', x, y, size, rock ? (st.access === 'car' ? 1 : st.access === 'unk' ? .8 : .5) : 1);
     const r = size / 2;
     stHits.push([x, y, i]);
     bctx.font = (sel ? '700 12.5px' : '600 11.5px') + ' IBM Plex Sans KR, sans-serif';
-    const w = bctx.measureText(st.name).width, box = [x + r + 2, y - 9, x + r + 6 + w, y + 9];
+    const left = dir && dir[0] < -.3, w = bctx.measureText(st.name).width;   // 바다가 왼쪽이면 이름도 왼쪽에 (육지를 덜 가림)
+    const tx = left ? x - r - 4 - w : x + r + 4, box = [tx - 2, y - 9, tx + w + 2, y + 9];
     if (!sel && (gpp > 700 || placed.some(b => !(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3])))) continue;
     placed.push(box);
-    bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(st.name, x + r + 4, y);
-    bctx.fillStyle = st.kind === 'rock' ? (sel ? '#f0a35e' : '#f6d2b0') : sel ? '#4fe3d3' : '#c9f6f0'; bctx.fillText(st.name, x + r + 4, y);
+    bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(st.name, tx, y);
+    bctx.fillStyle = st.kind === 'rock' ? (sel ? '#f0a35e' : '#f6d2b0') : sel ? '#4fe3d3' : '#c9f6f0'; bctx.fillText(st.name, tx, y);
   }
 }
 function stationAt(x, y) { let best = null, bd = 14; for (const [sx, sy, i] of stHits) { const d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = i; } } return best; }
@@ -2194,6 +2224,7 @@ function drawCrnt(tide) {
 /* ── 단면 ──────────────────────────────────────────────── */
 const sec = $('sec'), sctx = sec.getContext('2d'); let sw = 0, shh = 0, SEC = null;
 function analyzeSection() {
+  dirty = true;   // 아이콘이 새 단면선을 피해 다시 놓이도록 바탕을 다시 그림
   if (!S.A || !S.B) { SEC = null; renderSecInfo(); return; }
   const kA = kAt(latOf(S.A[1])), Lg = Math.hypot(S.B[0] - S.A[0], S.B[1] - S.A[1]) / kA;
   const N = Math.round(clamp(Lg / 2, 300, 1000));            // 최소 300개, 길면 약 2 m 간격까지
@@ -2785,7 +2816,7 @@ requestAnimationFrame(frame);
 const TABS = ['today', 'map', 'tide', 'bite', 'log'];
 let TAB = 'today';
 // 오늘 탭의 작은 지도: 지도 탭의 같은 지도(캔버스)를 오늘 탭으로 옮겨 와 쓴다. 선택 포인트로 고정(이동·확대 안 됨), 조류와 단면선 긋기는 됨
-const TD_MAP_W = 4000;   // 오늘 탭 지도의 보이는 폭 (m)
+const TD_MAP_W = 1500;   // 오늘 탭 지도의 보이는 폭 (m)
 const secPanel = $('secWrap').closest('section'), STAGE_HOME = [stage.parentNode, stage.nextSibling], SEC_HOME = [secPanel.parentNode, secPanel.nextSibling];
 let mapView = null;      // 지도 탭에서 보던 위치 (오늘 탭에 다녀와도 그대로)
 function placeMap(today) {
