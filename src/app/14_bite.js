@@ -68,5 +68,6 @@ function renderBite() {
   }).join('');
   if (pt && pt.kind === 'rock') $('rockInfo').innerHTML = rockInfoHTML(pt); else $('rockInfo').innerHTML = '';
   if (typeof renderBasis === 'function') renderBasis();
+  if (typeof renderToday === 'function') renderToday();
   if (typeof renderLog === 'function') renderLog();
 }

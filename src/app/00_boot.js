@@ -9,4 +9,4 @@ async function loadJSON(n) { const r = await fetch(`data/${n}.json?v=${Date.now(
 let TIDE, OBS, WXG, META;
 try { [TIDE, OBS, WXG, META] = await Promise.all(['tide', 'obs', 'wx', 'meta'].map(loadJSON)); }
 catch (e) { document.body.insertAdjacentHTML('afterbegin', `<p style="padding:16px;color:#ff7a6e;font:14px sans-serif">예보 자료를 불러오지 못했습니다 (${e.message}). 잠시 뒤 새로고침해 주세요.</p>`); throw e; }
-{ const g = new Date(META.generated); $('dataTime').textContent = `${g.getMonth() + 1}/${g.getDate()} ${String(g.getHours()).padStart(2, '0')}:${String(g.getMinutes()).padStart(2, '0')}`; }
+{ const g = new Date(META.generated); const txt = `${g.getMonth() + 1}/${g.getDate()} ${String(g.getHours()).padStart(2, '0')}:${String(g.getMinutes()).padStart(2, '0')}`; $('dataTime').textContent = txt; $('dataTime2').textContent = txt; }

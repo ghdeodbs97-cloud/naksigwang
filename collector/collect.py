@@ -69,7 +69,7 @@ def lim(xs):
 # ── 1. 조석예보(고, 저조) ─────────────────────────────────
 def tide():
     url = 'https://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService'
-    dates = [(NOW + dt.timedelta(days=i)).strftime('%Y%m%d') for i in range(DAYS)]
+    dates = [(NOW + dt.timedelta(days=i)).strftime('%Y%m%d') for i in range(-1, DAYS)]   # 어제도 받아 오늘 새벽 조위 곡선을 이어 그림
     jobs = [(c, n, d) for c, n in lim(PTS['tide']) for d in dates]
 
     def one(job):

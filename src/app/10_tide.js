@@ -16,10 +16,11 @@ const STATIONS = Object.entries(TIDE.st).map(([id, o]) => {
   const days = TDATES.map(date => { const [lm, ld, leap] = TIDE.lunar[date]; return { date, lunar: (leap ? '윤' : '') + lm + '.' + ld, mul: mulOf(region, ld), ev: (o.days[date] || []).map(([t, cm, k]) => [+t.slice(0, 2) + t.slice(3, 5) / 60, cm, k]) }; });
   const rng = days.map((d, i) => { const e = [...(days[i - 1] ? days[i - 1].ev.slice(-1) : []), ...d.ev, ...(days[i + 1] ? days[i + 1].ev.slice(0, 1) : [])].map(x => x[1]); return e.length > 1 ? Math.max(...e) - Math.min(...e) : 0; });
   const mx = Math.max(...rng) || 1; days.forEach((d, i) => d.pct = Math.round(rng[i] / mx * 100));
-  return { id, name: o.name, lat: o.lat, lon: o.lon, region, days };
+  const prev = (o.days[dateAdd(DAY0, -1)] || []).map(([t, cm, k]) => [+t.slice(0, 2) + t.slice(3, 5) / 60 - 24, cm, k]);   // 어제 극값: 오늘 0시 전후 곡선용
+  return { id, name: o.name, lat: o.lat, lon: o.lon, region, days, prev };
 }).filter(st => st.days.some(d => d.ev.length));
 for (const st of STATIONS) {
-  st.ev = []; st.days.forEach((d, i) => d.ev.forEach(([h, cm, k]) => st.ev.push([i * 24 + h, cm, k])));
+  st.ev = [...st.prev]; st.days.forEach((d, i) => d.ev.forEach(([h, cm, k]) => st.ev.push([i * 24 + h, cm, k])));
   st.ev.sort((a, b) => a[0] - b[0]);
   const hs = st.ev.map(e => e[1]); st.msl = hs.reduce((a, b) => a + b, 0) / hs.length;   // 극값 평균 ≈ 평균해면
   st.minCm = Math.min(...hs); st.maxCm = Math.max(...hs);

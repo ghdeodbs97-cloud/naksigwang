@@ -25,20 +25,27 @@
 | `07_import.js` | 좌표 정규화, 수심 파일 불러오기, 이 브라우저에 저장 | 121 | `toLatLon`, `pickDepthKey`, `depthVal`, `importDepthRows`, `importDepthJSON`, `findRecords`, `importStructJSON`, `saveDepth` 외 |
 | `08_depth_api.js` | 공공 수심 API 불러오기 | 81 | `apiCfg`, `apiSave`, `apiLoad`, `apiParams`, `apiMsg`, `apiFetchTile`, `apiLoadViewport` |
 | `09_rocks.js` | 낚시 제한구역과 갯바위 포인트 | 68 | `inBan`, `nearestRing`, `accessAt`, `addRock`, `importRocks`, `saveRocks`, `loadRocks`, `rockInfoHTML` |
-| `10_tide.js` | 조석: 예보지점·물때·조위 보간 | 39 | `tideAt`, `getTide` |
+| `10_tide.js` | 조석: 예보지점·물때·조위 보간 | 40 | `tideAt`, `getTide` |
 | `11_current.js` | 조류 예보(물돌이·최강)와 해 뜨고 지는 시각 | 66 | `loadCrnt`, `crntAt`, `crntDay`, `nearestCrnt`, `flowU`, `sunTimes` |
 | `12_fish.js` | 대상어 정보와 물고기 그림 | 71 | `fishSVG` |
 | `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 107 | `kmaGrid`, `wxCell`, `wxAt`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
-| `14_bite.js` | 시간별 입질 지수 | 72 | `lightF`, `targetF`, `tempF`, `myF`, `biteAt`, `spark`, `renderBite` |
+| `14_bite.js` | 시간별 입질 지수 | 73 | `lightF`, `targetF`, `tempF`, `myF`, `biteAt`, `spark`, `renderBite` |
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 68 | `drawStations`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
 | `16_terrain.js` | GEBCO 지형 격자와 바탕 지도 그리기 | 265 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
 | `17_flow.js` | 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표 | 102 | `buildFlowField`, `realField`, `spawn`, `stepParticles`, `drawCrnt` |
 | `18_section.js` | 단면(측면도) 분석과 그리기 | 177 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
 | `19_overlay.js` | 평면도 위 표시(단면선·핀) | 19 | `drawUI` |
 | `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |
-| `21_input.js` | 화면 크기, 마우스·터치·버튼 입력, 이름 검색 | 152 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
+| `20b_today.js` | 「오늘」 탭: 선택한 포인트의 오늘·지금 요약 (물때 상태, 조석 띠, 바람·파고·수온·조류, 잘 맞는 시간) | 58 | `renderToday`, `drawToday` |
+| `21_input.js` | 화면 크기, 마우스·터치·버튼 입력, 이름 검색 | 155 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
 | `22_catchlog.js` | 내 조과 기록 | 45 | `localCatches`, `renderLog` |
-| `23_main.js` | 예시 단면, 시작 처리, 매 프레임 갱신 | 84 | `exampleSection`, `drawBiteChart`, `apiAutoKick`, `frame` |
+| `23_main.js` | 예시 단면, 시작 처리, 매 프레임 갱신 | 91 | `exampleSection`, `drawBiteChart`, `apiAutoKick`, `frame` |
+| `24_tabs.js` | 아래(휴대폰)·위(넓은 화면) 탭 전환. 주소 끝 #today · #map · #tide · #bite · #log 로 바로 열 수 있다 | 20 | `showTab` |
+
+## 화면 구조 (3단계)
+
+탭 5개: `#v-today`(오늘 요약) · `#v-map`(평면도·측면도) · `#v-tide`(물때·예보) · `#v-bite`(어종별 입질 지수) · `#v-log`(조과 기록·자료 불러오기·출처).
+주소 끝에 `#map`처럼 붙이면 그 탭으로 열린다. 매 프레임 그리기는 보이는 탭 것만 한다(`23_main.js`의 `frame`).
 
 ## 공통으로 쓰는 값
 

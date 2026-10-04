@@ -1,8 +1,10 @@
 // 21_input.js — 화면 크기, 마우스·터치·버튼 입력, 이름 검색
 /* ── 크기 ──────────────────────────────────────────────── */
 function resize() {
+  if (!stage.clientWidth) return;                     // 지도 탭이 숨어 있으면 크기를 바꾸지 않음
   const r = DPR(), old = cw ? toM(cw / 2, ch / 2) : null, oldGW = cw ? cw / pxPerGround() : 0;
-  cw = stage.clientWidth; ch = Math.round(cw * (cw < 560 ? 1.05 : .72));
+  cw = stage.clientWidth;                               // 휴대폰: 화면 높이에 맞춰 길게, 넓은 화면: 가로 비율 0.72 (화면 높이 안에서)
+  ch = Math.round(cw < 560 ? clamp(innerHeight - 290, 320, cw * 1.3) : Math.min(cw * .72, Math.max(380, innerHeight - 240)));
   stage.style.height = ch + 'px';
   for (const c of [base, flow, ui]) { c.width = Math.round(cw * r); c.height = Math.round(ch * r); c.style.width = cw + 'px'; c.style.height = ch + 'px'; }
   mask.width = Math.ceil(cw / 2); mask.height = Math.ceil(ch / 2);
@@ -136,6 +138,7 @@ sec.addEventListener('pointermove', e => { const b = sec.getBoundingClientRect()
 sec.addEventListener('pointerleave', () => { S.secHover = null; });
 
 $('tIn').addEventListener('input', e => { S.t = +e.target.value; });
+$('tIn2').addEventListener('input', e => { S.t = +e.target.value; });
 $('stSel').addEventListener('change', e => selectPoint(+e.target.value, true));
 for (const id of ['dayStrip', 'biteDays']) $(id).addEventListener('click', e => { const b = e.target.closest('[data-day]'); if (b) setDay(+b.dataset.day); });
 function renderBasis() {

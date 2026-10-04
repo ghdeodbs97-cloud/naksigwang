@@ -74,11 +74,18 @@ exampleSection(128.93, 37.80);
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
-  if (S.playing) { S.t = (S.t + dt * .7) % 24; $('tIn').value = S.t; }
+  if (S.playing) S.t = (S.t + dt * .7) % 24;
+  for (const id of ['tIn', 'tIn2']) { const el = $(id); if (document.activeElement !== el && Math.abs(el.value - S.t) > .01) el.value = S.t; }
   const tide = getTide();
-  if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
   if (Math.floor(S.t) !== biteHour) renderBite();
-  updateHover(); drawUI(); drawCrnt(tide); stepParticles(tide, dt); drawSection(now, tide); updateReadouts(tide); drawTideChart(tide); drawBiteChart();
+  if (TAB === 'map') {                                   // 보이는 탭만 그린다 (휴대폰 전지 절약)
+    if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
+    setText('clock2', fmtH(S.t));
+    updateHover(); drawUI(); drawCrnt(tide); stepParticles(tide, dt); drawSection(now, tide);
+  }
+  updateReadouts(tide);
+  if (TAB === 'tide') drawTideChart(tide);
+  if (TAB === 'bite') drawBiteChart();
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
