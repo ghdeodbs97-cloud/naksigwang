@@ -1,15 +1,18 @@
 {
  "errors": [],
- "tide.json": "skipped (오늘 자료 있음)",
+ "tide.json": {
+  "ok": 166,
+  "requested": 166
+ },
  "obs.json": {
-  "ok": 55,
+  "ok": 54,
   "requested": 55
  },
  "wx.json": {
   "ok": 615,
   "requested": 615
  },
- "generated": "2026-10-04T23:08+09:00",
- "seconds": 256,
+ "generated": "2026-10-05T08:17+09:00",
+ "seconds": 207,
  "error_count": 0
 }
