@@ -259,6 +259,10 @@ details.more[open] summary{margin-bottom:12px}
 .logBox{border:0;padding:0;margin:0}
 .sources{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:8px}
 .sources p{margin:0}.sources a{color:var(--cyan)}
+.tdH small.tdHint{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:2px}
+#tdMapSlot{display:flex;flex-direction:column;gap:12px}
+#tdMapSlot #toSec{display:none}
+#tdMapSlot .panel{padding:12px}
 .tdActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .tdActions .btn{border-radius:8px;padding:9px 14px;font-size:14px;text-decoration:none}
 .tdActions a.btn.ghost{color:var(--cyan)}
@@ -314,6 +318,8 @@ details.more[open] summary{margin-bottom:12px}
       <div><dt>조류</dt><dd id="tdCur">—</dd></div>
       <div><dt>해</dt><dd id="tdSun">—</dd></div>
     </dl>
+    <h3 class="tdH">포인트 주변 바다 <small class="tdHint">손가락으로 끌어 단면선을 그으면 아래에 수심 단면이 나옵니다 · 지도 이동은 「지도」 탭에서</small></h3>
+    <div id="tdMapSlot"></div>
     <h3 class="tdH">오늘 잘 맞는 시간</h3>
     <ol class="tdBest" id="tdBest"></ol>
     <div class="tdActions">
@@ -439,7 +445,7 @@ details.more[open] summary{margin-bottom:12px}
       <input type="range" id="tIn" min="0" max="23.99" step="0.05" value="6" aria-label="시각">
       <div><span class="chip in" id="tideChip">들물</span></div>
       <dl class="read">
-        <dt>조위 (기본수준면 기준)</dt><dd id="etaVal">—</dd>
+        <dt>조위 <small class="hint" style="display:block">기본수준면(대략 가장 낮은 간조면)에서 잰 바닷물 높이</small></dt><dd id="etaVal">—</dd>
         <dt>다음 만조</dt><dd id="nextHW">—</dd>
         <dt>다음 간조</dt><dd id="nextLW">—</dd>
         <dt>물흐름 세기 (그날 최강 대비)</dt><dd id="curVal">—</dd>
@@ -1590,6 +1596,7 @@ function selectPoint(j, zoom) {
   $('stReg').textContent = (p.kind === 'rock' ? '갯바위 · ' + ACC_NAME[p.access] + ' · ' : '') + `조석: ${st.name} 예보지점 기준 · ${p.dkm < 1 ? '1 km 이내' : p.dkm.toFixed(0) + ' km'}`;
   $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : '';
   if (zoom) fitGround(p.lat, p.lon, 9000);
+  if (S.lock) { fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); }   // 오늘 탭 지도: 새 포인트로 옮기고 앞바다 단면
   $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
   dirty = true; renderDays(); renderBite();
 }
@@ -1801,7 +1808,7 @@ function clampView() {
 }
 function fitBox(x1, y1, x2, y2, pad = .9) { V.cx = (x1 + x2) / 2; V.cy = (y1 + y2) / 2; V.s = Math.min(cw / Math.max(1, x2 - x1), ch / Math.max(1, y2 - y1)) * pad; clampView(); }
 function fitLonLat(bb) { fitBox(mxOf(bb[0]), myOf(bb[1]), mxOf(bb[2]), myOf(bb[3])); }
-function fitGround(lat, lon, widthG) { V.cx = mxOf(lon); V.cy = myOf(lat); V.s = cw / (widthG * kAt(lat)); clampView(); }
+function fitGround(lat, lon, widthG) { if (S.lock) widthG = TD_MAP_W; /* 오늘 탭 지도는 늘 같은 폭 */ V.cx = mxOf(lon); V.cy = myOf(lat); V.s = cw / (widthG * kAt(lat)); clampView(); }
 function zoomAt(px, py, f) { const [mx, my] = toM(px, py); V.s *= f; clampView(); const [nx, ny] = toM(px, py); V.cx += mx - nx; V.cy += my - ny; clampView(); }
 
 /* ── 바탕 그리기 ───────────────────────────────────────── */
@@ -2488,7 +2495,7 @@ function resize() {
   if (!stage.clientWidth) return;                     // 지도 탭이 숨어 있으면 크기를 바꾸지 않음
   const r = DPR(), old = cw ? toM(cw / 2, ch / 2) : null, oldGW = cw ? cw / pxPerGround() : 0;
   cw = stage.clientWidth;                               // 휴대폰: 화면 높이에 맞춰 길게, 넓은 화면: 가로 비율 0.72 (화면 높이 안에서)
-  ch = Math.round(cw < 560 ? clamp(innerHeight - 290, 320, cw * 1.3) : Math.min(cw * .72, Math.max(380, innerHeight - 240)));
+  ch = Math.round(S.lock ? cw * (cw < 560 ? .85 : .5) : cw < 560 ? clamp(innerHeight - 290, 320, cw * 1.3) : Math.min(cw * .72, Math.max(380, innerHeight - 240)));   // 오늘 탭에서는 낮게
   stage.style.height = ch + 'px';
   for (const c of [base, flow, ui]) { c.width = Math.round(cw * r); c.height = Math.round(ch * r); c.style.width = cw + 'px'; c.style.height = ch + 'px'; }
   mask.width = Math.ceil(cw / 2); mask.height = Math.ceil(ch / 2);
@@ -2503,6 +2510,7 @@ const ptrs = new Map(); let pinch = null, panStart = null;
 const local = e => { const b = ui.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
 ui.addEventListener('pointerdown', e => {
   ui.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, local(e));
+  if (ptrs.size === 2 && S.lock) { S.drag = null; return; }   // 오늘 탭 지도: 두 손가락 확대 안 함
   if (ptrs.size === 2) { S.drag = null; panStart = null; const [p, q] = [...ptrs.values()]; pinch = { d: Math.hypot(p[0] - q[0], p[1] - q[1]), c: [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2] }; return; }
   const [x, y] = local(e);
   if (S.mode === 'pan' || e.pointerType === 'touch' && S.mode === 'pan') { panStart = { x, y, cx: V.cx, cy: V.cy }; ui.style.cursor = 'grabbing'; return; }
@@ -2536,7 +2544,7 @@ function endPtr(e) {
 }
 ui.addEventListener('pointerup', endPtr); ui.addEventListener('pointercancel', endPtr);
 ui.addEventListener('pointerleave', () => { hoverAt = null; setText('cursorRead', '커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다'); });
-ui.addEventListener('wheel', e => { e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
+ui.addEventListener('wheel', e => { if (S.lock) return; e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
 let hoverAt = null, hoverDone = null;
 function updateHover() {
   if (!hoverAt || (hoverDone && hoverDone[0] === hoverAt[0] && hoverDone[1] === hoverAt[1] && !dirtyHover)) return;
@@ -2762,7 +2770,7 @@ function frame(now) {
   for (const id of ['tIn', 'tIn2']) { const el = $(id); if (document.activeElement !== el && Math.abs(el.value - S.t) > .01) el.value = S.t; }
   const tide = getTide();
   if (Math.floor(S.t) !== biteHour) renderBite();
-  if (TAB === 'map') {                                   // 보이는 탭만 그린다 (휴대폰 전지 절약)
+  if (TAB === 'map' || TAB === 'today') {               // 보이는 탭만 그린다 (휴대폰 전지 절약). 오늘 탭에도 지도가 있다
     if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
     setText('clock2', fmtH(S.t));
     updateHover(); drawUI(); drawCrnt(tide); stepParticles(tide, dt); drawSection(now, tide);
@@ -2776,9 +2784,23 @@ requestAnimationFrame(frame);
 // 24_tabs.js — 아래(휴대폰)·위(넓은 화면) 탭 전환. 주소 끝 #today · #map · #tide · #bite · #log 로 바로 열 수 있다
 const TABS = ['today', 'map', 'tide', 'bite', 'log'];
 let TAB = 'today';
+// 오늘 탭의 작은 지도: 지도 탭의 같은 지도(캔버스)를 오늘 탭으로 옮겨 와 쓴다. 선택 포인트로 고정(이동·확대 안 됨), 조류와 단면선 긋기는 됨
+const TD_MAP_W = 4000;   // 오늘 탭 지도의 보이는 폭 (m)
+const secPanel = $('secWrap').closest('section'), STAGE_HOME = [stage.parentNode, stage.nextSibling], SEC_HOME = [secPanel.parentNode, secPanel.nextSibling];
+let mapView = null;      // 지도 탭에서 보던 위치 (오늘 탭에 다녀와도 그대로)
+function placeMap(today) {
+  const inToday = stage.parentNode === $('tdMapSlot'); if (today === inToday) return;
+  if (today) { mapView = { cx: V.cx, cy: V.cy, s: V.s }; $('tdMapSlot').append(stage, secPanel); S.lock = true; setMode('line'); }
+  else { STAGE_HOME[0].insertBefore(stage, STAGE_HOME[1]); SEC_HOME[0].insertBefore(secPanel, SEC_HOME[1]); S.lock = false; if (matchMedia('(pointer: coarse)').matches) setMode('pan'); }
+  resize();
+  if (today) { const p = POINTS[S.pt]; if (p) { fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); } }
+  else if (mapView) { V.cx = mapView.cx; V.cy = mapView.cy; V.s = mapView.s; clampView(); }
+  dirty = true;
+}
 function showTab(k, keepHash, focusPt) {
   if (!TABS.includes(k)) k = 'today';
   TAB = k;
+  if (k === 'today' || k === 'map') placeMap(k === 'today');
   for (const t of TABS) $('v-' + t).hidden = t !== k;
   for (const b of $('tabbar').children) b.setAttribute('aria-current', b.dataset.tab === k ? 'page' : 'false');
   if (!keepHash && location.hash !== '#' + k) history.replaceState(null, '', '#' + k);

@@ -71,6 +71,7 @@ function selectPoint(j, zoom) {
   $('stReg').textContent = (p.kind === 'rock' ? '갯바위 · ' + ACC_NAME[p.access] + ' · ' : '') + `조석: ${st.name} 예보지점 기준 · ${p.dkm < 1 ? '1 km 이내' : p.dkm.toFixed(0) + ' km'}`;
   $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : '';
   if (zoom) fitGround(p.lat, p.lon, 9000);
+  if (S.lock) { fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); }   // 오늘 탭 지도: 새 포인트로 옮기고 앞바다 단면
   $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
   dirty = true; renderDays(); renderBite();
 }

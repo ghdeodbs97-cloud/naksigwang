@@ -252,6 +252,10 @@ details.more[open] summary{margin-bottom:12px}
 .logBox{border:0;padding:0;margin:0}
 .sources{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:8px}
 .sources p{margin:0}.sources a{color:var(--cyan)}
+.tdH small.tdHint{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:2px}
+#tdMapSlot{display:flex;flex-direction:column;gap:12px}
+#tdMapSlot #toSec{display:none}
+#tdMapSlot .panel{padding:12px}
 .tdActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .tdActions .btn{border-radius:8px;padding:9px 14px;font-size:14px;text-decoration:none}
 .tdActions a.btn.ghost{color:var(--cyan)}
@@ -307,6 +311,8 @@ details.more[open] summary{margin-bottom:12px}
       <div><dt>조류</dt><dd id="tdCur">—</dd></div>
       <div><dt>해</dt><dd id="tdSun">—</dd></div>
     </dl>
+    <h3 class="tdH">포인트 주변 바다 <small class="tdHint">손가락으로 끌어 단면선을 그으면 아래에 수심 단면이 나옵니다 · 지도 이동은 「지도」 탭에서</small></h3>
+    <div id="tdMapSlot"></div>
     <h3 class="tdH">오늘 잘 맞는 시간</h3>
     <ol class="tdBest" id="tdBest"></ol>
     <div class="tdActions">
@@ -432,7 +438,7 @@ details.more[open] summary{margin-bottom:12px}
       <input type="range" id="tIn" min="0" max="23.99" step="0.05" value="6" aria-label="시각">
       <div><span class="chip in" id="tideChip">들물</span></div>
       <dl class="read">
-        <dt>조위 (기본수준면 기준)</dt><dd id="etaVal">—</dd>
+        <dt>조위 <small class="hint" style="display:block">기본수준면(대략 가장 낮은 간조면)에서 잰 바닷물 높이</small></dt><dd id="etaVal">—</dd>
         <dt>다음 만조</dt><dd id="nextHW">—</dd>
         <dt>다음 간조</dt><dd id="nextLW">—</dd>
         <dt>물흐름 세기 (그날 최강 대비)</dt><dd id="curVal">—</dd>
