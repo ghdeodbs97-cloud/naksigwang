@@ -1,4 +1,6 @@
 // 16_terrain.js — GEBCO 지형 격자와 바탕 지도 그리기
+// 남한 해안선 자료 밖의 북한·대마도 쪽 구역 (여기서 GEBCO가 육지면 남의 땅으로 본다)
+const foreignZone = (plat, plon) => (plat > 37.55 && plon < 126.0 && !(plat < 37.705 && plon > 125.55 && plon < 125.8) && !(plon < 124.82)) || (plat > 37.78 && plon < 126.35) || (plat > 37.86 && plon < 127.2) || (plat > 38.3 && plon < 128.2) || plat > 38.62 || (plon > 128.9 && plat < 34.8);
 /* ── GEBCO 2026 지형 격자 (15초 ≈ 460 m, 육지 표고 + 해저 수심) ───────────
    GEBCO Compilation Group (2026) GEBCO 2026 Grid. 공공 영역. 행마다 앞 칸과의 차이를 저장 후 deflate 압축. */
 let GE = null, GSH = null;   // GE: Int16 표고(m, 바다는 음수), GSH: 음영(0~1)
@@ -79,7 +81,7 @@ function renderTerrain(path, gpp) {
       // 남한 해안선 밖인데 GEBCO가 육지인 곳(북한·일본 등)은 회갈색으로. 해안 근처의 낮은 값은 바다색에 가깝게 둔다.
       // 북한·대마도 쪽에서만 GEBCO 육지를 회갈색으로 칠한다 (남한 연안의 거친 칸이 바다에 땅처럼 번지지 않게)
       const plat = lat0 - (fr + .5) * step, plon = lon0 + (fc + .5) * step;
-      const foreign = (plat > 37.55 && plon < 126.0 && !(plat < 37.705 && plon > 125.55 && plon < 125.8) && !(plon < 124.82)) || (plat > 37.78 && plon < 126.35) || (plat > 37.86 && plon < 127.2) || (plat > 38.3 && plon < 128.2) || plat > 38.62 || (plon > 128.9 && plat < 34.8);
+      const foreign = foreignZone(plat, plon);
       const fo = e > 0 && (foreign || e > 60) ? Math.min(1, e / 30) : 0, fr2 = (1 - fo) * fs, fg = fo * (.45 + .7 * sh);
       const dq = Math.min(3500, dep);
       sea.data[o] = Math.min(255, SEA_LUT[dq * 3] * fr2 + 112 * fg); sea.data[o + 1] = Math.min(255, SEA_LUT[dq * 3 + 1] * fr2 + 112 * fg); sea.data[o + 2] = Math.min(255, SEA_LUT[dq * 3 + 2] * fr2 + 100 * fg); sea.data[o + 3] = 255;

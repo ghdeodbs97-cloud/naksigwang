@@ -1,4 +1,35 @@
 // 15_view.js — 지도 표시 보조, 좌표 변환, 화면 보기 상태
+/* ── 항·갯바위 아이콘: 기기의 그림 문자(⚓, 🪨)로 그린다 ──
+   그림 문자가 없는 기기(오래된 Windows 등)는 직접 그린 모양으로 대신한다. 크기별로 한 번 그려 두고 복사해 쓴다. */
+const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+const ICON_CH = { port: '⚓', rock: '🪨' }, ICON_OK = {}, ICON_C = new Map();
+function hasEmoji(ch) {
+  const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d', { willReadFrequently: true });
+  g.font = `24px ${EMOJI_FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ch, 16, 17);
+  const d = g.getImageData(0, 0, 32, 32).data; let n = 0, colored = 0;
+  for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 40) { n++; if (Math.max(d[i], d[i + 1], d[i + 2]) - Math.min(d[i], d[i + 1], d[i + 2]) > 25) colored++; }
+  return n > 30 && colored > 8;                              // 빈 네모(글꼴 없음)는 색이 없다
+}
+function iconSprite(kind, size) {
+  const r = DPR(), key = kind + size + '@' + r; if (ICON_C.has(key)) return ICON_C.get(key);
+  if (!(kind in ICON_OK)) ICON_OK[kind] = hasEmoji(ICON_CH[kind]);
+  const px = Math.ceil(size * 1.3 * r), c = document.createElement('canvas'); c.width = c.height = px; const g = c.getContext('2d'), m = px / 2;
+  if (kind === 'port') { g.fillStyle = 'rgba(236,247,249,.95)'; g.strokeStyle = 'rgba(6,19,29,.9)'; g.lineWidth = r; g.beginPath(); g.arc(m, m, size * r * .56, 0, 7); g.fill(); g.stroke(); }   // 밝은 원판: 파란 바다 위에서도 닻이 보이게
+  if (ICON_OK[kind]) { const fs = kind === 'port' ? size * .78 : size; g.font = `${fs * r}px ${EMOJI_FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ICON_CH[kind], m, m + fs * r * .06); }
+  else if (kind === 'port') {                               // 닻 모양
+    const s = size * r / 2 * .8; g.strokeStyle = '#1d5c74'; g.lineWidth = Math.max(1.5, s / 4); g.lineCap = 'round';
+    g.beginPath(); g.arc(m, m - s * .65, s * .22, 0, 7); g.moveTo(m, m - s * .43); g.lineTo(m, m + s * .8); g.moveTo(m - s * .45, m - s * .2); g.lineTo(m + s * .45, m - s * .2);
+    g.moveTo(m - s * .75, m + s * .2); g.quadraticCurveTo(m - s * .6, m + s * .85, m, m + s * .8); g.quadraticCurveTo(m + s * .6, m + s * .85, m + s * .75, m + s * .2); g.stroke();
+  } else {                                                   // 바위 모양
+    const s = size * r / 2; g.fillStyle = '#9aa3a6'; g.strokeStyle = '#4c5558'; g.lineWidth = Math.max(1, s / 6);
+    g.beginPath(); g.moveTo(m - s * .9, m + s * .6); g.lineTo(m - s * .6, m - s * .2); g.lineTo(m - s * .1, m - s * .7); g.lineTo(m + s * .5, m - s * .45); g.lineTo(m + s * .9, m + s * .6); g.closePath(); g.fill(); g.stroke();
+  }
+  const o = { c, w: px / r }; ICON_C.set(key, o); return o;
+}
+function drawIcon(g, kind, x, y, size, alpha = 1) {
+  const o = iconSprite(kind, size); g.globalAlpha = alpha; g.drawImage(o.c, x - o.w / 2, y - o.w / 2, o.w, o.w); g.globalAlpha = 1;
+}
+
 /* ── 지도 위 관측소 표시 ─────────────────────────────── */
 let stHits = [];
 function drawStations() {
@@ -9,20 +40,18 @@ function drawStations() {
   for (const i of order) {
     const st = POINTS[i], [x, y] = toS(st.mx, st.my); if (x < -20 || y < -20 || x > cw + 20 || y > ch + 20) continue;
     if (i !== S.pt && !S.layers[st.kind === 'rock' ? 'rock' : 'port']) continue;
-    const sel = i === S.pt, r = sel ? 7 : gpp > 400 ? 3.5 : 5;
-    bctx.fillStyle = sel ? '#4fe3d3' : '#06131d'; bctx.strokeStyle = '#4fe3d3'; bctx.lineWidth = 2;
-    if (st.kind === 'rock') {
-      const rc = st.access === 'car' ? '#f0a35e' : st.access === 'unk' ? '#a9b7b9' : '#6c7d80';
-      bctx.fillStyle = sel ? rc : '#06131d'; bctx.strokeStyle = rc;
-      bctx.beginPath(); bctx.moveTo(x, y - r - 1); bctx.lineTo(x + r, y + r * .8); bctx.lineTo(x - r, y + r * .8); bctx.closePath(); bctx.fill(); bctx.stroke();
-    } else { bctx.beginPath(); bctx.moveTo(x, y - r); bctx.lineTo(x + r, y); bctx.lineTo(x, y + r); bctx.lineTo(x - r, y); bctx.closePath(); bctx.fill(); bctx.stroke(); }
+    const sel = i === S.pt, size = sel ? 24 : gpp > 700 ? 12 : gpp > 400 ? 14 : 18, rock = st.kind === 'rock';
+    if (sel) { bctx.fillStyle = 'rgba(79,227,211,.25)'; bctx.strokeStyle = '#4fe3d3'; bctx.lineWidth = 2; bctx.beginPath(); bctx.arc(x, y, size * .72, 0, 7); bctx.fill(); bctx.stroke(); }
+    // 갯바위 접근: 차량·도보는 진하게, 확인 필요는 조금 흐리게, 배로만은 흐리게
+    drawIcon(bctx, rock ? 'rock' : 'port', x, y, size, rock ? (st.access === 'car' ? 1 : st.access === 'unk' ? .8 : .5) : 1);
+    const r = size / 2;
     stHits.push([x, y, i]);
     bctx.font = (sel ? '700 12.5px' : '600 11.5px') + ' IBM Plex Sans KR, sans-serif';
-    const w = bctx.measureText(st.name).width, box = [x + 9, y - 9, x + 13 + w, y + 9];
+    const w = bctx.measureText(st.name).width, box = [x + r + 2, y - 9, x + r + 6 + w, y + 9];
     if (!sel && (gpp > 700 || placed.some(b => !(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3])))) continue;
     placed.push(box);
-    bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(st.name, x + 11, y);
-    bctx.fillStyle = st.kind === 'rock' ? (sel ? '#f0a35e' : '#f6d2b0') : sel ? '#4fe3d3' : '#c9f6f0'; bctx.fillText(st.name, x + 11, y);
+    bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(st.name, x + r + 4, y);
+    bctx.fillStyle = st.kind === 'rock' ? (sel ? '#f0a35e' : '#f6d2b0') : sel ? '#4fe3d3' : '#c9f6f0'; bctx.fillText(st.name, x + r + 4, y);
   }
 }
 function stationAt(x, y) { let best = null, bd = 14; for (const [sx, sy, i] of stHits) { const d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = i; } } return best; }
@@ -50,12 +79,16 @@ const V = { cx: mxOf(128), cy: myOf(36), s: 1e-3 };
 const toS = (mx, my) => [(mx - V.cx) * V.s + cw / 2, (V.cy - my) * V.s + ch / 2];
 const toM = (px, py) => [V.cx + (px - cw / 2) / V.s, V.cy - (py - ch / 2) / V.s];
 const pxPerGround = () => V.s * kAt(latOf(V.cy));
-const KB = { x1: mxOf(123.8), x2: mxOf(132.4), y1: myOf(32.6), y2: myOf(39) };
+// 지도 범위 = 지형 자료(GEBCO) 범위. 이보다 넓게 축소하거나 밖으로 밀면 자료 없는 검은 곳이 보이므로 막는다
+const KB = { x1: mxOf(124.4), x2: mxOf(131.95), y1: myOf(32.9), y2: myOf(38.7) };
 function clampView() {
+  if (!cw || !ch) return;
+  const sMin = Math.max(cw / (KB.x2 - KB.x1), ch / (KB.y2 - KB.y1));   // 화면이 자료 범위 안에 들어가는 가장 작은 배율
+  if (V.s < sMin) V.s = sMin;
   const gw = cw / pxPerGround();
-  if (gw > 1.1e6) V.s *= gw / 1.1e6;
   if (gw < 150) V.s *= gw / 150;
-  V.cx = clamp(V.cx, KB.x1, KB.x2); V.cy = clamp(V.cy, KB.y1, KB.y2);
+  const hx = cw / 2 / V.s, hy = ch / 2 / V.s;                          // 화면 가장자리가 범위 밖으로 나가지 않게
+  V.cx = clamp(V.cx, KB.x1 + hx, KB.x2 - hx); V.cy = clamp(V.cy, KB.y1 + hy, KB.y2 - hy);
   dirty = true;
 }
 function fitBox(x1, y1, x2, y2, pad = .9) { V.cx = (x1 + x2) / 2; V.cy = (y1 + y2) / 2; V.s = Math.min(cw / Math.max(1, x2 - x1), ch / Math.max(1, y2 - y1)) * pad; clampView(); }

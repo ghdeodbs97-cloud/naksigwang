@@ -78,11 +78,11 @@ function drawOSM(stage, gpp, TER) {
       else { g.fillStyle = o.c === 'ma' ? '#4fe3d3' : o.c === 'be' ? '#dcc994' : '#8e7f6b'; g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); }
     }
     if (showName) {
-      if (hn) { g.fillStyle = '#06131d'; g.strokeStyle = '#ffd08a'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); g.stroke(); }
-      if (hu) { g.fillStyle = 'rgba(200,210,212,.9)'; g.beginPath(); g.arc(x, y, 2.5, 0, 7); g.fill(); }
+      if (hn) drawIcon(g, 'port', x, y, 14);
+      if (hu) drawIcon(g, 'port', x, y, 11, .7);
       if (dk) { g.fillStyle = '#e8dcb8'; g.fillRect(x - 6, y - 1.5, 12, 3); }
-      if (harb && !showDot) { g.fillStyle = '#06131d'; g.strokeStyle = '#ffd08a'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); g.stroke(); }
-      const label = hu ? o.name + ' 앞 포구*' : o.name;
+      if (harb && !showDot) drawIcon(g, 'port', x, y, 14);
+      const label = hu ? o.name + ' 앞 포구*' : o.name;   // 이름은 아이콘 아래에 쓴다
       g.font = hu ? 'italic 500 10.5px IBM Plex Sans KR, sans-serif' : dk ? '700 11.5px IBM Plex Sans KR, sans-serif' : hn ? '500 11px IBM Plex Sans KR, sans-serif' : isl ? (o.c === 'is' ? 'italic 600 12px' : 'italic 500 10.5px') + ' IBM Plex Sans KR, sans-serif' : harb ? '500 11px IBM Plex Sans KR, sans-serif' : '500 11px IBM Plex Sans KR, sans-serif'; const w = g.measureText(label).width, box = [x - w / 2 - 2, y + 4, x + w / 2 + 2, y + 18];
       if (placed.some(b => !(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3]))) continue; placed.push(box);
       g.lineWidth = 3; g.strokeStyle = 'rgba(6,15,19,.85)'; g.strokeText(label, x - w / 2, y + 11); g.fillStyle = hu ? '#b9c6c8' : dk ? '#efe3bf' : hn ? '#ffe2b0' : isl ? '#e4f1d6' : harb ? '#ffe2b0' : o.c === 'lh' ? '#ffd0c8' : OSM_STRUCT.has(o.c) ? '#e8eeee' : '#f3e6c4'; g.fillText(label, x - w / 2, y + 11);

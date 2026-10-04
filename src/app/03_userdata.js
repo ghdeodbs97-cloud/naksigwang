@@ -156,9 +156,8 @@ function drawPortsAndSoundings(gpp) {
     const w = bctx.measureText(o.p.name).width, box = [o.x - 6, o.y - 8, o.x + 9 + w, o.y + 8];
     if (placed.some(b => !(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3]))) continue;
     placed.push(box);
-    bctx.fillStyle = '#06131d'; bctx.strokeStyle = big ? '#ffb84d' : '#ffd08a'; bctx.lineWidth = 2;
-    bctx.beginPath(); bctx.arc(o.x, o.y, big ? 4 : 3, 0, 7); bctx.fill(); bctx.stroke();
-    bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(o.p.name, o.x + 8, o.y);
-    bctx.fillStyle = big ? '#ffe2b0' : '#e7eef0'; bctx.fillText(o.p.name, o.x + 8, o.y);
+    drawIcon(bctx, 'port', o.x, o.y, big ? 15 : 13);   // 포인트 목록에 없는 항·포구 (5 km 안에 다른 포인트가 있는 곳)
+    bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(o.p.name, o.x + 10, o.y);
+    bctx.fillStyle = big ? '#ffe2b0' : '#e7eef0'; bctx.fillText(o.p.name, o.x + 10, o.y);
   }
 }

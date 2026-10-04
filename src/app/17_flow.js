@@ -1,23 +1,25 @@
 // 17_flow.js — 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표
 // 해안선과 나란한 방향장 (모식): 육지 마스크를 넓게 평균한 값의 기울기에 수직인 방향.
 // 예보 지점에서 먼 곳은 실제 조류 방향이 아니다 — 들물/날물에 따라 해안을 따라 오가는 모습만 나타낸다.
-const FC = 8; let FF = null, FFw = 0, FFh = 0;
+const FC = 8; let FF = null, FFw = 0, FFh = 0, FFB = null;   // FFB: 흐름을 그리지 않을 칸(북한·대마도 육지)
 function buildFlowField() {
   const W = mask.width, H = mask.height; if (!maskData || !W) { FF = null; return; }
   const sat = new Float32Array((W + 1) * (H + 1));
   for (let y = 0; y < H; y++) { let row = 0; for (let x = 0; x < W; x++) { row += maskData[(y * W + x) * 4 + 3] > 127 ? 1 : 0; sat[(y + 1) * (W + 1) + x + 1] = sat[y * (W + 1) + x + 1] + row; } }
   const box = (x1, y1, x2, y2) => { x1 = clamp(x1, 0, W); x2 = clamp(x2, 0, W); y1 = clamp(y1, 0, H); y2 = clamp(y2, 0, H); const a = (x2 - x1) * (y2 - y1); return a > 0 ? (sat[y2 * (W + 1) + x2] - sat[y1 * (W + 1) + x2] - sat[y2 * (W + 1) + x1] + sat[y1 * (W + 1) + x1]) / a : 0; };
-  FFw = Math.ceil(W / FC); FFh = Math.ceil(H / FC); FF = new Float32Array(FFw * FFh * 2);
+  FFw = Math.ceil(W / FC); FFh = Math.ceil(H / FC); FF = new Float32Array(FFw * FFh * 2); FFB = new Uint8Array(FFw * FFh);
   const R = 28;
   for (let j = 0; j < FFh; j++) for (let i = 0; i < FFw; i++) {
     const cx = i * FC + FC / 2, cy = j * FC + FC / 2;
     const gx = box(cx, cy - R, cx + R, cy + R) - box(cx - R, cy - R, cx, cy + R), gy = box(cx - R, cy, cx + R, cy + R) - box(cx - R, cy - R, cx + R, cy);
+    { const [mx, my] = toM(cx * 2, cy * 2), la = latOf(my), lo = lonOf(mx);   // 남한 해안선 밖 땅(북한 등)에는 흐름 없음
+      if (foreignZone(la, lo)) { const e = gebcoAt(la, lo); if (e == null || e > 0) { FFB[j * FFw + i] = 1; FF[(j * FFw + i) * 2] = FF[(j * FFw + i) * 2 + 1] = 0; continue; } } }
     const m = Math.hypot(gx, gy), k = (j * FFw + i) * 2;
     if (m < .02) { FF[k] = 0; FF[k + 1] = 0; continue; }
     const s = Math.min(1, m * 3) / m; FF[k] = -gy * s; FF[k + 1] = gx * s;   // 기울기에 수직 = 해안과 나란히
   }
 }
-const isSea = (x, y) => { if (!maskData || x < 0 || y < 0 || x >= cw || y >= ch) return false; const i = ((y >> 1) * mask.width + (x >> 1)) * 4 + 3; return maskData[i] < 128; };
+const isSea = (x, y) => { if (!maskData || x < 0 || y < 0 || x >= cw || y >= ch) return false; if (FFB && FFB[Math.min(FFh - 1, (y >> 1) / FC | 0) * FFw + Math.min(FFw - 1, (x >> 1) / FC | 0)]) return false; const i = ((y >> 1) * mask.width + (x >> 1)) * 4 + 3; return maskData[i] < 128; };
 
 // 화면 격자마다 가까운 조류 예보 지점들의 흐름을 거리 가중 평균 (8 km 밖은 0). 값은 노트/2.5, 최대 2.
 let RF = null, RFkey = '';
@@ -85,7 +87,7 @@ function drawCrnt(tide) {
     const q = crntAt(c, tide.tA); if (!q) continue;
     const kn = q.sp * KN, col = crColor(kn);
     uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.fillStyle = col;
-    if (kn < .2) { uctx.beginPath(); uctx.arc(x, y, big ? 4 : 2.5, 0, 7); uctx.fill(); uctx.stroke(); }
+    if (kn < .2) { uctx.strokeStyle = col; uctx.lineWidth = 1.5; uctx.beginPath(); uctx.arc(x, y, big ? 4 : 3, 0, 7); uctx.stroke(); }   // 물돌이: 속 빈 고리 (항 아이콘과 구분)
     else {
       const L = (big ? 10 : 6) + Math.min(big ? 30 : 14, kn * (big ? 8 : 4)), a = q.dir * D2R, dx = Math.sin(a), dy = -Math.cos(a);
       const x0 = x - dx * L / 2, y0 = y - dy * L / 2, x1 = x + dx * L / 2, y1 = y + dy * L / 2, hw = big ? 5 : 3.5, hl = big ? 8 : 5;
