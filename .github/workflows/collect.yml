@@ -9,6 +9,9 @@ on:
       limit:
         description: '시험용: 원천마다 받을 개수 (0 = 전체)'
         default: '0'
+      force_tide:
+        description: '조석을 지금 다시 받기 (1 = 예). 평소에는 오전 실행 때만 받음'
+        default: '0'
 
 permissions:
   contents: write
@@ -31,6 +34,7 @@ jobs:
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           LIMIT: ${{ github.event.inputs.limit || '0' }}
+          FORCE_TIDE: ${{ github.event.inputs.force_tide || '0' }}
         run: python collector/collect.py
       - name: 저장 (바뀐 자료만 커밋)
         run: |
