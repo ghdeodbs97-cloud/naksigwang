@@ -30,6 +30,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install requests korean_lunar_calendar
+      - name: 수집기 안정성 테스트
+        run: python tests/test_collector_resilience.py
+      - name: 프런트 데이터 저하 테스트
+        run: node tests/boot_degradation.mjs
       - name: 수집
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}

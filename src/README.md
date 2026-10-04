@@ -15,7 +15,7 @@
 
 | 파일 | 하는 일 | 줄 수 | 주요 함수 |
 |---|---|---|---|
-| `00_boot.js` | 공통 도구와 매일 갱신 자료(data/*.json) 불러오기 | 12 | `loadJSON` |
+| `00_boot.js` | 필수 조석 검증과 선택 자료 실패 시 제한된 기능으로 시작 | 79 | `loadJSON`, `validBootData`, `bootNotice` |
 | `01_geo.js` | 좌표계(웹 메르카토르)와 해안선 디코딩·육지 판정 | 67 | `decode`, `segDist`, `nearestCoast`, `inLand` |
 | `02_state.js` | 화면 상태(S)와 추정 수심 식 | 5 |  |
 | `03_userdata.js` | 내 자료: 항·포구 목록, CSV 읽기 | 164 | `readText`, `parseCSV`, `locate`, `parseDeg`, `getLL`, `importPorts`, `saveLocal`, `loadLocal` 외 |
