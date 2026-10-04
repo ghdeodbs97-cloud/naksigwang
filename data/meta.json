@@ -1,9 +1,6 @@
 {
  "errors": [],
- "tide.json": {
-  "ok": 166,
-  "requested": 166
- },
+ "tide.json": "skipped (오늘 자료 있음)",
  "obs.json": {
   "ok": 55,
   "requested": 55
@@ -12,7 +9,7 @@
   "ok": 615,
   "requested": 615
  },
- "generated": "2026-10-04T13:01+09:00",
- "seconds": 197,
+ "generated": "2026-10-04T13:29+09:00",
+ "seconds": 127,
  "error_count": 0
 }
