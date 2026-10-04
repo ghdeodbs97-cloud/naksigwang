@@ -150,7 +150,9 @@ renderBasis();
 $('play').addEventListener('click', () => { S.playing = !S.playing; $('play').textContent = S.playing ? '정지' : '재생'; });
 const bind = (id, key, out, fmt) => $(id).addEventListener('input', e => { S[key] = +e.target.value; $(out).textContent = fmt(S[key]); });
 bind('dmaxIn', 'dmax', 'dmaxOut', v => v + ' m');
+$('dmaxIn').addEventListener('input', () => { S.autoShore = false; $('autoShore').checked = false; });   // 손으로 바꾸면 자동 끔
 $('dmaxIn').addEventListener('change', () => { dirty = true; analyzeSection(); });
-$('slopeIn').addEventListener('change', e => { S.ratio = +e.target.value; dirty = true; analyzeSection(); });
+$('slopeIn').addEventListener('change', e => { S.autoShore = false; $('autoShore').checked = false; setShore(e.target.value); dirty = true; analyzeSection(); });
+$('autoShore').addEventListener('change', e => { S.autoShore = e.target.checked; analyzeSection(); });
 $('styleSeg').addEventListener('click', e => { const b = e.target.closest('[data-style]'); if (!b) return; S.mapStyle = b.dataset.style; for (const x of $('styleSeg').children) x.setAttribute('aria-pressed', x === b); dirty = true; });
 $('layerSeg').addEventListener('click', e => { const b = e.target.closest('[data-layer]'); if (!b) return; const k = b.dataset.layer; S.layers[k] = !S.layers[k]; b.setAttribute('aria-pressed', S.layers[k]); if (k === 'flow') { fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); } dirty = true; });

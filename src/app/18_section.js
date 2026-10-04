@@ -4,6 +4,7 @@ const sec = $('sec'), sctx = sec.getContext('2d'); let sw = 0, shh = 0, SEC = nu
 function analyzeSection() {
   dirty = true;   // 아이콘이 새 단면선을 피해 다시 놓이도록 바탕을 다시 그림
   if (!S.A || !S.B) { SEC = null; renderSecInfo(); return; }
+  autoShore();   // 해안 종류에 맞춰 추정 경사·수심 상한을 먼저 정한다 (18b_shore.js)
   const kA = kAt(latOf(S.A[1])), Lg = Math.hypot(S.B[0] - S.A[0], S.B[1] - S.A[1]) / kA;
   const N = Math.round(clamp(Lg / 2, 300, 1000));            // 최소 300개, 길면 약 2 m 간격까지
   const pts = []; let L = 0;
