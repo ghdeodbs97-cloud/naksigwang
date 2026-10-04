@@ -1,0 +1,442 @@
+<title>낚시광</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 소나 장비 화면 — 왼쪽 큰 평면도(실제 해안선) + 오른쪽 계기판, 아래 전폭 단면도. 단일 다크 테마(의도적). */
+:root{
+  color-scheme: dark;
+  --bg:#060f13;
+  --panel:#0a181e;
+  --line:#173039;
+  --fg:#d5ecee;
+  --muted:#7a9ea6;
+  --cyan:#4fe3d3;
+  --amber:#ffb84d;
+  --font-ui:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  --font-data:'JetBrains Mono',ui-monospace,'SFMono-Regular',Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--font-ui);font-size:14px;line-height:1.55}
+.app{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:18px 28px;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;justify-content:space-between}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-0.01em}
+.brand h1 span{color:var(--cyan)}
+.tag{font-family:var(--font-data);font-size:11px;letter-spacing:.06em;color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 45%,transparent);padding:2px 8px;border-radius:3px}
+.src{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px;min-width:0}
+.ph{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;margin-bottom:10px}
+.ph h2{margin:0;font-size:14px;font-weight:700}
+.ph h2 small{font-weight:400;color:var(--muted);margin-left:6px;font-size:12px;font-family:var(--font-data)}
+.hint{font-size:12px;color:var(--muted)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;flex-wrap:wrap}
+.seg button{font:inherit;font-size:12px;color:var(--muted);background:transparent;border:0;padding:6px 11px;cursor:pointer;min-width:34px}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:color-mix(in srgb,var(--cyan) 18%,transparent);color:var(--cyan);font-weight:600}
+.seg button:hover{color:var(--fg)}
+.seg button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.coord{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.coord input{flex:1 1 240px;min-width:0;font-family:var(--font-data);font-size:13px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 10px}
+.coord a.btn{text-decoration:none;display:inline-flex;align-items:center}
+.coord .btn.ghost{background:transparent;color:var(--cyan);border:1px solid var(--line)}
+.coord .msg{font-size:12px;color:var(--amber)}
+.stage{position:relative;width:100%;border-radius:4px;overflow:hidden;background:#06131d}
+.stage canvas{position:absolute;inset:0;display:block}
+#ui{touch-action:none;cursor:crosshair}
+#ui.pan{cursor:grab}
+.warn{position:absolute;left:60px;top:26px;font-size:12px;color:var(--amber);background:rgba(6,15,19,.85);border:1px solid color-mix(in srgb,var(--amber) 40%,transparent);border-radius:4px;padding:4px 9px;max-width:calc(100% - 76px);pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.bands{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.bands .b{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-data);font-size:10.5px;color:var(--fg)}
+.bands .b i{width:14px;height:10px;border-radius:2px;display:inline-block}
+.key{display:inline-flex;align-items:center;gap:6px}
+.sw{width:18px;height:0;border-top:2px solid #bff7ef}
+.sw.a{border-top:3px solid var(--amber)}
+.sw.p{width:10px;height:2px;border:0;background:rgba(200,255,250,.8)}
+#cursorRead{font-family:var(--font-data);color:var(--fg)}
+.ctrl{display:flex;flex-direction:column;gap:13px}
+.clock{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.clock .t{font-family:var(--font-data);font-size:34px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.btn{font:inherit;font-size:13px;color:var(--bg);background:var(--cyan);border:0;border-radius:4px;padding:7px 12px;cursor:pointer;font-weight:500}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn:hover{filter:brightness(1.08)}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label,.field .lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.field b{font-family:var(--font-data);font-weight:600;color:var(--fg);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--cyan)}
+select{font:inherit;font-size:13px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+.chip.in{color:var(--cyan)} .chip.out{color:var(--amber)} .chip.slack{color:var(--muted)}
+dl.read{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0;font-size:13px}
+dl.read dt{color:var(--muted)}
+dl.read dd{margin:0;text-align:right;font-family:var(--font-data);font-variant-numeric:tabular-nums}
+.sep{border:0;border-top:1px solid var(--line);margin:0}
+.sub{font-size:12px;font-weight:700;color:var(--amber);letter-spacing:.02em}
+.note{font-size:11.5px;color:var(--muted);margin:0}
+.readout{flex-direction:column;align-items:flex-start;gap:2px}
+#depthRead{font-family:var(--font-data);color:var(--cyan)}
+details.api{border:1px solid var(--line);border-radius:4px;padding:8px}
+details.api summary{cursor:pointer;color:var(--cyan);font-size:12.5px;font-weight:600}
+details.api > *+*{margin-top:8px}
+details.api input[type=text],details.api input[type=password]{width:100%;font-family:var(--font-data);font-size:12px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+details.api pre{margin:0;font-family:var(--font-data);font-size:10.5px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px;overflow-x:auto;white-space:pre}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pgrid label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.pgrid select{width:100%;min-width:0}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.lineKey{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;color:var(--muted);margin-bottom:8px;align-items:center}
+.lineKey i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:5px}
+#secInfo{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.casts{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
+.cast{font-family:var(--font-data);font-size:12px;color:var(--fg)}
+.cast b{color:var(--amber);font-weight:600;margin-right:4px}
+.feats{margin:0;padding-left:18px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.warnTxt{color:var(--amber)}
+.tri{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #f0a35e;display:inline-block}
+.hours{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:2px;margin:6px 0;overflow-x:auto}
+.hours button{font-family:var(--font-data);font-size:10px;padding:5px 0;border:1px solid var(--line);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;min-width:0}
+.hours button.dayH{background:rgba(255,184,77,.06)}
+.hours button[aria-pressed="true"]{border-color:var(--cyan);color:var(--cyan);background:color-mix(in srgb,var(--cyan) 18%,transparent);font-weight:600}
+.hours button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+@media (max-width:600px){.hours{grid-template-columns:repeat(12,minmax(0,1fr))}}
+.fish .fn{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.fish .lt{font-size:10.5px;font-weight:400;color:var(--muted)}
+.spark{width:100%;height:26px;display:block}
+.logBox{margin:14px 0 6px;padding:12px;border:1px solid var(--line);border-radius:6px}
+.logForm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.logForm input,.logForm select{font:inherit;font-size:13px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;min-width:0}
+.logForm #logMemo{flex:1 1 160px}
+.logList{list-style:none;padding:0;margin:6px 0 0;font-size:13px;display:grid;gap:4px}
+.linkBtn{font:inherit;font-size:12px;background:none;border:0;color:var(--amber);cursor:pointer;text-decoration:underline}
+#biteChart{width:100%;height:120px;display:block;touch-action:none;cursor:ew-resize;border-radius:4px;margin:6px 0 2px}
+.bestH{font-family:var(--font-data);font-size:10.5px;color:var(--muted)}
+dl.rock{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0;font-size:12px}
+dl.rock dt{color:var(--muted)}
+dl.rock dd{margin:0;color:var(--fg)}
+#rockInfo dl.rock{margin:4px 0 6px;max-width:640px}
+.note a{color:var(--cyan)}
+.note b{color:var(--fg);font-weight:600}
+input[type=file]{font:inherit;font-size:12px;color:var(--muted);max-width:100%}
+input[type=file]::file-selector-button{font:inherit;font-size:12px;color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:4px;padding:5px 10px;margin-right:8px;cursor:pointer}
+.dataRow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--font-data);font-size:12px}
+.btn.small{padding:4px 10px;font-size:12px}
+.stage.drop{outline:2px dashed var(--amber);outline-offset:-6px}
+.stats{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--font-data);font-size:12px;color:var(--muted);align-items:center}
+.stats b{color:var(--fg);font-weight:600}
+#secWrap{position:relative;width:100%}
+#sec{display:block;width:100%;touch-action:pan-y}
+footer{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:90ch}
+footer p{margin:0}
+footer a{color:var(--cyan)}
+
+.min0{min-width:0}
+.stHead{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+#stSel{width:100%;min-width:0}
+.dataRow #dataCount{min-width:0}
+.stName{font-size:20px;font-weight:700;color:var(--cyan);line-height:1.2}
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px 4px;padding-top:6px}
+.days button{font:inherit;position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 2px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;min-width:0}
+.days button .dd{font-family:var(--font-data);font-size:10.5px;color:var(--fg);white-space:nowrap}
+.days button .mm{font-size:10.5px;white-space:nowrap}
+.days button i{position:absolute;top:-7px;right:-2px;font-style:normal;font-size:9px;background:var(--amber);color:var(--bg);border-radius:3px;padding:0 3px;font-weight:700}
+.days button[aria-selected="true"]{border-color:var(--cyan);background:color-mix(in srgb,var(--cyan) 15%,transparent)}
+.days button[aria-selected="true"] .mm{color:var(--cyan);font-weight:600}
+.days button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+#tideChart{width:100%;height:130px;display:block;cursor:pointer;touch-action:none;border-radius:4px;background:#04090c}
+.evs{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--muted)}
+.evs .ev b{font-family:var(--font-data);color:var(--fg)}
+.evs .ev.H b{color:var(--amber)}
+#bite .days{max-width:640px;margin-bottom:8px}
+.lvKey{display:flex;flex-wrap:wrap;gap:6px}
+.lv{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.lv.hi{color:#5ff0a8}.lv.mid{color:var(--amber)}.lv.lo{color:#8fb3ba}.lv.none{color:#55707a}
+.fishGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:8px}
+.fish{border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#081419}
+.fish.none{opacity:.55}
+.fish .pic{background:radial-gradient(ellipse at 50% 60%,#0f2a33,#081419 70%);border-radius:4px;aspect-ratio:2/1;display:flex;align-items:center;justify-content:center}
+.fish .pic svg{width:92%;height:auto}
+.fish .fn{font-weight:700;font-size:14px}
+.fish .fp{display:flex;justify-content:space-between;align-items:center}
+.fish .fp b{font-family:var(--font-data);font-size:18px;font-variant-numeric:tabular-nums}
+.fish .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.fish .bar i{display:block;height:100%;background:var(--cyan)}
+.fish.hi .bar i{background:#5ff0a8}.fish.mid .bar i{background:var(--amber)}.fish.lo .bar i{background:#5f8790}
+.basis{margin-top:12px;font-size:12px}
+.basis summary{cursor:pointer;color:var(--cyan)}
+.basis p{margin:8px 0;max-width:90ch}
+.tblWrap{overflow-x:auto}
+.basis table{border-collapse:collapse;font-family:var(--font-data);font-size:11.5px}
+.basis th,.basis td{border:1px solid var(--line);padding:3px 8px;text-align:center}
+.basis th{color:var(--muted);font-weight:400}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>낚시<span>광</span></h1>
+      <span class="tag">실제 해안선 · 수심은 추정값</span>
+    </div>
+    <span class="src">해안선: © OpenStreetMap 기여자 (2026.10.03) + 통계청 SGIS</span>
+  </header>
+
+  <section class="grid">
+    <div class="panel">
+      <div class="ph">
+        <h2>평면도<small id="viewSize">—</small></h2>
+        <span class="hint" id="modeHint">드래그해서 단면선 긋기 · 휠로 확대/축소</span>
+      </div>
+      <div class="tools">
+        <div class="seg" role="group" aria-label="드래그 동작">
+          <button type="button" id="mLine" aria-pressed="true">단면선 긋기</button>
+          <button type="button" id="mPan" aria-pressed="false">지도 이동</button>
+        </div>
+        <div class="seg" role="group" aria-label="지역 바로가기">
+          <button type="button" data-bb="124.4,32.9,131.95,38.7">전국</button>
+          <button type="button" data-bb="128.25,35.3,129.65,38.65">동해안</button>
+          <button type="button" data-bb="126.0,34.15,129.35,35.25">남해안</button>
+          <button type="button" data-bb="125.9,34.5,127.0,37.8">서해안</button>
+          <button type="button" data-bb="126.1,33.15,127.0,33.6">제주</button>
+        </div>
+        <div class="seg" id="styleSeg" role="group" aria-label="지도 색">
+          <button type="button" data-style="terrain" aria-pressed="true">지형</button>
+          <button type="button" data-style="dark" aria-pressed="false">기본</button>
+        </div>
+        <div class="seg" id="layerSeg" role="group" aria-label="지도 표시 켜고 끄기">
+          <button type="button" data-layer="port" aria-pressed="true">항구</button>
+          <button type="button" data-layer="rock" aria-pressed="true">갯바위</button>
+          <button type="button" data-layer="flow" aria-pressed="true">조류 흐름</button>
+        </div>
+        <div class="seg" role="group" aria-label="확대">
+          <button type="button" id="zOut" aria-label="축소">−</button>
+          <button type="button" id="zIn" aria-label="확대">+</button>
+        </div>
+      </div>
+      <form class="coord" id="coordForm">
+        <input id="coordIn" type="search" list="nameList" autocomplete="off" placeholder="항구·갯바위 이름 (예: 주문진항, 대변항)" aria-label="항구 또는 갯바위 이름">
+        <datalist id="nameList"></datalist>
+        <button class="btn" type="submit">찾기</button>
+        <a class="btn ghost" id="kakaoLink" href="https://map.kakao.com/" target="_blank" rel="noopener" title="새 창에서 카카오맵이 열립니다. 오른쪽 위 스카이뷰를 누르면 위성사진으로 볼 수 있습니다">카카오맵에서 보기 ↗</a>
+        <span class="msg" id="coordMsg"></span>
+      </form>
+      <div class="stage" id="stage">
+        <canvas id="base"></canvas>
+        <canvas id="flow"></canvas>
+        <canvas id="ui" aria-label="평면도: 드래그해서 단면선 지정"></canvas>
+        <div class="warn" id="warn" hidden>이 배율에서는 해안선이 실제와 수십 m 어긋날 수 있습니다</div>
+      </div>
+      <div class="legend">
+        <span id="bandTitle">해안선에서 거리</span>
+        <div class="bands" id="bandLegend"></div>
+        <span class="key"><span class="sw"></span>해안선</span>
+        <span class="key"><span class="sw a"></span>단면선</span>
+        <span class="key"><span class="tri"></span>갯바위</span>
+        <span class="key"><span class="sw p"></span>조류 흐름(해안 따라 오가는 모식)</span>
+      </div>
+      <p class="note" id="terrainNote">지형: GEBCO 2026 격자(15초 ≈ 460 m)의 육지 표고와 바다 수심에 북서쪽 빛 음영을 넣었습니다. 바다는 수심 구간(0·2·5·10·15·20·30·40·50·75·100·150·200·300·500 m…)별로 색을 나누고, 확대할수록 등심선이 2·5·10 m 단위까지 촘촘해지며 숫자가 붙습니다. 해안 150 m 안은 "추정 수심 설정"의 경사로 계산하고 800 m 밖은 GEBCO, 그 사이는 거리에 따라 섞습니다(커서 수심과 같은 식). 육지 등고선은 200 m 간격. 해안선·방파제·해변·갯바위·갯벌·등대·섬/항/방조제 이름은 오픈스트리트맵(ODbL) 자료입니다. 이름이 없는 방파제 묶음에는 가장 가까운 마을 이름으로 "○○리 앞 포구*"라고 표시했습니다(*는 실제 항 이름이 확인되지 않았다는 뜻). 그 밖의 지형은 그 안팎의 지형은 460 m 칸을 부드럽게 이은 것이라 항구 한 곳을 크게 확대하면 세부(방파제·갯바위·수중여)는 나오지 않습니다. 산 높이도 평균되어 실제보다 낮게 나옵니다(예: 한라산 1,947 m → 약 1,840 m).</p>
+      <div class="legend readout"><span id="cursorRead">커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다</span><span id="depthRead"></span></div>
+    </div>
+
+    <aside class="panel ctrl">
+      <div class="stHead">
+        <div class="min0">
+          <div class="hint">포인트 (항 5 km 간격 · 갯바위)</div>
+          <div class="stName" id="stName">—</div>
+          <div class="hint" id="stReg"></div>
+        </div>
+        <select id="stSel" aria-label="포인트 선택"></select>
+      </div>
+      <div id="ptInfo"></div>
+      <div class="days" id="dayStrip" role="tablist" aria-label="날짜 선택"></div>
+      <canvas id="tideChart" aria-label="하루 조석 곡선. 눌러서 시각 선택"></canvas>
+      <div class="evs" id="dayEvents"></div>
+      <div class="clock">
+        <div>
+          <div class="hint">시각</div>
+          <div class="t" id="clock">06:00</div>
+        </div>
+        <button class="btn" id="play" type="button">재생</button>
+      </div>
+      <input type="range" id="tIn" min="0" max="23.99" step="0.05" value="6" aria-label="시각">
+      <div><span class="chip in" id="tideChip">들물</span></div>
+      <dl class="read">
+        <dt>조위 (기본수준면 기준)</dt><dd id="etaVal">—</dd>
+        <dt>다음 만조</dt><dd id="nextHW">—</dd>
+        <dt>다음 간조</dt><dd id="nextLW">—</dd>
+        <dt>물흐름 세기 (그날 최강 대비)</dt><dd id="curVal">—</dd>
+        <dt>물때</dt><dd id="curDir">—</dd>
+      </dl>
+      <div class="sub">조류 예보 <small id="crSrc" class="hint">—</small></div>
+      <dl class="read">
+        <dt>지금 흐름</dt><dd id="crNow">—</dd>
+        <dt>이날 물돌이 · 최강</dt><dd id="crDay">—</dd>
+      </dl>
+      <div class="sub">예보 <small id="wxSlot" class="hint">—</small></div>
+      <dl class="read">
+        <dt>풍향 · 풍속</dt><dd id="wxWind">—</dd>
+        <dt>파고</dt><dd id="wxWave">—</dd>
+        <dt>현재 수온</dt><dd id="wxSst">—</dd>
+      </dl>
+      <p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · 마지막 갱신 <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
+      <p class="note">조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」(공공데이터포털 Open API, 2026년 10월 4일 내려받음, 199개 지점). 지점별 물돌이(전류)·최강 유속 시각과 유향·유속이며, 그 사이 유속은 사인 곡선으로 보간했습니다. 관측 조류를 조화분석한 천문 예측이라 바람·파도·하천 유량의 영향은 빠져 있고, 조류는 수로·곶마다 크게 달라 예보 지점에서 멀수록 세기와 방향이 어긋납니다. 15 km 안에 지점이 없으면(동해안 대부분) 조위 변화 속도로 추정합니다. 지도 화살표는 예보 지점의 그 시각 흐름이고, 흐름 입자는 예보 지점 근처에서는 그 방향을, 해안 가까이에서는 해안선을 따르도록 그린 그림이라 실제 유선은 아닙니다. 파고 예보가 없는 곳은 조과 지수에 파고를 반영하지 않습니다.</p>
+      <hr class="sep">
+      <div class="sub">추정 수심 설정</div>
+      <div class="field">
+        <label for="slopeIn">해저 경사 (해안 근처)</label>
+        <select id="slopeIn">
+          <option value="4">급경사 갯바위 (1:4)</option>
+          <option value="8" selected>갯바위 (1:8)</option>
+          <option value="20">자갈·혼합 (1:20)</option>
+          <option value="50">모래 해변 (1:50)</option>
+          <option value="200">갯벌 (1:200)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="dmaxIn">먼바다 수심 상한 <b id="dmaxOut">30 m</b></label>
+        <input type="range" id="dmaxIn" min="5" max="80" step="1" value="30">
+      </div>
+      <p class="note">실측·해도·BADA 수심이 없는 곳에서, 해안선 150 m 안쪽은 이 가정값을, 800 m 밖은 GEBCO 수심을 쓰고 그 사이는 거리에 따라 섞습니다. 해안선에서 멀어질수록 고른 경사로 깊어지다가 '상한'에 가까워지면 더 깊어지지 않게 계산합니다 (수심 = 상한 × (1 − e<sup>−거리/(상한×경사)</sup>)). 단면도에는 점선과 '추정'으로 표시됩니다.</p>
+      <hr class="sep">
+      <div class="sub">내 자료 불러오기</div>
+      <div class="field">
+        <label for="portFile">항·포구 목록 (CSV)</label>
+        <input type="file" id="portFile" accept=".csv,.txt,text/csv">
+      </div>
+      <div class="field">
+        <label for="rockFile">갯바위 낚시 포인트 (CSV)</label>
+        <input type="file" id="rockFile" accept=".csv,.txt,text/csv">
+      </div>
+      <label class="chk"><input type="checkbox" id="showBoat"> 배로만 갈 수 있는 갯바위도 표시</label>
+      <div class="field">
+        <label for="depthType">수심 자료 종류 (우선순위 순)</label>
+        <select id="depthType">
+          <option value="survey">1. 사용자 실측·고해상도 측심</option>
+          <option value="coastal">2. 연안해역기본도 (GeoJSON 변환)</option>
+          <option value="chart">3. 전자해도·항만도</option>
+          <option value="bada">4. BADA2024 (150 m 격자)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="depthFile">수심 자료 (CSV · JSON · GeoJSON)</label>
+        <input type="file" id="depthFile" accept=".csv,.txt,.json,.geojson,text/csv,application/json">
+      </div>
+      <div class="field">
+        <label for="structFile">해안 구조물 · 방파제 · 부두 (GeoJSON)</label>
+        <input type="file" id="structFile" accept=".json,.geojson,application/json">
+      </div>
+      <p class="note">CSV를 지도 위에 끌어놓아도 됩니다. 항은 <b>명칭·위도·경도</b>, 수심은 <b>위도·경도·수심</b>(선택: source, resolution) 열이 필요합니다. GeoJSON은 점·등심선(LineString)을 받고, 수심 속성(수심, depth, VALSOU, VALDCO, 심도 등)을 자동으로 찾습니다. 등심선은 자료 해상도 간격으로만 샘플링합니다. 불러온 자료는 이 브라우저에만 남습니다.</p>
+      <p class="note" id="dataMsg" aria-live="polite"></p>
+      <div class="dataRow"><span id="dataCount">항·포구 0곳 · 수심 0점</span><button class="btn ghost small" id="clearData" type="button" hidden>지우기</button></div>
+      <details class="api">
+        <summary>방파제·항만 지형 넣는 법</summary>
+        <p class="note">기본 지도에는 오픈스트리트맵의 방파제·부두가 이미 들어 있습니다. 빠진 시설을 더하고 싶을 때만 쓰세요. <a href="https://overpass-turbo.eu/" target="_blank" rel="noopener">overpass-turbo.eu</a>에서 원하는 지역을 화면에 띄우고 아래 질의를 붙여 실행한 뒤 <b>내보내기 → GeoJSON</b>으로 받은 파일을 "해안 구조물"에 넣으세요 (OpenStreetMap 자료, ODbL).</p>
+        <pre id="overpassQ">[out:json][timeout:90];
+(
+  way["man_made"~"breakwater|groyne|pier|quay"]({{bbox}});
+  way["waterway"="dam"]({{bbox}});
+  way["man_made"="dyke"]({{bbox}});
+  way["natural"="coastline"]({{bbox}});
+);
+out geom;</pre>
+        <button class="btn ghost small" id="copyOverpass" type="button">질의 복사</button>
+        <p class="note">연안해역기본도 SHP는 <a href="https://mapshaper.org/" target="_blank" rel="noopener">mapshaper.org</a>에서 GeoJSON(경위도, WGS84)으로 바꿔 "2. 연안해역기본도"로 넣으면 됩니다.</p>
+      </details>
+      <details class="api">
+        <summary>공공 수심 API (BADA2024)</summary>
+        <p class="note">공공데이터포털 <a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">자연과학용 수심정보 조회</a>를 활용신청한 뒤, 마이페이지에 나오는 <b>요청 주소 예시</b>를 그대로 붙여 넣으세요. 주소와 파라미터 이름은 이 페이지가 추측하지 않습니다.</p>
+        <div class="field"><label for="apiUrl">요청 주소 예시 (https://…)</label><input type="text" id="apiUrl" autocomplete="off" spellcheck="false"></div>
+        <div class="field"><label for="apiKey">서비스키 (Decoding) · 이 탭에만 저장</label><input type="password" id="apiKey" autocomplete="off"></div>
+        <p class="note" id="apiParamsNote"></p>
+        <div class="pgrid">
+          <label>최소 위도<select id="pMinLat"></select></label>
+          <label>최대 위도<select id="pMaxLat"></select></label>
+          <label>최소 경도<select id="pMinLon"></select></label>
+          <label>최대 경도<select id="pMaxLon"></select></label>
+        </div>
+        <div class="field"><label for="apiProxy">프록시 주소 (선택, 끝에 대상 주소가 붙음)</label><input type="text" id="apiProxy" autocomplete="off" spellcheck="false" placeholder="https://내-프록시/?url="></div>
+        <div class="dataRow"><label class="chk"><input type="checkbox" id="apiAuto"> 지도 이동 시 자동</label><button class="btn small" id="apiGo" type="button">현재 화면 불러오기</button></div>
+        <p class="note" id="apiMsg" aria-live="polite">지도 폭 15 km 이하에서 0.03° 타일 단위로 요청하고, 받은 타일은 다시 요청하지 않습니다.</p>
+      </details>
+      <p class="note">기본 탑재 716곳: 국가어항 구역 82곳(구역 중심점), 해양수산부 어항정보, 충남 어항, 전남·제주 소규모항·어촌정주어항. 차로 갈 수 없는 전라·남해 섬은 섬마다 대표 항 하나만 남겼습니다. 지도에서 고를 수 있는 포인트는 이 중 5 km 안에 하나씩입니다. 다른 지역 항 좌표 자료: 공공데이터포털
+        <a href="https://www.data.go.kr/data/15148635/fileData.do" target="_blank" rel="noopener">소규모항</a> ·
+        <a href="https://www.data.go.kr/data/15147417/fileData.do" target="_blank" rel="noopener">어촌정주어항</a>
+        (해양수산부 공동활용체계)</p>
+    </aside>
+  </section>
+
+  <section class="panel">
+    <div class="ph">
+      <h2>측면도<small>단면 A → B</small></h2>
+      <div class="stats">
+        <span>길이 <b id="sLen">—</b></span>
+        <span>해안선 교차 <b id="sCross">—</b></span>
+        <span>최대 수심 <b id="sMax">—</b></span>
+        <span>실측·공공자료 구간 <b id="sMeas">—</b></span>
+        <span>예측 조위 <b id="sTide">—</b></span>
+        <button class="btn ghost" id="toSec" type="button">단면 위치로 이동</button>
+      </div>
+    </div>
+    <div class="lineKey">
+      <span><i style="border-top:3px solid #d6fff9"></i>실측</span>
+      <span><i style="border-top:3px solid #7ff3e6"></i>연안해역기본도</span>
+      <span><i style="border-top:3px solid #8fd3ff"></i>전자해도·항만도</span>
+      <span><i style="border-top:1.5px solid #c4b5ff"></i>BADA2024</span>
+      <span><i style="border-top:2px dashed #7ff3e6"></i>해안거리 추정</span>
+      <span class="hint">흐린 실선 = 자료점 사이 보간 · 예측 조위는 기준면 일치가 확인되지 않아 수심에 더하지 않습니다</span>
+    </div>
+    <div id="secWrap"><canvas id="sec" aria-label="단면도"></canvas></div>
+    <div id="secInfo"></div>
+  </section>
+
+  <section class="panel" id="bite">
+    <div class="ph">
+      <h2>조과 현황<small id="biteSub">—</small></h2>
+      <div class="lvKey"><span class="lv hi">높음 60%+</span><span class="lv mid">보통 40–59%</span><span class="lv lo">낮음 1–39%</span><span class="lv none">없음 0%</span></div>
+    </div>
+    <div class="days" id="biteDays" role="tablist" aria-label="날짜 선택"></div>
+    <canvas id="biteChart" aria-label="시간별 최고 조과 지수와 조석. 좌우로 끌어서 시간 선택"></canvas>
+    <p class="note">그래프를 좌우로 끌어 시간을 고릅니다. 막대는 그 시간에 가장 높은 어종의 지수, 선은 조석입니다.</p>
+    <p class="note" id="biteWin"></p>
+    <div id="rockInfo"></div>
+    <div class="fishGrid" id="fishGrid"></div>
+    <div class="logBox">
+      <div class="sub">내 조황 기록 <small class="hint" id="logCount"></small></div>
+      <form id="logForm" class="logForm">
+        <span class="hint">포인트: <b id="logPt">—</b></span>
+        <input type="date" id="logDate" aria-label="날짜">
+        <input type="time" id="logHour" aria-label="시각">
+        <select id="logSpecies" aria-label="어종"></select>
+        <input type="number" id="logCount2" min="0" max="999" value="1" aria-label="마릿수" style="width:70px">
+        <input type="text" id="logMemo" maxlength="120" placeholder="메모 (채비·미끼 등)" aria-label="메모">
+        <button class="btn" type="submit">기록</button>
+      </form>
+      <p class="note" id="logMsg">다녀온 출조를 남기면, 같은 해역 기록에서 그 어종을 잡은 비율로 지수를 0.5~1.5배 보정합니다 (기록이 적을 땐 보정이 작게 들어갑니다). 못 잡은 날도 "꽝"으로 남겨야 정확해집니다.</p>
+      <ul class="logList" id="logList"></ul>
+    </div>
+    <details class="basis">
+      <summary>입질 지수는 어떻게 계산하나요?</summary>
+      <p class="note">실제 조과 통계가 아니라 규칙으로 만든 추정 지수입니다. 시간마다 <b>시즌(현재 10월 기준값) × 해역 출현 × 물때 세기 × 파고 × 수온 × 내 기록 보정 × 시간대 밝기 × 그 시각 물흐름</b>을 곱하고 0.9를 더 곱합니다. 수온은 국립해양조사원 조위관측소의 실측 수온(50 km 안, 24시간 안의 값만)과 FishBase의 어종별 서식 수온(AquaMaps 모델값)을 비교해, 범위를 1 ℃ 벗어날 때마다 0.1씩 낮춥니다(노래미·전갱이·대구·잿방어는 범위 자료가 한국 연안에 맞지 않아 반영하지 않음). 곱셈이라 조건 하나만 나빠도 크게 내려가며, 해뜰녘·해질녘(해 뜨고 지는 시각 ±1시간 15분)처럼 어종이 잘 무는 시간대에 물이 그날 최강 유속의 65% 안팎으로 흐를 때만 "높음"이 나옵니다. 물흐름은 15 km 안에 국립해양조사원 조류 예보 지점이 있으면 그 지점의 예보 유속을, 없으면 조위 변화 속도를 씁니다. <b>조차가 작은 바다</b>(가까운 조석 관측소의 7일 예보에서 최고·최저 조위 차가 60 cm 미만인 곳: 속초·주문진·묵호·후포·포항·울산·울릉도, 20~48 cm)는 조석 흐름이 약하고 물흐름이 주로 바람과 해류로 정해지므로, 물때 세기와 조위 변화 속도는 넣지 않고 그 평균값(중립)을 곱합니다. 대신 풍속을 반영해 7 m/s 초과 0.85배, 10 m/s 초과 0.6배, 13 m/s 초과(풍랑주의보 기준 14 m/s 부근) 0.35배로 낮추고, 수온은 1 ℃ 벗어날 때마다 0.15씩 낮춥니다. 이 기준값들도 제가 정한 값입니다. 파고는 1 m를 넘으면 감점, 2.5 m를 넘으면 크게 감점합니다. 갯바위 포인트 자료에 주요 대상어가 적혀 있으면 목록에 없는 어종은 0.55배로 낮춥니다. 시간대 성향(낮·밤·해뜰녘·해질녘)과 아래 점수는 일반적인 낚시 정보를 바탕으로 제가 정한 값이라 검증된 수치가 아닙니다. 물고기 그림은 실사 사진이 아닌 일러스트입니다.</p>
+      <div class="tblWrap"><table id="basisTable"></table></div>
+    </details>
+  </section>
+
+  <footer>
+    <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
+    <p>수심은 사용자 실측 → 연안해역기본도 → 전자해도·항만도 → BADA2024 → GEBCO 2026(해안 가까이는 해안거리 추정과 혼합) 순으로 찾고, 높은 순위 자료가 있는 곳에서는 낮은 순위 자료와 섞지 않습니다. 보간 반경은 자료 해상도의 2배(BADA는 225 m)이며, 화면 안에서는 육지·구조물을 사이에 둔 자료점을 쓰지 않습니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대, 바다를 건너는 다리, 방조제 안쪽 호수(시화호·새만금호 등)는 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL) 자료를 2026년 10월 3일 내려받아 넣었고, 방파제·부두는 육지(구조물)로 처리해 항 안쪽과 바깥을 구분합니다. 오픈스트리트맵은 자원봉사자가 그린 지도라 빠지거나 오래된 시설이 있을 수 있습니다.</p>
+    <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
+    <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
+    <p>조석·수온은 해양수산부 국립해양조사원(<a href="https://www.data.go.kr/data/15156018/openapi.do" target="_blank" rel="noopener">조석예보(고, 저조)</a>, <a href="https://www.data.go.kr/data/15155508/openapi.do" target="_blank" rel="noopener">조위관측소 최신 관측데이터</a>), 풍향·풍속·파고는 <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noopener">기상청 단기예보 조회서비스</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다. 음력 날짜는 korean_lunar_calendar(한국천문연구원 음양력 기준)로 계산했습니다.</p>
+  </footer>
+</div>
+
+/*STATIC_SCRIPTS*/
+<script>
+/*COAST_DATA*/
+</script>
+<script>
+/*APP*/
+</script>

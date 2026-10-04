@@ -19,14 +19,14 @@ concurrency:
 
 jobs:
   collect:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - run: pip install requests
+      - run: pip install requests korean_lunar_calendar
       - name: 수집
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
@@ -37,5 +37,7 @@ jobs:
           git config user.name "naksigwang-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          git diff --cached --quiet || git commit -m "data: $(date -u -d '+9 hours' '+%Y-%m-%d %H:%M') KST"
+          git diff --cached --quiet && exit 0
+          git commit -m "data: $(date -u -d '+9 hours' '+%Y-%m-%d %H:%M') KST"
+          git pull --rebase origin main
           git push

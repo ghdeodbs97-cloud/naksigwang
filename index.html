@@ -1,0 +1,2520 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+<title>낚시광</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 소나 장비 화면 — 왼쪽 큰 평면도(실제 해안선) + 오른쪽 계기판, 아래 전폭 단면도. 단일 다크 테마(의도적). */
+:root{
+  color-scheme: dark;
+  --bg:#060f13;
+  --panel:#0a181e;
+  --line:#173039;
+  --fg:#d5ecee;
+  --muted:#7a9ea6;
+  --cyan:#4fe3d3;
+  --amber:#ffb84d;
+  --font-ui:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  --font-data:'JetBrains Mono',ui-monospace,'SFMono-Regular',Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--font-ui);font-size:14px;line-height:1.55}
+.app{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:18px 28px;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;justify-content:space-between}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-0.01em}
+.brand h1 span{color:var(--cyan)}
+.tag{font-family:var(--font-data);font-size:11px;letter-spacing:.06em;color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 45%,transparent);padding:2px 8px;border-radius:3px}
+.src{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px;min-width:0}
+.ph{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;margin-bottom:10px}
+.ph h2{margin:0;font-size:14px;font-weight:700}
+.ph h2 small{font-weight:400;color:var(--muted);margin-left:6px;font-size:12px;font-family:var(--font-data)}
+.hint{font-size:12px;color:var(--muted)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;flex-wrap:wrap}
+.seg button{font:inherit;font-size:12px;color:var(--muted);background:transparent;border:0;padding:6px 11px;cursor:pointer;min-width:34px}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:color-mix(in srgb,var(--cyan) 18%,transparent);color:var(--cyan);font-weight:600}
+.seg button:hover{color:var(--fg)}
+.seg button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
+.coord{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.coord input{flex:1 1 240px;min-width:0;font-family:var(--font-data);font-size:13px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 10px}
+.coord a.btn{text-decoration:none;display:inline-flex;align-items:center}
+.coord .btn.ghost{background:transparent;color:var(--cyan);border:1px solid var(--line)}
+.coord .msg{font-size:12px;color:var(--amber)}
+.stage{position:relative;width:100%;border-radius:4px;overflow:hidden;background:#06131d}
+.stage canvas{position:absolute;inset:0;display:block}
+#ui{touch-action:none;cursor:crosshair}
+#ui.pan{cursor:grab}
+.warn{position:absolute;left:60px;top:26px;font-size:12px;color:var(--amber);background:rgba(6,15,19,.85);border:1px solid color-mix(in srgb,var(--amber) 40%,transparent);border-radius:4px;padding:4px 9px;max-width:calc(100% - 76px);pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.bands{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.bands .b{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-data);font-size:10.5px;color:var(--fg)}
+.bands .b i{width:14px;height:10px;border-radius:2px;display:inline-block}
+.key{display:inline-flex;align-items:center;gap:6px}
+.sw{width:18px;height:0;border-top:2px solid #bff7ef}
+.sw.a{border-top:3px solid var(--amber)}
+.sw.p{width:10px;height:2px;border:0;background:rgba(200,255,250,.8)}
+#cursorRead{font-family:var(--font-data);color:var(--fg)}
+.ctrl{display:flex;flex-direction:column;gap:13px}
+.clock{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.clock .t{font-family:var(--font-data);font-size:34px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.btn{font:inherit;font-size:13px;color:var(--bg);background:var(--cyan);border:0;border-radius:4px;padding:7px 12px;cursor:pointer;font-weight:500}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn:hover{filter:brightness(1.08)}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label,.field .lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.field b{font-family:var(--font-data);font-weight:600;color:var(--fg);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--cyan)}
+select{font:inherit;font-size:13px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+.chip.in{color:var(--cyan)} .chip.out{color:var(--amber)} .chip.slack{color:var(--muted)}
+dl.read{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0;font-size:13px}
+dl.read dt{color:var(--muted)}
+dl.read dd{margin:0;text-align:right;font-family:var(--font-data);font-variant-numeric:tabular-nums}
+.sep{border:0;border-top:1px solid var(--line);margin:0}
+.sub{font-size:12px;font-weight:700;color:var(--amber);letter-spacing:.02em}
+.note{font-size:11.5px;color:var(--muted);margin:0}
+.readout{flex-direction:column;align-items:flex-start;gap:2px}
+#depthRead{font-family:var(--font-data);color:var(--cyan)}
+details.api{border:1px solid var(--line);border-radius:4px;padding:8px}
+details.api summary{cursor:pointer;color:var(--cyan);font-size:12.5px;font-weight:600}
+details.api > *+*{margin-top:8px}
+details.api input[type=text],details.api input[type=password]{width:100%;font-family:var(--font-data);font-size:12px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+details.api pre{margin:0;font-family:var(--font-data);font-size:10.5px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px;overflow-x:auto;white-space:pre}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pgrid label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.pgrid select{width:100%;min-width:0}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.lineKey{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;color:var(--muted);margin-bottom:8px;align-items:center}
+.lineKey i{display:inline-block;width:18px;height:0;vertical-align:middle;margin-right:5px}
+#secInfo{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.casts{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
+.cast{font-family:var(--font-data);font-size:12px;color:var(--fg)}
+.cast b{color:var(--amber);font-weight:600;margin-right:4px}
+.feats{margin:0;padding-left:18px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.warnTxt{color:var(--amber)}
+.tri{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #f0a35e;display:inline-block}
+.hours{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:2px;margin:6px 0;overflow-x:auto}
+.hours button{font-family:var(--font-data);font-size:10px;padding:5px 0;border:1px solid var(--line);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;min-width:0}
+.hours button.dayH{background:rgba(255,184,77,.06)}
+.hours button[aria-pressed="true"]{border-color:var(--cyan);color:var(--cyan);background:color-mix(in srgb,var(--cyan) 18%,transparent);font-weight:600}
+.hours button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+@media (max-width:600px){.hours{grid-template-columns:repeat(12,minmax(0,1fr))}}
+.fish .fn{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.fish .lt{font-size:10.5px;font-weight:400;color:var(--muted)}
+.spark{width:100%;height:26px;display:block}
+.logBox{margin:14px 0 6px;padding:12px;border:1px solid var(--line);border-radius:6px}
+.logForm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.logForm input,.logForm select{font:inherit;font-size:13px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;min-width:0}
+.logForm #logMemo{flex:1 1 160px}
+.logList{list-style:none;padding:0;margin:6px 0 0;font-size:13px;display:grid;gap:4px}
+.linkBtn{font:inherit;font-size:12px;background:none;border:0;color:var(--amber);cursor:pointer;text-decoration:underline}
+#biteChart{width:100%;height:120px;display:block;touch-action:none;cursor:ew-resize;border-radius:4px;margin:6px 0 2px}
+.bestH{font-family:var(--font-data);font-size:10.5px;color:var(--muted)}
+dl.rock{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0;font-size:12px}
+dl.rock dt{color:var(--muted)}
+dl.rock dd{margin:0;color:var(--fg)}
+#rockInfo dl.rock{margin:4px 0 6px;max-width:640px}
+.note a{color:var(--cyan)}
+.note b{color:var(--fg);font-weight:600}
+input[type=file]{font:inherit;font-size:12px;color:var(--muted);max-width:100%}
+input[type=file]::file-selector-button{font:inherit;font-size:12px;color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:4px;padding:5px 10px;margin-right:8px;cursor:pointer}
+.dataRow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--font-data);font-size:12px}
+.btn.small{padding:4px 10px;font-size:12px}
+.stage.drop{outline:2px dashed var(--amber);outline-offset:-6px}
+.stats{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--font-data);font-size:12px;color:var(--muted);align-items:center}
+.stats b{color:var(--fg);font-weight:600}
+#secWrap{position:relative;width:100%}
+#sec{display:block;width:100%;touch-action:pan-y}
+footer{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:90ch}
+footer p{margin:0}
+footer a{color:var(--cyan)}
+
+.min0{min-width:0}
+.stHead{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+#stSel{width:100%;min-width:0}
+.dataRow #dataCount{min-width:0}
+.stName{font-size:20px;font-weight:700;color:var(--cyan);line-height:1.2}
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px 4px;padding-top:6px}
+.days button{font:inherit;position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 2px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;min-width:0}
+.days button .dd{font-family:var(--font-data);font-size:10.5px;color:var(--fg);white-space:nowrap}
+.days button .mm{font-size:10.5px;white-space:nowrap}
+.days button i{position:absolute;top:-7px;right:-2px;font-style:normal;font-size:9px;background:var(--amber);color:var(--bg);border-radius:3px;padding:0 3px;font-weight:700}
+.days button[aria-selected="true"]{border-color:var(--cyan);background:color-mix(in srgb,var(--cyan) 15%,transparent)}
+.days button[aria-selected="true"] .mm{color:var(--cyan);font-weight:600}
+.days button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+#tideChart{width:100%;height:130px;display:block;cursor:pointer;touch-action:none;border-radius:4px;background:#04090c}
+.evs{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--muted)}
+.evs .ev b{font-family:var(--font-data);color:var(--fg)}
+.evs .ev.H b{color:var(--amber)}
+#bite .days{max-width:640px;margin-bottom:8px}
+.lvKey{display:flex;flex-wrap:wrap;gap:6px}
+.lv{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.lv.hi{color:#5ff0a8}.lv.mid{color:var(--amber)}.lv.lo{color:#8fb3ba}.lv.none{color:#55707a}
+.fishGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:8px}
+.fish{border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#081419}
+.fish.none{opacity:.55}
+.fish .pic{background:radial-gradient(ellipse at 50% 60%,#0f2a33,#081419 70%);border-radius:4px;aspect-ratio:2/1;display:flex;align-items:center;justify-content:center}
+.fish .pic svg{width:92%;height:auto}
+.fish .fn{font-weight:700;font-size:14px}
+.fish .fp{display:flex;justify-content:space-between;align-items:center}
+.fish .fp b{font-family:var(--font-data);font-size:18px;font-variant-numeric:tabular-nums}
+.fish .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.fish .bar i{display:block;height:100%;background:var(--cyan)}
+.fish.hi .bar i{background:#5ff0a8}.fish.mid .bar i{background:var(--amber)}.fish.lo .bar i{background:#5f8790}
+.basis{margin-top:12px;font-size:12px}
+.basis summary{cursor:pointer;color:var(--cyan)}
+.basis p{margin:8px 0;max-width:90ch}
+.tblWrap{overflow-x:auto}
+.basis table{border-collapse:collapse;font-family:var(--font-data);font-size:11.5px}
+.basis th,.basis td{border:1px solid var(--line);padding:3px 8px;text-align:center}
+.basis th{color:var(--muted);font-weight:400}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>낚시<span>광</span></h1>
+      <span class="tag">실제 해안선 · 수심은 추정값</span>
+    </div>
+    <span class="src">해안선: © OpenStreetMap 기여자 (2026.10.03) + 통계청 SGIS</span>
+  </header>
+
+  <section class="grid">
+    <div class="panel">
+      <div class="ph">
+        <h2>평면도<small id="viewSize">—</small></h2>
+        <span class="hint" id="modeHint">드래그해서 단면선 긋기 · 휠로 확대/축소</span>
+      </div>
+      <div class="tools">
+        <div class="seg" role="group" aria-label="드래그 동작">
+          <button type="button" id="mLine" aria-pressed="true">단면선 긋기</button>
+          <button type="button" id="mPan" aria-pressed="false">지도 이동</button>
+        </div>
+        <div class="seg" role="group" aria-label="지역 바로가기">
+          <button type="button" data-bb="124.4,32.9,131.95,38.7">전국</button>
+          <button type="button" data-bb="128.25,35.3,129.65,38.65">동해안</button>
+          <button type="button" data-bb="126.0,34.15,129.35,35.25">남해안</button>
+          <button type="button" data-bb="125.9,34.5,127.0,37.8">서해안</button>
+          <button type="button" data-bb="126.1,33.15,127.0,33.6">제주</button>
+        </div>
+        <div class="seg" id="styleSeg" role="group" aria-label="지도 색">
+          <button type="button" data-style="terrain" aria-pressed="true">지형</button>
+          <button type="button" data-style="dark" aria-pressed="false">기본</button>
+        </div>
+        <div class="seg" id="layerSeg" role="group" aria-label="지도 표시 켜고 끄기">
+          <button type="button" data-layer="port" aria-pressed="true">항구</button>
+          <button type="button" data-layer="rock" aria-pressed="true">갯바위</button>
+          <button type="button" data-layer="flow" aria-pressed="true">조류 흐름</button>
+        </div>
+        <div class="seg" role="group" aria-label="확대">
+          <button type="button" id="zOut" aria-label="축소">−</button>
+          <button type="button" id="zIn" aria-label="확대">+</button>
+        </div>
+      </div>
+      <form class="coord" id="coordForm">
+        <input id="coordIn" type="search" list="nameList" autocomplete="off" placeholder="항구·갯바위 이름 (예: 주문진항, 대변항)" aria-label="항구 또는 갯바위 이름">
+        <datalist id="nameList"></datalist>
+        <button class="btn" type="submit">찾기</button>
+        <a class="btn ghost" id="kakaoLink" href="https://map.kakao.com/" target="_blank" rel="noopener" title="새 창에서 카카오맵이 열립니다. 오른쪽 위 스카이뷰를 누르면 위성사진으로 볼 수 있습니다">카카오맵에서 보기 ↗</a>
+        <span class="msg" id="coordMsg"></span>
+      </form>
+      <div class="stage" id="stage">
+        <canvas id="base"></canvas>
+        <canvas id="flow"></canvas>
+        <canvas id="ui" aria-label="평면도: 드래그해서 단면선 지정"></canvas>
+        <div class="warn" id="warn" hidden>이 배율에서는 해안선이 실제와 수십 m 어긋날 수 있습니다</div>
+      </div>
+      <div class="legend">
+        <span id="bandTitle">해안선에서 거리</span>
+        <div class="bands" id="bandLegend"></div>
+        <span class="key"><span class="sw"></span>해안선</span>
+        <span class="key"><span class="sw a"></span>단면선</span>
+        <span class="key"><span class="tri"></span>갯바위</span>
+        <span class="key"><span class="sw p"></span>조류 흐름(해안 따라 오가는 모식)</span>
+      </div>
+      <p class="note" id="terrainNote">지형: GEBCO 2026 격자(15초 ≈ 460 m)의 육지 표고와 바다 수심에 북서쪽 빛 음영을 넣었습니다. 바다는 수심 구간(0·2·5·10·15·20·30·40·50·75·100·150·200·300·500 m…)별로 색을 나누고, 확대할수록 등심선이 2·5·10 m 단위까지 촘촘해지며 숫자가 붙습니다. 해안 150 m 안은 "추정 수심 설정"의 경사로 계산하고 800 m 밖은 GEBCO, 그 사이는 거리에 따라 섞습니다(커서 수심과 같은 식). 육지 등고선은 200 m 간격. 해안선·방파제·해변·갯바위·갯벌·등대·섬/항/방조제 이름은 오픈스트리트맵(ODbL) 자료입니다. 이름이 없는 방파제 묶음에는 가장 가까운 마을 이름으로 "○○리 앞 포구*"라고 표시했습니다(*는 실제 항 이름이 확인되지 않았다는 뜻). 그 밖의 지형은 그 안팎의 지형은 460 m 칸을 부드럽게 이은 것이라 항구 한 곳을 크게 확대하면 세부(방파제·갯바위·수중여)는 나오지 않습니다. 산 높이도 평균되어 실제보다 낮게 나옵니다(예: 한라산 1,947 m → 약 1,840 m).</p>
+      <div class="legend readout"><span id="cursorRead">커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다</span><span id="depthRead"></span></div>
+    </div>
+
+    <aside class="panel ctrl">
+      <div class="stHead">
+        <div class="min0">
+          <div class="hint">포인트 (항 5 km 간격 · 갯바위)</div>
+          <div class="stName" id="stName">—</div>
+          <div class="hint" id="stReg"></div>
+        </div>
+        <select id="stSel" aria-label="포인트 선택"></select>
+      </div>
+      <div id="ptInfo"></div>
+      <div class="days" id="dayStrip" role="tablist" aria-label="날짜 선택"></div>
+      <canvas id="tideChart" aria-label="하루 조석 곡선. 눌러서 시각 선택"></canvas>
+      <div class="evs" id="dayEvents"></div>
+      <div class="clock">
+        <div>
+          <div class="hint">시각</div>
+          <div class="t" id="clock">06:00</div>
+        </div>
+        <button class="btn" id="play" type="button">재생</button>
+      </div>
+      <input type="range" id="tIn" min="0" max="23.99" step="0.05" value="6" aria-label="시각">
+      <div><span class="chip in" id="tideChip">들물</span></div>
+      <dl class="read">
+        <dt>조위 (기본수준면 기준)</dt><dd id="etaVal">—</dd>
+        <dt>다음 만조</dt><dd id="nextHW">—</dd>
+        <dt>다음 간조</dt><dd id="nextLW">—</dd>
+        <dt>물흐름 세기 (그날 최강 대비)</dt><dd id="curVal">—</dd>
+        <dt>물때</dt><dd id="curDir">—</dd>
+      </dl>
+      <div class="sub">조류 예보 <small id="crSrc" class="hint">—</small></div>
+      <dl class="read">
+        <dt>지금 흐름</dt><dd id="crNow">—</dd>
+        <dt>이날 물돌이 · 최강</dt><dd id="crDay">—</dd>
+      </dl>
+      <div class="sub">예보 <small id="wxSlot" class="hint">—</small></div>
+      <dl class="read">
+        <dt>풍향 · 풍속</dt><dd id="wxWind">—</dd>
+        <dt>파고</dt><dd id="wxWave">—</dd>
+        <dt>현재 수온</dt><dd id="wxSst">—</dd>
+      </dl>
+      <p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · 마지막 갱신 <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
+      <p class="note">조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」(공공데이터포털 Open API, 2026년 10월 4일 내려받음, 199개 지점). 지점별 물돌이(전류)·최강 유속 시각과 유향·유속이며, 그 사이 유속은 사인 곡선으로 보간했습니다. 관측 조류를 조화분석한 천문 예측이라 바람·파도·하천 유량의 영향은 빠져 있고, 조류는 수로·곶마다 크게 달라 예보 지점에서 멀수록 세기와 방향이 어긋납니다. 15 km 안에 지점이 없으면(동해안 대부분) 조위 변화 속도로 추정합니다. 지도 화살표는 예보 지점의 그 시각 흐름이고, 흐름 입자는 예보 지점 근처에서는 그 방향을, 해안 가까이에서는 해안선을 따르도록 그린 그림이라 실제 유선은 아닙니다. 파고 예보가 없는 곳은 조과 지수에 파고를 반영하지 않습니다.</p>
+      <hr class="sep">
+      <div class="sub">추정 수심 설정</div>
+      <div class="field">
+        <label for="slopeIn">해저 경사 (해안 근처)</label>
+        <select id="slopeIn">
+          <option value="4">급경사 갯바위 (1:4)</option>
+          <option value="8" selected>갯바위 (1:8)</option>
+          <option value="20">자갈·혼합 (1:20)</option>
+          <option value="50">모래 해변 (1:50)</option>
+          <option value="200">갯벌 (1:200)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="dmaxIn">먼바다 수심 상한 <b id="dmaxOut">30 m</b></label>
+        <input type="range" id="dmaxIn" min="5" max="80" step="1" value="30">
+      </div>
+      <p class="note">실측·해도·BADA 수심이 없는 곳에서, 해안선 150 m 안쪽은 이 가정값을, 800 m 밖은 GEBCO 수심을 쓰고 그 사이는 거리에 따라 섞습니다. 해안선에서 멀어질수록 고른 경사로 깊어지다가 '상한'에 가까워지면 더 깊어지지 않게 계산합니다 (수심 = 상한 × (1 − e<sup>−거리/(상한×경사)</sup>)). 단면도에는 점선과 '추정'으로 표시됩니다.</p>
+      <hr class="sep">
+      <div class="sub">내 자료 불러오기</div>
+      <div class="field">
+        <label for="portFile">항·포구 목록 (CSV)</label>
+        <input type="file" id="portFile" accept=".csv,.txt,text/csv">
+      </div>
+      <div class="field">
+        <label for="rockFile">갯바위 낚시 포인트 (CSV)</label>
+        <input type="file" id="rockFile" accept=".csv,.txt,text/csv">
+      </div>
+      <label class="chk"><input type="checkbox" id="showBoat"> 배로만 갈 수 있는 갯바위도 표시</label>
+      <div class="field">
+        <label for="depthType">수심 자료 종류 (우선순위 순)</label>
+        <select id="depthType">
+          <option value="survey">1. 사용자 실측·고해상도 측심</option>
+          <option value="coastal">2. 연안해역기본도 (GeoJSON 변환)</option>
+          <option value="chart">3. 전자해도·항만도</option>
+          <option value="bada">4. BADA2024 (150 m 격자)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="depthFile">수심 자료 (CSV · JSON · GeoJSON)</label>
+        <input type="file" id="depthFile" accept=".csv,.txt,.json,.geojson,text/csv,application/json">
+      </div>
+      <div class="field">
+        <label for="structFile">해안 구조물 · 방파제 · 부두 (GeoJSON)</label>
+        <input type="file" id="structFile" accept=".json,.geojson,application/json">
+      </div>
+      <p class="note">CSV를 지도 위에 끌어놓아도 됩니다. 항은 <b>명칭·위도·경도</b>, 수심은 <b>위도·경도·수심</b>(선택: source, resolution) 열이 필요합니다. GeoJSON은 점·등심선(LineString)을 받고, 수심 속성(수심, depth, VALSOU, VALDCO, 심도 등)을 자동으로 찾습니다. 등심선은 자료 해상도 간격으로만 샘플링합니다. 불러온 자료는 이 브라우저에만 남습니다.</p>
+      <p class="note" id="dataMsg" aria-live="polite"></p>
+      <div class="dataRow"><span id="dataCount">항·포구 0곳 · 수심 0점</span><button class="btn ghost small" id="clearData" type="button" hidden>지우기</button></div>
+      <details class="api">
+        <summary>방파제·항만 지형 넣는 법</summary>
+        <p class="note">기본 지도에는 오픈스트리트맵의 방파제·부두가 이미 들어 있습니다. 빠진 시설을 더하고 싶을 때만 쓰세요. <a href="https://overpass-turbo.eu/" target="_blank" rel="noopener">overpass-turbo.eu</a>에서 원하는 지역을 화면에 띄우고 아래 질의를 붙여 실행한 뒤 <b>내보내기 → GeoJSON</b>으로 받은 파일을 "해안 구조물"에 넣으세요 (OpenStreetMap 자료, ODbL).</p>
+        <pre id="overpassQ">[out:json][timeout:90];
+(
+  way["man_made"~"breakwater|groyne|pier|quay"]({{bbox}});
+  way["waterway"="dam"]({{bbox}});
+  way["man_made"="dyke"]({{bbox}});
+  way["natural"="coastline"]({{bbox}});
+);
+out geom;</pre>
+        <button class="btn ghost small" id="copyOverpass" type="button">질의 복사</button>
+        <p class="note">연안해역기본도 SHP는 <a href="https://mapshaper.org/" target="_blank" rel="noopener">mapshaper.org</a>에서 GeoJSON(경위도, WGS84)으로 바꿔 "2. 연안해역기본도"로 넣으면 됩니다.</p>
+      </details>
+      <details class="api">
+        <summary>공공 수심 API (BADA2024)</summary>
+        <p class="note">공공데이터포털 <a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">자연과학용 수심정보 조회</a>를 활용신청한 뒤, 마이페이지에 나오는 <b>요청 주소 예시</b>를 그대로 붙여 넣으세요. 주소와 파라미터 이름은 이 페이지가 추측하지 않습니다.</p>
+        <div class="field"><label for="apiUrl">요청 주소 예시 (https://…)</label><input type="text" id="apiUrl" autocomplete="off" spellcheck="false"></div>
+        <div class="field"><label for="apiKey">서비스키 (Decoding) · 이 탭에만 저장</label><input type="password" id="apiKey" autocomplete="off"></div>
+        <p class="note" id="apiParamsNote"></p>
+        <div class="pgrid">
+          <label>최소 위도<select id="pMinLat"></select></label>
+          <label>최대 위도<select id="pMaxLat"></select></label>
+          <label>최소 경도<select id="pMinLon"></select></label>
+          <label>최대 경도<select id="pMaxLon"></select></label>
+        </div>
+        <div class="field"><label for="apiProxy">프록시 주소 (선택, 끝에 대상 주소가 붙음)</label><input type="text" id="apiProxy" autocomplete="off" spellcheck="false" placeholder="https://내-프록시/?url="></div>
+        <div class="dataRow"><label class="chk"><input type="checkbox" id="apiAuto"> 지도 이동 시 자동</label><button class="btn small" id="apiGo" type="button">현재 화면 불러오기</button></div>
+        <p class="note" id="apiMsg" aria-live="polite">지도 폭 15 km 이하에서 0.03° 타일 단위로 요청하고, 받은 타일은 다시 요청하지 않습니다.</p>
+      </details>
+      <p class="note">기본 탑재 716곳: 국가어항 구역 82곳(구역 중심점), 해양수산부 어항정보, 충남 어항, 전남·제주 소규모항·어촌정주어항. 차로 갈 수 없는 전라·남해 섬은 섬마다 대표 항 하나만 남겼습니다. 지도에서 고를 수 있는 포인트는 이 중 5 km 안에 하나씩입니다. 다른 지역 항 좌표 자료: 공공데이터포털
+        <a href="https://www.data.go.kr/data/15148635/fileData.do" target="_blank" rel="noopener">소규모항</a> ·
+        <a href="https://www.data.go.kr/data/15147417/fileData.do" target="_blank" rel="noopener">어촌정주어항</a>
+        (해양수산부 공동활용체계)</p>
+    </aside>
+  </section>
+
+  <section class="panel">
+    <div class="ph">
+      <h2>측면도<small>단면 A → B</small></h2>
+      <div class="stats">
+        <span>길이 <b id="sLen">—</b></span>
+        <span>해안선 교차 <b id="sCross">—</b></span>
+        <span>최대 수심 <b id="sMax">—</b></span>
+        <span>실측·공공자료 구간 <b id="sMeas">—</b></span>
+        <span>예측 조위 <b id="sTide">—</b></span>
+        <button class="btn ghost" id="toSec" type="button">단면 위치로 이동</button>
+      </div>
+    </div>
+    <div class="lineKey">
+      <span><i style="border-top:3px solid #d6fff9"></i>실측</span>
+      <span><i style="border-top:3px solid #7ff3e6"></i>연안해역기본도</span>
+      <span><i style="border-top:3px solid #8fd3ff"></i>전자해도·항만도</span>
+      <span><i style="border-top:1.5px solid #c4b5ff"></i>BADA2024</span>
+      <span><i style="border-top:2px dashed #7ff3e6"></i>해안거리 추정</span>
+      <span class="hint">흐린 실선 = 자료점 사이 보간 · 예측 조위는 기준면 일치가 확인되지 않아 수심에 더하지 않습니다</span>
+    </div>
+    <div id="secWrap"><canvas id="sec" aria-label="단면도"></canvas></div>
+    <div id="secInfo"></div>
+  </section>
+
+  <section class="panel" id="bite">
+    <div class="ph">
+      <h2>조과 현황<small id="biteSub">—</small></h2>
+      <div class="lvKey"><span class="lv hi">높음 60%+</span><span class="lv mid">보통 40–59%</span><span class="lv lo">낮음 1–39%</span><span class="lv none">없음 0%</span></div>
+    </div>
+    <div class="days" id="biteDays" role="tablist" aria-label="날짜 선택"></div>
+    <canvas id="biteChart" aria-label="시간별 최고 조과 지수와 조석. 좌우로 끌어서 시간 선택"></canvas>
+    <p class="note">그래프를 좌우로 끌어 시간을 고릅니다. 막대는 그 시간에 가장 높은 어종의 지수, 선은 조석입니다.</p>
+    <p class="note" id="biteWin"></p>
+    <div id="rockInfo"></div>
+    <div class="fishGrid" id="fishGrid"></div>
+    <div class="logBox">
+      <div class="sub">내 조황 기록 <small class="hint" id="logCount"></small></div>
+      <form id="logForm" class="logForm">
+        <span class="hint">포인트: <b id="logPt">—</b></span>
+        <input type="date" id="logDate" aria-label="날짜">
+        <input type="time" id="logHour" aria-label="시각">
+        <select id="logSpecies" aria-label="어종"></select>
+        <input type="number" id="logCount2" min="0" max="999" value="1" aria-label="마릿수" style="width:70px">
+        <input type="text" id="logMemo" maxlength="120" placeholder="메모 (채비·미끼 등)" aria-label="메모">
+        <button class="btn" type="submit">기록</button>
+      </form>
+      <p class="note" id="logMsg">다녀온 출조를 남기면, 같은 해역 기록에서 그 어종을 잡은 비율로 지수를 0.5~1.5배 보정합니다 (기록이 적을 땐 보정이 작게 들어갑니다). 못 잡은 날도 "꽝"으로 남겨야 정확해집니다.</p>
+      <ul class="logList" id="logList"></ul>
+    </div>
+    <details class="basis">
+      <summary>입질 지수는 어떻게 계산하나요?</summary>
+      <p class="note">실제 조과 통계가 아니라 규칙으로 만든 추정 지수입니다. 시간마다 <b>시즌(현재 10월 기준값) × 해역 출현 × 물때 세기 × 파고 × 수온 × 내 기록 보정 × 시간대 밝기 × 그 시각 물흐름</b>을 곱하고 0.9를 더 곱합니다. 수온은 국립해양조사원 조위관측소의 실측 수온(50 km 안, 24시간 안의 값만)과 FishBase의 어종별 서식 수온(AquaMaps 모델값)을 비교해, 범위를 1 ℃ 벗어날 때마다 0.1씩 낮춥니다(노래미·전갱이·대구·잿방어는 범위 자료가 한국 연안에 맞지 않아 반영하지 않음). 곱셈이라 조건 하나만 나빠도 크게 내려가며, 해뜰녘·해질녘(해 뜨고 지는 시각 ±1시간 15분)처럼 어종이 잘 무는 시간대에 물이 그날 최강 유속의 65% 안팎으로 흐를 때만 "높음"이 나옵니다. 물흐름은 15 km 안에 국립해양조사원 조류 예보 지점이 있으면 그 지점의 예보 유속을, 없으면 조위 변화 속도를 씁니다. <b>조차가 작은 바다</b>(가까운 조석 관측소의 7일 예보에서 최고·최저 조위 차가 60 cm 미만인 곳: 속초·주문진·묵호·후포·포항·울산·울릉도, 20~48 cm)는 조석 흐름이 약하고 물흐름이 주로 바람과 해류로 정해지므로, 물때 세기와 조위 변화 속도는 넣지 않고 그 평균값(중립)을 곱합니다. 대신 풍속을 반영해 7 m/s 초과 0.85배, 10 m/s 초과 0.6배, 13 m/s 초과(풍랑주의보 기준 14 m/s 부근) 0.35배로 낮추고, 수온은 1 ℃ 벗어날 때마다 0.15씩 낮춥니다. 이 기준값들도 제가 정한 값입니다. 파고는 1 m를 넘으면 감점, 2.5 m를 넘으면 크게 감점합니다. 갯바위 포인트 자료에 주요 대상어가 적혀 있으면 목록에 없는 어종은 0.55배로 낮춥니다. 시간대 성향(낮·밤·해뜰녘·해질녘)과 아래 점수는 일반적인 낚시 정보를 바탕으로 제가 정한 값이라 검증된 수치가 아닙니다. 물고기 그림은 실사 사진이 아닌 일러스트입니다.</p>
+      <div class="tblWrap"><table id="basisTable"></table></div>
+    </details>
+  </section>
+
+  <footer>
+    <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
+    <p>수심은 사용자 실측 → 연안해역기본도 → 전자해도·항만도 → BADA2024 → GEBCO 2026(해안 가까이는 해안거리 추정과 혼합) 순으로 찾고, 높은 순위 자료가 있는 곳에서는 낮은 순위 자료와 섞지 않습니다. 보간 반경은 자료 해상도의 2배(BADA는 225 m)이며, 화면 안에서는 육지·구조물을 사이에 둔 자료점을 쓰지 않습니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대, 바다를 건너는 다리, 방조제 안쪽 호수(시화호·새만금호 등)는 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL) 자료를 2026년 10월 3일 내려받아 넣었고, 방파제·부두는 육지(구조물)로 처리해 항 안쪽과 바깥을 구분합니다. 오픈스트리트맵은 자원봉사자가 그린 지도라 빠지거나 오래된 시설이 있을 수 있습니다.</p>
+    <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
+    <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
+    <p>조석·수온은 해양수산부 국립해양조사원(<a href="https://www.data.go.kr/data/15156018/openapi.do" target="_blank" rel="noopener">조석예보(고, 저조)</a>, <a href="https://www.data.go.kr/data/15155508/openapi.do" target="_blank" rel="noopener">조위관측소 최신 관측데이터</a>), 풍향·풍속·파고는 <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noopener">기상청 단기예보 조회서비스</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다. 음력 날짜는 korean_lunar_calendar(한국천문연구원 음양력 기준)로 계산했습니다.</p>
+  </footer>
+</div>
+
+<script src="static/coast.js?v=5bbcc9d6"></script>
+<script src="static/ports.js?v=426a859b"></script>
+<script src="static/access.js?v=de6e57fc"></script>
+<script src="static/rocks.js?v=cf1ee4a9"></script>
+<script src="static/ban.js?v=f82b4472"></script>
+<script src="static/fish_temp.js?v=0721c633"></script>
+<script src="static/gebco.js?v=4817b959"></script>
+<script src="static/osm.js?v=0b554c3b"></script>
+<script src="static/crnt.js?v=840ffc99"></script>
+<script>
+
+</script>
+<script>
+(async () => {
+const $ = id => document.getElementById(id);
+const DPR = () => Math.min(window.devicePixelRatio || 1, 2);
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── 매일 갱신 자료: GitHub Actions 수집기가 하루 2번 공공데이터포털 API를 받아 data/*.json으로 저장 ── */
+async function loadJSON(n) { const r = await fetch(`data/${n}.json?v=${Date.now() / 6e5 | 0}`, { cache: 'no-cache' }); if (!r.ok) throw new Error(n + '.json ' + r.status); return r.json(); }
+let TIDE, OBS, WXG, META;
+try { [TIDE, OBS, WXG, META] = await Promise.all(['tide', 'obs', 'wx', 'meta'].map(loadJSON)); }
+catch (e) { document.body.insertAdjacentHTML('afterbegin', `<p style="padding:16px;color:#ff7a6e;font:14px sans-serif">예보 자료를 불러오지 못했습니다 (${e.message}). 잠시 뒤 새로고침해 주세요.</p>`); throw e; }
+{ const g = new Date(META.generated); $('dataTime').textContent = `${g.getMonth() + 1}/${g.getDate()} ${String(g.getHours()).padStart(2, '0')}:${String(g.getMinutes()).padStart(2, '0')}`; }
+
+/* ── 좌표계: 웹 메르카토르 (m) ─────────────────────────── */
+const R = 6378137, D2R = Math.PI / 180;
+const mxOf = lon => R * lon * D2R;
+const myOf = lat => R * Math.log(Math.tan(Math.PI / 4 + lat * D2R / 2));
+const lonOf = mx => mx / R / D2R;
+const latOf = my => (2 * Math.atan(Math.exp(my / R)) - Math.PI / 2) / D2R;
+const kAt = lat => 1 / Math.cos(lat * D2R);       // 메르카토르 축척계수
+
+/* ── 해안선 데이터 디코딩 ──────────────────────────────── */
+function decode(list) {
+  return list.map(fl => {
+    const n = fl.length / 2, xs = new Float64Array(n), ys = new Float64Array(n);
+    let x = 0, y = 0, minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+    for (let i = 0; i < n; i++) {
+      x += fl[2 * i]; y += fl[2 * i + 1];
+      const X = mxOf(124 + x / 1e5), Y = myOf(32.9 + y / 1e5);
+      xs[i] = X; ys[i] = Y;
+      if (X < minx) minx = X; if (X > maxx) maxx = X; if (Y < miny) miny = Y; if (Y > maxy) maxy = Y;
+    }
+    return { xs, ys, n, minx, maxx, miny, maxy };
+  });
+}
+const LOD = { full: decode(KR_COAST.full), mid: decode(KR_COAST.mid), low: decode(KR_COAST.low) };
+
+// 가까운 해안선 검색용 격자 색인
+const CS = 1000, segIdx = new Map(), BAND = 500, bandIdx = new Map(); let SEG, SEG_RING;
+(() => {
+  const tmp = [], tr = [];
+  LOD.full.forEach((r, ri) => { for (let i = 0; i < r.n - 1; i++) {
+    const x1 = r.xs[i], y1 = r.ys[i], x2 = r.xs[i + 1], y2 = r.ys[i + 1], id = tmp.length / 4;
+    tmp.push(x1, y1, x2, y2); tr.push(ri);
+    const gx1 = Math.floor(Math.min(x1, x2) / CS), gx2 = Math.floor(Math.max(x1, x2) / CS);
+    const gy1 = Math.floor(Math.min(y1, y2) / CS), gy2 = Math.floor(Math.max(y1, y2) / CS);
+    for (let gx = gx1; gx <= gx2; gx++) for (let gy = gy1; gy <= gy2; gy++) { const k = gx * 100000 + gy; let a = segIdx.get(k); if (!a) segIdx.set(k, a = []); a.push(id); }
+    for (let b = Math.floor(Math.min(y1, y2) / BAND); b <= Math.floor(Math.max(y1, y2) / BAND); b++) { let a = bandIdx.get(b); if (!a) bandIdx.set(b, a = []); a.push(id); }
+  } });
+  SEG = Float64Array.from(tmp); SEG_RING = Int32Array.from(tr);
+})();
+function segDist(px, py, i) {
+  const x1 = SEG[4 * i], y1 = SEG[4 * i + 1], x2 = SEG[4 * i + 2], y2 = SEG[4 * i + 3];
+  const dx = x2 - x1, dy = y2 - y1, L = dx * dx + dy * dy;
+  let t = L ? ((px - x1) * dx + (py - y1) * dy) / L : 0; t = clamp(t, 0, 1);
+  return Math.hypot(px - x1 - t * dx, py - y1 - t * dy);
+}
+function nearestCoast(mx, my, maxR) {   // 반환: 메르카토르 m (못 찾으면 Infinity)
+  const gx = Math.floor(mx / CS), gy = Math.floor(my / CS), maxRing = Math.ceil(maxR / CS);
+  let best = Infinity;
+  for (let r = 0; r <= maxRing; r++) {
+    if ((r - 1) * CS > best) break;
+    for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+      const a = segIdx.get((gx + dx) * 100000 + gy + dy); if (!a) continue;
+      for (const i of a) { const d = segDist(mx, my, i); if (d < best) best = d; }
+    }
+  }
+  return best <= maxR ? best : Infinity;
+}
+function inLand(mx, my) {   // 같은 높이 띠의 해안선 선분만 세는 반직선 교차 판정 (짝홀 규칙)
+  let c = false; const a = bandIdx.get(Math.floor(my / BAND));
+  if (a) for (const i of a) {
+    const x1 = SEG[4 * i], y1 = SEG[4 * i + 1], x2 = SEG[4 * i + 2], y2 = SEG[4 * i + 3];
+    if ((y1 > my) !== (y2 > my) && mx < (x2 - x1) * (my - y1) / (y2 - y1) + x1) c = !c;
+  }
+  return c || (STRUCT.n > 0 && inStruct(mx, my));
+}
+const groundToCoast = (mx, my, maxG = 8000) => { const k = kAt(latOf(my)); const d = Math.min(nearestCoast(mx, my, maxG * k), structDist(mx, my, Math.min(maxG, 3000) * k)); return d / k; };
+
+/* ── 조석, 조류 (모식) ─────────────────────────────────── */
+const PERIOD = 12.42, HW = 3.0;
+const S = { mapStyle: 'terrain', st: 0, day: 0, t: new Date(Date.now() + 9 * 36e5).getUTCHours() + .5, range: 1.6, hs: .5, layers: { port: true, rock: true, flow: true }, ratio: 8, dmax: 30, playing: false, mode: 'line', A: null, B: null, drag: null, secHover: null, pin: null };
+const depthAt = dG => S.dmax * (1 - Math.exp(-dG / (S.dmax * S.ratio)));
+
+/* ── 내 자료: 항·포구 목록, 수심 기록 (CSV) ────────────── */
+const PORTS = [];
+async function readText(file) {
+  const buf = await file.arrayBuffer();
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf).replace(/^﻿/, ''); }
+  catch (e) { return new TextDecoder('euc-kr').decode(buf); }   // 공공데이터포털 CSV는 대개 EUC-KR
+}
+function parseCSV(t) {
+  const first = t.split(/\r?\n/, 1)[0] || '';
+  const delim = (first.split('\t').length > first.split(',').length) ? '\t' : ',';
+  const rows = []; let row = [], f = '', q = false;
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (q) { if (c === '"') { if (t[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true;
+    else if (c === delim) { row.push(f); f = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && t[i + 1] === '\n') i++; row.push(f); rows.push(row); row = []; f = ''; }
+    else f += c;
+  }
+  if (f || row.length) { row.push(f); rows.push(row); }
+  return rows.filter(r => r.some(x => x.trim()));
+}
+const findCol = (H, tests) => { for (const t of tests) { const i = H.findIndex(h => t.test(h)); if (i >= 0) return i; } return -1; };
+const num = v => { const x = parseFloat(String(v).replace(/[^\d.\-]/g, '')); return isFinite(x) ? x : NaN; };
+function locate(H, rows) {
+  let la = findCol(H, [/위도/, /^lat(itude)?$/i, /lat/i]), lo = findCol(H, [/경도/, /^(lon|lng|long|longitude)$/i, /lon|lng/i]);
+  let wkt = -1, xc = -1, yc = -1;
+  if (la < 0 || lo < 0) {
+    const r = rows[1] || []; wkt = r.findIndex(v => /POINT\s*\(/i.test(v));
+    if (wkt < 0) { xc = findCol(H, [/^x$/i, /x좌표|좌표x|x_?coord/i, /^경도?x/i]); yc = findCol(H, [/^y$/i, /y좌표|좌표y|y_?coord/i]); }
+  }
+  return { la, lo, wkt, xc, yc };
+}
+function parseDeg(v) {
+  v = String(v || '').trim(); if (!v) return NaN;
+  if (/^-?\d+(\.\d+)?$/.test(v)) return +v;
+  const ns = v.match(/\d+(?:\.\d+)?/g); if (!ns) return NaN;
+  const sign = /^-|[SW]\s*$/i.test(v) ? -1 : 1;
+  if (ns.length >= 3) return sign * (+ns[0] + ns[1] / 60 + ns[2] / 3600);
+  if (ns.length === 2) return sign * (+ns[0] + ns[1] / 60);
+  return sign * +ns[0];
+}
+function getLL(r, L) {
+  let lat, lon;
+  if (L.wkt >= 0) { const m = /POINT\s*\(\s*([-\d.]+)[\s,]+([-\d.]+)/i.exec(r[L.wkt] || ''); if (!m) return null; lon = +m[1]; lat = +m[2]; }
+  else if (L.xc >= 0 && L.yc >= 0) { lon = num(r[L.xc]); lat = num(r[L.yc]); }
+  else { lat = parseDeg(r[L.la]); lon = parseDeg(r[L.lo]); }
+  if (lat > 1000 || lon > 1000) {   // 평면직각좌표: 경도열=X, 위도열=Y 로 먼저 시도
+    const inKR = q => q[0] >= 32 && q[0] <= 39.5 && q[1] >= 123.5 && q[1] <= 132.5;
+    let q = tmToLL(lon, lat); if (!inKR(q)) { const q2 = tmToLL(lat, lon); if (inKR(q2)) q = q2; }
+    L.crs = q[2]; lat = q[0]; lon = q[1];
+  }
+  if (lat > 90 && lon < 90) [lat, lon] = [lon, lat];
+  if (!(lat >= 32 && lat <= 39.5 && lon >= 123.5 && lon <= 132.5)) return null;
+  return [lat, lon];
+}
+function importPorts(rows) {
+  const H = rows[0].map(h => h.trim()), L = locate(H, rows);
+  if (L.wkt < 0 && (L.la < 0 || L.lo < 0) && (L.xc < 0 || L.yc < 0)) return { ok: 0, msg: '위도·경도 열을 찾지 못했습니다. 머리글: ' + H.slice(0, 12).join(', ') };
+  const nm = findCol(H, [/명칭/, /어항명|항명|항구명|포구명/, /^name$/i, /name/i, /명$/]);
+  const ty = findCol(H, [/종류/, /구분/, /등급/, /type/i]);
+  if (nm < 0) return { ok: 0, msg: '항 이름 열을 찾지 못했습니다. 머리글: ' + H.slice(0, 12).join(', ') };
+  let ok = 0, bad = 0;
+  for (const r of rows.slice(1)) {
+    const ll = getLL(r, L); const name = (r[nm] || '').trim();
+    if (!ll || !name) { bad++; continue; }
+    PORTS.push({ name, type: ty >= 0 ? (r[ty] || '').trim() : '', lat: ll[0], lon: ll[1], mx: mxOf(ll[1]), my: myOf(ll[0]) });
+    ok++;
+  }
+  const first = PORTS[PORTS.length - ok];
+  const cols = `인식한 열: 이름=${H[nm]}` + (L.wkt >= 0 ? `, 좌표=${H[L.wkt]}` : L.xc >= 0 ? `, X=${H[L.xc]}, Y=${H[L.yc]}` : `, 위도=${H[L.la]}, 경도=${H[L.lo]}`) + (L.crs ? ` (${L.crs} 평면좌표를 변환)` : '');
+  return { ok, bad, msg: ok ? `항·포구 ${ok.toLocaleString()}곳을 불러왔습니다` + (bad ? ` (좌표 없음·범위 밖 ${bad}건 제외)` : '') + `. ${cols}. 첫 항목: ${first.name} ${first.lat.toFixed(4)}, ${first.lon.toFixed(4)}. 지도 폭 약 100 km 이하로 확대하면 이름이 나타납니다.`
+    : `불러온 항목이 없습니다. ${cols}. 첫 줄 값: ${(rows[1] || []).slice(0, 8).join(' | ')}` };
+}
+const portPri = t => /국가/.test(t) ? 0 : /지방|충남|^어항$/.test(t) ? 1 : /정주/.test(t) ? 2 : /소규모|포구/.test(t) ? 3 : 2;
+function saveLocal() { try { localStorage.setItem('ps_ports', JSON.stringify(PORTS.map(p => [p.name, p.type, p.lat, p.lon]))); } catch (e) {} }
+function loadLocal() {
+  const seen = new Set();
+  const add = (name, type, lat, lon) => { const k = name + '|' + lat.toFixed(4) + '|' + lon.toFixed(4); if (seen.has(k)) return; seen.add(k); PORTS.push({ name, type, lat, lon, mx: mxOf(lon), my: myOf(lat) }); };
+  for (const [name, type, lat, lon] of BASE_PORTS) add(name, type, lat, lon);
+  try { const a = JSON.parse(localStorage.getItem('ps_ports') || '[]'); for (const [name, type, lat, lon] of a) add(name, type, lat, lon); } catch (e) {}
+}
+async function handleFile(file, kind) {
+  const msgEl = $('dataMsg');
+  try {
+    const text = await readText(file), isJSON = /\.(geo)?json$/i.test(file.name) || /^\s*[\[{]/.test(text);
+    let res;
+    if (kind === 'struct') {
+      if (!isJSON) { msgEl.textContent = file.name + ': 구조물은 GeoJSON 파일만 받습니다.'; return; }
+      res = importStructJSON(JSON.parse(text)); if (res.ok) saveDepth();
+    } else if (isJSON) {
+      res = importDepthJSON(JSON.parse(text), $('depthType').value); kind = 'depth'; if (res.ok) saveDepth();
+    } else {
+      const rows = parseCSV(text);
+      if (rows.length < 2) { msgEl.textContent = file.name + ': 내용이 비어 있습니다.'; return; }
+      if (!kind || kind === 'port') kind = findCol(rows[0], [/포인트명/]) >= 0 ? 'rock' : kind;
+      if (!kind) kind = findCol(rows[0], DEPTH_KEYS) >= 0 ? 'depth' : 'port';
+      res = kind === 'depth' ? importDepthRows(rows, $('depthType').value) : kind === 'rock' ? importRocks(rows) : importPorts(rows);
+      if (res.ok) kind === 'depth' ? saveDepth() : kind === 'rock' ? saveRocks() : saveLocal();
+    }
+    msgEl.textContent = file.name + ': ' + res.msg;
+    if (res.ok) { dirty = true; analyzeSection(); updateDataCount(); if (kind === 'port' || kind === 'rock') { const nm = POINTS[S.pt] && POINTS[S.pt].name; buildPoints(); selectPoint(Math.max(0, POINTS.findIndex(p => p.name === nm)), false); } }
+  } catch (e) { msgEl.textContent = file.name + ': 읽지 못했습니다 (' + e.message + ')'; }
+}
+function updateDataCount() {
+  const parts = DORDER.filter(t => LAYERS[t] && LAYERS[t].n).map(t => `${DTYPES[t].short} ${LAYERS[t].n.toLocaleString()}`);
+  $('dataCount').textContent = `항·포구 ${PORTS.length.toLocaleString()}곳 · 수심 ${parts.length ? parts.join(' · ') + '점' : '없음'}` + (STRUCT.n - STRUCT.nb ? ` · 내 구조물 ${STRUCT.n - STRUCT.nb}` : '') + (ROCKS.length ? ` · 갯바위 ${ROCKS.length.toLocaleString()}곳` : '');
+  $('clearData').hidden = !(totalPts() || STRUCT.n - STRUCT.nb || PORTS.length > BASE_PORTS.length || ROCKS.length > (typeof BASE_ROCKS !== 'undefined' ? BASE_ROCKS.length : 0));
+}
+function clearData() {
+  PORTS.length = 0; ROCKS.length = 0; clearLayers(); BADA.tiles.clear();
+  { const L = STRUCT.lines.filter(r => r.base), Pp = STRUCT.polys.filter(r => r.base); STRUCT.lines = []; STRUCT.polys = []; STRUCT.seg = []; STRUCT.idx = new Map(); STRUCT.n = 0; STRUCT.nb = 0;
+    const pts = r => Array.from({ length: r.n }, (_, i) => [r.xs[i], r.ys[i]]); L.forEach(r => addStructLine(pts(r), false, true)); Pp.forEach(r => addStructLine(pts(r), true, true)); }
+  try { localStorage.removeItem('ps_ports'); localStorage.removeItem('ps_rocks'); localStorage.removeItem('ps_depth2'); localStorage.removeItem('ps_struct'); localStorage.removeItem('ps_sound'); } catch (e) {}
+  loadLocal(); loadRocks(); { const nm = POINTS[S.pt] && POINTS[S.pt].name; buildPoints(); selectPoint(Math.max(0, POINTS.findIndex(p => p.name === nm)), false); }
+  $('dataMsg').textContent = '불러온 자료를 지웠습니다 (기본 항·포구는 남아 있습니다).'; dirty = true; analyzeSection(); updateDataCount();
+}
+
+function drawPortsAndSoundings(gpp) {
+  // 수심 자료점 (확대했을 때만)
+  if (totalPts() && gpp < 25) {
+    const [x1, y2] = toM(0, 0), [x2, y1] = toM(cw, ch), used = new Set(); let drawn = 0;
+    bctx.font = '600 9.5px JetBrains Mono, monospace'; bctx.textBaseline = 'middle';
+    for (const t of DORDER.slice().reverse()) {
+      const Lr = LAYERS[t]; if (!Lr || !Lr.n) continue;
+      const gx1 = Math.floor(x1 / Lr.cell), gx2 = Math.floor(x2 / Lr.cell), gy1 = Math.floor(y1 / Lr.cell), gy2 = Math.floor(y2 / Lr.cell);
+      if ((gx2 - gx1 + 1) * (gy2 - gy1 + 1) > 400000) continue;
+      const sz = t === 'bada' ? 5 : 3.5;
+      for (let gx = gx1; gx <= gx2 && drawn < 30000; gx++) for (let gy = gy1; gy <= gy2; gy++) {
+        const a = Lr.idx.get(gx * 1000000 + gy); if (!a) continue;
+        for (const i of a) {
+          const [x, y] = toS(Lr.mx[i], Lr.my[i]); if (x < -5 || y < -5 || x > cw + 5 || y > ch + 5) continue;
+          const tt = clamp(Lr.d[i] / 40, 0, 1);
+          bctx.fillStyle = `hsl(${185 - tt * 25},${80 - tt * 30}%,${72 - tt * 42}%)`;
+          if (t === 'bada') { bctx.strokeStyle = DTYPES.bada.color; bctx.lineWidth = 1; bctx.strokeRect(x - sz / 2, y - sz / 2, sz, sz); } else bctx.fillRect(x - sz / 2, y - sz / 2, sz, sz);
+          drawn++;
+          if (gpp < 2.5) { const key = Math.floor(x / 34) + ',' + Math.floor(y / 15); if (!used.has(key)) { used.add(key); bctx.fillStyle = '#e8fbf8'; bctx.fillText(t === 'survey' ? Lr.d[i].toFixed(1) : String(Math.round(Lr.d[i])), x + 4, y); } }
+        }
+      }
+    }
+  }
+  // 항 이름 (겹치지 않게, 큰 항부터)
+  if (!PORTS.length || !S.layers.port) return;
+  if (gpp > 120) {   // 넓게 볼 때는 위치 점만
+    bctx.fillStyle = 'rgba(255,208,138,.8)';
+    for (const p of PORTS) { const [x, y] = toS(p.mx, p.my); if (x > 0 && y > 0 && x < cw && y < ch) bctx.fillRect(x - 1.5, y - 1.5, 3, 3); }
+    return;
+  }
+  const maxPri = gpp > 60 ? 1 : gpp > 25 ? 2 : 3;
+  const vis = PORTS.filter(p => !p.isPt && portPri(p.type) <= maxPri).map(p => { const [x, y] = toS(p.mx, p.my); return { p, x, y, pr: portPri(p.type) }; })
+    .filter(o => o.x > -40 && o.y > -20 && o.x < cw + 40 && o.y < ch + 20).sort((a, b) => a.pr - b.pr);
+  const placed = []; bctx.textBaseline = 'middle';
+  for (const o of vis.slice(0, 3000)) {
+    const big = o.pr <= 1; bctx.font = (big ? '700 12px' : '500 11px') + ' IBM Plex Sans KR, sans-serif';
+    const w = bctx.measureText(o.p.name).width, box = [o.x - 6, o.y - 8, o.x + 9 + w, o.y + 8];
+    if (placed.some(b => !(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3]))) continue;
+    placed.push(box);
+    bctx.fillStyle = '#06131d'; bctx.strokeStyle = big ? '#ffb84d' : '#ffd08a'; bctx.lineWidth = 2;
+    bctx.beginPath(); bctx.arc(o.x, o.y, big ? 4 : 3, 0, 7); bctx.fill(); bctx.stroke();
+    bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(o.p.name, o.x + 8, o.y);
+    bctx.fillStyle = big ? '#ffe2b0' : '#e7eef0'; bctx.fillText(o.p.name, o.x + 8, o.y);
+  }
+}
+
+/* ── 수심 자료 층 ─────────────────────────────────────────
+   우선순위: 1 사용자 실측 > 2 연안해역기본도 > 3 전자해도·항만도 > 4 BADA2024 > 5 해안거리 추정
+   위 순서대로 찾고, 높은 순위 자료가 반경 안에 있으면 그 자료만으로 보간한다(낮은 순위와 섞지 않음). */
+const DTYPES = {
+  survey:  { pri: 1, label: '사용자 실측',     short: '실측',   res: 10,  color: '#d6fff9' },
+  coastal: { pri: 2, label: '연안해역기본도',  short: '연안',   res: 30,  color: '#7ff3e6' },
+  chart:   { pri: 3, label: '전자해도·항만도', short: '해도',   res: 50,  color: '#8fd3ff' },
+  bada:    { pri: 4, label: 'BADA2024',        short: 'BADA',   res: 150, color: '#c4b5ff' },
+  gebco:   { pri: 5, label: 'GEBCO 2026',      short: 'GEBCO',  res: 460, color: '#e2c48a' },
+};
+const DORDER = ['survey', 'coastal', 'chart', 'bada'];
+const MAX_PTS = 600000;
+const LAYERS = {};
+function layerOf(type) {
+  if (!LAYERS[type]) LAYERS[type] = { type, n: 0, mx: [], my: [], d: [], res: [], src: [], yr: [], idx: new Map(), cell: Math.max(60, DTYPES[type].res * 2.5), resMax: 0 };
+  return LAYERS[type];
+}
+const totalPts = () => DORDER.reduce((s, t) => s + (LAYERS[t] ? LAYERS[t].n : 0), 0);
+function addDepthPt(type, mx, my, d, res, src, yr) {
+  if (totalPts() >= MAX_PTS) return false;
+  const L = layerOf(type), i = L.n++;
+  L.mx.push(mx); L.my.push(my); L.d.push(d); L.res.push(res); L.src.push(src || ''); L.yr.push(yr || '');
+  if (res > L.resMax) L.resMax = res;
+  const k = Math.floor(mx / L.cell) * 1000000 + Math.floor(my / L.cell); let a = L.idx.get(k); if (!a) L.idx.set(k, a = []); a.push(i);
+  return true;
+}
+function clearLayers() { for (const t of DORDER) delete LAYERS[t]; }
+
+// 화면 안에서 두 점 사이에 육지·구조물이 끼어 있는지 (화면 밖은 판단하지 않음)
+function crossesLand(mx1, my1, mx2, my2) {
+  for (let s = 1; s <= 4; s++) {
+    const f = s / 5, [x, y] = toS(mx1 + (mx2 - mx1) * f, my1 + (my2 - my1) * f);
+    if (x < 0 || y < 0 || x >= cw || y >= ch) continue;
+    if (!isSea(x | 0, y | 0)) return true;
+  }
+  return false;
+}
+const searchRadius = (type, L) => type === 'bada' ? 1.5 * Math.max(150, L.resMax) : Math.max(20, 2 * Math.max(DTYPES[type].res, L.resMax));
+function depthQuery(mx, my) {
+  const k = kAt(latOf(my));
+  for (const type of DORDER) {
+    const L = LAYERS[type]; if (!L || !L.n) continue;
+    const R = searchRadius(type, L), r = R * k, c = Math.ceil(r / L.cell), gx = Math.floor(mx / L.cell), gy = Math.floor(my / L.cell);
+    const cand = [];
+    for (let dx = -c; dx <= c; dx++) for (let dy = -c; dy <= c; dy++) {
+      const a = L.idx.get((gx + dx) * 1000000 + gy + dy); if (!a) continue;
+      for (const i of a) { const d = Math.hypot(L.mx[i] - mx, L.my[i] - my); if (d <= r) cand.push([d, i]); }
+    }
+    if (!cand.length) continue;
+    cand.sort((a, b) => a[0] - b[0]);
+    const use = [];
+    for (const [d, i] of cand) { if (use.length >= 6) break; if (d > 2 * k && crossesLand(mx, my, L.mx[i], L.my[i])) continue; use.push([d, i]); }
+    if (!use.length) continue;
+    const [d0, i0] = use[0], resN = L.res[i0], distG = d0 / k;
+    let depth;
+    if (distG < .5) depth = L.d[i0];
+    else { let ws = 0, vs = 0; for (const [d, i] of use) { const w = 1 / (d * d); ws += w; vs += w * L.d[i]; } depth = vs / ws; }
+    const interp = distG > resN;
+    const conf = type === 'bada' ? (distG <= 150 ? '중간' : '낮음') : type === 'chart' ? '중간' : (interp ? '중간' : '높음');
+    return { depth, type, label: DTYPES[type].label, res: resN, dist: distG, n: use.length, conf, interp, src: L.src[i0], yr: L.yr[i0] };
+  }
+  return null;
+}
+// 공식 수심 자료가 없을 때: 해안 150 m 안은 경사 추정, 800 m 밖은 GEBCO, 그 사이는 거리에 따라 섞는다
+function modelDepth(mx, my, dG) {
+  const est = estimateAt(dG); if (!GE || !isFinite(dG)) return est;
+  const e = gebcoAt(latOf(my), lonOf(mx)); if (e == null) return est;
+  const w = Math.max(0, Math.min(1, (dG - 150) / 650)), g = -e;
+  if (w === 0 || (g < 1 && w < 1)) return est;   // 해안 가까이에서 GEBCO 칸이 육지로 잡힌 경우는 추정만 사용
+  return { depth: w * Math.max(.5, g) + (1 - w) * est.depth, type: 'gebco', label: 'GEBCO 2026', res: 460, dist: null, conf: '낮음', interp: true, mix: w < 1 };
+}
+function estimateAt(dG) { return { depth: depthAt(dG), type: 'est', label: '해안거리 기반 추정', res: null, dist: null, conf: '낮음', interp: true }; }
+function fmtDepth(r) {
+  if (!r) return '—';
+  if (r.type === 'survey') return (r.interp ? '약 ' : '') + r.depth.toFixed(1) + ' m';
+  if ((r.type === 'coastal' || r.type === 'chart') && r.res <= 10 && !r.interp) return r.depth.toFixed(1) + ' m';
+  return '약 ' + Math.round(r.depth) + ' m';
+}
+function describeDepth(r) {
+  if (!r) return '';
+  if (r.type === 'est') return `추정 수심 ${fmtDepth(r)} · 출처: 해안거리 기반 추정 · 신뢰도: 낮음`;
+  if (r.type === 'gebco') return `수심 ${fmtDepth(r)} · 출처: GEBCO 2026 (약 460 m 격자${r.mix ? ', 해안 가까이는 경사 추정과 혼합' : ''}) · 신뢰도: 낮음 · 수중여·턱 표현 불가`;
+  let s = `수심 ${fmtDepth(r)} · 출처: ${r.label}${r.src ? ' (' + r.src + ')' : ''} · 신뢰도: ${r.conf} · 최근 자료점 ${Math.round(r.dist)} m · ${r.type === 'bada' ? '격자' : '자료'} 해상도 약 ${r.res} m`;
+  if (r.type === 'bada') s += ' · 세부 수중여·턱 표현 불가';
+  return s;
+}
+
+/* ── 해안 구조물(방파제·부두 등) 층 ─────────────────── */
+const STRUCT = { lines: [], polys: [], seg: [], idx: new Map(), n: 0, nb: 0 };   // nb: 기본 내장(OSM) 구조물 수
+const STC = 400;
+function addStructSeg(x1, y1, x2, y2) {
+  const id = STRUCT.seg.length / 4; STRUCT.seg.push(x1, y1, x2, y2);
+  for (let gx = Math.floor(Math.min(x1, x2) / STC); gx <= Math.floor(Math.max(x1, x2) / STC); gx++)
+    for (let gy = Math.floor(Math.min(y1, y2) / STC); gy <= Math.floor(Math.max(y1, y2) / STC); gy++) { const k = gx * 100000 + gy; let a = STRUCT.idx.get(k); if (!a) STRUCT.idx.set(k, a = []); a.push(id); }
+}
+function addStructLine(pts, closed, base) {   // pts: [[mx,my],...]
+  if (pts.length < 2) return;
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const o = { xs, ys, n: pts.length, minx: Math.min(...xs), maxx: Math.max(...xs), miny: Math.min(...ys), maxy: Math.max(...ys), base: !!base };
+  (closed ? STRUCT.polys : STRUCT.lines).push(o); STRUCT.n++; if (base) STRUCT.nb++;
+  for (let i = 0; i < pts.length - 1; i++) addStructSeg(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1]);
+  if (closed) addStructSeg(pts[pts.length - 1][0], pts[pts.length - 1][1], pts[0][0], pts[0][1]);
+}
+function structDist(mx, my, maxR) {
+  if (!STRUCT.n) return Infinity;
+  const gx = Math.floor(mx / STC), gy = Math.floor(my / STC), c = Math.ceil(maxR / STC); let best = Infinity;
+  for (let dx = -c; dx <= c; dx++) for (let dy = -c; dy <= c; dy++) {
+    const a = STRUCT.idx.get((gx + dx) * 100000 + gy + dy); if (!a) continue;
+    for (const i of a) {
+      const x1 = STRUCT.seg[4 * i], y1 = STRUCT.seg[4 * i + 1], x2 = STRUCT.seg[4 * i + 2], y2 = STRUCT.seg[4 * i + 3];
+      const ddx = x2 - x1, ddy = y2 - y1, L2 = ddx * ddx + ddy * ddy; let t = L2 ? ((mx - x1) * ddx + (my - y1) * ddy) / L2 : 0; t = clamp(t, 0, 1);
+      const d = Math.hypot(mx - x1 - t * ddx, my - y1 - t * ddy); if (d < best) best = d;
+    }
+  }
+  return best <= maxR ? best : Infinity;
+}
+function inStruct(mx, my) {
+  const k = kAt(latOf(my));
+  if (structDist(mx, my, 6 * k) <= 4 * k) return true;     // 선형 구조물은 폭 약 8 m로 간주
+  for (const r of STRUCT.polys) {
+    if (mx < r.minx || mx > r.maxx || my < r.miny || my > r.maxy) continue;
+    let c = false; for (let i = 0, j = r.n - 1; i < r.n; j = i++) if ((r.ys[i] > my) !== (r.ys[j] > my) && mx < (r.xs[j] - r.xs[i]) * (my - r.ys[i]) / (r.ys[j] - r.ys[i]) + r.xs[i]) c = !c;
+    if (c) return true;
+  }
+  return false;
+}
+function structPath(margin) {
+  const p = new Path2D(), lp = new Path2D();
+  const [vx1, vy1] = toM(-margin, ch + margin), [vx2, vy2] = toM(cw + margin, -margin);
+  const vis = r => r.maxx >= vx1 && r.minx <= vx2 && r.maxy >= vy1 && r.miny <= vy2;
+  for (const r of STRUCT.polys) if (vis(r)) { for (let i = 0; i < r.n; i++) { const [x, y] = toS(r.xs[i], r.ys[i]); i ? p.lineTo(x, y) : p.moveTo(x, y); } p.closePath(); }
+  for (const r of STRUCT.lines) if (vis(r)) { for (let i = 0; i < r.n; i++) { const [x, y] = toS(r.xs[i], r.ys[i]); i ? lp.lineTo(x, y) : lp.moveTo(x, y); } }
+  return [p, lp];
+}
+
+/* ── 오픈스트리트맵 해안 지형 (© OpenStreetMap 기여자, ODbL · 2026-10-03 내려받음) ───
+   방파제·도류제·부두·안벽은 구조물 층(육지 취급)으로, 해변·암반·갯벌·암초 등은 그림과 커서 정보로 쓴다. */
+const OSM = { list: [], lab: [] };
+let PORT_NAMES = new Set();
+const OSM_STRUCT = new Set(['bw', 'gr', 'pi', 'qu']);
+const OSM_NAME = { bw: '방파제', gr: '도류제', pi: '부두·잔교', qu: '안벽', be: '해변', br: '암반·갯바위', cl: '절벽', rf: '암초', sh: '여울·사주', tf: '갯벌 (간조 때 드러남)', sm: '염습지', hb: '항만 구역', ma: '마리나', sl: '선착장 경사로', lh: '등대', hn: '항', hu: '이름 미확인 포구', dk: '방조제', bm: '다리', bd: '다리', bf: '보행 다리', bt: '철도 다리' };
+function decodeOSM() {
+  if (typeof OSMF === 'undefined') return;
+  PORT_NAMES = new Set(BASE_PORTS.map(p => String(p[0]).replace(/\s/g, '')));
+  for (const [c, ty, name, rings] of OSMF) {
+    const R = rings.map(r => { let x = 12400000, y = 3300000; const n = r.length / 2, xs = new Float64Array(n), ys = new Float64Array(n);
+      for (let i = 0; i < n; i++) { x += r[2 * i]; y += r[2 * i + 1]; xs[i] = mxOf(x / 1e5); ys[i] = myOf(y / 1e5); } return { xs, ys, n }; });
+    let minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+    for (const r of R) for (let i = 0; i < r.n; i++) { if (r.xs[i] < minx) minx = r.xs[i]; if (r.xs[i] > maxx) maxx = r.xs[i]; if (r.ys[i] < miny) miny = r.ys[i]; if (r.ys[i] > maxy) maxy = r.ys[i]; }
+    OSM.list.push({ c, t: ty, name, R, minx, maxx, miny, maxy });
+    if (OSM_STRUCT.has(c) && ty > 0) {
+      const toPts = r => Array.from({ length: r.n }, (_, i) => [r.xs[i], r.ys[i]]);
+      if (ty === 2) addStructLine(toPts(R[0]), true, true); else R.forEach(r => addStructLine(toPts(r), false, true));
+    }
+  }
+  OSM.lab = OSM.list.slice().sort((a, b) => (LAB_PRI[a.c] ?? 5) - (LAB_PRI[b.c] ?? 5));
+}
+const LAB_PRI = { dk: 0, hn: 1, hb: 2, ma: 2, pi: 2, is: 3, lh: 4, il: 6, hu: 7 };
+function osmPath(pred, margin, close) {
+  const p = new Path2D(), [vx1, vy1] = toM(-margin, ch + margin), [vx2, vy2] = toM(cw + margin, -margin); let any = false;
+  for (const o of OSM.list) {
+    if (!pred(o) || o.maxx < vx1 || o.minx > vx2 || o.maxy < vy1 || o.miny > vy2) continue;
+    for (const r of o.R) { for (let i = 0; i < r.n; i++) { const [x, y] = toS(r.xs[i], r.ys[i]); i ? p.lineTo(x, y) : p.moveTo(x, y); } if (close) p.closePath(); }
+    any = true;
+  }
+  return any ? p : null;
+}
+function drawOSM(stage, gpp, TER) {
+  if (!OSM.list.length || gpp > (stage === 'under' ? 90 : 400)) return;
+  const g = bctx, fillP = (pred, fill, stroke, lw, dash) => { const p = osmPath(o => o.t === 2 && pred(o), 4, true); if (!p) return; if (fill) { g.fillStyle = fill; g.fill(p, 'evenodd'); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1; g.setLineDash(dash || []); g.stroke(p); g.setLineDash([]); } };
+  if (stage === 'under') {
+    fillP(o => o.c === 'tf', 'rgba(150,128,92,.62)', gpp < 15 ? 'rgba(190,170,130,.5)' : null, .8);
+    fillP(o => o.c === 'sm', 'rgba(112,138,88,.62)', null);
+    fillP(o => o.c === 'rf' || o.c === 'sh', 'rgba(214,198,150,.38)', 'rgba(240,226,180,.7)', 1, [3, 3]);
+    if (gpp < 60) {
+      fillP(o => o.c === 'be', TER ? '#dcc994' : 'rgba(220,201,148,.85)', 'rgba(255,240,200,.5)', .6);
+      fillP(o => o.c === 'br', TER ? '#8e7f6b' : 'rgba(142,127,107,.9)', 'rgba(70,58,46,.8)', .7);
+    }
+    if (gpp < 30) fillP(o => o.c === 'hb', null, 'rgba(255,208,138,.55)', 1, [5, 4]);
+    if (gpp < 30) fillP(o => o.c === 'ma', 'rgba(79,227,211,.12)', 'rgba(79,227,211,.6)', 1);
+    return;
+  }
+  // over: 절벽, 경사로, 등대, 이름
+  if (gpp < 60) {
+    const cl = osmPath(o => o.c === 'cl' && o.t === 1, 4, false);
+    if (cl) { g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 3.5; g.stroke(cl); g.strokeStyle = '#5a4430'; g.lineWidth = 2; g.stroke(cl); }
+    const cp = osmPath(o => o.c === 'cl' && o.t === 2, 4, true); if (cp) { g.strokeStyle = '#5a4430'; g.lineWidth = 1.5; g.stroke(cp); }
+  }
+  if (gpp < 20) { const sl = osmPath(o => o.c === 'sl', 4, false); if (sl) { g.strokeStyle = '#cfd6d4'; g.lineWidth = 2; g.stroke(sl); } }
+  // 다리: 바다·간척호를 건너는 것만 (오픈스트리트맵)
+  if (gpp < 400) {
+    const z = gpp < 20 ? 1.6 : gpp < 80 ? 1.2 : 1;
+    const draw = (cat, w, col, dash) => { const p = osmPath(o => o.c === cat, 8, false); if (!p) return; g.lineCap = 'butt'; g.strokeStyle = 'rgba(15,20,22,.85)'; g.lineWidth = (w + 2) * z; g.stroke(p); g.strokeStyle = col; g.lineWidth = w * z; g.setLineDash(dash || []); g.stroke(p); g.setLineDash([]); g.lineCap = 'round'; };
+    if (gpp < 60) draw('bf', 1.6, '#d9dfe0');
+    draw('bt', 2.2, '#9aa3a6', [6 * z, 4 * z]);
+    draw('bd', 2.6, '#eef1f1');
+    draw('bm', 3.4, '#f2dca0');
+  }
+  const placed = [];
+  g.textBaseline = 'middle';
+  for (const o of OSM.lab) {
+    const harb = o.name && (o.c === 'hb' || o.c === 'ma' || (o.c === 'pi' && /항|선착장|부두|나루|포구|터미널/.test(o.name))) && !PORT_NAMES.has(o.name.replace(/\s/g, ''));
+    const isl = o.c === 'is' || o.c === 'il', hn = o.c === 'hn', hu = o.c === 'hu', dk = o.c === 'dk';
+    const showName = !!o.name && (gpp < 6 || ((o.c === 'bm' || o.c === 'bd') && gpp < 12) || (harb && gpp < 25) || (o.c === 'is' && gpp < 60) || (o.c === 'il' && gpp < 10) || (hn && S.layers.port && gpp < 25) || (hu && S.layers.port && gpp < 10) || (dk && gpp < 120));
+    const showDot = o.t === 0 && ((o.c === 'lh' && gpp < 120) || (o.c === 'ma' && gpp < 25) || (o.c === 'be' && gpp < 25) || (o.c === 'cl' && gpp < 25) || (o.c === 'rf' && gpp < 25) || (o.c === 'br' && gpp < 25));
+    if (!showName && !showDot) continue;
+    if (isl && !showName) continue;
+    const r = o.R[0]; let cx = 0, cy = 0; for (let i = 0; i < r.n; i++) { cx += r.xs[i]; cy += r.ys[i]; } const [x, y] = toS(cx / r.n, cy / r.n);
+    if (x < -20 || y < -20 || x > cw + 20 || y > ch + 20) continue;
+    if (showDot) {
+      if (o.c === 'lh') { g.fillStyle = '#fff'; g.strokeStyle = '#e0483a'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, gpp < 20 ? 4 : 3, 0, 7); g.fill(); g.stroke(); }
+      else { g.fillStyle = o.c === 'ma' ? '#4fe3d3' : o.c === 'be' ? '#dcc994' : '#8e7f6b'; g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); }
+    }
+    if (showName) {
+      if (hn) { g.fillStyle = '#06131d'; g.strokeStyle = '#ffd08a'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); g.stroke(); }
+      if (hu) { g.fillStyle = 'rgba(200,210,212,.9)'; g.beginPath(); g.arc(x, y, 2.5, 0, 7); g.fill(); }
+      if (dk) { g.fillStyle = '#e8dcb8'; g.fillRect(x - 6, y - 1.5, 12, 3); }
+      if (harb && !showDot) { g.fillStyle = '#06131d'; g.strokeStyle = '#ffd08a'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 3, 0, 7); g.fill(); g.stroke(); }
+      const label = hu ? o.name + ' 앞 포구*' : o.name;
+      g.font = hu ? 'italic 500 10.5px IBM Plex Sans KR, sans-serif' : dk ? '700 11.5px IBM Plex Sans KR, sans-serif' : hn ? '500 11px IBM Plex Sans KR, sans-serif' : isl ? (o.c === 'is' ? 'italic 600 12px' : 'italic 500 10.5px') + ' IBM Plex Sans KR, sans-serif' : harb ? '500 11px IBM Plex Sans KR, sans-serif' : '500 11px IBM Plex Sans KR, sans-serif'; const w = g.measureText(label).width, box = [x - w / 2 - 2, y + 4, x + w / 2 + 2, y + 18];
+      if (placed.some(b => !(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3]))) continue; placed.push(box);
+      g.lineWidth = 3; g.strokeStyle = 'rgba(6,15,19,.85)'; g.strokeText(label, x - w / 2, y + 11); g.fillStyle = hu ? '#b9c6c8' : dk ? '#efe3bf' : hn ? '#ffe2b0' : isl ? '#e4f1d6' : harb ? '#ffe2b0' : o.c === 'lh' ? '#ffd0c8' : OSM_STRUCT.has(o.c) ? '#e8eeee' : '#f3e6c4'; g.fillText(label, x - w / 2, y + 11);
+    }
+  }
+}
+function osmAt(mx, my) {   // 커서 위치의 OSM 면 (가장 작은 것)
+  let best = null, ba = Infinity;
+  for (const o of OSM.list) {
+    if (o.t !== 2 || mx < o.minx || mx > o.maxx || my < o.miny || my > o.maxy) continue;
+    let inside = false; for (const r of o.R) for (let i = 0, j = r.n - 1; i < r.n; j = i++) if ((r.ys[i] > my) !== (r.ys[j] > my) && mx < (r.xs[j] - r.xs[i]) * (my - r.ys[i]) / (r.ys[j] - r.ys[i]) + r.xs[i]) inside = !inside;
+    const a = (o.maxx - o.minx) * (o.maxy - o.miny); if (inside && a < ba) { ba = a; best = o; }
+  }
+  return best;
+}
+
+/* ── 좌표 정규화 (경위도 또는 평면직각좌표) ─────────── */
+function toLatLon(a, b) {   // GeoJSON 순서 [x(lon), y(lat)]
+  let lon = a, lat = b;
+  if (Math.abs(a) > 1000 || Math.abs(b) > 1000) { const q = tmToLL(a, b); lat = q[0]; lon = q[1]; }
+  else if (lat > 90 && lon < 90) [lat, lon] = [lon, lat];
+  if (!(lat >= 32 && lat <= 39.5 && lon >= 123.5 && lon <= 132.5)) return null;
+  return [lat, lon];
+}
+const DEPTH_KEYS = [/^수심$/, /^depth$/i, /^valsou$/i, /^valdco$/i, /^심도$/, /^drval1$/i, /^contour$/i, /^elevation$/i, /^z$/i, /수심/, /depth/i, /심도/];
+function pickDepthKey(props) { const ks = Object.keys(props || {}); for (const re of DEPTH_KEYS) { const k = ks.find(x => re.test(x)); if (k) return k; } return null; }
+function depthVal(props, key) {
+  const v = num(props[key]); if (!isFinite(v)) return NaN;
+  return /elevation|^z$/i.test(key) ? Math.abs(v) : Math.abs(v);  // 해저고도(음수)는 깊이(양수)로 바꿈
+}
+const pickKey = (o, res) => { const ks = Object.keys(o); for (const re of res) { const k = ks.find(x => re.test(x)); if (k) return k; } return null; };
+
+/* ── 수심 자료 불러오기 ─────────────────────────────── */
+function importDepthRows(rows, type) {
+  const H = rows[0].map(h => h.trim()), L = locate(H, rows);
+  const dc = findCol(H, DEPTH_KEYS);
+  if (L.wkt < 0 && (L.la < 0 || L.lo < 0) && (L.xc < 0 || L.yc < 0)) return { ok: 0, msg: '위도·경도 열을 찾지 못했습니다. 머리글: ' + H.slice(0, 10).join(', ') };
+  if (dc < 0) return { ok: 0, msg: '수심 열을 찾지 못했습니다. 머리글: ' + H.slice(0, 10).join(', ') };
+  const sc = findCol(H, [/^source$/i, /출처/]), rc = findCol(H, [/^resolution$/i, /해상도/]), yc = findCol(H, [/조사년도|연도|year/i]);
+  let ok = 0, bad = 0, full = false;
+  for (const r of rows.slice(1)) {
+    const ll = getLL(r, L), d = Math.abs(num(r[dc]));
+    if (!ll || !isFinite(d)) { bad++; continue; }
+    const res = rc >= 0 && isFinite(num(r[rc])) ? num(r[rc]) : DTYPES[type].res;
+    if (!addDepthPt(type, mxOf(ll[1]), myOf(ll[0]), d, res, sc >= 0 ? r[sc] : '', yc >= 0 ? r[yc] : '')) { full = true; break; }
+    ok++;
+  }
+  return { ok, msg: ok ? `${DTYPES[type].label} 수심 ${ok.toLocaleString()}점을 불러왔습니다 (열: ${H[dc]})` + (bad ? `, ${bad}건 제외` : '') + (full ? `. 최대 ${MAX_PTS.toLocaleString()}점에서 멈췄습니다` : '') : '불러온 수심점이 없습니다.' };
+}
+function importDepthJSON(obj, type) {
+  const res0 = DTYPES[type].res;
+  let ok = 0, lines = 0, bad = 0, keyUsed = null, full = false;
+  const add = (lat, lon, d, res, src, yr) => { if (!addDepthPt(type, mxOf(lon), myOf(lat), d, res, src, yr)) { full = true; return false; } ok++; return true; };
+  const sampleLine = (coords, d, res, src, yr) => {   // 등심선: 자료 해상도 간격으로만 샘플링
+    lines++; const step = Math.max(10, res);
+    let carry = 0;
+    for (let i = 0; i < coords.length - 1 && !full; i++) {
+      const a = toLatLon(coords[i][0], coords[i][1]), b = toLatLon(coords[i + 1][0], coords[i + 1][1]); if (!a || !b) { bad++; continue; }
+      const segG = Math.hypot((b[0] - a[0]) * 111000, (b[1] - a[1]) * 111000 * Math.cos(a[0] * D2R));
+      let t = carry; while (t <= segG) { const f = segG ? t / segG : 0; if (!add(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, d, res, src, yr)) break; t += step; }
+      carry = t - segG;
+    }
+  };
+  const handle = (g, props) => {
+    if (!g || full) return;
+    const key = pickDepthKey(props); keyUsed = keyUsed || key;
+    let d = key ? depthVal(props, key) : NaN;
+    const res = isFinite(num(props && (props.resolution ?? props['해상도']))) ? num(props.resolution ?? props['해상도']) : res0;
+    const src = props && (props.source || props['출처']) || '', yr = props && (props['조사년도'] || props.year) || '';
+    const pt = c => { const dd = isFinite(d) ? d : (c.length > 2 && isFinite(c[2]) ? Math.abs(c[2]) : NaN); const ll = toLatLon(c[0], c[1]); if (!ll || !isFinite(dd)) { bad++; return; } add(ll[0], ll[1], dd, res, src, yr); };
+    if (g.type === 'Point') pt(g.coordinates);
+    else if (g.type === 'MultiPoint') g.coordinates.forEach(pt);
+    else if (g.type === 'LineString') { if (isFinite(d)) sampleLine(g.coordinates, d, res, src, yr); else bad++; }
+    else if (g.type === 'MultiLineString') { if (isFinite(d)) g.coordinates.forEach(c => sampleLine(c, d, res, src, yr)); else bad++; }
+    else if (g.type === 'GeometryCollection') g.geometries.forEach(x => handle(x, props));
+    else bad++;
+  };
+  if (obj.type === 'FeatureCollection') obj.features.forEach(f => handle(f.geometry, f.properties || {}));
+  else if (obj.type === 'Feature') handle(obj.geometry, obj.properties || {});
+  else {
+    const recs = findRecords(obj);
+    if (!recs.length) return { ok: 0, msg: 'GeoJSON(FeatureCollection)도, 위도·경도·수심을 가진 목록도 아닙니다.' };
+    const r0 = recs[0], la = pickKey(r0, [/^lat(itude)?$/i, /위도/, /lat/i]), lo = pickKey(r0, [/^(lon|lng|longitude)$/i, /경도/, /lon|lng/i]), dk = pickDepthKey(r0);
+    if (!la || !lo || !dk) return { ok: 0, msg: '목록에서 위도·경도·수심 항목을 찾지 못했습니다. 항목: ' + Object.keys(r0).slice(0, 10).join(', ') };
+    keyUsed = dk;
+    for (const r of recs) { const ll = toLatLon(num(r[lo]), num(r[la])), d = depthVal(r, dk); if (!ll || !isFinite(d)) { bad++; continue; } if (!add(ll[0], ll[1], d, res0, r.source || '', '')) break; }
+  }
+  return { ok, msg: ok ? `${DTYPES[type].label} 수심 ${ok.toLocaleString()}점을 불러왔습니다` + (lines ? ` (등심선 ${lines}개를 약 ${Math.max(10, res0)} m 간격으로 샘플링)` : '') + (keyUsed ? `, 수심 속성: ${keyUsed}` : '') + (bad ? `, ${bad}건 제외` : '') + (full ? `. 최대 ${MAX_PTS.toLocaleString()}점에서 멈췄습니다` : '')
+    : '불러온 수심점이 없습니다. 수심 속성(수심, depth, VALSOU, VALDCO 등)과 좌표를 확인하세요.' };
+}
+function findRecords(o, depth = 0) {   // JSON 안에서 객체 배열을 찾음 (공공데이터포털 response.body.items.item 형태 포함)
+  if (depth > 6 || o == null) return [];
+  if (Array.isArray(o)) { if (o.length && typeof o[0] === 'object' && !Array.isArray(o[0])) return o; for (const x of o) { const r = findRecords(x, depth + 1); if (r.length) return r; } return []; }
+  if (typeof o === 'object') { for (const k of Object.keys(o)) { const v = o[k]; if (k === 'item' && v && typeof v === 'object' && !Array.isArray(v)) return [v]; const r = findRecords(v, depth + 1); if (r.length) return r; } }
+  return [];
+}
+function importStructJSON(obj) {
+  let n = 0, bad = 0;
+  const conv = cs => cs.map(c => toLatLon(c[0], c[1])).filter(Boolean).map(([la, lo]) => [mxOf(lo), myOf(la)]);
+  const h = g => {
+    if (!g) return;
+    if (g.type === 'LineString') { const p = conv(g.coordinates); if (p.length > 1) { addStructLine(p, false); n++; } else bad++; }
+    else if (g.type === 'MultiLineString') g.coordinates.forEach(c => h({ type: 'LineString', coordinates: c }));
+    else if (g.type === 'Polygon') { const p = conv(g.coordinates[0]); if (p.length > 2) { addStructLine(p, true); n++; } else bad++; }
+    else if (g.type === 'MultiPolygon') g.coordinates.forEach(c => h({ type: 'Polygon', coordinates: c }));
+    else if (g.type === 'GeometryCollection') g.geometries.forEach(h);
+  };
+  const fs = obj.type === 'FeatureCollection' ? obj.features : obj.type === 'Feature' ? [obj] : [];
+  fs.forEach(f => h(f.geometry));
+  return { ok: n, msg: n ? `해안 구조물 ${n}개(선·면)를 불러왔습니다` + (bad ? `, ${bad}개 제외` : '') + '. 지도와 단면에서 육지(구조물)로 처리합니다.' : 'GeoJSON에서 선(LineString)이나 면(Polygon)을 찾지 못했습니다.' };
+}
+
+/* ── 저장 (이 브라우저에만) ──────────────────────────── */
+function saveDepth() {
+  try {
+    const o = {}; for (const t of DORDER) { const L = LAYERS[t]; if (L && L.n && L.n <= 150000) o[t] = L.d.map((d, i) => [+latOf(L.my[i]).toFixed(6), +lonOf(L.mx[i]).toFixed(6), d, L.res[i], L.src[i]]); }
+    localStorage.setItem('ps_depth2', JSON.stringify(o));
+  } catch (e) {}
+  try {
+    const conv = r => Array.from({ length: r.n }, (_, i) => [+lonOf(r.xs[i]).toFixed(6), +latOf(r.ys[i]).toFixed(6)]);
+    localStorage.setItem('ps_struct', JSON.stringify({ l: STRUCT.lines.filter(r => !r.base).map(conv), p: STRUCT.polys.filter(r => !r.base).map(conv) }));
+  } catch (e) {}
+}
+function loadDepth() {
+  try {
+    const o = JSON.parse(localStorage.getItem('ps_depth2') || '{}');
+    for (const t of DORDER) for (const [la, lo, d, res, src] of (o[t] || [])) addDepthPt(t, mxOf(lo), myOf(la), d, res, src, '');
+    const old = JSON.parse(localStorage.getItem('ps_sound') || '[]');     // 이전 버전의 실측 기록
+    for (const [la, lo, d] of old) addDepthPt('survey', mxOf(lo), myOf(la), d, 10, '이전 버전 실측', '');
+    if (old.length) { localStorage.removeItem('ps_sound'); saveDepth(); }
+  } catch (e) {}
+  try {
+    const s = JSON.parse(localStorage.getItem('ps_struct') || 'null');
+    if (s) { const m = a => a.map(([lo, la]) => [mxOf(lo), myOf(la)]); s.l.forEach(a => addStructLine(m(a), false)); s.p.forEach(a => addStructLine(m(a), true)); }
+  } catch (e) {}
+}
+
+/* ── 공공 수심 API (국립해양조사원 자연과학용 수심정보, BADA2024) ─────
+   요청 주소·파라미터 이름은 추측하지 않는다. 사용자가 공공데이터포털에서 받은 "요청 주소 예시"를 그대로 쓰고,
+   그 안의 파라미터 중 어떤 것이 범위(최소·최대 위도·경도)인지 사용자가 지정한다. */
+const BADA = { tiles: new Map(), TILE: .03 };
+function apiCfg() {
+  return { url: $('apiUrl').value.trim(), key: $('apiKey').value.trim(), proxy: $('apiProxy').value.trim(),
+    map: { minLat: $('pMinLat').value, maxLat: $('pMaxLat').value, minLon: $('pMinLon').value, maxLon: $('pMaxLon').value } };
+}
+function apiSave() { try { const c = apiCfg(); sessionStorage.setItem('ps_api', JSON.stringify(c)); } catch (e) {} }
+function apiLoad() {
+  try { const c = JSON.parse(sessionStorage.getItem('ps_api') || 'null'); if (!c) return; $('apiUrl').value = c.url || ''; $('apiKey').value = c.key || ''; $('apiProxy').value = c.proxy || ''; apiParams(c.map); } catch (e) {}
+}
+function apiParams(pre) {
+  let names = [];
+  try { names = [...new URL($('apiUrl').value.trim()).searchParams.keys()]; } catch (e) {}
+  const guess = { minLat: [/min.*la|la.*min|south|lat_?1|stLat/i], maxLat: [/max.*la|la.*max|north|lat_?2|edLat/i], minLon: [/min.*lo|lo.*min|west|lon_?1|stLon/i], maxLon: [/max.*lo|lo.*max|east|lon_?2|edLon/i] };
+  for (const k of Object.keys(guess)) {
+    const sel = $('p' + k[0].toUpperCase() + k.slice(1));
+    const g = (pre && pre[k]) || names.find(n => guess[k].some(re => re.test(n))) || '';
+    sel.innerHTML = '<option value="">선택</option>' + names.map(n => `<option${n === g ? ' selected' : ''}>${n}</option>`).join('');
+  }
+  $('apiParamsNote').textContent = names.length ? `요청 주소에서 찾은 파라미터: ${names.join(', ')}` : '요청 주소를 붙여 넣으면 파라미터 목록이 나옵니다.';
+}
+function apiMsg(t) { $('apiMsg').textContent = t; }
+async function apiFetchTile(cfg, la1, lo1) {
+  const la2 = la1 + BADA.TILE, lo2 = lo1 + BADA.TILE;
+  const u = new URL(cfg.url);
+  const set = (name, v) => { if (name) u.searchParams.set(name, v.toFixed(6)); };
+  set(cfg.map.minLat, la1); set(cfg.map.maxLat, la2); set(cfg.map.minLon, lo1); set(cfg.map.maxLon, lo2);
+  if (cfg.key) for (const n of [...u.searchParams.keys()]) if (/^servicekey$/i.test(n)) u.searchParams.set(n, cfg.key);
+  const hasPage = u.searchParams.has('pageNo') && u.searchParams.has('numOfRows');
+  let page = 1, got = 0;
+  for (; page <= 20; page++) {
+    if (hasPage) u.searchParams.set('pageNo', String(page));
+    const target = cfg.proxy ? cfg.proxy + encodeURIComponent(u.toString()) : u.toString();
+    const res = await fetch(target);
+    const text = await res.text();
+    if (!res.ok) throw new Error(`HTTP ${res.status} · ${text.slice(0, 160)}`);
+    let obj = null;
+    try { obj = JSON.parse(text); } catch (e) {
+      const doc = new DOMParser().parseFromString(text, 'application/xml');
+      const err = doc.querySelector('returnAuthMsg, errMsg, resultMsg'); const code = doc.querySelector('returnReasonCode, resultCode');
+      const items = [...doc.querySelectorAll('item')].map(it => Object.fromEntries([...it.children].map(c => [c.tagName, c.textContent])));
+      if (!items.length && err) throw new Error(`응답 오류: ${err.textContent}${code ? ' (' + code.textContent + ')' : ''}`);
+      obj = items;
+    }
+    const recs = findRecords(obj);
+    if (!recs.length) { if (page === 1 && obj && !Array.isArray(obj)) { const s = JSON.stringify(obj).slice(0, 200); if (/error|err|fail/i.test(s)) throw new Error('응답 오류: ' + s); } break; }
+    const r0 = recs[0], la = pickKey(r0, [/^lat(itude)?$/i, /위도/, /lat/i]), lo = pickKey(r0, [/^(lon|lng|longitude)$/i, /경도/, /lon|lng/i]), dk = pickDepthKey(r0) || pickKey(r0, [/dep|dpth|수심/i]);
+    if (!la || !lo || !dk) throw new Error('응답 항목에서 위도·경도·수심을 찾지 못했습니다. 항목: ' + Object.keys(r0).join(', '));
+    for (const r of recs) { const lat = num(r[la]), lon = num(r[lo]), d = num(r[dk]); if (isFinite(lat) && isFinite(lon) && isFinite(d)) { addDepthPt('bada', mxOf(lon), myOf(lat), Math.abs(d), 150, 'BADA2024 API', ''); got++; } }
+    if (!hasPage || recs.length < +u.searchParams.get('numOfRows')) break;
+  }
+  return got;
+}
+let apiBusy = false;
+async function apiLoadViewport() {
+  const cfg = apiCfg(); apiSave();
+  if (!cfg.url) { apiMsg('공공데이터포털에서 받은 요청 주소를 먼저 붙여 넣으세요.'); return; }
+  try { new URL(cfg.url); } catch (e) { apiMsg('요청 주소 형식이 올바르지 않습니다 (https://로 시작해야 합니다).'); return; }
+  if (!cfg.map.minLat || !cfg.map.maxLat || !cfg.map.minLon || !cfg.map.maxLon) { apiMsg('최소·최대 위도·경도에 해당하는 파라미터를 모두 고르세요.'); return; }
+  const gw = cw / pxPerGround(); if (gw > 15000) { apiMsg('지도 폭 15 km 이하로 확대한 뒤 불러오세요. 전국 자료를 한 번에 요청하지 않습니다.'); return; }
+  if (apiBusy) return; apiBusy = true;
+  const [mx1, my1] = toM(0, ch), [mx2, my2] = toM(cw, 0), T = BADA.TILE;
+  const la1 = Math.floor(latOf(my1) / T) * T, la2 = latOf(my2), lo1 = Math.floor(lonOf(mx1) / T) * T, lo2 = lonOf(mx2);
+  const want = []; for (let la = la1; la < la2; la += T) for (let lo = lo1; lo < lo2; lo += T) { const key = cfg.url.split('?')[0] + '|' + la.toFixed(3) + ',' + lo.toFixed(3); if (!BADA.tiles.has(key)) want.push([key, la, lo]); }
+  if (!want.length) { apiMsg('이 화면 범위는 이미 불러왔습니다 (같은 범위는 다시 요청하지 않습니다).'); apiBusy = false; return; }
+  let total = 0, done = 0;
+  for (const [key, la, lo] of want.slice(0, 16)) {
+    apiMsg(`불러오는 중… ${done + 1}/${Math.min(16, want.length)} 타일`);
+    try { total += await apiFetchTile(cfg, la, lo); BADA.tiles.set(key, 'ok'); done++; }
+    catch (e) {
+      const blocked = e instanceof TypeError;
+      apiMsg(blocked ? '호출이 차단되었습니다. Claude 아티팩트 화면은 보안 정책으로 외부 주소를 부를 수 없고, 공공데이터포털 API는 브라우저 직접 호출(CORS)을 허용하지 않을 수 있습니다. 내려받은 HTML을 PC 브라우저에서 열고 "프록시 주소"에 서버리스·백엔드 프록시를 넣어 사용하세요.' : '불러오기 실패: ' + e.message);
+      apiBusy = false; return;
+    }
+  }
+  apiBusy = false; dirty = true; analyzeSection(); updateDataCount();
+  apiMsg(`BADA2024 ${total.toLocaleString()}점을 ${done}개 타일에서 불러왔습니다` + (want.length > 16 ? ` (남은 ${want.length - 16}개 타일은 다시 누르면 이어서 불러옵니다)` : '') + '.');
+}
+
+/* ── 낚시 제한구역 (국립해양조사원 전자해도 제한구역, 2024.11.30 제작분) — 그리지 않고, 안에 있는 포인트만 뺀다 ─ */
+const BAN = BAN_AREAS.map(r => ({ r, x1: Math.min(...r.map(p => p[0])), x2: Math.max(...r.map(p => p[0])), y1: Math.min(...r.map(p => p[1])), y2: Math.max(...r.map(p => p[1])) }));
+function inBan(lat, lon) {
+  for (const b of BAN) {
+    if (lon < b.x1 || lon > b.x2 || lat < b.y1 || lat > b.y2) continue;
+    let c = false; const r = b.r;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) if ((r[i][1] > lat) !== (r[j][1] > lat) && lon < (r[j][0] - r[i][0]) * (lat - r[i][1]) / (r[j][1] - r[i][1]) + r[i][0]) c = !c;
+    if (c) return true;
+  }
+  return false;
+}
+/* ── 갯바위 낚시 포인트 (해양수산부 공동활용체계 자료) ───
+   접근성: 가장 가까운 해안선이 본토·큰 섬·연륙교로 이어진 섬이면 "차량·도보", 확인 못 한 섬은 "확인 필요", 그 밖의 섬은 "배로만". */
+const ROCKS = [];
+const ACC_CAR = new Set(ACCESS.car), ACC_UNK = new Set(ACCESS.unk);
+function nearestRing(mx, my, maxR) {
+  const gx = Math.floor(mx / CS), gy = Math.floor(my / CS), maxRing = Math.ceil(maxR / CS);
+  let best = Infinity, bi = -1;
+  for (let r = 0; r <= maxRing; r++) {
+    if ((r - 1) * CS > best) break;
+    for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+      const a = segIdx.get((gx + dx) * 100000 + gy + dy); if (!a) continue;
+      for (const i of a) { const d = segDist(mx, my, i); if (d < best) { best = d; bi = i; } }
+    }
+  }
+  return bi >= 0 && best <= maxR ? SEG_RING[bi] : -1;
+}
+function accessAt(mx, my) {
+  const ring = nearestRing(mx, my, 3000 * kAt(latOf(my)));
+  return ring < 0 ? 'unk' : ACC_CAR.has(ring) ? 'car' : ACC_UNK.has(ring) ? 'unk' : 'boat';
+}
+const ACC_NAME = { car: '차량·도보 접근', unk: '접근 확인 필요', boat: '배로만 접근' };
+function addRock(o) {
+  const mx = mxOf(o.lon), my = myOf(o.lat);
+  ROCKS.push({ kind: 'rock', type: '갯바위', ...o, mx, my, access: accessAt(mx, my), banned: inBan(o.lat, o.lon) });
+}
+function importRocks(rows) {
+  const H = rows[0].map(h => h.trim()), L = locate(H, rows);
+  const nm = findCol(H, [/포인트명/, /명칭/, /^name$/i]);
+  if (nm < 0) return { ok: 0, msg: '포인트 이름 열을 찾지 못했습니다. 머리글: ' + H.slice(0, 12).join(', ') };
+  if (L.wkt < 0 && (L.la < 0 || L.lo < 0) && (L.xc < 0 || L.yc < 0)) return { ok: 0, msg: '위도·경도 열을 찾지 못했습니다. 머리글: ' + H.slice(0, 12).join(', ') };
+  const col = res => findCol(H, res);
+  const rg = col([/지역명/, /지역/]), dp = col([/수심/]), tg = col([/주요.*어종|대상어|어종/]), td = col([/조석|물때/]), me = col([/방법|채비|낚시법/]), ad = col([/행정구역/]);
+  let ok = 0, bad = 0; const seen = new Set(ROCKS.map(r => r.name + '|' + r.lat.toFixed(4)));
+  for (const r of rows.slice(1)) {
+    const ll = getLL(r, L), name = (r[nm] || '').trim();
+    if (!ll || !name) { bad++; continue; }
+    const key = name + '|' + ll[0].toFixed(4); if (seen.has(key)) continue; seen.add(key);
+    addRock({ name, lat: ll[0], lon: ll[1], area: rg >= 0 ? r[rg].trim() : '', depth: dp >= 0 ? r[dp].trim() : '', targets: tg >= 0 ? r[tg].trim() : '', tide: td >= 0 ? r[td].trim() : '', method: me >= 0 ? r[me].trim() : '', addr: ad >= 0 ? r[ad].trim() : '' });
+    ok++;
+  }
+  const c = { car: 0, unk: 0, boat: 0 }; ROCKS.forEach(r => c[r.access]++); const nb = ROCKS.filter(r => r.banned).length;
+  return { ok, msg: ok ? `갯바위 포인트 ${ok.toLocaleString()}곳을 불러왔습니다 (차량·도보 ${c.car}, 확인 필요 ${c.unk}, 배로만 ${c.boat}` + (nb ? `, 제한구역 안이라 뺀 곳 ${nb}` : '') + ')' + (bad ? `, 좌표 없음 ${bad}건 제외` : '') + `. 위도 열: ${H[L.la] || '-'}, 경도 열: ${H[L.lo] || '-'}` : '불러온 포인트가 없습니다. 첫 줄 값: ' + (rows[1] || []).slice(0, 8).join(' | ') };
+}
+function saveRocks() { try { localStorage.setItem('ps_rocks', JSON.stringify(ROCKS.map(r => [r.name, r.lat, r.lon, r.area, r.depth, r.targets, r.tide, r.method, r.addr]))); } catch (e) {} }
+function loadRocks() {
+  const seen = new Set();
+  const put = a => { const [name, lat, lon, area, depth, targets, tide, method, addr] = a; const k = name + '|' + (+lat).toFixed(4); if (seen.has(k)) return; seen.add(k); addRock({ name, lat: +lat, lon: +lon, area, depth, targets, tide, method, addr }); };
+  (typeof BASE_ROCKS !== 'undefined' ? BASE_ROCKS : []).forEach(put);
+  try { JSON.parse(localStorage.getItem('ps_rocks') || '[]').forEach(put); } catch (e) {}
+}
+const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function rockInfoHTML(p) {
+  const rows = [['접근', ACC_NAME[p.access]], ['지역', p.area || p.addr], ['수심 범위 (자료)', p.depth], ['주요 대상어 (자료)', p.targets], ['조석 (자료)', p.tide], ['낚시 방법 (자료)', p.method]].filter(r => r[1]);
+  return `<dl class="rock">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`;
+}
+
+/* ── 조석: 국립해양조사원 조석예보(고, 저조) 예보지점 166곳, 오늘부터 15일 ─
+   물때 이름은 음력 날짜로 정한다 (서해 7물때식: 음력 1일 = 7물, 그 밖 8물때식: 음력 1일 = 8물).
+   물때 세기(%)는 그 지점의 15일(사리~조금 한 주기) 중 하루 조차가 가장 큰 날을 100으로 본 그날 조차 비율. */
+const DAY0 = TIDE.from, NDAYS = 7;
+const KST_NOW = new Date(Date.now() + 9 * 36e5), TODAY = KST_NOW.toISOString().slice(0, 10);
+const TODAY_IDX = Math.max(0, Math.round((new Date(TODAY + 'T12:00:00Z') - new Date(DAY0 + 'T12:00:00Z')) / 864e5));   // 새벽 갱신 전이면 1
+const dateAdd = (d, n) => { const x = new Date(d + 'T12:00:00+09:00'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+const regionOf = (lat, lon) => (lon > 129.15 && lat > 35.3) || (lat > 35.9 && lon > 128.3) || lon > 130 ? '동해'
+  : lat < 33.75 || (lat < 34.05 && lon > 126.1 && lon < 126.45) ? '제주' : (lat > 34.6 && lon < 126.95) || lon < 126 ? '서해' : '남해';
+const mulOf = (reg, ld) => { if (reg === '서해') { const n = ((ld - 24) % 15 + 15) % 15; return n === 0 ? '무시' : n === 14 ? '조금' : n + '물'; } const n = ((ld - 23) % 15 + 15) % 15; return n === 0 ? '조금' : n + '물'; };
+const TDATES = Object.keys(TIDE.lunar).sort();
+S.day = Math.min(TODAY_IDX, NDAYS - 1);
+const STATIONS = Object.entries(TIDE.st).map(([id, o]) => {
+  const region = regionOf(o.lat, o.lon);
+  const days = TDATES.map(date => { const [lm, ld, leap] = TIDE.lunar[date]; return { date, lunar: (leap ? '윤' : '') + lm + '.' + ld, mul: mulOf(region, ld), ev: (o.days[date] || []).map(([t, cm, k]) => [+t.slice(0, 2) + t.slice(3, 5) / 60, cm, k]) }; });
+  const rng = days.map((d, i) => { const e = [...(days[i - 1] ? days[i - 1].ev.slice(-1) : []), ...d.ev, ...(days[i + 1] ? days[i + 1].ev.slice(0, 1) : [])].map(x => x[1]); return e.length > 1 ? Math.max(...e) - Math.min(...e) : 0; });
+  const mx = Math.max(...rng) || 1; days.forEach((d, i) => d.pct = Math.round(rng[i] / mx * 100));
+  return { id, name: o.name, lat: o.lat, lon: o.lon, region, days };
+}).filter(st => st.days.some(d => d.ev.length));
+for (const st of STATIONS) {
+  st.ev = []; st.days.forEach((d, i) => d.ev.forEach(([h, cm, k]) => st.ev.push([i * 24 + h, cm, k])));
+  st.ev.sort((a, b) => a[0] - b[0]);
+  const hs = st.ev.map(e => e[1]); st.msl = hs.reduce((a, b) => a + b, 0) / hs.length;   // 극값 평균 ≈ 평균해면
+  st.minCm = Math.min(...hs); st.maxCm = Math.max(...hs);
+  let mr = 0; for (let i = 1; i < st.ev.length; i++) { const [t0, h0] = st.ev[i - 1], [t1, h1] = st.ev[i]; mr = Math.max(mr, Math.abs(h1 - h0) * Math.PI / 2 / (t1 - t0)); }
+  st.maxRate = mr || 1;
+  st.mx = mxOf(st.lon); st.my = myOf(st.lat);
+}
+function tideAt(st, tA) {               // tA: 오늘(DAY0) 00시부터 시간
+  const E = st.ev; if (tA <= E[0][0]) return { cm: E[0][1], rate: 0 }; if (tA >= E[E.length - 1][0]) return { cm: E[E.length - 1][1], rate: 0 };
+  let i = 1; while (E[i][0] < tA) i++;
+  const [t0, h0] = E[i - 1], [t1, h1] = E[i], f = (tA - t0) / (t1 - t0);
+  return { cm: (h0 + h1) / 2 + (h0 - h1) / 2 * Math.cos(Math.PI * f), rate: (h1 - h0) / 2 * Math.PI / (t1 - t0) * Math.sin(Math.PI * f) };
+}
+function getTide() {
+  const st = STATIONS[S.st], tA = S.day * 24 + S.t, r = tideAt(st, tA);
+  return { eta: (r.cm - st.msl) / 100, u: r.rate / st.maxRate, cm: r.cm, rate: r.rate, tA };
+}
+/* ── 조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」 (공공데이터포털, 199개 예보 지점) ──
+   지점마다 전류(물돌이, 유속 0)와 최강 유속 시각·유향·유속(cm/s)이 번갈아 있다. 그 사이는 사인 곡선으로 보간한다.
+   유향은 물이 흘러가는 방향(북=0°, 시계 방향). 바람·하천·해류 영향은 들어 있지 않은 천문 조류 예측값이다. */
+const CR = { st: [], ready: false, err: '' }, CR_NEAR = 15, CR_GOOD = 5;   // km: 15 km 넘으면 쓰지 않음, 5 km 이내면 가까움
+const KN = 0.0194384;   // cm/s → 노트
+async function loadCrnt() {
+  try {
+    if (typeof DecompressionStream === 'undefined') throw new Error('이 브라우저는 압축 해제를 지원하지 않습니다');
+    const bin = atob(CRNT.b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const buf = new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
+    const n = CRNT.n, rd = (p, k) => buf[p * 2 * n + k] | (buf[p * 2 * n + n + k] << 8);
+    let k = 0;
+    for (const [name, lat, lon, cnt, t0] of CRNT.st) {
+      const t = new Float64Array(cnt), d = new Uint16Array(cnt), s = new Float32Array(cnt); let acc = t0;
+      for (let i = 0; i < cnt; i++, k++) { if (i) acc += rd(0, k); t[i] = acc / 60; d[i] = rd(1, k); s[i] = rd(2, k) / 10; }
+      CR.st.push({ name, lat, lon, t, d, s, mx: mxOf(lon), my: myOf(lat) });
+    }
+    CR.ready = true; CR_NEAR_CACHE.clear(); biteHour = -1; if (typeof renderBasis === 'function') renderBasis();
+  } catch (e) { CR.err = e.message || String(e); }
+}
+// tA(9/30 00시부터 시간)의 유향·유속
+const CR_OFF = (new Date(DAY0 + 'T00:00:00+09:00') - new Date('2026-09-30T00:00:00+09:00')) / 36e5;   // 조류 자료는 9/30 00시 기준
+function crntAt(c, tA) {
+  tA += CR_OFF; const T = c.t; if (tA < T[0] || tA >= T[T.length - 1]) return null;
+  let lo = 0, hi = T.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (T[m] <= tA) lo = m; else hi = m; }
+  const f = (tA - T[lo]) / (T[hi] - T[lo]);
+  if (c.s[lo] === 0) return { sp: c.s[hi] * Math.sin(Math.PI / 2 * f), dir: c.d[hi], i: hi };   // 물돌이 → 최강
+  return { sp: c.s[lo] * Math.cos(Math.PI / 2 * f), dir: c.d[lo], i: lo };                    // 최강 → 물돌이
+}
+// 하루(day 0 = 9/30) 안의 물돌이·최강 시각
+function crntDay(c, day) {
+  const a = day * 24 + CR_OFF, b = a + 24, out = [];
+  for (let i = 0; i < c.t.length; i++) { if (c.t[i] >= b) break; if (c.t[i] >= a) out.push({ h: c.t[i] - a + 1e-6, sp: c.s[i], dir: c.d[i] }); }
+  return out;
+}
+const CR_NEAR_CACHE = new Map();
+function nearestCrnt(lat, lon) {
+  const key = lat.toFixed(4) + ',' + lon.toFixed(4); if (CR_NEAR_CACHE.has(key)) return CR_NEAR_CACHE.get(key);
+  let best = null, bd = Infinity; for (const c of CR.st) { const d = gdist({ lat, lon }, c); if (d < bd) { bd = d; best = c; } }
+  const r = best ? { c: best, km: bd } : null; CR_NEAR_CACHE.set(key, r); return r;
+}
+// 조과 지수용 흐름 세기: 15 km 안에 예보 지점이 있으면 그 지점 유속을 그날 최강 유속으로 나눈 값
+function flowU(st, pt, day, tA) {
+  if (CR.ready) {
+    const nc = nearestCrnt(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon);
+    if (nc && nc.km <= CR_NEAR) {
+      const r = crntAt(nc.c, tA); let mx = 0; for (const e of crntDay(nc.c, day)) mx = Math.max(mx, e.sp);
+      if (r && mx > 0) return { u: r.sp / mx, real: true, nc, r, mx };
+    }
+  }
+  return { u: tideAt(st, tA).rate / st.maxRate, real: false };
+}
+const ARROW_DIRS = ['북', '북북동', '북동', '동북동', '동', '동남동', '남동', '남남동', '남', '남남서', '남서', '서남서', '서', '서북서', '북서', '북북서'];
+const dirName16 = d => ARROW_DIRS[Math.round((((d % 360) + 360) % 360) / 22.5) % 16];
+// 해 뜨고 지는 시각 (NOAA 근사식, 한국 표준시)
+const DOY0 = Math.round((new Date(DAY0 + 'T12:00:00Z') - new Date(DAY0.slice(0, 4) + '-01-01T12:00:00Z')) / 864e5) + 1;
+function sunTimes(lat, lon, dayIdx) {
+  const N = DOY0 + dayIdx;
+  const g = 2 * Math.PI / 365 * (N - 1 + .5);
+  const eq = 229.18 * (.000075 + .001868 * Math.cos(g) - .032077 * Math.sin(g) - .014615 * Math.cos(2 * g) - .040849 * Math.sin(2 * g));
+  const dec = .006918 - .399912 * Math.cos(g) + .070257 * Math.sin(g) - .006758 * Math.cos(2 * g) + .000907 * Math.sin(2 * g) - .002697 * Math.cos(3 * g) + .00148 * Math.sin(3 * g);
+  const la = lat * D2R, ha = Math.acos(Math.cos(90.833 * D2R) / (Math.cos(la) * Math.cos(dec)) - Math.tan(la) * Math.tan(dec)) / D2R;
+  const noon = 720 - 4 * lon - eq + 540;
+  return [(noon - 4 * ha) / 60, (noon + 4 * ha) / 60];
+}
+
+/* ── 대상어 ───────────────────────────────────────────── */
+// season: 10월 시즌 점수(0~1), reg: [동해, 남해, 서해, 제주] 출현 점수, cur: 물살 선호(1=물때 영향 큼)
+const FISH = [
+  { n: '감성돔', season: .9, reg: [.6, 1, .8, 1], cur: 1, f: { h: .44, top: '#5f6b74', bot: '#dfe3e6', tail: 'fork', spiny: 1 } },
+  { n: '볼락', season: .5, reg: [.8, 1, .6, .6], cur: .4, f: { h: .36, top: '#7a4a3a', bot: '#c99a7c', tail: 'cut', mott: 1, eye: 1.4, spiny: 1 } },
+  { n: '벵에돔', season: .7, reg: [.3, 1, .1, 1], cur: .8, f: { h: .42, top: '#26343a', bot: '#55666d', tail: 'fork' } },
+  { n: '농어', season: .75, reg: [.8, 1, 1, .8], cur: .9, f: { h: .27, top: '#56645f', bot: '#e3e8e6', tail: 'fork', mouth: 1.4, spiny: 1 } },
+  { n: '우럭', season: .7, reg: [.8, .8, 1, .3], cur: .4, f: { h: .34, top: '#4a3c32', bot: '#8a7a6a', tail: 'round', mott: 1, mouth: 1.4, spiny: 1 } },
+  { n: '광어', season: .7, reg: [.7, .8, 1, .6], cur: .6, f: { flat: 1, top: '#6b5a40', bot: '#8a7656', mott: 1 } },
+  { n: '노래미', season: .6, reg: [1, .8, .9, .4], cur: .4, f: { h: .26, top: '#6b5a3a', bot: '#b8a580', tail: 'cut', mott: 1, longD: 1 } },
+  { n: '삼치', season: .9, reg: [.6, 1, 1, .8], cur: .8, f: { h: .2, top: '#33648f', bot: '#e6edf2', tail: 'deep', spots: '#1d3550' } },
+  { n: '고등어', season: .8, reg: [1, 1, .6, 1], cur: .7, f: { h: .24, top: '#2f6f6a', bot: '#e8eeee', tail: 'deep', wavy: 1 } },
+  { n: '참돔', season: .7, reg: [.4, 1, .6, 1], cur: 1, f: { h: .42, top: '#d4566a', bot: '#f2c2c6', tail: 'fork', dots: '#7fd0ff', spiny: 1 } },
+  { n: '잿방어', season: .5, reg: [.2, .6, .1, 1], cur: .9, f: { h: .36, top: '#7f7663', bot: '#d9d2c2', tail: 'deep', band: 1 } },
+  { n: '부시리', season: .8, reg: [.6, .9, .2, 1], cur: 1, f: { h: .26, top: '#2c6a80', bot: '#e9eef0', tail: 'deep', yline: 1 } },
+  { n: '대구', season: .1, reg: [.8, .6, .3, .1], cur: .5, f: { h: .3, top: '#857560', bot: '#e3dbcc', tail: 'cut', mott: 1, mouth: 1.3, barbel: 1 } },
+  { n: '숭어', season: .5, reg: [.8, 1, 1, .6], cur: .6, f: { h: .25, top: '#5f7586', bot: '#e5eaee', tail: 'fork', lines: 1 } },
+  { n: '전갱이', season: .8, reg: [.8, 1, .6, 1], cur: .7, f: { h: .3, top: '#5f8282', bot: '#e9eeee', tail: 'deep', scute: 1 } },
+  { n: '돌돔', season: .6, reg: [.4, 1, .1, 1], cur: .9, f: { h: .44, top: '#c9ccc6', bot: '#eeefe9', tail: 'fork', bars: 7, spiny: 1 } },
+  { n: '백조기', season: .6, reg: [0, .4, 1, .2], cur: .7, f: { h: .28, top: '#b9bdb6', bot: '#eef0ec', tail: 'round' } },
+  { n: '전어', season: .9, reg: [.5, 1, 1, .4], cur: .6, f: { h: .32, top: '#3a6a7e', bot: '#e8eef0', tail: 'fork', gspot: 1 } },
+];
+const REG_IDX = { '동해': 0, '남해': 1, '서해': 2, '제주': 3 };
+/* ── 물고기 일러스트 (SVG) ──────────────────────────── */
+function fishSVG(f, id) {
+  const W = 120, Hh = 64, cy = 32;
+  if (f.flat) {
+    let s = `<svg viewBox="0 0 ${W} ${Hh}" aria-hidden="true"><defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${f.top}"/><stop offset="1" stop-color="${f.bot}"/></linearGradient></defs>`;
+    s += `<ellipse cx="56" cy="${cy}" rx="44" ry="21" fill="none" stroke="${f.top}" stroke-width="6" stroke-dasharray="2 2" opacity=".7"/>`;
+    s += `<path d="M14 ${cy} C 20 8, 92 8, 100 ${cy} C 92 56, 20 56, 14 ${cy} Z" fill="url(#g${id})"/>`;
+    s += `<path d="M100 ${cy} L116 ${cy - 10} L116 ${cy + 10} Z" fill="${f.top}"/>`;
+    for (let i = 0; i < 9; i++) s += `<circle cx="${30 + (i * 37) % 60}" cy="${cy - 10 + (i * 13) % 22}" r="${2 + (i % 3)}" fill="#3b301f" opacity=".45"/>`;
+    s += `<circle cx="24" cy="${cy - 7}" r="3.2" fill="#f4f1e8"/><circle cx="24" cy="${cy - 7}" r="1.6" fill="#111"/><circle cx="30" cy="${cy - 11}" r="3" fill="#f4f1e8"/><circle cx="30" cy="${cy - 11}" r="1.5" fill="#111"/>`;
+    return s + '</svg>';
+  }
+  const h = f.h * 100, x0 = 8, x1 = 90, top = cy - h / 2, bot = cy + h / 2;
+  let s = `<svg viewBox="0 0 ${W} ${Hh}" aria-hidden="true"><defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${f.top}"/><stop offset=".55" stop-color="${f.top}" stop-opacity=".85"/><stop offset="1" stop-color="${f.bot}"/></linearGradient><clipPath id="c${id}"><path d="M${x0} ${cy + 2} C ${x0 + 10} ${top - 2}, ${x1 - 26} ${top}, ${x1} ${cy - h * .12} L ${x1} ${cy + h * .12} C ${x1 - 26} ${bot}, ${x0 + 12} ${bot + 1}, ${x0} ${cy + 2} Z"/></clipPath></defs>`;
+  // 꼬리
+  const tt = f.tail, th = Math.max(10, h * .9);
+  if (tt === 'fork') s += `<path d="M${x1 - 2} ${cy} L${x1 + 22} ${cy - th / 2} L${x1 + 14} ${cy} L${x1 + 22} ${cy + th / 2} Z" fill="${f.top}"/>`;
+  else if (tt === 'deep') s += `<path d="M${x1 - 2} ${cy} L${x1 + 24} ${cy - th * .75} L${x1 + 10} ${cy} L${x1 + 24} ${cy + th * .75} Z" fill="${f.top}"/>`;
+  else if (tt === 'round') s += `<path d="M${x1 - 2} ${cy - 3} C ${x1 + 22} ${cy - th / 2}, ${x1 + 22} ${cy + th / 2}, ${x1 - 2} ${cy + 3} Z" fill="${f.top}"/>`;
+  else s += `<path d="M${x1 - 2} ${cy - 3} L${x1 + 18} ${cy - th / 2} L${x1 + 18} ${cy + th / 2} L${x1 - 2} ${cy + 3} Z" fill="${f.top}"/>`;
+  // 등지느러미
+  if (f.longD) s += `<path d="M${x0 + 24} ${top + 3} Q ${x0 + 50} ${top - 9}, ${x1 - 8} ${cy - h * .2} L ${x1 - 10} ${cy - h * .12} Z" fill="${f.top}" opacity=".9"/>`;
+  else if (f.spiny) s += `<path d="M${x0 + 26} ${top + 2} L${x0 + 32} ${top - 9} L${x0 + 38} ${top - 2} L${x0 + 44} ${top - 10} L${x0 + 50} ${top - 2} L${x0 + 56} ${top - 8} L${x0 + 66} ${top + 3} Z" fill="${f.top}"/>`;
+  else s += `<path d="M${x0 + 34} ${top + 2} L${x0 + 46} ${top - 8} L${x0 + 56} ${top + 2} Z" fill="${f.top}"/>`;
+  s += `<path d="M${x0 + 46} ${bot - 2} L${x0 + 54} ${bot + 6} L${x0 + 60} ${bot - 1} Z" fill="${f.top}" opacity=".85"/>`;
+  // 몸통
+  s += `<path d="M${x0} ${cy + 2} C ${x0 + 10} ${top - 2}, ${x1 - 26} ${top}, ${x1} ${cy - h * .12} L ${x1} ${cy + h * .12} C ${x1 - 26} ${bot}, ${x0 + 12} ${bot + 1}, ${x0} ${cy + 2} Z" fill="url(#g${id})"/>`;
+  let pat = '';
+  if (f.bars) for (let i = 0; i < f.bars; i++) pat += `<rect x="${x0 + 14 + i * 10}" y="${top - 4}" width="5" height="${h + 8}" fill="#1c1f22" opacity=".85"/>`;
+  if (f.mott) for (let i = 0; i < 12; i++) pat += `<circle cx="${x0 + 16 + (i * 29) % 64}" cy="${top + 4 + (i * 11) % (h * .7)}" r="${2.4 + (i % 3)}" fill="#1d150f" opacity=".35"/>`;
+  if (f.spots) for (let i = 0; i < 14; i++) pat += `<circle cx="${x0 + 18 + i * 4.6}" cy="${cy - 2 + ((i % 2) ? 3 : -2)}" r="1.6" fill="${f.spots}"/>`;
+  if (f.dots) for (let i = 0; i < 12; i++) pat += `<circle cx="${x0 + 16 + (i * 23) % 62}" cy="${top + 5 + (i * 7) % (h * .5)}" r="1.3" fill="${f.dots}"/>`;
+  if (f.wavy) for (let i = 0; i < 6; i++) pat += `<path d="M${x0 + 20 + i * 10} ${top + 1} q 3 6 0 ${h * .3}" stroke="#123" stroke-width="1.6" fill="none" opacity=".7"/>`;
+  if (f.yline) pat += `<rect x="${x0 + 4}" y="${cy - 1.6}" width="${x1 - x0}" height="3.2" fill="#f2c94c" opacity=".9"/>`;
+  if (f.lines) for (let i = 0; i < 4; i++) pat += `<rect x="${x0 + 8}" y="${top + 4 + i * h / 6}" width="${x1 - x0}" height="1" fill="#2c3a44" opacity=".5"/>`;
+  if (f.scute) pat += `<path d="M${x0 + 30} ${cy - 2} Q ${x0 + 56} ${cy + 4}, ${x1} ${cy}" stroke="#c9d6d6" stroke-width="2" fill="none" stroke-dasharray="2 1.5"/>`;
+  if (f.band) pat += `<path d="M${x0 + 2} ${cy - 4} L${x0 + 22} ${top + 2}" stroke="#3a3328" stroke-width="3" opacity=".8"/>`;
+  if (f.gspot) pat += `<circle cx="${x0 + 26}" cy="${cy - 3}" r="2.6" fill="#122" />`;
+  s += `<g clip-path="url(#c${id})">${pat}</g>`;
+  // 아가미, 눈, 입
+  s += `<path d="M${x0 + 20} ${top + h * .22} Q ${x0 + 25} ${cy + 2}, ${x0 + 20} ${bot - h * .18}" stroke="#000" stroke-opacity=".25" stroke-width="1.3" fill="none"/>`;
+  const er = 3 * (f.eye || 1);
+  s += `<circle cx="${x0 + 11}" cy="${cy - h * .14}" r="${er}" fill="#f6f4ee"/><circle cx="${x0 + 11.5}" cy="${cy - h * .14}" r="${er * .5}" fill="#111"/>`;
+  s += `<path d="M${x0 - 1} ${cy + 2} l ${6 * (f.mouth || 1)} 1.5" stroke="#000" stroke-opacity=".4" stroke-width="1.2"/>`;
+  if (f.barbel) s += `<path d="M${x0 + 3} ${cy + 5} q 0 6 -3 8" stroke="${f.top}" stroke-width="1.2" fill="none"/>`;
+  return s + '</svg>';
+}
+
+/* ── 계기판 (관측소·날짜·조석 곡선) ─────────────────── */
+const tc = $('tideChart'), tcx = tc.getContext('2d');
+/* ── 선택 포인트: 항·포구를 5 km 간격으로 골라 가장 가까운 관측소 조석과 연결 ─ */
+let POINTS = [];
+const gdist = (a, b) => Math.hypot((a.lat - b.lat) * 111.0, (a.lon - b.lon) * 111.0 * Math.cos(a.lat * D2R));   // km
+/* ── 풍향·풍속·파고: 기상청 단기예보 5 km 격자 (항·포구·갯바위가 있는 격자만 수집) ──
+   포인트의 격자에 자료가 없으면 2칸(약 10 km) 안의 가장 가까운 격자를 쓰고 그 사실을 표시한다. */
+function kmaGrid(lat, lon) {   // 기상청 람베르트 정각원추도법 격자 (활용가이드의 변환식)
+  const RE = 6371.00877 / 5, s1 = 30 * D2R, s2 = 60 * D2R, ol = 126 * D2R, oa = 38 * D2R;
+  const sn = Math.log(Math.cos(s1) / Math.cos(s2)) / Math.log(Math.tan(Math.PI / 4 + s2 / 2) / Math.tan(Math.PI / 4 + s1 / 2));
+  const sf = Math.tan(Math.PI / 4 + s1 / 2) ** sn * Math.cos(s1) / sn, ro = RE * sf / Math.tan(Math.PI / 4 + oa / 2) ** sn;
+  const ra = RE * sf / Math.tan(Math.PI / 4 + lat * D2R / 2) ** sn; let th = lon * D2R - ol;
+  if (th > Math.PI) th -= 2 * Math.PI; if (th < -Math.PI) th += 2 * Math.PI; th *= sn;
+  return [Math.floor(ra * Math.sin(th) + 43 + .5), Math.floor(ro - ra * Math.cos(th) + 136 + .5)];
+}
+const WX_CELL = new Map();
+function wxCell(lat, lon) {
+  const [x, y] = kmaGrid(lat, lon), key = x + ',' + y; if (WX_CELL.has(key)) return WX_CELL.get(key);
+  let r = WXG.cells[key] ? { c: WXG.cells[key], near: 0 } : null;
+  if (!r) { let bd = 4.5; for (const k in WXG.cells) { const [a, b] = k.split(',').map(Number), d = (a - x) ** 2 + (b - y) ** 2; if (d <= bd) { bd = d; r = { c: WXG.cells[k], near: Math.round(Math.sqrt(d) * 5) }; } } }
+  WX_CELL.set(key, r); return r;
+}
+function wxAt(st, day, h, pt) {
+  const p = pt || st, r = wxCell(p.lat, p.lon); if (!r) return null;
+  const date = dateAdd(DAY0, day).replace(/-/g, '');
+  for (let hh = Math.floor(h); hh >= Math.max(0, Math.floor(h) - 2); hh--) {   // 4일째부터는 3시간 간격
+    const v = r.c[date + String(hh).padStart(2, '0')];
+    if (v) return { dir: v[0] == null ? '—' : dirName(v[0]), deg: v[0], sp: v[1], wave: v[2], slot: hh, from: `기상청 ${+WXG.base.slice(6, 8)}일 ${WXG.base.slice(8, 10)}시 발표`, near: r.near > 0, km: r.near };
+  }
+  return null;
+}
+/* ── 바다 수온: 국립해양조사원 조위관측소 실측 (50 km 안, 수집 시각 기준 24시간 안의 값만) ── */
+const SST_C = new Map();
+function sstFor(st) {
+  if (SST_C.has(st.id)) return SST_C.get(st.id);
+  const t0 = new Date(META.generated); let r = null, bd = 50;
+  for (const o of Object.values(OBS)) {
+    if (!o.sst || !(o.sst[0] > 1 && o.sst[0] < 33)) continue; const age = (t0 - new Date(o.sst[1].replace(' ', 'T') + ':00+09:00')) / 36e5; if (age > 24) continue;
+    const d = gdist(st, o); if (d < bd) { bd = d; r = [o.sst[0], o.sst[1].slice(5).replace('-', '/'), o.name, Math.round(d)]; }
+  }
+  SST_C.set(st.id, r); return r;
+}
+function buildPoints() {
+  setTimeout(fillNameList, 0);
+  const cand = PORTS.slice().sort((a, b) => portPri(a.type) - portPri(b.type) || a.name.localeCompare(b.name, 'ko'));
+  const kept = [];
+  for (const p of cand) if (!inBan(p.lat, p.lon) && !kept.some(q => gdist(p, q) < 5)) kept.push(p);
+  POINTS = kept.map(p => {
+    let bi = 0, bd = Infinity; STATIONS.forEach((st, i) => { const d = gdist(p, st); if (d < bd) { bd = d; bi = i; } });
+    p.isPt = true;
+    return { name: p.name, type: p.type, lat: p.lat, lon: p.lon, mx: p.mx, my: p.my, st: bi, dkm: bd, region: STATIONS[bi].region };
+  });
+  for (const p of PORTS) if (!kept.includes(p)) p.isPt = false;
+  for (const r of ROCKS) {
+    if ((r.access === 'boat' && !S.showBoat) || r.banned) continue;
+    let bi = 0, bd = Infinity; STATIONS.forEach((st, i) => { const d = gdist(r, st); if (d < bd) { bd = d; bi = i; } });
+    POINTS.push({ ...r, st: bi, dkm: bd, region: STATIONS[bi].region });
+  }
+  const order = ['동해', '남해', '서해', '제주'];
+  const grp = (r, rock) => POINTS.map((p, i) => ({ p, i })).filter(o => o.p.region === r && (o.p.kind === 'rock') === rock).sort((a, b) => b.p.lat - a.p.lat);
+  $('stSel').innerHTML = order.map(r => `<optgroup label="항·포구 · ${r}">` + grp(r, false).map(o => `<option value="${o.i}">${o.p.name}</option>`).join('') + '</optgroup>').join('')
+    + order.map(r => { const g = grp(r, true); return g.length ? `<optgroup label="갯바위 · ${r}">` + g.map(o => `<option value="${o.i}">${o.p.name}${o.p.access === 'unk' ? ' (접근 확인 필요)' : o.p.access === 'boat' ? ' (배로만)' : ''}</option>`).join('') + '</optgroup>' : ''; }).join('');
+}
+function selectPoint(j, zoom) {
+  S.pt = j; const p = POINTS[j];
+  S.st = p.st; const st = STATIONS[p.st];
+  S.range = (st.maxCm - st.minCm) / 100;
+  $('stSel').value = String(j);
+  $('stName').textContent = p.name;
+  $('stReg').textContent = (p.kind === 'rock' ? '갯바위 · ' + ACC_NAME[p.access] + ' · ' : '') + `조석: ${st.name} 예보지점 기준 · ${p.dkm < 1 ? '1 km 이내' : p.dkm.toFixed(0) + ' km'}`;
+  $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : '';
+  if (zoom) fitGround(p.lat, p.lon, 9000);
+  $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
+  dirty = true; renderDays(); renderBite();
+}
+function renderDays() {
+  const st = STATIONS[S.st];
+  const html = st.days.slice(0, NDAYS).map((d, i) => {
+    const [, m, dd] = d.date.split('-'), wd = '일월화수목금토'[new Date(d.date + 'T12:00:00+09:00').getDay()];
+    return `<button type="button" role="tab" aria-selected="${i === S.day}" data-day="${i}"><span class="dd">${+m}/${+dd} ${wd}</span><span class="mm">${d.mul}</span>${i === TODAY_IDX ? '<i>오늘</i>' : ''}</button>`;
+  }).join('');
+  for (const id of ['dayStrip', 'biteDays']) $(id).innerHTML = html;
+  const d = st.days[S.day];
+  $('dayEvents').innerHTML = d.ev.map(([h, cm, k]) => `<span class="ev ${k}">${k === 'H' ? '만조' : '간조'} <b>${fmtH(h)}</b> ${cm}cm</span>`).join('') + `<span class="ev">음력 ${d.lunar}</span>`;
+}
+function setDay(i) { S.day = i; renderDays(); renderBite(); }
+function drawTideChart(tide) {
+  const r = DPR(), w = tc.clientWidth, h = 130; if (tc.width !== Math.round(w * r)) { tc.width = Math.round(w * r); tc.height = Math.round(h * r); }
+  tcx.setTransform(r, 0, 0, r, 0, 0); tcx.clearRect(0, 0, w, h);
+  const st = STATIONS[S.st], ml = 34, mr = 8, mt = 14, mb = 18, lo = st.minCm - 10, hi = st.maxCm + 10;
+  const X = t => ml + t / 24 * (w - ml - mr), Y = cm => mt + (hi - cm) / (hi - lo) * (h - mt - mb);
+  const [sr, ss] = sunTimes(st.lat, st.lon, S.day);
+  tcx.fillStyle = 'rgba(4,9,12,.6)'; tcx.fillRect(X(0), mt, X(sr) - X(0), h - mt - mb); tcx.fillRect(X(ss), mt, X(24) - X(ss), h - mt - mb);
+  tcx.font = '400 9.5px JetBrains Mono, monospace'; tcx.fillStyle = '#7a9ea6'; tcx.textBaseline = 'top';
+  for (let t = 0; t <= 24; t += 6) { tcx.fillText(String(t).padStart(2, '0'), X(t) - 6, h - mb + 4); tcx.fillStyle = 'rgba(120,220,230,.08)'; tcx.fillRect(X(t), mt, 1, h - mt - mb); tcx.fillStyle = '#7a9ea6'; }
+  tcx.textBaseline = 'middle'; tcx.fillText(Math.round(hi - 10) + '', 2, Y(hi - 10)); tcx.fillText(Math.round(lo + 10) + '', 2, Y(lo + 10));
+  tcx.beginPath(); for (let i = 0; i <= 240; i++) { const t = i / 10, c = tideAt(st, S.day * 24 + t).cm; i ? tcx.lineTo(X(t), Y(c)) : tcx.moveTo(X(t), Y(c)); }
+  tcx.lineTo(X(24), h - mb); tcx.lineTo(X(0), h - mb); tcx.closePath();
+  const g = tcx.createLinearGradient(0, mt, 0, h - mb); g.addColorStop(0, 'rgba(79,227,211,.45)'); g.addColorStop(1, 'rgba(79,227,211,.03)'); tcx.fillStyle = g; tcx.fill();
+  tcx.beginPath(); for (let i = 0; i <= 240; i++) { const t = i / 10, c = tideAt(st, S.day * 24 + t).cm; i ? tcx.lineTo(X(t), Y(c)) : tcx.moveTo(X(t), Y(c)); } tcx.strokeStyle = '#4fe3d3'; tcx.lineWidth = 1.6; tcx.stroke();
+  tcx.font = '600 9.5px JetBrains Mono, monospace';
+  for (const [hh, cm, k] of st.days[S.day].ev) { const x = X(hh), y = Y(cm); tcx.fillStyle = k === 'H' ? '#ffb84d' : '#9ec9cf'; tcx.beginPath(); tcx.arc(x, y, 3, 0, 7); tcx.fill(); tcx.textBaseline = k === 'H' ? 'bottom' : 'top'; tcx.fillText(fmtH(hh), clamp(x - 14, ml, w - mr - 30), k === 'H' ? y - 4 : y + 4); }
+  const x = X(S.t); tcx.strokeStyle = '#fff'; tcx.lineWidth = 1; tcx.beginPath(); tcx.moveTo(x, mt); tcx.lineTo(x, h - mb); tcx.stroke();
+  tcx.fillStyle = '#fff'; tcx.beginPath(); tcx.arc(x, Y(tide.cm), 4, 0, 7); tcx.fill();
+}
+tc.addEventListener('pointerdown', e => { const set = ev => { const b = tc.getBoundingClientRect(); S.t = clamp((ev.clientX - b.left - 34) / (b.width - 42) * 24, 0, 23.99); $('tIn').value = S.t; }; tc.setPointerCapture(e.pointerId); set(e); tc.onpointermove = ev => { if (tc.hasPointerCapture(ev.pointerId)) set(ev); }; });
+
+/* ── 시간별 조과 지수 (엄격한 규칙 기반 추정) ───────────
+   시즌 × 해역 × 물때 세기 × 파고 × 시간대 밝기 × 그 시각 물흐름 세기를 곱한다.
+   곱셈이라 조건이 하나만 나빠도 크게 내려가고, 해뜰녘·해질녘에 물이 적당히 흐를 때만 높게 나온다. */
+const LIGHT = { 감성돔: 'dd', 볼락: 'n', 벵에돔: 'd', 농어: 'nd', 우럭: 'n', 광어: 'd', 노래미: 'd', 삼치: 'dd', 고등어: 'dd', 참돔: 'dd', 잿방어: 'd', 부시리: 'dd', 대구: 'd', 숭어: 'd', 전갱이: 'nd', 돌돔: 'd', 백조기: 'd', 전어: 'd' };
+const LIGHT_T = { dd: [1, .55, .2], d: [.85, .85, .15], n: [.8, .3, 1], nd: [1, .45, .85] };   // [해뜰녘·해질녘, 낮, 밤]
+const LIGHT_NAME = { dd: '해뜰녘·해질녘', d: '낮', n: '밤', nd: '밤·해뜰녘·해질녘' };
+function lightF(type, h, sr, ss) {
+  const tw = Math.min(Math.abs(h - sr), Math.abs(h - ss)) <= 1.25, day = h > sr && h < ss, T = LIGHT_T[type];
+  return tw ? T[0] : day ? T[1] : T[2];
+}
+const flowF = (fish, u) => 1 - fish.cur * .6 * Math.min(1, Math.abs(Math.abs(u) - .65) / .65);   // 최강 유속의 65% 안팎에서 가장 좋게
+function targetF(fish, pt) {
+  if (!pt || !pt.targets) return 1;
+  return pt.targets.includes(fish.n) || (fish.n === '우럭' && pt.targets.includes('조피볼락')) || (fish.n === '노래미' && pt.targets.includes('쥐노래미')) || (fish.n === '광어' && pt.targets.includes('넙치')) || (fish.n === '백조기' && pt.targets.includes('보구치')) ? 1 : .55;
+}
+// 수온: 관측값이 범위 안이면 1, 벗어난 1 ℃마다 0.1씩 (최소 0.5). 관측값이 없거나 범위 자료가 부정확한 어종은 반영하지 않음
+function tempF(fish, st) {
+  const w = sstFor(st), r = TEMP_PREF[fish.n]; if (!w || !r || !r[2]) return 1;
+  const d = w[0] < r[0] ? r[0] - w[0] : w[0] > r[1] ? w[0] - r[1] : 0; return Math.max(.5, 1 - (weakTide(st) ? .15 : .1) * d);
+}
+// 조차가 작은 바다(그 관측소 7일 예보의 최고·최저 조위 차 60 cm 미만: 동해안·울릉도)는 조석 흐름이 약해
+// 물때와 조위 변화 속도를 지수에 넣지 않고, 대신 평균값(중립)을 곱한 뒤 바람·수온 비중을 높인다.
+const weakTide = st => st.maxCm - st.minCm < 60;
+const FLOW_AVG_C = new Map(), FLOW_AVG = cur => FLOW_AVG_C.get(cur) ?? (FLOW_AVG_C.set(cur, FLOW_AVG0(cur)), FLOW_AVG_C.get(cur));
+const FLOW_AVG0 = cur => { let a = 0; for (let i = 0; i < 180; i++) a += flowF({ cur }, Math.sin((i + .5) / 180 * Math.PI)); return a / 180; };
+const FT_AVG = cur => 1 - .25 * cur + .25 * cur * .57;   // 물때 세기 0~100% 고르게 놓았을 때의 평균
+const windF = sp => sp == null ? 1 : sp <= 7 ? 1 : sp <= 10 ? .85 : sp <= 13 ? .6 : .35;   // 풍랑주의보 기준(14 m/s)에 가까울수록 크게 감점
+// 내 조황 기록 보정: 같은 해역에서 기록한 출조 중 그 어종을 잡은 비율을, 모델 기대치(시즌×해역)와 섞어 0.5~1.5배로 반영
+let CATCHES = [];
+function myF(fish, st) {
+  const reg = st.region, trips = new Map();
+  for (const c of CATCHES) if (c.region === reg) { const k = c.date + '|' + c.pt; if (!trips.has(k)) trips.set(k, new Set()); if (c.count > 0) trips.get(k).add(c.species); }
+  const n = trips.size; if (!n) return { f: 1, n: 0, hit: 0 };
+  let hit = 0; for (const s2 of trips.values()) if (s2.has(fish.n)) hit++;
+  const base = Math.max(.05, fish.season * fish.reg[REG_IDX[reg]]), K = 5, rate = (hit + K * base) / (n + K);
+  return { f: Math.max(.5, Math.min(1.5, rate / base)), n, hit };
+}
+function biteAt(fish, pt, st, day, h) {
+  const base = fish.season * fish.reg[REG_IDX[st.region]] * targetF(fish, pt);
+  if (base <= 0) return 0;
+  const weak = weakTide(st), pct = st.days[day].pct, g = 1 - Math.min(1, Math.abs(pct - 60) / 60);
+  const fT = weak ? FT_AVG(fish.cur) : (1 - .25 * fish.cur) + .25 * fish.cur * g;
+  const wx = wxAt(st, day, h + .5, pt), hs = wx && wx.wave != null ? wx.wave : null;
+  const fW = (hs == null ? 1 : hs <= 1 ? 1 : hs <= 1.5 ? .85 : hs <= 2.5 ? .55 : .25) * (weak && wx ? windF(wx.sp) : 1);   // 파고 예보가 없으면 반영하지 않음
+  const lat = pt ? pt.lat : st.lat, lon = pt ? pt.lon : st.lon, [sr, ss] = sunTimes(lat, lon, day);
+  const fu = flowU(st, pt, day, day * 24 + h + .5), fF = weak && !fu.real ? FLOW_AVG(fish.cur) : flowF(fish, fu.u);
+  return Math.max(1, Math.min(99, Math.round(100 * base * fT * fW * tempF(fish, st) * myF(fish, st).f * lightF(LIGHT[fish.n], h + .5, sr, ss) * fF * .9)));
+}
+const level = p => p >= 60 ? ['높음', 'hi'] : p >= 40 ? ['보통', 'mid'] : p > 0 ? ['낮음', 'lo'] : ['없음', 'none'];
+function spark(arr, sel) {
+  const w = 120, hh = 26, bw = w / 24;
+  return `<svg class="spark" viewBox="0 0 ${w} ${hh}" aria-hidden="true">` + arr.map((p, i) => { const bh = Math.max(1, p / 100 * (hh - 2)), c = p >= 60 ? '#5ff0a8' : p >= 40 ? '#ffb84d' : p > 0 ? '#3d6670' : '#22343a'; return `<rect x="${(i * bw + .5).toFixed(1)}" y="${(hh - bh).toFixed(1)}" width="${(bw - 1).toFixed(1)}" height="${bh.toFixed(1)}" fill="${c}"${i === sel ? ' stroke="#fff" stroke-width="1"' : ''}/>`; }).join('') + '</svg>';
+}
+let biteHour = -1, BITE_H = null;
+function renderBite() {
+  const st = STATIONS[S.st], d = st.days[S.day], pt = POINTS[S.pt], H = Math.floor(S.t);
+  biteHour = H;
+  $('biteSub').textContent = `${pt ? pt.name : st.name} · ${d.date.slice(5).replace('-', '/')} ${String(H).padStart(2, '0')}시 · ${d.mul} (${d.pct}%)`;
+  const [sr, ss] = sunTimes(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon, S.day);
+  const rows = FISH.map((f, i) => { const arr = Array.from({ length: 24 }, (_, h) => biteAt(f, pt, st, S.day, h)); const best = arr.indexOf(Math.max(...arr)); return { f, i, arr, p: arr[H], best }; }).sort((a, b) => b.p - a.p || b.arr[b.best] - a.arr[a.best]);
+  BITE_H = { sr, ss, best: Array.from({ length: 24 }, (_, h) => { let b = null; for (const r of rows) if (!b || r.arr[h] > b.p) b = { p: r.arr[h], n: r.f.n }; return b; }) };
+  const top = rows.filter(r => r.arr[r.best] >= 60);
+  $('biteWin').textContent = `해 뜸 ${fmtH(sr)} · 해 짐 ${fmtH(ss)} · ` + (top.length ? '오늘 "높음"이 나오는 시간: ' + top.slice(0, 4).map(r => `${r.f.n} ${String(r.best).padStart(2, '0')}시`).join(', ') : '오늘은 "높음"이 나오는 시간이 없습니다.');
+  $('fishGrid').innerHTML = rows.map(({ f, i, arr, p, best }) => {
+    const [lv, cls] = level(p);
+    return `<div class="fish ${cls}"><div class="pic">${fishSVG(f.f, i)}</div><div class="fn">${f.n}<span class="lt">${LIGHT_NAME[LIGHT[f.n]]}</span></div><div class="fp"><b>${p}%</b><span class="lv ${cls}">${lv}</span></div>${spark(arr, H)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}%</div></div>`;
+  }).join('');
+  if (pt && pt.kind === 'rock') $('rockInfo').innerHTML = rockInfoHTML(pt); else $('rockInfo').innerHTML = '';
+  if (typeof renderBasis === 'function') renderBasis();
+  if (typeof renderLog === 'function') renderLog();
+}
+
+/* ── 지도 위 관측소 표시 ─────────────────────────────── */
+let stHits = [];
+function drawStations() {
+  stHits = []; const placed = [];
+  bctx.textBaseline = 'middle';
+  const gpp = 1 / pxPerGround();
+  const order = POINTS.map((p, i) => i).sort((a, b) => (a === S.pt ? -1 : b === S.pt ? 1 : portPri(POINTS[a].type) - portPri(POINTS[b].type)));
+  for (const i of order) {
+    const st = POINTS[i], [x, y] = toS(st.mx, st.my); if (x < -20 || y < -20 || x > cw + 20 || y > ch + 20) continue;
+    if (i !== S.pt && !S.layers[st.kind === 'rock' ? 'rock' : 'port']) continue;
+    const sel = i === S.pt, r = sel ? 7 : gpp > 400 ? 3.5 : 5;
+    bctx.fillStyle = sel ? '#4fe3d3' : '#06131d'; bctx.strokeStyle = '#4fe3d3'; bctx.lineWidth = 2;
+    if (st.kind === 'rock') {
+      const rc = st.access === 'car' ? '#f0a35e' : st.access === 'unk' ? '#a9b7b9' : '#6c7d80';
+      bctx.fillStyle = sel ? rc : '#06131d'; bctx.strokeStyle = rc;
+      bctx.beginPath(); bctx.moveTo(x, y - r - 1); bctx.lineTo(x + r, y + r * .8); bctx.lineTo(x - r, y + r * .8); bctx.closePath(); bctx.fill(); bctx.stroke();
+    } else { bctx.beginPath(); bctx.moveTo(x, y - r); bctx.lineTo(x + r, y); bctx.lineTo(x, y + r); bctx.lineTo(x - r, y); bctx.closePath(); bctx.fill(); bctx.stroke(); }
+    stHits.push([x, y, i]);
+    bctx.font = (sel ? '700 12.5px' : '600 11.5px') + ' IBM Plex Sans KR, sans-serif';
+    const w = bctx.measureText(st.name).width, box = [x + 9, y - 9, x + 13 + w, y + 9];
+    if (!sel && (gpp > 700 || placed.some(b => !(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3])))) continue;
+    placed.push(box);
+    bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(st.name, x + 11, y);
+    bctx.fillStyle = st.kind === 'rock' ? (sel ? '#f0a35e' : '#f6d2b0') : sel ? '#4fe3d3' : '#c9f6f0'; bctx.fillText(st.name, x + 11, y);
+  }
+}
+function stationAt(x, y) { let best = null, bd = 14; for (const [sx, sy, i] of stHits) { const d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = i; } } return best; }
+
+/* ── 평면직각좌표(TM) → 경위도 (EPSG:5179, 5186 지원) ─── */
+function tmToLL(x, y) {
+  const P = y > 1000000 ? { lon0: 127.5, lat0: 38, k0: .9996, fe: 1000000, fn: 2000000, name: 'EPSG:5179' } : { lon0: 127, lat0: 38, k0: 1, fe: 200000, fn: 600000, name: 'EPSG:5186' };
+  const a = 6378137, f = 1 / 298.257222101, e2 = 2 * f - f * f, ep2 = e2 / (1 - e2);
+  const Mf = ph => a * ((1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * e2 ** 3 / 256) * ph - (3 * e2 / 8 + 3 * e2 * e2 / 32 + 45 * e2 ** 3 / 1024) * Math.sin(2 * ph) + (15 * e2 * e2 / 256 + 45 * e2 ** 3 / 1024) * Math.sin(4 * ph) - (35 * e2 ** 3 / 3072) * Math.sin(6 * ph));
+  const M = Mf(P.lat0 * D2R) + (y - P.fn) / P.k0, mu = M / (a * (1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * e2 ** 3 / 256));
+  const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
+  const p1 = mu + (3 * e1 / 2 - 27 * e1 ** 3 / 32) * Math.sin(2 * mu) + (21 * e1 * e1 / 16 - 55 * e1 ** 4 / 32) * Math.sin(4 * mu) + (151 * e1 ** 3 / 96) * Math.sin(6 * mu) + (1097 * e1 ** 4 / 512) * Math.sin(8 * mu);
+  const C1 = ep2 * Math.cos(p1) ** 2, T1 = Math.tan(p1) ** 2, N1 = a / Math.sqrt(1 - e2 * Math.sin(p1) ** 2), R1 = a * (1 - e2) / (1 - e2 * Math.sin(p1) ** 2) ** 1.5, D = (x - P.fe) / (N1 * P.k0);
+  const lat = p1 - (N1 * Math.tan(p1) / R1) * (D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * ep2) * D ** 4 / 24 + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * ep2 - 3 * C1 * C1) * D ** 6 / 720);
+  const lon = P.lon0 * D2R + (D - (1 + 2 * T1 + C1) * D ** 3 / 6 + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * ep2 + 24 * T1 * T1) * D ** 5 / 120) / Math.cos(p1);
+  return [lat / D2R, lon / D2R, P.name];
+}
+
+/* ── 보기 ──────────────────────────────────────────────── */
+const stage = $('stage'), base = $('base'), flow = $('flow'), ui = $('ui');
+const bctx = base.getContext('2d'), fctx = flow.getContext('2d'), uctx = ui.getContext('2d');
+const mask = document.createElement('canvas'), mctx = mask.getContext('2d', { willReadFrequently: true });
+let maskData = null, cw = 0, ch = 0, dirty = true;
+const V = { cx: mxOf(128), cy: myOf(36), s: 1e-3 };
+const toS = (mx, my) => [(mx - V.cx) * V.s + cw / 2, (V.cy - my) * V.s + ch / 2];
+const toM = (px, py) => [V.cx + (px - cw / 2) / V.s, V.cy - (py - ch / 2) / V.s];
+const pxPerGround = () => V.s * kAt(latOf(V.cy));
+const KB = { x1: mxOf(123.8), x2: mxOf(132.4), y1: myOf(32.6), y2: myOf(39) };
+function clampView() {
+  const gw = cw / pxPerGround();
+  if (gw > 1.1e6) V.s *= gw / 1.1e6;
+  if (gw < 150) V.s *= gw / 150;
+  V.cx = clamp(V.cx, KB.x1, KB.x2); V.cy = clamp(V.cy, KB.y1, KB.y2);
+  dirty = true;
+}
+function fitBox(x1, y1, x2, y2, pad = .9) { V.cx = (x1 + x2) / 2; V.cy = (y1 + y2) / 2; V.s = Math.min(cw / Math.max(1, x2 - x1), ch / Math.max(1, y2 - y1)) * pad; clampView(); }
+function fitLonLat(bb) { fitBox(mxOf(bb[0]), myOf(bb[1]), mxOf(bb[2]), myOf(bb[3])); }
+function fitGround(lat, lon, widthG) { V.cx = mxOf(lon); V.cy = myOf(lat); V.s = cw / (widthG * kAt(lat)); clampView(); }
+function zoomAt(px, py, f) { const [mx, my] = toM(px, py); V.s *= f; clampView(); const [nx, ny] = toM(px, py); V.cx += mx - nx; V.cy += my - ny; clampView(); }
+
+/* ── 바탕 그리기 ───────────────────────────────────────── */
+const BANDS = [[10, '#64e6d4'], [30, '#43ccc3'], [50, '#2fb0b4'], [100, '#2194a5'], [150, '#1b8097'], [200, '#176e88'], [300, '#135d77'], [500, '#104e68'], [1000, '#0d405a'], [2000, '#0b344b'], [5000, '#0a2a3e'], [10000, '#082233'], [20000, '#071b2a']];
+const FAR = '#06141f';
+/* ── GEBCO 2026 지형 격자 (15초 ≈ 460 m, 육지 표고 + 해저 수심) ───────────
+   GEBCO Compilation Group (2026) GEBCO 2026 Grid. 공공 영역. 행마다 앞 칸과의 차이를 저장 후 deflate 압축. */
+let GE = null, GSH = null;   // GE: Int16 표고(m, 바다는 음수), GSH: 음영(0~1)
+async function loadGebco() {
+  try {
+    if (typeof DecompressionStream === 'undefined') throw new Error('이 브라우저는 압축 해제를 지원하지 않습니다');
+    const bin = atob(GEBCO.b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const buf = new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
+    const { w, h } = GEBCO, n = w * h, E = new Int16Array(n);
+    for (let r = 0; r < h; r++) { let acc = 0; for (let c = 0; c < w; c++) { const k = r * w + c; let d = buf[k] | (buf[n + k] << 8); if (d > 32767) d -= 65536; acc += d; E[k] = acc; } }
+    // 음영기복: 북서쪽(315°) 45° 높이의 빛. 해저는 경사가 완만해 과장 배율을 크게.
+    const S2 = new Uint8Array(n), Lx = -.5, Ly = .5, Lz = Math.SQRT1_2;
+    for (let r = 0; r < h; r++) {
+      const lat = GEBCO.lat0 - (r + .5) * GEBCO.step, dx = GEBCO.step * 111320 * Math.cos(lat * D2R), dy = GEBCO.step * 110574;
+      for (let c = 0; c < w; c++) {
+        const k = r * w + c, e = E[k], z = e >= 0 ? 2.2 : 7;
+        const zx = (E[r * w + Math.min(w - 1, c + 1)] - E[r * w + Math.max(0, c - 1)]) / (2 * dx) * z;
+        const zy = (E[Math.max(0, r - 1) * w + c] - E[Math.min(h - 1, r + 1) * w + c]) / (2 * dy) * z;
+        const L = Math.hypot(zx, zy, 1), v = (-zx * Lx - zy * Ly + Lz) / L;
+        S2[k] = Math.max(0, Math.min(255, Math.round(v * 255)));
+      }
+    }
+    GE = E; GSH = S2; dirty = true; dirtyHover = true; analyzeSection();
+  } catch (err) { console.warn('GEBCO 지형을 불러오지 못했습니다:', err); $('terrainNote').textContent = '지형 자료를 풀지 못했습니다 (' + err.message + '). 기본 지도로 표시합니다.'; }
+}
+// 경위도에서 쌍선형 보간한 표고/음영 (자료 범위 밖이면 null)
+function gebcoAt(lat, lon, arr = GE) {
+  if (!arr) return null;
+  const { w, h, lat0, lon0, step } = GEBCO, fc = (lon - lon0) / step - .5, fr = (lat0 - lat) / step - .5;
+  if (fc < 0 || fr < 0 || fc > w - 1 || fr > h - 1) return null;
+  const c0 = Math.min(w - 2, fc | 0), r0 = Math.min(h - 2, fr | 0), tx = fc - c0, ty = fr - r0, k = r0 * w + c0;
+  return (arr[k] * (1 - tx) + arr[k + 1] * tx) * (1 - ty) + (arr[k + w] * (1 - tx) + arr[k + w + 1] * tx) * ty;
+}
+const hex2 = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+function makeLUT(stops, max) {
+  const out = new Uint8Array((max + 1) * 3), S_ = stops.map(([v, c]) => [v, hex2(c)]);
+  for (let v = 0; v <= max; v++) { let i = 1; while (i < S_.length - 1 && S_[i][0] < v) i++; const [v0, a] = S_[i - 1], [v1, b] = S_[i], f = Math.max(0, Math.min(1, (v - v0) / (v1 - v0))); for (let j = 0; j < 3; j++) out[v * 3 + j] = a[j] + (b[j] - a[j]) * f; }
+  return out;
+}
+const SEA_STOPS = [[0, '#86d8cf'], [5, '#64c4c0'], [10, '#46acb6'], [20, '#2f91a8'], [50, '#227597'], [100, '#1b6184'], [200, '#164f70'], [500, '#11405e'], [1000, '#0d324d'], [2000, '#0a263d'], [3500, '#071b2e']];
+const LAND_STOPS = [[0, '#55704a'], [50, '#5f7c4e'], [200, '#728c56'], [400, '#8a9562'], [700, '#9c966f'], [1000, '#a08c72'], [1400, '#aa9e8f'], [2000, '#ddd6cc']];
+const SEA_LUT = makeLUT(SEA_STOPS, 3500), LAND_LUT = makeLUT(LAND_STOPS, 2000);
+const tcan = [document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas')];
+// 화면 크기의 절반 해상도로 바다용/육지용 지형 그림을 만든다 (육지/바다 구분은 실제 해안선이 정함)
+// 수심 단계 (해도처럼 구간별 색) — 단계 경계값(m)
+const DEPTH_STEPS = [0, 2, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200, 300, 500, 1000, 2000, 3500];
+const STEP_OF = new Uint8Array(3501); { let k = 0; for (let v = 0; v <= 3500; v++) { while (k < DEPTH_STEPS.length - 2 && v >= DEPTH_STEPS[k + 1]) k++; STEP_OF[v] = k; } }
+let DEPTH_GRID = null;   // 화면 절반 해상도의 바다 수심(m), 육지는 NaN
+function renderTerrain(path, gpp) {
+  const W = Math.ceil(cw / 2), H = Math.ceil(ch / 2);
+  for (const c of tcan) if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
+  // 1) 육지 마스크(절반 해상도) → 해안선까지 거리(챔퍼 3-4 거리변환)
+  const mc = tcan[2].getContext('2d'); mc.setTransform(1, 0, 0, 1, 0, 0); mc.clearRect(0, 0, W, H); mc.setTransform(.5, 0, 0, .5, 0, 0); mc.fillStyle = '#fff'; mc.fill(path, 'evenodd');
+  const md = mc.getImageData(0, 0, W, H).data, N = W * H, DT = new Float32Array(N), BIG = 1e9;
+  for (let i = 0; i < N; i++) DT[i] = md[i * 4 + 3] > 127 ? 0 : BIG;
+  for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) { const k = j * W + i; let v = DT[k]; if (!v) continue;
+    if (i > 0) v = Math.min(v, DT[k - 1] + 3); if (j > 0) { v = Math.min(v, DT[k - W] + 3); if (i > 0) v = Math.min(v, DT[k - W - 1] + 4); if (i < W - 1) v = Math.min(v, DT[k - W + 1] + 4); } DT[k] = v; }
+  for (let j = H - 1; j >= 0; j--) for (let i = W - 1; i >= 0; i--) { const k = j * W + i; let v = DT[k]; if (!v) continue;
+    if (i < W - 1) v = Math.min(v, DT[k + 1] + 3); if (j < H - 1) { v = Math.min(v, DT[k + W] + 3); if (i < W - 1) v = Math.min(v, DT[k + W + 1] + 4); if (i > 0) v = Math.min(v, DT[k + W - 1] + 4); } DT[k] = v; }
+  const pxm = 2 * gpp / 3;   // 거리변환 1단위 = 절반 해상도 1칸/3 → 지상 m
+  const D = new Float32Array(N);
+  const sea = tcan[0].getContext('2d').createImageData(W, H), land = tcan[1].getContext('2d').createImageData(W, H);
+  const { w, h, lat0, lon0, step } = GEBCO;
+  const cols = new Float32Array(W); for (let i = 0; i < W; i++) cols[i] = (lonOf(toM(i * 2 + 1, 0)[0]) - lon0) / step - .5;
+  for (let j = 0; j < H; j++) {
+    const fr = (lat0 - latOf(toM(0, j * 2 + 1)[1])) / step - .5;
+    for (let i = 0; i < W; i++) {
+      const fc = cols[i], o = (j * W + i) * 4;
+      if (fc < 0 || fr < 0 || fc > w - 1 || fr > h - 1) { sea.data[o] = 7; sea.data[o + 1] = 27; sea.data[o + 2] = 46; sea.data[o + 3] = 255; D[j * W + i] = NaN; continue; }
+      const c0 = Math.min(w - 2, fc | 0), r0 = Math.min(h - 2, fr | 0), tx = fc - c0, ty = fr - r0, k = r0 * w + c0;
+      const a = (1 - tx) * (1 - ty), b = tx * (1 - ty), c = (1 - tx) * ty, d = tx * ty;
+      const e = GE[k] * a + GE[k + 1] * b + GE[k + w] * c + GE[k + w + 1] * d;
+      const sh = (GSH[k] * a + GSH[k + 1] * b + GSH[k + w] * c + GSH[k + w + 1] * d) / 255;
+      // 수심: 해안 150 m 안은 경사 추정, 800 m 밖은 GEBCO, 사이는 거리로 섞음 (커서 수심과 같은 식)
+      const kk = j * W + i, dG = md[kk * 4 + 3] > 127 ? 0 : (DT[kk] >= BIG ? 1e6 : DT[kk] * pxm), est = depthAt(dG), wg = Math.max(0, Math.min(1, (dG - 150) / 650));
+      const dm = md[kk * 4 + 3] > 127 ? NaN : (-e < 1 && wg < 1) ? est : wg * Math.max(.5, -e) + (1 - wg) * est; D[kk] = dm;
+      const dv = dm === dm ? Math.min(3500, dm) | 0 : 0, si = STEP_OF[dv], dep = Math.round((DEPTH_STEPS[si] * .35 + DEPTH_STEPS[si + 1] * .65)) , fs = .62 + .55 * sh;
+      // 남한 해안선 밖인데 GEBCO가 육지인 곳(북한·일본 등)은 회갈색으로. 해안 근처의 낮은 값은 바다색에 가깝게 둔다.
+      // 북한·대마도 쪽에서만 GEBCO 육지를 회갈색으로 칠한다 (남한 연안의 거친 칸이 바다에 땅처럼 번지지 않게)
+      const plat = lat0 - (fr + .5) * step, plon = lon0 + (fc + .5) * step;
+      const foreign = (plat > 37.55 && plon < 126.0 && !(plat < 37.705 && plon > 125.55 && plon < 125.8) && !(plon < 124.82)) || (plat > 37.78 && plon < 126.35) || (plat > 37.86 && plon < 127.2) || (plat > 38.3 && plon < 128.2) || plat > 38.62 || (plon > 128.9 && plat < 34.8);
+      const fo = e > 0 && (foreign || e > 60) ? Math.min(1, e / 30) : 0, fr2 = (1 - fo) * fs, fg = fo * (.45 + .7 * sh);
+      const dq = Math.min(3500, dep);
+      sea.data[o] = Math.min(255, SEA_LUT[dq * 3] * fr2 + 112 * fg); sea.data[o + 1] = Math.min(255, SEA_LUT[dq * 3 + 1] * fr2 + 112 * fg); sea.data[o + 2] = Math.min(255, SEA_LUT[dq * 3 + 2] * fr2 + 100 * fg); sea.data[o + 3] = 255;
+      const el = Math.min(2000, Math.max(0, e)) | 0, fl = .35 + .95 * sh;
+      land.data[o] = Math.min(255, LAND_LUT[el * 3] * fl); land.data[o + 1] = Math.min(255, LAND_LUT[el * 3 + 1] * fl); land.data[o + 2] = Math.min(255, LAND_LUT[el * 3 + 2] * fl); land.data[o + 3] = 255;
+    }
+  }
+  tcan[0].getContext('2d').putImageData(sea, 0, 0); tcan[1].getContext('2d').putImageData(land, 0, 0);
+  bctx.imageSmoothingEnabled = true;
+  bctx.drawImage(tcan[0], 0, 0, W * 2, H * 2);
+  const full = new Path2D(); full.rect(-10, -10, cw + 20, ch + 20); full.addPath(path);
+  bctx.save(); bctx.clip(full, 'evenodd');
+  DEPTH_GRID = { D, W, H };
+  drawDepthContours(D, W, H, gpp);
+  bctx.restore();
+  bctx.save(); bctx.clip(path, 'evenodd');
+  bctx.drawImage(tcan[1], 0, 0, W * 2, H * 2);
+  drawContours([200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800], v => v % 1000 === 0 ? 'rgba(45,35,20,.38)' : 'rgba(45,35,20,.2)');
+  bctx.restore();
+}
+// 등심선 (위에서 만든 수심 격자로, 확대할수록 촘촘하게) + 수심 숫자
+function drawDepthContours(D, W, H, gpp) {
+  const levels = gpp < 15 ? [2, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100] : gpp < 60 ? [5, 10, 20, 30, 40, 50, 75, 100, 150, 200] : gpp < 400 ? [10, 20, 30, 50, 100, 200, 500, 1000] : [20, 50, 100, 200, 500, 1000, 1500, 2000, 2500, 3000];
+  const major = new Set([10, 50, 100, 500, 1000, 2000]);
+  const g = 2, nx = Math.floor((W - 1) / g) + 1, ny = Math.floor((H - 1) / g) + 1, Z = new Float32Array(nx * ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) Z[j * nx + i] = D[(j * g) * W + i * g];
+  const sc = 2 * g, labels = [];
+  bctx.lineWidth = 1;
+  for (const L of levels) {
+    bctx.strokeStyle = major.has(L) ? 'rgba(220,250,252,.5)' : 'rgba(220,250,252,.24)'; bctx.beginPath(); let cand = null, cl = 0;
+    for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++) {
+      const a = Z[j * nx + i], b = Z[j * nx + i + 1], c = Z[(j + 1) * nx + i + 1], d = Z[(j + 1) * nx + i];
+      if (a !== a || b !== b || c !== c || d !== d) continue;
+      const idx = (a > L ? 8 : 0) | (b > L ? 4 : 0) | (c > L ? 2 : 0) | (d > L ? 1 : 0); if (idx === 0 || idx === 15) continue;
+      const x = i * sc, y = j * sc, f = (p, q) => (L - p) / (q - p);
+      const T = [x + sc * f(a, b), y], R = [x + sc, y + sc * f(b, c)], B = [x + sc * f(d, c), y + sc], Lf = [x, y + sc * f(a, d)];
+      const seg = { 1: [Lf, B], 2: [B, R], 3: [Lf, R], 4: [T, R], 5: [Lf, T, B, R], 6: [T, B], 7: [Lf, T], 8: [Lf, T], 9: [T, B], 10: [T, R, Lf, B], 11: [T, R], 12: [Lf, R], 13: [B, R], 14: [Lf, B] }[idx];
+      for (let s2 = 0; s2 < seg.length; s2 += 2) { bctx.moveTo(seg[s2][0], seg[s2][1]); bctx.lineTo(seg[s2 + 1][0], seg[s2 + 1][1]); }
+      if (++cl % 97 === 0) labels.push([L, (seg[0][0] + seg[1][0]) / 2, (seg[0][1] + seg[1][1]) / 2, Math.atan2(seg[1][1] - seg[0][1], seg[1][0] - seg[0][0])]);
+    }
+    bctx.stroke();
+  }
+  // 수심 숫자: 서로 겹치지 않게 일부만
+  const placed = []; bctx.font = '600 10px JetBrains Mono, monospace'; bctx.textBaseline = 'middle'; bctx.textAlign = 'center';
+  for (const [L, x, y, ang] of labels) {
+    if (x < 30 || y < 20 || x > cw - 30 || y > ch - 20 || placed.some(([px, py]) => Math.abs(px - x) < 90 && Math.abs(py - y) < 40)) continue;
+    placed.push([x, y]); let a = ang; if (a > Math.PI / 2) a -= Math.PI; if (a < -Math.PI / 2) a += Math.PI;
+    bctx.save(); bctx.translate(x, y); bctx.rotate(a); bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(8,40,55,.85)'; bctx.strokeText(L + 'm', 0, 0); bctx.fillStyle = '#e6fbfc'; bctx.fillText(L + 'm', 0, 0); bctx.restore();
+  }
+  bctx.textAlign = 'left';
+}
+// 등고선 (육지, GEBCO 표고)
+function drawContours(levels, color) {
+  const g = 6, nx = Math.ceil(cw / g) + 1, ny = Math.ceil(ch / g) + 1, Z = new Float32Array(nx * ny);
+  const lons = new Float64Array(nx); for (let i = 0; i < nx; i++) lons[i] = lonOf(toM(i * g, 0)[0]);
+  for (let j = 0; j < ny; j++) { const lat = latOf(toM(0, j * g)[1]); for (let i = 0; i < nx; i++) { const v = gebcoAt(lat, lons[i]); Z[j * nx + i] = v == null ? NaN : v; } }
+  bctx.lineWidth = 1;
+  for (const L of levels) {
+    bctx.strokeStyle = color(L); bctx.beginPath();
+    for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++) {
+      const a = Z[j * nx + i], b = Z[j * nx + i + 1], c = Z[(j + 1) * nx + i + 1], d = Z[(j + 1) * nx + i];
+      if (a !== a || b !== b || c !== c || d !== d) continue;
+      const idx = (a > L ? 8 : 0) | (b > L ? 4 : 0) | (c > L ? 2 : 0) | (d > L ? 1 : 0); if (idx === 0 || idx === 15) continue;
+      const x = i * g, y = j * g, f = (p, q) => (L - p) / (q - p);
+      const T = [x + g * f(a, b), y], R = [x + g, y + g * f(b, c)], B = [x + g * f(d, c), y + g], Lf = [x, y + g * f(a, d)];
+      const seg = { 1: [Lf, B], 2: [B, R], 3: [Lf, R], 4: [T, R], 5: [Lf, T, B, R], 6: [T, B], 7: [Lf, T], 8: [Lf, T], 9: [T, B], 10: [T, R, Lf, B], 11: [T, R], 12: [Lf, R], 13: [B, R], 14: [Lf, B] }[idx];
+      for (let s2 = 0; s2 < seg.length; s2 += 2) { bctx.moveTo(seg[s2][0], seg[s2][1]); bctx.lineTo(seg[s2 + 1][0], seg[s2 + 1][1]); }
+    }
+    bctx.stroke();
+  }
+}
+const CITIES = [['서울', 37.566, 126.978], ['인천', 37.456, 126.705], ['태안', 36.745, 126.298], ['군산', 35.968, 126.737], ['목포', 34.812, 126.392], ['여수', 34.760, 127.662], ['통영', 34.854, 128.433], ['부산', 35.180, 129.075], ['울산', 35.539, 129.311], ['포항', 36.019, 129.343], ['강릉', 37.752, 128.876], ['속초', 38.207, 128.592], ['제주', 33.499, 126.531], ['울릉도', 37.484, 130.906]];
+
+function buildPath(rings, margin) {
+  const p = new Path2D(), x0 = -margin, x1 = cw + margin, y0 = -margin, y1 = ch + margin;
+  const oc = (x, y) => (x < x0 ? 1 : 0) | (x > x1 ? 2 : 0) | (y < y0 ? 4 : 0) | (y > y1 ? 8 : 0);
+  const sx = new Float64Array(0);
+  for (const r of rings) {
+    const n = r.n, X = new Float64Array(n), Y = new Float64Array(n), C = new Uint8Array(n);
+    for (let i = 0; i < n; i++) { X[i] = (r.xs[i] - V.cx) * V.s + cw / 2; Y[i] = (V.cy - r.ys[i]) * V.s + ch / 2; C[i] = oc(X[i], Y[i]); }
+    let lx = X[0], ly = Y[0], lc = C[0];
+    p.moveTo(lx, ly);
+    for (let i = 1; i < n; i++) {
+      if (i < n - 1) {
+        if (lc & C[i] & C[i + 1]) continue;                       // 화면 밖 같은 쪽에 머무는 구간 생략
+        if (Math.abs(X[i] - lx) < .6 && Math.abs(Y[i] - ly) < .6) continue;
+      }
+      p.lineTo(X[i], Y[i]); lx = X[i]; ly = Y[i]; lc = C[i];
+    }
+    p.closePath();
+  }
+  return p;
+}
+
+function renderBase() {
+  dirty = false;
+  const r = DPR(), ppg = pxPerGround(), gpp = 1 / ppg, diag = Math.hypot(cw, ch);
+  const lod = gpp > 2000 ? LOD.low : gpp > 35 ? LOD.mid : LOD.full;
+  const TER = S.mapStyle === 'terrain' && !!GE, BANDS_ = BANDS;
+  const drawBands = BANDS_.filter(([d]) => d * ppg >= 3 && d * ppg <= 3 * diag);
+  const margin = drawBands.length ? drawBands[drawBands.length - 1][0] * ppg + 4 : 4;
+  // 화면 중심이 해안에서 아주 먼 경우의 바탕색
+  const dC = groundToCoast(V.cx, V.cy, 25000);
+  let bg = FAR; for (const [d, c] of BANDS_) if (d * ppg > 3 * diag && dC < d) { bg = c; break; }
+  const [vx1, vy1] = toM(-margin, ch + margin), [vx2, vy2] = toM(cw + margin, -margin);
+  const vis = lod.filter(q => q.maxx >= vx1 && q.minx <= vx2 && q.maxy >= vy1 && q.miny <= vy2);
+  const path = buildPath(vis, margin);
+  bctx.setTransform(r, 0, 0, r, 0, 0);
+  bctx.fillStyle = bg; bctx.fillRect(0, 0, cw, ch);
+  bctx.lineJoin = 'round'; bctx.lineCap = 'round';
+  if (TER) renderTerrain(path, gpp);
+  else {
+    for (let k = drawBands.length - 1; k >= 0; k--) { const [d, c] = drawBands[k]; bctx.lineWidth = 2 * d * ppg; bctx.strokeStyle = c; bctx.stroke(path); }
+    bctx.fillStyle = '#141b19'; bctx.fill(path, 'evenodd');
+  }
+  drawOSM('under', gpp, TER);
+  let sPoly = null, sLine = null;
+  if (STRUCT.n) { [sPoly, sLine] = structPath(margin); const sw0 = Math.max(gpp > 60 ? 1 : 2, 8 * ppg); bctx.fillStyle = TER ? '#a9b1af' : '#3a4744'; bctx.fill(sPoly); bctx.strokeStyle = TER ? '#eef2f1' : '#c9d6d2'; bctx.lineWidth = gpp > 60 ? .5 : 1; bctx.stroke(sPoly); bctx.lineCap = 'butt'; bctx.strokeStyle = TER ? '#c3cac8' : '#b9c7c3'; bctx.lineWidth = sw0; bctx.stroke(sLine); bctx.lineCap = 'round'; }
+  if (TER) {   // 실제 해안선 (OSM)
+    bctx.strokeStyle = 'rgba(214,201,160,.35)'; bctx.lineWidth = gpp > 300 ? 1.5 : 3; bctx.stroke(path);
+    bctx.strokeStyle = 'rgba(232,224,196,.75)'; bctx.lineWidth = gpp > 300 ? .5 : .9; bctx.stroke(path);
+  } else {
+    bctx.strokeStyle = 'rgba(191,247,239,.18)'; bctx.lineWidth = 3.5; bctx.stroke(path);
+    bctx.strokeStyle = '#bff7ef'; bctx.lineWidth = gpp > 300 ? .7 : 1.2; bctx.stroke(path);
+  }
+  drawOSM('over', gpp, TER);
+  // 경위도선
+  const degPx = R * D2R * V.s;
+  const STEPS = [5, 2, 1, .5, .2, .1, .05, .02, .01, .005, .002, .001, .0005], step = STEPS.filter(s => s * degPx >= 70).pop() || 5;
+  const dec = step >= 1 ? 0 : step >= .1 ? 1 : step >= .01 ? 2 : step >= .001 ? 3 : 4;
+  const [mxL, myB] = toM(0, ch), [mxR, myT] = toM(cw, 0);
+  bctx.strokeStyle = 'rgba(150,230,240,.09)'; bctx.lineWidth = 1; bctx.font = '400 10px JetBrains Mono, monospace'; bctx.fillStyle = 'rgba(190,230,235,.65)';
+  bctx.beginPath();
+  for (let lo = Math.ceil(lonOf(mxL) / step) * step; lo <= lonOf(mxR); lo += step) { const x = toS(mxOf(lo), 0)[0]; bctx.moveTo(x, 0); bctx.lineTo(x, ch); }
+  for (let la = Math.ceil(latOf(myB) / step) * step; la <= latOf(myT); la += step) { const y = toS(0, myOf(la))[1]; bctx.moveTo(0, y); bctx.lineTo(cw, y); }
+  bctx.stroke();
+  bctx.textBaseline = 'top';
+  for (let lo = Math.ceil(lonOf(mxL) / step) * step; lo <= lonOf(mxR); lo += step) { const x = toS(mxOf(lo), 0)[0]; if (x > 40 && x < cw - 60) bctx.fillText(lo.toFixed(dec) + '°E', x + 3, 3); }
+  bctx.textBaseline = 'bottom';
+  for (let la = Math.ceil(latOf(myB) / step) * step; la <= latOf(myT); la += step) { const y = toS(0, myOf(la))[1]; if (y > 30 && y < ch - 40) bctx.fillText(la.toFixed(dec) + '°N', 3, y - 2); }
+  // 도시 이름 (넓게 볼 때만)
+  if (gpp > 60) {
+    bctx.font = '500 12px IBM Plex Sans KR, sans-serif'; bctx.textBaseline = 'middle';
+    for (const [nm, la, lo] of CITIES) { const [x, y] = toS(mxOf(lo), myOf(la)); if (x < 0 || y < 0 || x > cw || y > ch) continue; bctx.fillStyle = '#ffb84d'; bctx.beginPath(); bctx.arc(x, y, 2.5, 0, 7); bctx.fill(); bctx.fillStyle = 'rgba(230,245,246,.9)'; bctx.fillText(nm, x + 6, y); }
+  }
+  drawPortsAndSoundings(gpp);
+  drawStations();
+  // 축척, 방위
+  const bm = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000].find(m => m * ppg >= 70) || 100000;
+  const bar = bm * ppg, lbl = bm >= 1000 ? bm / 1000 + ' km' : bm + ' m';
+  bctx.fillStyle = 'rgba(6,15,19,.7)'; bctx.fillRect(10, ch - 30, bar + 24 + lbl.length * 7, 20);
+  bctx.strokeStyle = '#d5ecee'; bctx.lineWidth = 2; bctx.beginPath(); bctx.moveTo(16, ch - 16); bctx.lineTo(16 + bar, ch - 16); bctx.stroke();
+  bctx.fillStyle = '#d5ecee'; bctx.font = '600 11px JetBrains Mono, monospace'; bctx.textBaseline = 'alphabetic'; bctx.fillText(lbl, 22 + bar, ch - 12);
+  bctx.fillText('N ↑', cw - 34, 20);
+  // 위치 안내 미니맵
+  const gw = cw * gpp;
+  if (gw < 300000) {
+    const mw = Math.min(130, cw * .22), bx1 = mxOf(124.4), bx2 = mxOf(131.95), by1 = myOf(32.9), by2 = myOf(38.7);
+    const ms = mw / (bx2 - bx1), mh = (by2 - by1) * ms, ox = cw - mw - 12, oy = ch - mh - 12;
+    bctx.fillStyle = 'rgba(6,15,19,.85)'; bctx.fillRect(ox - 4, oy - 4, mw + 8, mh + 8);
+    bctx.strokeStyle = 'rgba(79,227,211,.35)'; bctx.lineWidth = 1; bctx.strokeRect(ox - 4, oy - 4, mw + 8, mh + 8);
+    bctx.fillStyle = '#2a3a37'; bctx.beginPath();
+    for (const q of LOD.low) { for (let i = 0; i < q.n; i++) { const x = ox + (q.xs[i] - bx1) * ms, y = oy + (by2 - q.ys[i]) * ms; i ? bctx.lineTo(x, y) : bctx.moveTo(x, y); } bctx.closePath(); }
+    bctx.fill('evenodd');
+    const [a1, a2] = toM(0, 0), [b1, b2] = toM(cw, ch);
+    const rx = ox + (a1 - bx1) * ms, ry = oy + (by2 - a2) * ms, rw = Math.max(4, (b1 - a1) * ms), rh = Math.max(4, (a2 - b2) * ms);
+    bctx.strokeStyle = '#ffb84d'; bctx.lineWidth = 1.5; bctx.strokeRect(rx, ry, rw, rh);
+  }
+  // 육지 마스크 (조류 입자용)
+  mctx.setTransform(1, 0, 0, 1, 0, 0); mctx.clearRect(0, 0, mask.width, mask.height);
+  mctx.setTransform(.5, 0, 0, .5, 0, 0); mctx.fillStyle = '#fff'; mctx.fill(path, 'evenodd');
+  if (sPoly) { mctx.fill(sPoly); mctx.strokeStyle = '#fff'; mctx.lineWidth = Math.max(2, 8 * ppg); mctx.stroke(sLine); }
+  maskData = mctx.getImageData(0, 0, mask.width, mask.height).data;
+  // 범례, 안내
+  $('bandTitle').textContent = TER ? '수심 구간' : '해안선에서 거리';
+  $('bandLegend').innerHTML = TER ? DEPTH_STEPS.slice(0, -1).map((d, k) => { const v = Math.round(d * .35 + DEPTH_STEPS[k + 1] * .65), c = `rgb(${SEA_LUT[v * 3]},${SEA_LUT[v * 3 + 1]},${SEA_LUT[v * 3 + 2]})`; return `<span class="b"><i style="background:${c}"></i>${d >= 1000 ? d / 1000 + 'k' : d}~</span>`; }).join('') + '<span class="b">m</span>' + '<span class="b"><i style="background:#728c56"></i>육지 200m</span><span class="b"><i style="background:#a08c72"></i>1000m</span>'
+    : BANDS_.filter(([d]) => d * ppg >= 3).slice(0, 8).map(([d, c]) => `<span class="b"><i style="background:${c}"></i>${d >= 1000 ? d / 1000 + 'km' : d + 'm'}</span>`).join('');
+  $('viewSize').textContent = '보이는 폭 ' + (gw >= 1000 ? (gw / 1000).toFixed(gw >= 10000 ? 0 : 1) + ' km' : Math.round(gw) + ' m');
+  $('warn').hidden = gw > 1500;
+  buildFlowField();
+  for (let k = 0; k < NP; k++) spawn(k);
+  fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height);
+}
+// 해안선과 나란한 방향장 (모식): 육지 마스크를 넓게 평균한 값의 기울기에 수직인 방향.
+// 예보 지점에서 먼 곳은 실제 조류 방향이 아니다 — 들물/날물에 따라 해안을 따라 오가는 모습만 나타낸다.
+const FC = 8; let FF = null, FFw = 0, FFh = 0;
+function buildFlowField() {
+  const W = mask.width, H = mask.height; if (!maskData || !W) { FF = null; return; }
+  const sat = new Float32Array((W + 1) * (H + 1));
+  for (let y = 0; y < H; y++) { let row = 0; for (let x = 0; x < W; x++) { row += maskData[(y * W + x) * 4 + 3] > 127 ? 1 : 0; sat[(y + 1) * (W + 1) + x + 1] = sat[y * (W + 1) + x + 1] + row; } }
+  const box = (x1, y1, x2, y2) => { x1 = clamp(x1, 0, W); x2 = clamp(x2, 0, W); y1 = clamp(y1, 0, H); y2 = clamp(y2, 0, H); const a = (x2 - x1) * (y2 - y1); return a > 0 ? (sat[y2 * (W + 1) + x2] - sat[y1 * (W + 1) + x2] - sat[y2 * (W + 1) + x1] + sat[y1 * (W + 1) + x1]) / a : 0; };
+  FFw = Math.ceil(W / FC); FFh = Math.ceil(H / FC); FF = new Float32Array(FFw * FFh * 2);
+  const R = 28;
+  for (let j = 0; j < FFh; j++) for (let i = 0; i < FFw; i++) {
+    const cx = i * FC + FC / 2, cy = j * FC + FC / 2;
+    const gx = box(cx, cy - R, cx + R, cy + R) - box(cx - R, cy - R, cx, cy + R), gy = box(cx - R, cy, cx + R, cy + R) - box(cx - R, cy - R, cx + R, cy);
+    const m = Math.hypot(gx, gy), k = (j * FFw + i) * 2;
+    if (m < .02) { FF[k] = 0; FF[k + 1] = 0; continue; }
+    const s = Math.min(1, m * 3) / m; FF[k] = -gy * s; FF[k + 1] = gx * s;   // 기울기에 수직 = 해안과 나란히
+  }
+}
+const isSea = (x, y) => { if (!maskData || x < 0 || y < 0 || x >= cw || y >= ch) return false; const i = ((y >> 1) * mask.width + (x >> 1)) * 4 + 3; return maskData[i] < 128; };
+
+// 화면 격자마다 가까운 조류 예보 지점들의 흐름을 거리 가중 평균 (8 km 밖은 0). 값은 노트/2.5, 최대 2.
+let RF = null, RFkey = '';
+function realField(tA) {
+  if (!CR.ready || !FF) return null;
+  const key = FFw + ',' + FFh + ',' + V.cx.toFixed(1) + ',' + V.cy.toFixed(1) + ',' + V.s + ',' + (Math.round(tA * 20) / 20);
+  if (key === RFkey) return RF; RFkey = key;
+  const ppg = pxPerGround(), Rpx = 8000 * ppg, e2 = (500 * ppg) ** 2, near = [];
+  for (const c of CR.st) {
+    const [x, y] = toS(c.mx, c.my); if (x < -Rpx || y < -Rpx || x > cw + Rpx || y > ch + Rpx) continue;
+    const q = crntAt(c, tA); if (!q) continue;
+    const m = Math.min(2, q.sp * KN / 2.5), a = q.dir * D2R; near.push([x, y, Math.sin(a) * m, -Math.cos(a) * m]);
+  }
+  if (!near.length) return (RF = null);
+  if (!RF || RF.length !== FFw * FFh * 3) RF = new Float32Array(FFw * FFh * 3);
+  for (let j = 0; j < FFh; j++) for (let i = 0; i < FFw; i++) {
+    const sx = (i * FC + FC / 2) * 2, sy = (j * FC + FC / 2) * 2, k = (j * FFw + i) * 3;
+    let ws = 0, vx = 0, vy = 0, am = 0;
+    for (const [x, y, ex, ey] of near) { const d2 = (sx - x) ** 2 + (sy - y) ** 2; if (d2 >= Rpx * Rpx) continue; const w = 1 / (d2 + e2); ws += w; vx += w * ex; vy += w * ey; am = Math.max(am, 1 - Math.sqrt(d2) / Rpx); }
+    if (!ws) { RF[k + 2] = 0; continue; }
+    RF[k] = vx / ws; RF[k + 1] = vy / ws; RF[k + 2] = am * am * (3 - 2 * am);
+  }
+  return RF;
+}
+/* ── 조류 입자 ─────────────────────────────────────────── */
+const NP = 900; const P = { x: new Float32Array(NP), y: new Float32Array(NP), age: new Float32Array(NP), max: new Float32Array(NP) };
+function spawn(k) { for (let t = 0; t < 25; t++) { const x = Math.random() * cw, y = Math.random() * ch; if (isSea(x | 0, y | 0)) { P.x[k] = x; P.y[k] = y; P.age[k] = 0; P.max[k] = 50 + Math.random() * 110; return; } } P.age[k] = 1e9; }
+function stepParticles(tide, dt) {
+  fctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+  fctx.globalCompositeOperation = 'destination-out'; fctx.fillStyle = 'rgba(0,0,0,.09)'; fctx.fillRect(0, 0, cw, ch);
+  fctx.globalCompositeOperation = 'source-over';
+  if (!S.layers.flow || !FF) return;
+  const sc = 1.4 * dt * 60, rf = realField(tide.tA);
+  fctx.strokeStyle = 'rgba(205,255,250,.55)'; fctx.lineWidth = 1; fctx.beginPath();
+  for (let k = 0; k < NP; k++) {
+    if (P.age[k] > P.max[k]) { spawn(k); continue; }
+    const fi = (Math.min(FFh - 1, (P.y[k] >> 1) / FC | 0) * FFw + Math.min(FFw - 1, (P.x[k] >> 1) / FC | 0)) * 2;
+    let vx = FF[fi] * tide.u, vy = FF[fi + 1] * tide.u;
+    if (rf) {   // 예보 지점 8 km 안: 예보 유향·유속 (해안 가까이는 해안선 방향으로 꺾음)
+      const k3 = fi / 2 * 3, a = rf[k3 + 2];
+      if (a > 0) {
+        let ex = rf[k3], ey = rf[k3 + 1]; const fm = Math.hypot(FF[fi], FF[fi + 1]);
+        if (fm > .05) { const hx = FF[fi] / fm, hy = FF[fi + 1] / fm, dot = ex * hx + ey * hy, mag = Math.hypot(ex, ey), sg = dot < 0 ? -1 : 1; ex += (sg * hx * mag - ex) * fm; ey += (sg * hy * mag - ey) * fm; }
+        vx += (ex - vx) * a; vy += (ey - vy) * a;
+      }
+    }
+    const nx = P.x[k] + vx * sc + (Math.random() - .5) * .15, ny = P.y[k] + vy * sc + (Math.random() - .5) * .15;
+    if (!isSea(nx | 0, ny | 0)) { spawn(k); continue; }
+    fctx.moveTo(P.x[k], P.y[k]); fctx.lineTo(nx + .01, ny);
+    P.x[k] = nx; P.y[k] = ny; P.age[k] += dt * 60;
+  }
+  fctx.stroke();
+}
+
+/* ── 단면 ──────────────────────────────────────────────── */
+const sec = $('sec'), sctx = sec.getContext('2d'); let sw = 0, shh = 0, SEC = null;
+function analyzeSection() {
+  if (!S.A || !S.B) { SEC = null; renderSecInfo(); return; }
+  const kA = kAt(latOf(S.A[1])), Lg = Math.hypot(S.B[0] - S.A[0], S.B[1] - S.A[1]) / kA;
+  const N = Math.round(clamp(Lg / 2, 300, 1000));            // 최소 300개, 길면 약 2 m 간격까지
+  const pts = []; let L = 0;
+  for (let k = 0; k <= N; k++) {
+    const f = k / N, mx = S.A[0] + (S.B[0] - S.A[0]) * f, my = S.A[1] + (S.B[1] - S.A[1]) * f;
+    if (k) { const p = pts[k - 1]; L += Math.hypot(mx - p.mx, my - p.my) / kAt(latOf((my + p.my) / 2)); }
+    const land = inLand(mx, my), dG = Math.min(groundToCoast(mx, my, 8000), 8000);
+    const r = land ? null : (depthQuery(mx, my) || modelDepth(mx, my, dG));
+    pts.push({ mx, my, s: L, land, dG, r });
+  }
+  const cross = [];
+  for (let k = 1; k <= N; k++) if (pts[k].land !== pts[k - 1].land) cross.push(k);
+  SEC = { pts, L, cross, N };
+  SEC.prof = profileFeatures(SEC);
+  renderSecInfo();
+}
+const isPub = t => t === 'survey' || t === 'coastal' || t === 'chart';
+// 해안선에서 바다 쪽으로 진행하는 수심 프로파일에서 지형 특징을 찾는다
+function profileFeatures(sec) {
+  const { pts, cross } = sec;
+  let c0 = 0, dir = 1;
+  if (cross.length) { const c = cross[0]; if (pts[c - 1].land && !pts[c].land) { c0 = c; dir = 1; } else { c0 = c - 1; dir = -1; } }
+  const s0 = pts[c0].s, seq = [];
+  for (let k = c0; k >= 0 && k < pts.length; k += dir) { const p = pts[k]; if (p.land) { if (seq.length) break; continue; } seq.push({ x: Math.abs(p.s - s0), d: p.r.depth, t: p.r.type }); }
+  const out = { items: [], note: '', cast: [] };
+  if (seq.length < 10) { out.note = '바다 구간이 짧아 분석하지 않았습니다.'; return out; }
+  const types = new Set(seq.map(q => q.t)), onlyEst = types.size === 1 && types.has('est'), pubShare = seq.filter(q => isPub(q.t)).length / seq.length;
+  for (const m of [50, 100, 150]) { const q = seq.find(q => q.x >= m); out.cast.push({ m, q }); }
+  if ([...types].every(x => x === 'est' || x === 'gebco') && types.has('gebco')) { out.note = '이 단면은 GEBCO 460 m 격자와 추정값뿐이라 수십 m 단위의 급심·수중여는 찾을 수 없습니다. 아래 결과는 큰 흐름만 참고하세요.'; }
+  if (onlyEst) { out.note = '이 단면은 추정 모델만 있어 해저지형 특징을 분석하지 않았습니다. 실측·공공 수심을 불러오면 분석합니다.'; return out; }
+  if (pubShare < .5 && !out.note) out.note = '세부 급심/수중여 탐지 신뢰도 낮음 (고해상도 연안 자료가 부족하고 BADA 150 m 격자·추정값 위주인 구간).';
+  // 평활 후 기울기
+  const step = seq.length > 1 ? (seq[seq.length - 1].x - seq[0].x) / (seq.length - 1) : 1;
+  const win = Math.max(1, Math.round(10 / step));
+  const sm = seq.map((q, i) => { let a = 0, n = 0; for (let j = Math.max(0, i - win); j <= Math.min(seq.length - 1, i + win); j++) { a += seq[j].d; n++; } return a / n; });
+  const sl = sm.map((d, i) => { const a = Math.max(0, i - win), b = Math.min(sm.length - 1, i + win); return (sm[b] - sm[a]) / Math.max(1e-6, seq[b].x - seq[a].x); });
+  const runs = (test, minLen) => { const r = []; let st = null; for (let i = 0; i <= sl.length; i++) { const ok = i < sl.length && test(sl[i], i); if (ok && st === null) st = i; if (!ok && st !== null) { if (seq[i - 1].x - seq[st].x >= minLen) r.push([st, i - 1]); st = null; } } return r; };
+  const f = v => v.toFixed(1), xm = i => Math.round(seq[i].x);
+  const steep = runs(v => v > .12, 10);
+  steep.slice(0, 3).forEach(([a, b]) => {
+    out.items.push(`${xm(a)}~${xm(b)} m 급심 (${f(sm[a])} m → ${f(sm[b])} m)`);
+    let bi = a, bv = 0; for (let i = Math.max(1, a - win); i <= Math.min(sl.length - 2, a + win); i++) { const cv = sl[i + 1] - sl[i - 1]; if (cv > bv) { bv = cv; bi = i; } }
+    out.items.push(`브레이크라인 약 ${xm(bi)} m`);
+    if (a > 0) { let i0 = a; while (i0 > 0 && sl[i0 - 1] > .05) i0--; if (i0 < a) out.items.push(`${xm(i0)} m 전방부터 수심 변화율 증가`); }
+  });
+  runs(v => Math.abs(v) < .01, 40).slice(0, 2).forEach(([a, b]) => out.items.push(`${xm(a)}~${xm(b)} m 평탄지 (약 ${f(sm[a])} m)`));
+  runs(v => v > .01 && v < .03, 40).slice(0, 2).forEach(([a, b]) => out.items.push(`${xm(a)}~${xm(b)} m 완경사`));
+  for (let i = 1; i < seq.length; i++) { const j = seq.findIndex(q => q.x >= seq[i].x + 10); if (j > 0 && Math.abs(seq[j].d - seq[i].d) > 1.5) { out.items.push(`${xm(i)} m 부근 수심 급변 (${f(seq[i].d)} m → ${f(seq[j].d)} m)`); break; } }
+  const span = Math.max(win * 3, Math.round(20 / step));
+  let got = 0;
+  for (let i = span; i < sm.length - span && got < 3; i++) {
+    const L0 = Math.min(...sm.slice(i - span, i)), R0 = Math.min(...sm.slice(i + 1, i + span + 1)), Lx = Math.max(...sm.slice(i - span, i)), Rx = Math.max(...sm.slice(i + 1, i + span + 1));
+    if (sm[i] - Math.max(sm[i - span], sm[i + span]) > 1 && sm[i] >= Lx && sm[i] >= Rx) { out.items.push(`${xm(i)} m 부근 골·물골 후보 (주변보다 약 ${f(sm[i] - Math.max(sm[i - span], sm[i + span]))} m 깊음)`); got++; i += span; }
+    else if (Math.min(sm[i - span], sm[i + span]) - sm[i] > 1 && sm[i] <= L0 && sm[i] <= R0) { out.items.push(`${xm(i)} m 부근 수중 능선 후보 (주변보다 약 ${f(Math.min(sm[i - span], sm[i + span]) - sm[i])} m 얕음)`); got++; i += span; }
+  }
+  if (!out.items.length) out.items.push('뚜렷한 급심·골·능선이 보이지 않는 완만한 단면입니다.');
+  return out;
+}
+function renderSecInfo() {
+  const box = $('secInfo');
+  if (!SEC) { box.innerHTML = ''; return; }
+  const P = SEC.prof || { items: [], cast: [], note: '' };
+  const cast = P.cast.map(({ m, q }) => `<span class="cast"><b>${m} m</b> ${q ? (q.t === 'est' ? '추정 약 ' + Math.round(q.d) + ' m' : q.t === 'gebco' ? '약 ' + Math.round(q.d) + ' m · GEBCO' : (q.t === 'bada' ? '약 ' + Math.round(q.d) : q.t === 'survey' ? q.d.toFixed(1) : '약 ' + Math.round(q.d)) + ' m · ' + DTYPES[q.t].short) : '단면 밖'}</span>`).join('');
+  box.innerHTML = (cast ? `<div class="casts"><span class="hint">해안선에서 캐스팅 거리별 수심</span>${cast}</div>` : '') +
+    `<ul class="feats">${P.items.map(t => `<li>${t}</li>`).join('')}</ul>` + (P.note ? `<p class="note warnTxt">${P.note}</p>` : '');
+}
+
+function lineStyle(r) {
+  if (!r || r.type === 'est') return { c: 'rgba(127,243,230,.75)', w: 1.4, dash: [5, 4] };
+  if (r.type === 'gebco') return { c: DTYPES.gebco.color, w: 1.4, dash: [2, 3], a: .9 };
+  const c = DTYPES[r.type].color;
+  if (r.type === 'bada') return { c, w: 1.3, dash: [], a: r.interp ? .6 : 1 };
+  return { c, w: 2.8, dash: [], a: r.interp ? .55 : 1 };
+}
+function drawSection(now, tide) {
+  const r = DPR(); sctx.setTransform(r, 0, 0, r, 0, 0);
+  const w = sw, h = shh, ml = 50, mr = 14, mt = 22, mb = 26;
+  sctx.globalAlpha = 1; sctx.fillStyle = '#04090c'; sctx.fillRect(0, 0, w, h);
+  if (!SEC) { sctx.fillStyle = '#7a9ea6'; sctx.font = '400 13px IBM Plex Sans KR, sans-serif'; sctx.textBaseline = 'middle'; sctx.fillText('평면도에서 해안을 확대한 뒤, 육지에서 바다 쪽으로 단면선을 그어 보세요.', 20, h / 2); return; }
+  const { pts, L, cross, N } = SEC;
+  const landH = 3;
+  const zs = pts.map(p => p.land ? landH : -p.r.depth);
+  const minZ = Math.min(...zs), maxD = -minZ;
+  const ymin = Math.floor((minZ - 2) / 5) * 5, ymax = landH + 1.5;
+  const X = d => ml + d / L * (w - ml - mr), Y = v => mt + (ymax - v) / (ymax - ymin) * (h - mt - mb);
+  const xk = k => X(pts[k].s);
+  sctx.font = '400 10px JetBrains Mono, monospace'; sctx.textBaseline = 'middle';
+  sctx.strokeStyle = 'rgba(120,220,230,.08)'; sctx.fillStyle = '#7a9ea6'; sctx.lineWidth = 1;
+  const vstep = ymax - ymin > 60 ? 10 : 5;
+  for (let v = Math.ceil(ymin / vstep) * vstep; v <= ymax; v += vstep) { sctx.beginPath(); sctx.moveTo(ml, Y(v)); sctx.lineTo(w - mr, Y(v)); sctx.stroke(); sctx.fillText(v === 0 ? '0 m' : (v > 0 ? '+' : '') + v + 'm', 6, Y(v)); }
+  const nice = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000];
+  const step = nice.find(s => s / L * (w - ml - mr) >= 70) || 50000; sctx.textBaseline = 'top';
+  for (let d = 0; d <= L; d += step) { sctx.beginPath(); sctx.moveTo(X(d), mt); sctx.lineTo(X(d), h - mb); sctx.stroke(); const lbl = d >= 1000 ? d / 1000 + 'km' : d + 'm'; sctx.fillText(lbl, Math.min(X(d) - 8, w - mr - lbl.length * 6.2), h - mb + 6); }
+  // 물: 자료 기준면(0 m) 기준으로 그림. 예측 조위는 기준면 일치가 확인되지 않아 더하지 않는다.
+  const phase = reduceMotion ? 0 : now / 1000 * 1.6, lam = Math.max(30, L / 25);
+  const surf = d => S.hs / 2 * Math.sin(2 * Math.PI * d / lam - phase);
+  sctx.beginPath(); sctx.moveTo(ml, Y(surf(0)));
+  for (let x = ml; x <= w - mr; x += 2) sctx.lineTo(x, Y(surf((x - ml) / (w - ml - mr) * L)));
+  sctx.lineTo(w - mr, Y(ymin)); sctx.lineTo(ml, Y(ymin)); sctx.closePath();
+  const g = sctx.createLinearGradient(0, Y(0), 0, Y(ymin)); g.addColorStop(0, 'rgba(60,210,205,.30)'); g.addColorStop(1, 'rgba(8,44,64,.55)');
+  sctx.fillStyle = g; sctx.fill();
+  if (maxD > 4) {
+    sctx.setLineDash([6, 5]); sctx.strokeStyle = 'rgba(255,120,110,.45)'; sctx.lineWidth = 1.2;
+    for (const f of [1 / 3, 2 / 3]) { sctx.beginPath(); sctx.moveTo(ml, Y(-maxD * f)); sctx.lineTo(w - mr, Y(-maxD * f)); sctx.stroke(); }
+    sctx.setLineDash([]);
+    let deep = 0; zs.forEach((z, k) => { if (z < zs[deep]) deep = k; });
+    sctx.font = '700 12px IBM Plex Sans KR, sans-serif'; sctx.textBaseline = 'middle'; sctx.fillStyle = 'rgba(213,236,238,.7)';
+    const lx = clamp(xk(deep) - 14, ml + 4, w - mr - 36);
+    [['상층', 1 / 6], ['중층', .5], ['하층', 5 / 6]].forEach(([t, f]) => sctx.fillText(t, lx, Y(-maxD * f)));
+  }
+  // 해저면 채움
+  sctx.beginPath(); sctx.moveTo(xk(0), Y(zs[0]));
+  for (let k = 1; k <= N; k++) { if (pts[k].land !== pts[k - 1].land) sctx.lineTo(xk(k), Y(zs[k - 1])); sctx.lineTo(xk(k), Y(zs[k])); }
+  sctx.lineTo(xk(N), h - mb + 1); sctx.lineTo(xk(0), h - mb + 1); sctx.closePath();
+  const gb = sctx.createLinearGradient(0, Y(0), 0, h); gb.addColorStop(0, '#20302c'); gb.addColorStop(1, '#0a1214'); sctx.fillStyle = gb; sctx.fill();
+  // 육지 구간
+  let k0 = null; const runs = [];
+  for (let k = 0; k <= N + 1; k++) { const isL = k <= N && pts[k].land; if (isL && k0 === null) k0 = k; if (!isL && k0 !== null) { runs.push([k0, k - 1]); k0 = null; } }
+  for (const [a, b] of runs) {
+    const x1 = xk(a), x2 = xk(b);
+    sctx.fillStyle = '#1c2622'; sctx.fillRect(x1, Y(landH), Math.max(1, x2 - x1), h - mb - Y(landH));
+    sctx.save(); sctx.beginPath(); sctx.rect(x1, Y(landH), Math.max(1, x2 - x1), h - mb - Y(landH)); sctx.clip();
+    sctx.strokeStyle = 'rgba(191,247,239,.08)'; sctx.lineWidth = 1;
+    for (let x = x1 - h; x < x2 + h; x += 8) { sctx.beginPath(); sctx.moveTo(x, h); sctx.lineTo(x + h, 0); sctx.stroke(); }
+    sctx.restore();
+    if (x2 - x1 > 70) { sctx.fillStyle = '#7a9ea6'; sctx.font = '400 11px IBM Plex Sans KR, sans-serif'; sctx.textBaseline = 'top'; sctx.fillText('육지·구조물 (고도 자료 없음)', x1 + 6, Y(landH) + 6); }
+  }
+  // 해저면 선: 자료 출처별 스타일
+  let seg = null;
+  const flush = () => { if (!seg) return; sctx.globalAlpha = seg.st.a ?? 1; sctx.setLineDash(seg.st.dash); sctx.strokeStyle = seg.st.c; sctx.lineWidth = seg.st.w; sctx.stroke(); sctx.setLineDash([]); sctx.globalAlpha = 1; seg = null; };
+  for (let k = 0; k <= N; k++) {
+    const p = pts[k]; if (p.land) { flush(); continue; }
+    const st = lineStyle(p.r), key = st.c + st.w + (st.a ?? 1) + st.dash.join();
+    const x = xk(k), y = Y(zs[k]);
+    if (!seg || seg.key !== key) { const prev = seg && seg.last; flush(); sctx.beginPath(); if (prev) sctx.moveTo(prev[0], prev[1]); else sctx.moveTo(x, y); seg = { key, st }; }
+    sctx.lineTo(x, y); seg.last = [x, y];
+  }
+  flush();
+  // 해안선에서 캐스팅 거리
+  sctx.font = '600 10px JetBrains Mono, monospace'; sctx.textBaseline = 'bottom';
+  cross.slice(0, 4).forEach(c => {
+    const seaFwd = pts[c - 1].land && !pts[c].land, s0 = (pts[c].s + pts[c - 1].s) / 2;
+    sctx.strokeStyle = '#ffb84d'; sctx.lineWidth = 2; sctx.beginPath(); sctx.moveTo(X(s0), Y(landH)); sctx.lineTo(X(s0), Y(S.hs / 2 + .8)); sctx.stroke();
+    sctx.fillStyle = '#ffb84d'; sctx.fillText('해안선', clamp(X(s0) - 18, ml, w - mr - 40), Y(S.hs / 2 + .8) - 2);
+    for (const m of [50, 100, 150]) {
+      const s = seaFwd ? s0 + m : s0 - m; if (s < 0 || s > L) continue;
+      const k = Math.round(s / L * N); if (pts[k].land) continue;
+      const x = X(s); sctx.setLineDash([2, 4]); sctx.strokeStyle = 'rgba(255,184,77,.6)'; sctx.lineWidth = 1;
+      sctx.beginPath(); sctx.moveTo(x, Y(0)); sctx.lineTo(x, Y(zs[k])); sctx.stroke(); sctx.setLineDash([]);
+      sctx.fillStyle = 'rgba(255,184,77,.85)'; sctx.fillText(m + 'm', x - 12, Y(zs[k]) - 3);
+    }
+  });
+  // 수면(자료 기준면 0 m 주변 파고)
+  sctx.beginPath(); let on = false;
+  for (let x = ml; x <= w - mr; x += 2) { const d = (x - ml) / (w - ml - mr) * L, k = Math.round(d / L * N); if (pts[k].land) { on = false; continue; } const y = Y(surf(d)); on ? sctx.lineTo(x, y) : sctx.moveTo(x, y); on = true; }
+  sctx.strokeStyle = 'rgba(235,255,252,.85)'; sctx.lineWidth = 1.2; sctx.stroke();
+  const vx = (L / (w - ml - mr)) / ((ymax - ymin) / (h - mt - mb));
+  sctx.font = '400 10px JetBrains Mono, monospace'; sctx.textBaseline = 'top'; sctx.fillStyle = '#7a9ea6';
+  sctx.fillText('수직 과장 ×' + (vx >= 10 ? vx.toFixed(0) : vx.toFixed(1)) + ' · 0 m = 자료 기준면', ml + 4, 5);
+  sctx.fillStyle = '#ffb84d'; sctx.font = '600 11px JetBrains Mono, monospace'; sctx.fillText('A', ml - 12, 5); sctx.fillText('B', w - mr - 8, 5);
+  if (S.secHover != null) {
+    const k = Math.round(S.secHover * N), x = xk(k), p = pts[k];
+    sctx.strokeStyle = 'rgba(255,255,255,.6)'; sctx.lineWidth = 1; sctx.beginPath(); sctx.moveTo(x, mt); sctx.lineTo(x, h - mb); sctx.stroke();
+    const lines = ['A에서 ' + fmtD(p.s), p.land ? '육지·구조물' : '해안에서 ' + (p.dG >= 8000 ? '8 km+' : fmtD(p.dG))];
+    if (!p.land) { const q = p.r; lines.push((q.type === 'est' ? '추정 수심 ' : '수심 ') + fmtDepth(q), '출처 ' + (q.type === 'est' ? '해안거리 추정' : DTYPES[q.type].label), '신뢰도 ' + q.conf); }
+    const bw = 168, bh = 8 + lines.length * 15, bx = x + bw + 12 > w ? x - bw - 8 : x + 8;
+    sctx.fillStyle = 'rgba(6,15,19,.92)'; sctx.fillRect(bx, mt + 4, bw, bh);
+    sctx.font = '600 11px JetBrains Mono, monospace';
+    lines.forEach((t, i) => { sctx.fillStyle = i === 2 ? '#4fe3d3' : '#d5ecee'; sctx.fillText(t, bx + 7, mt + 9 + i * 15); });
+  }
+}
+const fmtD = m => m >= 1000 ? (m / 1000).toFixed(2) + ' km' : Math.round(m) + ' m';
+
+/* ── 평면도 위 표시 ────────────────────────────────────── */
+function drawUI() {
+  const r = DPR(); uctx.setTransform(r, 0, 0, r, 0, 0); uctx.clearRect(0, 0, cw, ch);
+  const A = S.drag ? S.drag.A : S.A, B = S.drag ? S.drag.B : S.B;
+  if (A && B) {
+    const [ax, ay] = toS(...A), [bx, by] = toS(...B);
+    uctx.strokeStyle = 'rgba(255,184,77,.25)'; uctx.lineWidth = 7; uctx.beginPath(); uctx.moveTo(ax, ay); uctx.lineTo(bx, by); uctx.stroke();
+    uctx.strokeStyle = '#ffb84d'; uctx.lineWidth = 2; uctx.stroke();
+    uctx.font = '600 12px JetBrains Mono, monospace'; uctx.textBaseline = 'alphabetic';
+    for (const [x, y, t] of [[ax, ay, 'A'], [bx, by, 'B']]) { uctx.fillStyle = '#ffb84d'; uctx.beginPath(); uctx.arc(x, y, 9, 0, 7); uctx.fill(); uctx.fillStyle = '#060f13'; uctx.fillText(t, x - 4, y + 4); }
+    if (!S.drag && S.secHover != null) { const x = ax + (bx - ax) * S.secHover, y = ay + (by - ay) * S.secHover; uctx.strokeStyle = '#fff'; uctx.lineWidth = 2; uctx.beginPath(); uctx.arc(x, y, 6, 0, 7); uctx.stroke(); }
+  }
+  if (S.pin) {
+    const [x, y] = toS(...S.pin);
+    uctx.strokeStyle = '#ff7a6e'; uctx.lineWidth = 2; uctx.beginPath(); uctx.arc(x, y, 7, 0, 7); uctx.stroke();
+    uctx.beginPath(); uctx.moveTo(x - 13, y); uctx.lineTo(x - 4, y); uctx.moveTo(x + 4, y); uctx.lineTo(x + 13, y); uctx.moveTo(x, y - 13); uctx.lineTo(x, y - 4); uctx.moveTo(x, y + 4); uctx.lineTo(x, y + 13); uctx.stroke();
+  }
+}
+
+// 조류 예보 지점 화살표: 그 시각 유향·유속 (길이 ∝ 유속)
+const crColor = kn => kn < .5 ? '#9ec9cf' : kn < 1.5 ? '#5ff0a8' : kn < 3 ? '#ffb84d' : '#ff7a6e';
+function drawCrnt(tide) {
+  if (!S.layers.flow || !CR.ready) return;
+  const r = DPR(); uctx.setTransform(r, 0, 0, r, 0, 0);
+  const gw = cw / pxPerGround(), showName = gw < 60000, big = gw < 400000;
+  uctx.font = '600 10.5px JetBrains Mono, monospace'; uctx.textBaseline = 'middle';
+  for (const c of CR.st) {
+    const [x, y] = toS(c.mx, c.my); if (x < -30 || y < -30 || x > cw + 30 || y > ch + 30) continue;
+    const q = crntAt(c, tide.tA); if (!q) continue;
+    const kn = q.sp * KN, col = crColor(kn);
+    uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.fillStyle = col;
+    if (kn < .2) { uctx.beginPath(); uctx.arc(x, y, big ? 4 : 2.5, 0, 7); uctx.fill(); uctx.stroke(); }
+    else {
+      const L = (big ? 10 : 6) + Math.min(big ? 30 : 14, kn * (big ? 8 : 4)), a = q.dir * D2R, dx = Math.sin(a), dy = -Math.cos(a);
+      const x0 = x - dx * L / 2, y0 = y - dy * L / 2, x1 = x + dx * L / 2, y1 = y + dy * L / 2, hw = big ? 5 : 3.5, hl = big ? 8 : 5;
+      uctx.beginPath(); uctx.moveTo(x0, y0); uctx.lineTo(x1 - dx * hl * .6, y1 - dy * hl * .6);
+      uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.lineWidth = 5; uctx.stroke(); uctx.strokeStyle = col; uctx.lineWidth = 2.5; uctx.stroke();
+      uctx.beginPath(); uctx.moveTo(x1, y1); uctx.lineTo(x1 - dx * hl - dy * hw, y1 - dy * hl + dx * hw); uctx.lineTo(x1 - dx * hl + dy * hw, y1 - dy * hl - dx * hw); uctx.closePath();
+      uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.stroke(); uctx.fill();
+    }
+    if (big) {
+      const t = (kn < .2 ? '물돌이' : kn.toFixed(1) + 'kn') + (showName ? ' ' + c.name : '');
+      uctx.lineWidth = 3; uctx.strokeStyle = 'rgba(6,15,19,.85)'; uctx.strokeText(t, x + 9, y + 9); uctx.fillStyle = col; uctx.fillText(t, x + 9, y + 9);
+    }
+  }
+}
+/* ── 계기판 ────────────────────────────────────────────── */
+const fmtH = t => { t = ((t % 24) + 24) % 24; const h = Math.floor(t), m = Math.floor((t - h) * 60); return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'); };
+const setText = (id, v) => { const el = $(id); if (el.textContent !== v) el.textContent = v; };
+const DIRS = ['북', '북동', '동', '남동', '남', '남서', '서', '북서'];
+const dirName = d => DIRS[Math.round((((d % 360) + 360) % 360) / 45) % 8];
+function updateReadouts(tide) {
+  setText('clock', fmtH(S.t));
+  setText('etaVal', Math.round(tide.cm) + ' cm');
+  const slack = Math.abs(tide.u) < .15, dd = STATIONS[S.st].days[S.day];
+  const pt = POINTS[S.pt], fu = flowU(STATIONS[S.st], pt, S.day, tide.tA);
+  setText('curVal', fu.real ? Math.round(fu.u * 100) + '% · ' + (fu.r.sp * KN < .2 ? '물돌이 무렵' : dirName16(fu.r.dir) + '쪽으로 흐름') + ' (조류 예보)'
+    : Math.round(Math.abs(tide.u) * 100) + '% · ' + (slack ? '정조 무렵' : tide.u > 0 ? '들물 중' : '날물 중') + (weakTide(STATIONS[S.st]) ? ' (조차가 작아 지수에 안 씀)' : ' (조위 변화로 추정)'));
+  updateCrnt(pt, tide);
+  const wst = STATIONS[S.st]; setText('curDir', dd.mul + ' (물때 세기 ' + dd.pct + '%)' + (weakTide(wst) ? ` · 조차 ${Math.round(wst.maxCm - wst.minCm)} cm라 지수에 안 씀` : ''));
+  const wx = wxAt(STATIONS[S.st], S.day, S.t, POINTS[S.pt]);
+  S.hs = wx && wx.wave != null ? wx.wave : .5;
+  setText('wxWind', wx ? wx.dir + '풍 ' + (wx.sp == null ? '(세기 정성 예보)' : wx.sp.toFixed(1) + ' m/s') : '자료 없음');
+  setText('wxWave', wx && wx.wave != null ? wx.wave.toFixed(2) + ' m' : '자료 없음');
+  const sw = sstFor(STATIONS[S.st]); setText('wxSst', sw ? `${sw[0].toFixed(1)} ℃ (${sw[2]} ${sw[3]} km · ${sw[1]} 관측)` : '50 km 안 최근 관측 없음');
+  setText('wxSlot', wx ? String(wx.slot).padStart(2, '0') + '시 예보 · ' + wx.from + (wx.near ? ` (약 ${wx.km} km 옆 격자)` : '') : S.day <= TODAY_IDX ? '이 시각 예보 없음 (이미 지난 시각)' : '이 시각 예보 없음 (기상청 단기예보는 3~5일 뒤까지)');
+  const chip = $('tideChip');
+  const label = slack ? (tide.eta > 0 ? '만조 전후 · 정조' : '간조 전후 · 정조') : tide.u > 0 ? '들물' : '날물';
+  if (chip.textContent !== label) { chip.textContent = label; chip.className = 'chip ' + (slack ? 'slack' : tide.u > 0 ? 'in' : 'out'); }
+  const st = STATIONS[S.st], nh = st.ev.find(e => e[0] > tide.tA && e[2] === 'H'), nl = st.ev.find(e => e[0] > tide.tA && e[2] === 'L');
+  const fmtE = e => { if (!e) return '—'; const dd = Math.floor(e[0] / 24) - S.day; return fmtH(e[0] % 24) + (dd > 0 ? ` (+${dd}일)` : '') + ' ' + e[1] + 'cm'; };
+  setText('nextHW', fmtE(nh)); setText('nextLW', fmtE(nl));
+  if (SEC) {
+    setText('sLen', fmtD(SEC.L)); setText('sCross', SEC.cross.length + '곳');
+    let md = null, sea = 0, me = 0; for (const p of SEC.pts) if (!p.land) { sea++; if (isPub(p.r.type)) me++; if (!md || p.r.depth > md.depth) md = p.r; } setText('sMax', md ? fmtDepth(md) + (md.type === 'est' ? ' (추정)' : md.type === 'gebco' ? ' (GEBCO)' : '') : '—'); setText('sMeas', sea ? Math.round(me / sea * 100) + '%' : '—');
+  } else { setText('sLen', '—'); setText('sCross', '—'); setText('sMax', '—'); setText('sMeas', '—'); }
+  setText('sTide', Math.round(tide.cm) + ' cm (' + STATIONS[S.st].name + ', 기본수준면 기준)');
+}
+
+
+function updateCrnt(pt, tide) {
+  if (!CR.ready) { setText('crNow', CR.err ? '불러오지 못함: ' + CR.err : '불러오는 중…'); setText('crDay', '—'); setText('crSrc', '—'); return; }
+  const st = STATIONS[S.st], nc = nearestCrnt(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon);
+  if (!nc || nc.km > CR_NEAR) { setText('crNow', '15 km 안에 예보 지점 없음'); setText('crDay', '—'); setText('crSrc', nc ? `가장 가까운 지점: ${nc.c.name} ${nc.km.toFixed(0)} km` : '—'); return; }
+  const r = crntAt(nc.c, tide.tA);
+  setText('crNow', !r ? '예보 기간 밖' : r.sp * KN < .2 ? `물돌이 무렵 (${(r.sp * KN).toFixed(1)} 노트)` : `${dirName16(r.dir)}쪽으로 ${(r.sp * KN).toFixed(1)} 노트 (${Math.round(r.sp)} cm/s)`);
+  const ev = crntDay(nc.c, S.day);
+  setText('crDay', ev.map(e => e.sp === 0 ? `${fmtH(e.h)} 물돌이` : `${fmtH(e.h)} 최강 ${dirName16(e.dir)} ${(e.sp * KN).toFixed(1)}kn`).join(' · ') || '—');
+  setText('crSrc', `${nc.c.name} 예보 지점 · ${nc.km < 1 ? '1 km 이내' : nc.km.toFixed(1) + ' km'}${nc.km > CR_GOOD ? ' (떨어져 있어 세기·방향은 다를 수 있음)' : ''}`);
+}
+/* ── 크기 ──────────────────────────────────────────────── */
+function resize() {
+  const r = DPR(), old = cw ? toM(cw / 2, ch / 2) : null, oldGW = cw ? cw / pxPerGround() : 0;
+  cw = stage.clientWidth; ch = Math.round(cw * (cw < 560 ? 1.05 : .72));
+  stage.style.height = ch + 'px';
+  for (const c of [base, flow, ui]) { c.width = Math.round(cw * r); c.height = Math.round(ch * r); c.style.width = cw + 'px'; c.style.height = ch + 'px'; }
+  mask.width = Math.ceil(cw / 2); mask.height = Math.ceil(ch / 2);
+  sw = $('secWrap').clientWidth; shh = sw < 560 ? 240 : 300;
+  sec.width = Math.round(sw * r); sec.height = Math.round(shh * r); sec.style.height = shh + 'px';
+  if (old) { V.cx = old[0]; V.cy = old[1]; V.s = cw / (oldGW * kAt(latOf(V.cy))); clampView(); }
+  dirty = true;
+}
+
+/* ── 입력 ──────────────────────────────────────────────── */
+const ptrs = new Map(); let pinch = null, panStart = null;
+const local = e => { const b = ui.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+ui.addEventListener('pointerdown', e => {
+  ui.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, local(e));
+  if (ptrs.size === 2) { S.drag = null; panStart = null; const [p, q] = [...ptrs.values()]; pinch = { d: Math.hypot(p[0] - q[0], p[1] - q[1]), c: [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2] }; return; }
+  const [x, y] = local(e);
+  if (S.mode === 'pan' || e.pointerType === 'touch' && S.mode === 'pan') { panStart = { x, y, cx: V.cx, cy: V.cy }; ui.style.cursor = 'grabbing'; return; }
+  const m = toM(x, y); S.drag = { A: m, B: m };
+});
+ui.addEventListener('pointermove', e => {
+  const [x, y] = local(e);
+  if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, [x, y]);
+  if (pinch && ptrs.size === 2) {
+    const [p, q] = [...ptrs.values()], d = Math.hypot(p[0] - q[0], p[1] - q[1]), c = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    zoomAt(c[0], c[1], d / pinch.d); V.cx -= (c[0] - pinch.c[0]) / V.s; V.cy += (c[1] - pinch.c[1]) / V.s; clampView(); pinch = { d, c }; return;
+  }
+  if (panStart) { V.cx = panStart.cx - (x - panStart.x) / V.s; V.cy = panStart.cy + (y - panStart.y) / V.s; clampView(); return; }
+  if (S.drag) { S.drag.B = toM(x, y); return; }
+  hoverAt = [x, y];
+});
+function endPtr(e) {
+  ptrs.delete(e.pointerId);
+  if (pinch) { if (ptrs.size < 2) pinch = null; return; }
+  if (panStart) {
+    const [x, y] = local(e), moved = Math.hypot(x - panStart.x, y - panStart.y); panStart = null; ui.style.cursor = '';
+    if (moved < 6) { const i = stationAt(x, y); if (i != null) selectPoint(i, cw / pxPerGround() > 60000); }
+    return;
+  }
+  if (S.drag) {
+    const [ax, ay] = toS(...S.drag.A), [bx, by] = toS(...S.drag.B);
+    if (Math.hypot(bx - ax, by - ay) > 12) { S.A = S.drag.A; S.B = S.drag.B; analyzeSection(); }
+    else { const i = stationAt(ax, ay); if (i != null) selectPoint(i, cw / pxPerGround() > 60000); }
+    S.drag = null;
+  }
+}
+ui.addEventListener('pointerup', endPtr); ui.addEventListener('pointercancel', endPtr);
+ui.addEventListener('pointerleave', () => { hoverAt = null; setText('cursorRead', '커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다'); });
+ui.addEventListener('wheel', e => { e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
+let hoverAt = null, hoverDone = null;
+function updateHover() {
+  if (!hoverAt || (hoverDone && hoverDone[0] === hoverAt[0] && hoverDone[1] === hoverAt[1] && !dirtyHover)) return;
+  hoverDone = hoverAt; dirtyHover = false;
+  const [mx, my] = toM(...hoverAt), lat = latOf(my), lon = lonOf(mx);
+  const land = inLand(mx, my), d = groundToCoast(mx, my, 20000);
+  const q = land ? null : (depthQuery(mx, my) || (GE ? modelDepth(mx, my, isFinite(d) ? d : 20000) : isFinite(d) && d < 8000 ? estimateAt(d) : null));
+  const el = land && GE ? gebcoAt(lat, lon) : null;
+  const of = osmAt(mx, my), ofs = of ? ' · ' + OSM_NAME[of.c] + (of.name ? ` 「${of.name}」` : '') : '';
+  setText('cursorRead', lat.toFixed(5) + '°N, ' + lon.toFixed(5) + '°E' + ofs + ' · ' + (land ? '육지·구조물' + (el != null && el > 5 ? ` · 표고 약 ${Math.round(el / 10) * 10} m (GEBCO)` : '') : '바다') + ' · 해안까지 ' + (isFinite(d) ? fmtD(d) : '20 km+'));
+  setText('depthRead', q ? describeDepth(q) : '');
+}
+let dirtyHover = false;
+
+$('zIn').addEventListener('click', () => zoomAt(cw / 2, ch / 2, 1.8));
+$('zOut').addEventListener('click', () => zoomAt(cw / 2, ch / 2, 1 / 1.8));
+document.querySelectorAll('[data-bb]').forEach(b => b.addEventListener('click', () => fitLonLat(b.dataset.bb.split(',').map(Number))));
+function setMode(m) {
+  S.mode = m; $('mLine').setAttribute('aria-pressed', m === 'line'); $('mPan').setAttribute('aria-pressed', m === 'pan');
+  ui.classList.toggle('pan', m === 'pan');
+  $('modeHint').textContent = m === 'pan' ? '드래그해서 지도 이동 · 휠/두 손가락으로 확대' : '드래그해서 단면선 긋기 · 휠/두 손가락으로 확대';
+}
+$('mLine').addEventListener('click', () => setMode('line'));
+$('mPan').addEventListener('click', () => setMode('pan'));
+const normName = v => v.replace(/\s+/g, '').replace(/\(.*?\)/g, '').toLowerCase();
+function fillNameList() {
+  const seen = new Set(), opts = [];
+  const add = (n, tag) => { if (!n || seen.has(n)) return; seen.add(n); opts.push(`<option value="${n.replace(/"/g, '&quot;')}">${tag}</option>`); };
+  for (const p of POINTS) add(p.name, p.kind === 'rock' ? '갯바위' : p.type || '항');
+  for (const p of PORTS) add(p.name, p.type || '항');
+  for (const r of ROCKS) if (!r.banned) add(r.name, '갯바위 · ' + (r.area || ''));
+  for (const o of OSM.list) if (o.c === 'hn' || o.c === 'dk') add(o.name, o.c === 'dk' ? '방조제' : '항·선착장 (오픈스트리트맵)');
+  $('nameList').innerHTML = opts.join('');
+}
+function findPlace(q) {
+  const k = normName(q); if (!k) return null;
+  const osmP = OSM.list.filter(o => o.c === 'hn' || o.c === 'dk').map(o => { const mx = o.R[0].xs[0], my = o.R[0].ys[0]; return { p: { name: o.name, mx, my, lat: latOf(my), lon: lonOf(mx) }, pt: false }; });
+  const cands = [...POINTS.map((p, i) => ({ p, i, pt: true })), ...ROCKS.filter(r => !r.banned && !POINTS.some(q => q.kind === 'rock' && q.name === r.name && q.lat === r.lat)).map(p => ({ p, pt: false, rock: true })), ...PORTS.map(p => ({ p, pt: false })), ...osmP];
+  const score = o => { const n = normName(o.p.name); return n === k ? 0 : n === k + '항' || n === k + '포구' ? 1 : n.startsWith(k) ? 2 : n.includes(k) ? 3 : 9; };
+  let best = null, bs = 9;
+  for (const o of cands) { const sc = score(o) + (o.pt ? 0 : .5); if (sc < bs) { bs = sc; best = o; } }
+  return bs < 9 ? best : null;
+}
+$('coordForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const q = $('coordIn').value.trim();
+  const n = q.match(/^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/);
+  if (n) {   // 숫자 두 개를 넣으면 예전처럼 좌표로 이동
+    let lat = +n[1], lon = +n[2]; if (lat > 90) [lat, lon] = [lon, lat];
+    if (lat < 32.5 || lat > 39 || lon < 123.8 || lon > 132.2) { $('coordMsg').textContent = '한국 연안 범위(북위 32.5~39°, 동경 124~132°)를 벗어났습니다.'; return; }
+    $('coordMsg').textContent = ''; S.pin = [mxOf(lon), myOf(lat)]; fitGround(lat, lon, 1500); return;
+  }
+  const f = findPlace(q);
+  if (!f) {
+    const k = normName(q).replace(/항$/, ''), st = k && STATIONS.find(o => normName(o.name).startsWith(k));
+    if (st) {   // 항구 자료에는 없지만 조석 관측소 이름과 같을 때: 관측소 근처(좌표 정밀도 약 0.1°)로 이동
+      let j = 0, bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, st); if (d < bd) { bd = d; j = i; } });
+      selectPoint(j, false); S.pin = null; fitGround(st.lat, st.lon, 12000);
+      $('coordMsg').textContent = `'${q}'은(는) 불러온 항구 자료에 없어 ${st.name} 조석 관측소 부근(대략 위치)으로 이동했습니다.`;
+      return;
+    }
+    $('coordMsg').textContent = `'${q}'을(를) 찾지 못했습니다. 불러온 항구·갯바위 자료에 없는 이름입니다.`; return;
+  }
+  if (f.rock) {   // 배로만 가는 갯바위: '배로만 가는 곳도 보기'를 켜고 그 포인트를 선택
+    S.showBoat = true; $('showBoat').checked = true; buildPoints();
+    const k = POINTS.findIndex(q => q.kind === 'rock' && q.name === f.p.name && q.lat === f.p.lat); if (k >= 0) { selectPoint(k, false); S.pin = null; fitGround(f.p.lat, f.p.lon, 2500); $('coordMsg').textContent = '배로만 갈 수 있는 갯바위라 "배로만 가는 곳도 보기"를 켰습니다.'; dirty = true; return; }
+  }
+  let j = f.i;
+  if (!f.pt) { let bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, f.p); if (d < bd) { bd = d; j = i; } }); }
+  selectPoint(j, false);
+  S.pin = f.pt ? null : [f.p.mx, f.p.my];
+  fitGround(f.p.lat, f.p.lon, 2500);
+  $('coordMsg').textContent = f.pt ? '' : `${f.p.name}: 5 km 간격 포인트에 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
+  $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(f.p.name)},${f.p.lat.toFixed(6)},${f.p.lon.toFixed(6)}`;
+});
+$('toSec').addEventListener('click', () => {
+  if (!S.A) return;
+  const x1 = Math.min(S.A[0], S.B[0]), x2 = Math.max(S.A[0], S.B[0]), y1 = Math.min(S.A[1], S.B[1]), y2 = Math.max(S.A[1], S.B[1]);
+  const k = kAt(latOf((y1 + y2) / 2)), pad = Math.max(150 * k, (x2 - x1) * .25, (y2 - y1) * .25);
+  fitBox(x1 - pad, y1 - pad, x2 + pad, y2 + pad, 1);
+});
+sec.addEventListener('pointermove', e => { const b = sec.getBoundingClientRect(); S.secHover = clamp((e.clientX - b.left - 50) / (b.width - 64), 0, 1); });
+sec.addEventListener('pointerleave', () => { S.secHover = null; });
+
+$('tIn').addEventListener('input', e => { S.t = +e.target.value; });
+$('stSel').addEventListener('change', e => selectPoint(+e.target.value, true));
+for (const id of ['dayStrip', 'biteDays']) $(id).addEventListener('click', e => { const b = e.target.closest('[data-day]'); if (b) setDay(+b.dataset.day); });
+function renderBasis() {
+  const st = STATIONS[S.st];
+  $('basisTable').innerHTML = '<tr><th>대상어</th><th>10월 시즌</th><th>동해</th><th>남해</th><th>서해</th><th>제주</th><th>물때 영향</th><th>서식 수온</th><th>지금 수온 보정</th><th>내 기록 보정</th></tr>' + FISH.map(f => { const r = TEMP_PREF[f.n], m = myF(f, st); return `<tr><td>${f.n}</td><td>${f.season}</td>${f.reg.map(v => `<td>${v}</td>`).join('')}<td>${f.cur}</td><td>${r[0]}~${r[1]} ℃${r[2] ? '' : ' (안 씀)'}</td><td>×${tempF(f, st).toFixed(2)}</td><td>${m.n ? `×${m.f.toFixed(2)} (${m.n}회 중 ${m.hit})` : '—'}</td></tr>`; }).join('');
+}
+renderBasis();
+$('play').addEventListener('click', () => { S.playing = !S.playing; $('play').textContent = S.playing ? '정지' : '재생'; });
+const bind = (id, key, out, fmt) => $(id).addEventListener('input', e => { S[key] = +e.target.value; $(out).textContent = fmt(S[key]); });
+bind('dmaxIn', 'dmax', 'dmaxOut', v => v + ' m');
+$('dmaxIn').addEventListener('change', () => { dirty = true; analyzeSection(); });
+$('slopeIn').addEventListener('change', e => { S.ratio = +e.target.value; dirty = true; analyzeSection(); });
+$('styleSeg').addEventListener('click', e => { const b = e.target.closest('[data-style]'); if (!b) return; S.mapStyle = b.dataset.style; for (const x of $('styleSeg').children) x.setAttribute('aria-pressed', x === b); dirty = true; });
+$('layerSeg').addEventListener('click', e => { const b = e.target.closest('[data-layer]'); if (!b) return; const k = b.dataset.layer; S.layers[k] = !S.layers[k]; b.setAttribute('aria-pressed', S.layers[k]); if (k === 'flow') { fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); } dirty = true; });
+
+/* ── 내 조황 기록: 이 기기 브라우저(localStorage)에 저장. 로그인·서버 저장은 다음 단계 ── */
+function localCatches() {
+  const K = 'nsg_catches', subs = [];
+  const read = () => { try { return JSON.parse(localStorage.getItem(K) || '[]'); } catch (e) { return []; } };
+  const write = a => { try { localStorage.setItem(K, JSON.stringify(a)); } catch (e) { throw { code: '저장 공간 사용 불가' }; } const docs = a.map(x => ({ id: x.id, data: () => x })); subs.forEach(f => f({ docs })); };
+  return {
+    onSnapshot(f) { subs.push(f); f({ docs: read().map(x => ({ id: x.id, data: () => x })) }); },
+    async add(o) { const a = read(); a.push({ ...o, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }); write(a); },
+    doc(id) { return { async delete() { write(read().filter(x => x.id !== id)); } }; }
+  };
+}
+let catchDB = null, catchCol = null, myId = '';
+$('logSpecies').innerHTML = '<option value="">어종 선택</option>' + FISH.map(f => `<option>${f.n}</option>`).join('') + '<option value="-">꽝 (못 잡음)</option>';
+function renderLog() {
+  const pt = POINTS[S.pt]; $('logPt').textContent = pt ? pt.name : '—';
+  if (!$('logDate').value) $('logDate').value = STATIONS[S.st].days[S.day].date;
+  const list = CATCHES.slice().sort((a, b) => (b.date + b.hour).localeCompare(a.date + a.hour)).slice(0, 12);
+  $('logList').innerHTML = list.length ? list.map(c => `<li><b>${c.date.slice(5)} ${c.hour}</b> ${c.pt} · ${c.species === '-' ? '꽝' : c.species + ' ' + c.count + '마리'}${c.memo ? ' · ' + c.memo.replace(/[<>&]/g, '') : ''} <button type="button" class="linkBtn" data-del="${c.id}">삭제</button></li>`).join('') : '<li class="hint">아직 기록이 없습니다.</li>';
+  $('logCount').textContent = CATCHES.length ? `전체 ${CATCHES.length}건` : '';
+}
+(async () => {
+  try {
+    catchDB = window.claude && window.claude.use && await window.claude.use('db');
+    if (!catchDB) { catchCol = localCatches(); $('logCount').title = '이 기기의 브라우저에만 저장됩니다'; }
+    else { const user = await window.claude.use('user'); myId = user ? await user.id() : ''; catchCol = catchDB.collection('catches'); }
+    catchCol.onSnapshot(snap => { CATCHES = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderBite(); }, e => { $('logMsg').textContent = '기록을 불러오지 못했습니다 (' + e.code + ').'; });
+  } catch (e) { $('logMsg').textContent = '기록 저장소에 연결하지 못했습니다.'; }
+})();
+$('logForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!catchCol) return;
+  const pt = POINTS[S.pt], sp = $('logSpecies').value, cnt = sp === '-' ? 0 : Math.max(0, Math.round(+$('logCount2').value || 0));
+  if (!sp) { $('logMsg').textContent = '어종을 고르세요 (못 잡았으면 "꽝").'; return; }
+  if (sp !== '-' && cnt < 1) { $('logMsg').textContent = '마릿수를 1 이상으로 넣으세요.'; return; }
+  const st = STATIONS[pt.st];
+  try {
+    await catchCol.add({ date: $('logDate').value, hour: $('logHour').value || '', pt: pt.name, lat: +pt.lat.toFixed(5), lon: +pt.lon.toFixed(5), region: st.region, station: st.name, species: sp, count: cnt, memo: $('logMemo').value.slice(0, 120), by: myId, at: new Date().toISOString() });
+    $('logMsg').textContent = '저장했습니다. 이 기록이 조과 지수 보정에 바로 반영됩니다.'; $('logMemo').value = '';
+  } catch (err) { $('logMsg').textContent = '저장하지 못했습니다 (' + (err && err.code || '오류') + ').'; }
+});
+$('logList').addEventListener('click', async e => {
+  const b = e.target.closest('[data-del]'); if (!b || !catchCol) return;
+  try { await catchCol.doc(b.dataset.del).delete(); } catch (err) { $('logMsg').textContent = '삭제하지 못했습니다 (' + (err && err.code || '오류') + ').'; }
+});
+
+/* ── 예시 단면: 강릉 북쪽 동해안의 한 지점에서 바다 방향 ─── */
+function exampleSection(lon, lat) {
+  const tx = mxOf(lon), ty = myOf(lat); let best = Infinity, br = null, bi = 0;
+  for (const r of LOD.full) for (let i = 1; i < r.n - 1; i++) { const d = Math.hypot(r.xs[i] - tx, r.ys[i] - ty); if (d < best) { best = d; br = r; bi = i; } }
+  const vx = br.xs[bi], vy = br.ys[bi], k = kAt(latOf(vy));
+  let nx = -(br.ys[bi + 1] - br.ys[bi - 1]), ny = br.xs[bi + 1] - br.xs[bi - 1]; const nl = Math.hypot(nx, ny); nx /= nl; ny /= nl;
+  if (inLand(vx + nx * 30 * k, vy + ny * 30 * k)) { nx = -nx; ny = -ny; }
+  S.A = [vx - nx * 80 * k, vy - ny * 80 * k]; S.B = [vx + nx * 450 * k, vy + ny * 450 * k];
+  analyzeSection();
+}
+
+$('portFile').addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f, 'port'); e.target.value = ''; });
+$('depthFile').addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f, 'depth'); e.target.value = ''; });
+$('clearData').addEventListener('click', clearData);
+stage.addEventListener('dragover', e => { e.preventDefault(); stage.classList.add('drop'); });
+stage.addEventListener('dragleave', () => stage.classList.remove('drop'));
+stage.addEventListener('drop', e => { e.preventDefault(); stage.classList.remove('drop'); for (const f of e.dataTransfer.files) handleFile(f); });
+decodeOSM(); loadLocal(); loadDepth(); loadRocks(); updateDataCount();
+$('rockFile').addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f, 'rock'); e.target.value = ''; });
+$('showBoat').addEventListener('change', e => { S.showBoat = e.target.checked; const nm = POINTS[S.pt] && POINTS[S.pt].name; buildPoints(); selectPoint(Math.max(0, POINTS.findIndex(p => p.name === nm)), false); dirty = true; });
+const bc = $('biteChart'), bcx = bc.getContext('2d');
+function drawBiteChart() {
+  if (!BITE_H) return;
+  const r = DPR(), w = bc.clientWidth, h = 120; if (!w) return;
+  if (bc.width !== Math.round(w * r)) { bc.width = Math.round(w * r); bc.height = Math.round(h * r); }
+  bcx.setTransform(r, 0, 0, r, 0, 0); bcx.clearRect(0, 0, w, h);
+  const ml = 8, mr = 8, mt = 24, mb = 18, X = t => ml + t / 24 * (w - ml - mr), Y = p => mt + (1 - p / 100) * (h - mt - mb);
+  const { sr, ss, best } = BITE_H;
+  bcx.fillStyle = '#04090c'; bcx.fillRect(0, 0, w, h);
+  bcx.fillStyle = 'rgba(255,184,77,.06)'; bcx.fillRect(X(sr), mt, X(ss) - X(sr), h - mt - mb);
+  bcx.strokeStyle = 'rgba(120,220,230,.14)'; bcx.lineWidth = 1; bcx.setLineDash([3, 3]);
+  for (const p of [40, 60]) { bcx.beginPath(); bcx.moveTo(ml, Y(p)); bcx.lineTo(w - mr, Y(p)); bcx.stroke(); }
+  bcx.setLineDash([]);
+  const bw = (w - ml - mr) / 24;
+  best.forEach((b, i) => { const p = b ? b.p : 0; bcx.fillStyle = p >= 60 ? '#5ff0a8' : p >= 40 ? '#ffb84d' : '#2f5560'; bcx.fillRect(X(i) + 1, Y(p), Math.max(1, bw - 2), h - mb - Y(p)); });
+  const st = STATIONS[S.st], lo = st.minCm, hi = st.maxCm;
+  bcx.beginPath();
+  for (let i = 0; i <= 96; i++) { const t = i / 4, c = tideAt(st, S.day * 24 + t).cm, y = mt + (hi - c) / Math.max(1, hi - lo) * (h - mt - mb); i ? bcx.lineTo(X(t), y) : bcx.moveTo(X(t), y); }
+  bcx.strokeStyle = 'rgba(79,227,211,.75)'; bcx.lineWidth = 1.4; bcx.stroke();
+  bcx.font = '400 9.5px JetBrains Mono, monospace'; bcx.fillStyle = '#7a9ea6'; bcx.textBaseline = 'top';
+  for (let t = 0; t <= 24; t += 6) bcx.fillText(String(t).padStart(2, '0'), clamp(X(t) - 6, 0, w - 14), h - mb + 4);
+  const x = X(S.t), b = best[Math.floor(S.t)];
+  bcx.strokeStyle = '#fff'; bcx.lineWidth = 1.5; bcx.beginPath(); bcx.moveTo(x, mt - 4); bcx.lineTo(x, h - mb); bcx.stroke();
+  bcx.fillStyle = '#fff'; bcx.beginPath(); bcx.arc(x, h - mb, 6, 0, 7); bcx.fill();
+  const label = `${fmtH(S.t)} · ${b ? b.n + ' ' + b.p + '%' : ''}`;
+  bcx.font = '600 11px JetBrains Mono, monospace';
+  const lw = bcx.measureText(label).width + 12, lx = clamp(x - lw / 2, 0, w - lw);
+  bcx.fillStyle = 'rgba(6,15,19,.92)'; bcx.fillRect(lx, 2, lw, 18); bcx.fillStyle = '#d5ecee'; bcx.fillText(label, lx + 6, 5);
+}
+bc.addEventListener('pointerdown', e => {
+  const set = ev => { const b = bc.getBoundingClientRect(); S.t = clamp((ev.clientX - b.left - 8) / (b.width - 16) * 24, 0, 23.99); $('tIn').value = S.t; };
+  bc.setPointerCapture(e.pointerId); set(e);
+  bc.onpointermove = ev => { if (bc.hasPointerCapture(ev.pointerId)) set(ev); };
+});
+$('structFile').addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f, 'struct'); e.target.value = ''; });
+apiLoad(); if (!$('pMinLat').options.length) apiParams();
+$('apiUrl').addEventListener('input', () => { apiParams(); apiSave(); });
+for (const id of ['apiKey', 'apiProxy', 'pMinLat', 'pMaxLat', 'pMinLon', 'pMaxLon']) $(id).addEventListener('change', apiSave);
+$('apiGo').addEventListener('click', apiLoadViewport);
+let apiTimer = null;
+function apiAutoKick() { if (!$('apiAuto').checked) return; clearTimeout(apiTimer); apiTimer = setTimeout(apiLoadViewport, 900); }
+$('copyOverpass').addEventListener('click', () => { const t = $('overpassQ').textContent; navigator.clipboard && navigator.clipboard.writeText(t).then(() => { $('copyOverpass').textContent = '복사됨'; }, () => { const r = document.createRange(); r.selectNodeContents($('overpassQ')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }); });
+
+new ResizeObserver(() => { if (stage.clientWidth !== cw) resize(); }).observe(stage);
+resize();
+loadGebco();
+loadCrnt();
+fitLonLat([124.4, 32.9, 131.95, 38.7]);
+buildPoints();
+{ const z = { lat: 37.9, lon: 128.83 }; let bi = 0, bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, z); if (d < bd) { bd = d; bi = i; } }); selectPoint(bi, false); }
+exampleSection(128.93, 37.80);
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (S.playing) { S.t = (S.t + dt * .7) % 24; $('tIn').value = S.t; }
+  const tide = getTide();
+  if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
+  if (Math.floor(S.t) !== biteHour) renderBite();
+  updateHover(); drawUI(); drawCrnt(tide); stepParticles(tide, dt); drawSection(now, tide); updateReadouts(tide); drawTideChart(tide); drawBiteChart();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+
+</script>
+
+</body>
+</html>

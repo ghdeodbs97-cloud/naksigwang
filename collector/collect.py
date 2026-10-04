@@ -1,6 +1,6 @@
 """낚시광 데이터 수집기
 매일 공공데이터포털 API 4종을 받아 data/ 폴더에 JSON으로 저장한다.
-  - 국립해양조사원 조석예보(고, 저조)     → data/tide.json   (예보지점 166곳 × 7일)
+  - 국립해양조사원 조석예보(고, 저조)     → data/tide.json   (예보지점 166곳 × 15일, 음력 날짜 포함. 오전 실행 때만 받음)
   - 국립해양조사원 조위관측소 최신 관측   → data/obs.json    (관측소 55곳: 수온·바람·기온·기압·조위)
   - 기상청 단기예보                     → data/wx.json     (항·포구·갯바위가 있는 5 km 격자: 풍향·풍속·파고)
   - 실행 기록                           → data/meta.json
@@ -18,7 +18,7 @@ OUT = ROOT / 'data'
 PTS = json.loads((Path(__file__).parent / 'points.json').read_text(encoding='utf-8'))
 KST = dt.timezone(dt.timedelta(hours=9))
 NOW = dt.datetime.now(KST)
-DAYS = int(os.environ.get('TIDE_DAYS', '7'))
+DAYS = int(os.environ.get('TIDE_DAYS', '15'))   # 사리~조금 한 주기(약 15일)가 있어야 물때 세기를 계산할 수 있다
 LIMIT = int(os.environ.get('LIMIT', '0'))   # 시험용: 0이면 전체, 숫자면 원천마다 그 개수만
 S = requests.Session()
 S.headers['User-Agent'] = 'naksigwang-collector/1.0'
@@ -80,7 +80,7 @@ def tide():
             LOG['errors'].append(f'tide {c} {d}: {e}')
             return job, None
     out = {}
-    for (c, n, d), rows in pmap(one, jobs):
+    for (c, n, d), rows in pmap(one, jobs, workers=8):
         if rows is None:
             continue
         o = out.setdefault(c, {'name': n, 'days': {}})
@@ -92,7 +92,24 @@ def tide():
     for o in out.values():
         for d, v in o['days'].items():
             o['days'][d] = sorted(set(map(tuple, v)))
-    return out, len(jobs)
+    # 음력 날짜 (한국천문연구원 음양력 표 기반 korean_lunar_calendar)
+    from korean_lunar_calendar import KoreanLunarCalendar
+    cal, lunar = KoreanLunarCalendar(), {}
+    for i in range(DAYS):
+        x = NOW + dt.timedelta(days=i)
+        cal.setSolarDate(x.year, x.month, x.day)
+        lunar[x.strftime('%Y-%m-%d')] = [cal.lunarMonth, cal.lunarDay, int(cal.isIntercalation)]
+    return {'from': NOW.strftime('%Y-%m-%d'), 'lunar': lunar, 'st': out}, len(jobs)
+
+
+def tide_needed():
+    """조석 예측은 하루 동안 바뀌지 않으므로 오전 실행이나, 파일이 없거나 오늘 것이 아닐 때만 받는다"""
+    if os.environ.get('FORCE_TIDE') == '1' or NOW.hour < 12:
+        return True
+    try:
+        return json.loads((OUT / 'tide.json').read_text(encoding='utf-8')).get('from') != NOW.strftime('%Y-%m-%d')
+    except Exception:
+        return True
 
 
 # ── 2. 조위관측소 최신 관측 ───────────────────────────────
@@ -172,6 +189,17 @@ def wx():
             o.setdefault(k, [None, None, None])[('VEC', 'WSD', 'WAV').index(c)] = v
         return cell, o
     out = {f'{nx},{ny}': o for (nx, ny), o in pmap(one, cells) if o}
+    # 오늘 이미 지난 시각은 새 발표에 없으므로 이전 파일의 값을 남겨 둔다 (오늘 00시 이후만)
+    try:
+        prev = json.loads((OUT / 'wx.json').read_text(encoding='utf-8'))['cells']
+        today = NOW.strftime('%Y%m%d') + '00'
+        for k, o in out.items():
+            for h, v in (prev.get(k) or {}).items():
+                if h >= today and h not in o:
+                    o[h] = v
+            out[k] = dict(sorted(o.items()))
+    except Exception:
+        pass
     return {'base': bd + bt, 'cells': out}, len(cells)
 
 
@@ -188,7 +216,10 @@ def main():
         sys.exit('DATA_GO_KR_KEY 환경변수가 없습니다.')
     OUT.mkdir(exist_ok=True)
     t0 = time.time()
-    td, n = tide(); save('tide.json', td, len(td), len(lim(PTS['tide'])))
+    if tide_needed():
+        td, n = tide(); save('tide.json', td, len(td['st']), len(lim(PTS['tide'])))
+    else:
+        LOG['tide.json'] = 'skipped (오늘 자료 있음)'
     ob, n = obs(); save('obs.json', ob, len(ob), n)
     w, n = wx(); save('wx.json', w, len(w['cells']), n)
     LOG['generated'] = NOW.isoformat(timespec='minutes')
