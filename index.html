@@ -1787,8 +1787,10 @@ const toM = (px, py) => [V.cx + (px - cw / 2) / V.s, V.cy - (py - ch / 2) / V.s]
 const pxPerGround = () => V.s * kAt(latOf(V.cy));
 // 지도 범위 = 지형 자료(GEBCO) 범위. 이보다 넓게 축소하거나 밖으로 밀면 자료 없는 검은 곳이 보이므로 막는다
 const KB = { x1: mxOf(124.4), x2: mxOf(131.95), y1: myOf(32.9), y2: myOf(38.7) };
+let VIEW_T = 0;      // 마지막으로 지도를 옮기거나 확대·축소한 시각 (조류 입자를 잠깐 숨기는 데 씀)
 function clampView() {
   if (!cw || !ch) return;
+  VIEW_T = performance.now();
   const sMin = Math.max(cw / (KB.x2 - KB.x1), ch / (KB.y2 - KB.y1));   // 화면이 자료 범위 안에 들어가는 가장 작은 배율
   if (V.s < sMin) V.s = sMin;
   const gw = cw / pxPerGround();
@@ -2068,9 +2070,7 @@ function renderBase() {
     : BANDS_.filter(([d]) => d * ppg >= 3).slice(0, 8).map(([d, c]) => `<span class="b"><i style="background:${c}"></i>${d >= 1000 ? d / 1000 + 'km' : d + 'm'}</span>`).join('');
   $('viewSize').textContent = '보이는 폭 ' + (gw >= 1000 ? (gw / 1000).toFixed(gw >= 10000 ? 0 : 1) + ' km' : Math.round(gw) + ' m');
   $('warn').hidden = gw > 1500;
-  buildFlowField();
-  for (let k = 0; k < NP; k++) spawn(k);
-  fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height);
+  flowStale = true;   // 흐름장·입자는 지도 움직임이 멈춘 뒤 stepParticles에서 다시 만든다
 }
 // 17_flow.js — 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표
 // 해안선과 나란한 방향장 (모식): 육지 마스크를 넓게 평균한 값의 기울기에 수직인 방향.
@@ -2122,7 +2122,14 @@ function realField(tA) {
 /* ── 조류 입자 ─────────────────────────────────────────── */
 const NP = 900; const P = { x: new Float32Array(NP), y: new Float32Array(NP), age: new Float32Array(NP), max: new Float32Array(NP) };
 function spawn(k) { for (let t = 0; t < 25; t++) { const x = Math.random() * cw, y = Math.random() * ch; if (isSea(x | 0, y | 0)) { P.x[k] = x; P.y[k] = y; P.age[k] = 0; P.max[k] = 50 + Math.random() * 110; return; } } P.age[k] = 1e9; }
+// 지도를 끌거나 확대·축소하는 동안에는 입자를 숨겼다가, 손을 떼고 0.3초 뒤 새 화면에 맞춰 다시 뿌린다.
+// (예전에는 움직이는 동안 매 프레임 입자를 새로 뿌려서, 휴대폰에서 누르면 조류가 아주 빨리 흐르는 것처럼 보였다)
+let flowStale = true, flowHidden = false;
 function stepParticles(tide, dt) {
+  const moving = ptrs.size > 0 || performance.now() - VIEW_T < 300;
+  if (moving) { if (!flowHidden) { fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowHidden = true; } return; }
+  if (flowStale) { buildFlowField(); for (let k = 0; k < NP; k++) spawn(k); fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowStale = false; }
+  flowHidden = false;
   fctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
   fctx.globalCompositeOperation = 'destination-out'; fctx.fillStyle = 'rgba(0,0,0,.09)'; fctx.fillRect(0, 0, cw, ch);
   fctx.globalCompositeOperation = 'source-over';

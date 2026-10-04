@@ -48,7 +48,14 @@ function realField(tA) {
 /* ── 조류 입자 ─────────────────────────────────────────── */
 const NP = 900; const P = { x: new Float32Array(NP), y: new Float32Array(NP), age: new Float32Array(NP), max: new Float32Array(NP) };
 function spawn(k) { for (let t = 0; t < 25; t++) { const x = Math.random() * cw, y = Math.random() * ch; if (isSea(x | 0, y | 0)) { P.x[k] = x; P.y[k] = y; P.age[k] = 0; P.max[k] = 50 + Math.random() * 110; return; } } P.age[k] = 1e9; }
+// 지도를 끌거나 확대·축소하는 동안에는 입자를 숨겼다가, 손을 떼고 0.3초 뒤 새 화면에 맞춰 다시 뿌린다.
+// (예전에는 움직이는 동안 매 프레임 입자를 새로 뿌려서, 휴대폰에서 누르면 조류가 아주 빨리 흐르는 것처럼 보였다)
+let flowStale = true, flowHidden = false;
 function stepParticles(tide, dt) {
+  const moving = ptrs.size > 0 || performance.now() - VIEW_T < 300;
+  if (moving) { if (!flowHidden) { fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowHidden = true; } return; }
+  if (flowStale) { buildFlowField(); for (let k = 0; k < NP; k++) spawn(k); fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowStale = false; }
+  flowHidden = false;
   fctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
   fctx.globalCompositeOperation = 'destination-out'; fctx.fillStyle = 'rgba(0,0,0,.09)'; fctx.fillRect(0, 0, cw, ch);
   fctx.globalCompositeOperation = 'source-over';
