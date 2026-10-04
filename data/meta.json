@@ -1,0 +1,18 @@
+{
+ "errors": [],
+ "tide.json": {
+  "ok": 3,
+  "requested": 3
+ },
+ "obs.json": {
+  "ok": 3,
+  "requested": 3
+ },
+ "wx.json": {
+  "ok": 3,
+  "requested": 3
+ },
+ "generated": "2026-10-04T12:59+09:00",
+ "seconds": 4,
+ "error_count": 0
+}
