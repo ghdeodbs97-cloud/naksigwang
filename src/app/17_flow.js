@@ -96,7 +96,7 @@ function drawCrnt(tide) {
       uctx.beginPath(); uctx.moveTo(x1, y1); uctx.lineTo(x1 - dx * hl - dy * hw, y1 - dy * hl + dx * hw); uctx.lineTo(x1 - dx * hl + dy * hw, y1 - dy * hl - dx * hw); uctx.closePath();
       uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.stroke(); uctx.fill();
     }
-    if (big) {
+    if (gw < 150000 && (kn >= .2 || gw < 40000)) {   // 글자는 150 km 폭 안에서만, 「물돌이」 글자는 40 km 안에서만 (넓게 볼 때 어지럽지 않게)
       const t = (kn < .2 ? '물돌이' : kn.toFixed(1) + 'kn') + (showName ? ' ' + c.name : '');
       uctx.lineWidth = 3; uctx.strokeStyle = 'rgba(6,15,19,.85)'; uctx.strokeText(t, x + 9, y + 9); uctx.fillStyle = col; uctx.fillText(t, x + 9, y + 9);
     }

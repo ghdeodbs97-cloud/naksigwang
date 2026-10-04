@@ -40,7 +40,14 @@ function drawStations() {
   for (const i of order) {
     const st = POINTS[i], [x, y] = toS(st.mx, st.my); if (x < -20 || y < -20 || x > cw + 20 || y > ch + 20) continue;
     if (i !== S.pt && !S.layers[st.kind === 'rock' ? 'rock' : 'port']) continue;
-    const sel = i === S.pt, size = sel ? 24 : gpp > 700 ? 12 : gpp > 400 ? 14 : 18, rock = st.kind === 'rock';
+    const sel = i === S.pt, rock = st.kind === 'rock';
+    // 축척에 따라 보여 줄 것을 줄인다: 넓게 볼수록 큰 항만, 확대할수록 작은 항·갯바위까지
+    //   전국(1 px > 600 m): 국가어항만 · 지방(250~600 m): 지방어항까지 + 차로 가는 갯바위 · 해역(80~250 m): 정주어항까지 + 갯바위 전부 · 가까이: 전부
+    if (!sel) {
+      const pr = rock ? 9 : portPri(st.type);
+      if (gpp > 600 ? rock || pr > 0 : gpp > 250 ? (rock ? st.access !== 'car' : pr > 1) : gpp > 80 ? (!rock && pr > 2) : false) continue;
+    }
+    const size = sel ? 24 : gpp > 600 ? 11 : gpp > 250 ? 13 : gpp > 80 ? 15 : 18;
     if (sel) { bctx.fillStyle = 'rgba(79,227,211,.25)'; bctx.strokeStyle = '#4fe3d3'; bctx.lineWidth = 2; bctx.beginPath(); bctx.arc(x, y, size * .72, 0, 7); bctx.fill(); bctx.stroke(); }
     // 갯바위 접근: 차량·도보는 진하게, 확인 필요는 조금 흐리게, 배로만은 흐리게
     drawIcon(bctx, rock ? 'rock' : 'port', x, y, size, rock ? (st.access === 'car' ? 1 : st.access === 'unk' ? .8 : .5) : 1);

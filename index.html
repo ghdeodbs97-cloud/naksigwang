@@ -820,11 +820,7 @@ function drawPortsAndSoundings(gpp) {
   }
   // 항 이름 (겹치지 않게, 큰 항부터)
   if (!PORTS.length || !S.layers.port) return;
-  if (gpp > 120) {   // 넓게 볼 때는 위치 점만
-    bctx.fillStyle = 'rgba(255,208,138,.8)';
-    for (const p of PORTS) { const [x, y] = toS(p.mx, p.my); if (x > 0 && y > 0 && x < cw && y < ch) bctx.fillRect(x - 1.5, y - 1.5, 3, 3); }
-    return;
-  }
+  if (gpp > 120) return;   // 넓게 볼 때는 포인트 목록의 항만 (15_view.js의 축척 규칙)
   const maxPri = gpp > 60 ? 1 : gpp > 25 ? 2 : 3;
   const vis = PORTS.filter(p => !p.isPt && portPri(p.type) <= maxPri).map(p => { const [x, y] = toS(p.mx, p.my); return { p, x, y, pr: portPri(p.type) }; })
     .filter(o => o.x > -40 && o.y > -20 && o.x < cw + 40 && o.y < ch + 20).sort((a, b) => a.pr - b.pr);
@@ -1743,7 +1739,14 @@ function drawStations() {
   for (const i of order) {
     const st = POINTS[i], [x, y] = toS(st.mx, st.my); if (x < -20 || y < -20 || x > cw + 20 || y > ch + 20) continue;
     if (i !== S.pt && !S.layers[st.kind === 'rock' ? 'rock' : 'port']) continue;
-    const sel = i === S.pt, size = sel ? 24 : gpp > 700 ? 12 : gpp > 400 ? 14 : 18, rock = st.kind === 'rock';
+    const sel = i === S.pt, rock = st.kind === 'rock';
+    // 축척에 따라 보여 줄 것을 줄인다: 넓게 볼수록 큰 항만, 확대할수록 작은 항·갯바위까지
+    //   전국(1 px > 600 m): 국가어항만 · 지방(250~600 m): 지방어항까지 + 차로 가는 갯바위 · 해역(80~250 m): 정주어항까지 + 갯바위 전부 · 가까이: 전부
+    if (!sel) {
+      const pr = rock ? 9 : portPri(st.type);
+      if (gpp > 600 ? rock || pr > 0 : gpp > 250 ? (rock ? st.access !== 'car' : pr > 1) : gpp > 80 ? (!rock && pr > 2) : false) continue;
+    }
+    const size = sel ? 24 : gpp > 600 ? 11 : gpp > 250 ? 13 : gpp > 80 ? 15 : 18;
     if (sel) { bctx.fillStyle = 'rgba(79,227,211,.25)'; bctx.strokeStyle = '#4fe3d3'; bctx.lineWidth = 2; bctx.beginPath(); bctx.arc(x, y, size * .72, 0, 7); bctx.fill(); bctx.stroke(); }
     // 갯바위 접근: 차량·도보는 진하게, 확인 필요는 조금 흐리게, 배로만은 흐리게
     drawIcon(bctx, rock ? 'rock' : 'port', x, y, size, rock ? (st.access === 'car' ? 1 : st.access === 'unk' ? .8 : .5) : 1);
@@ -2167,7 +2170,7 @@ function drawCrnt(tide) {
       uctx.beginPath(); uctx.moveTo(x1, y1); uctx.lineTo(x1 - dx * hl - dy * hw, y1 - dy * hl + dx * hw); uctx.lineTo(x1 - dx * hl + dy * hw, y1 - dy * hl - dx * hw); uctx.closePath();
       uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.stroke(); uctx.fill();
     }
-    if (big) {
+    if (gw < 150000 && (kn >= .2 || gw < 40000)) {   // 글자는 150 km 폭 안에서만, 「물돌이」 글자는 40 km 안에서만 (넓게 볼 때 어지럽지 않게)
       const t = (kn < .2 ? '물돌이' : kn.toFixed(1) + 'kn') + (showName ? ' ' + c.name : '');
       uctx.lineWidth = 3; uctx.strokeStyle = 'rgba(6,15,19,.85)'; uctx.strokeText(t, x + 9, y + 9); uctx.fillStyle = col; uctx.fillText(t, x + 9, y + 9);
     }

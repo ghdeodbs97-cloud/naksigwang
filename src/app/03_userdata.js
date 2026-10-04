@@ -142,11 +142,7 @@ function drawPortsAndSoundings(gpp) {
   }
   // 항 이름 (겹치지 않게, 큰 항부터)
   if (!PORTS.length || !S.layers.port) return;
-  if (gpp > 120) {   // 넓게 볼 때는 위치 점만
-    bctx.fillStyle = 'rgba(255,208,138,.8)';
-    for (const p of PORTS) { const [x, y] = toS(p.mx, p.my); if (x > 0 && y > 0 && x < cw && y < ch) bctx.fillRect(x - 1.5, y - 1.5, 3, 3); }
-    return;
-  }
+  if (gpp > 120) return;   // 넓게 볼 때는 포인트 목록의 항만 (15_view.js의 축척 규칙)
   const maxPri = gpp > 60 ? 1 : gpp > 25 ? 2 : 3;
   const vis = PORTS.filter(p => !p.isPt && portPri(p.type) <= maxPri).map(p => { const [x, y] = toS(p.mx, p.my); return { p, x, y, pr: portPri(p.type) }; })
     .filter(o => o.x > -40 && o.y > -20 && o.x < cw + 40 && o.y < ch + 20).sort((a, b) => a.pr - b.pr);
