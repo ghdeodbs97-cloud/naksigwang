@@ -454,6 +454,7 @@ out geom;</pre>
 </script>
 <script>
 (async () => {
+// 00_boot.js — 공통 도구와 매일 갱신 자료(data/*.json) 불러오기
 const $ = id => document.getElementById(id);
 const DPR = () => Math.min(window.devicePixelRatio || 1, 2);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
@@ -465,7 +466,7 @@ let TIDE, OBS, WXG, META;
 try { [TIDE, OBS, WXG, META] = await Promise.all(['tide', 'obs', 'wx', 'meta'].map(loadJSON)); }
 catch (e) { document.body.insertAdjacentHTML('afterbegin', `<p style="padding:16px;color:#ff7a6e;font:14px sans-serif">예보 자료를 불러오지 못했습니다 (${e.message}). 잠시 뒤 새로고침해 주세요.</p>`); throw e; }
 { const g = new Date(META.generated); $('dataTime').textContent = `${g.getMonth() + 1}/${g.getDate()} ${String(g.getHours()).padStart(2, '0')}:${String(g.getMinutes()).padStart(2, '0')}`; }
-
+// 01_geo.js — 좌표계(웹 메르카토르)와 해안선 디코딩·육지 판정
 /* ── 좌표계: 웹 메르카토르 (m) ─────────────────────────── */
 const R = 6378137, D2R = Math.PI / 180;
 const mxOf = lon => R * lon * D2R;
@@ -532,12 +533,12 @@ function inLand(mx, my) {   // 같은 높이 띠의 해안선 선분만 세는 �
   return c || (STRUCT.n > 0 && inStruct(mx, my));
 }
 const groundToCoast = (mx, my, maxG = 8000) => { const k = kAt(latOf(my)); const d = Math.min(nearestCoast(mx, my, maxG * k), structDist(mx, my, Math.min(maxG, 3000) * k)); return d / k; };
-
+// 02_state.js — 화면 상태(S)와 추정 수심 식
 /* ── 조석, 조류 (모식) ─────────────────────────────────── */
 const PERIOD = 12.42, HW = 3.0;
 const S = { mapStyle: 'terrain', st: 0, day: 0, t: new Date(Date.now() + 9 * 36e5).getUTCHours() + .5, range: 1.6, hs: .5, layers: { port: true, rock: true, flow: true }, ratio: 8, dmax: 30, playing: false, mode: 'line', A: null, B: null, drag: null, secHover: null, pin: null };
 const depthAt = dG => S.dmax * (1 - Math.exp(-dG / (S.dmax * S.ratio)));
-
+// 03_userdata.js — 내 자료: 항·포구 목록, CSV 읽기
 /* ── 내 자료: 항·포구 목록, 수심 기록 (CSV) ────────────── */
 const PORTS = [];
 async function readText(file) {
@@ -701,7 +702,7 @@ function drawPortsAndSoundings(gpp) {
     bctx.fillStyle = big ? '#ffe2b0' : '#e7eef0'; bctx.fillText(o.p.name, o.x + 8, o.y);
   }
 }
-
+// 04_depth.js — 수심 자료 층과 보간
 /* ── 수심 자료 층 ─────────────────────────────────────────
    우선순위: 1 사용자 실측 > 2 연안해역기본도 > 3 전자해도·항만도 > 4 BADA2024 > 5 해안거리 추정
    위 순서대로 찾고, 높은 순위 자료가 반경 안에 있으면 그 자료만으로 보간한다(낮은 순위와 섞지 않음). */
@@ -788,7 +789,7 @@ function describeDepth(r) {
   if (r.type === 'bada') s += ' · 세부 수중여·턱 표현 불가';
   return s;
 }
-
+// 05_struct.js — 해안 구조물(방파제·부두) 층
 /* ── 해안 구조물(방파제·부두 등) 층 ─────────────────── */
 const STRUCT = { lines: [], polys: [], seg: [], idx: new Map(), n: 0, nb: 0 };   // nb: 기본 내장(OSM) 구조물 수
 const STC = 400;
@@ -836,7 +837,7 @@ function structPath(margin) {
   for (const r of STRUCT.lines) if (vis(r)) { for (let i = 0; i < r.n; i++) { const [x, y] = toS(r.xs[i], r.ys[i]); i ? lp.lineTo(x, y) : lp.moveTo(x, y); } }
   return [p, lp];
 }
-
+// 06_osm.js — 오픈스트리트맵 해안 지형·이름
 /* ── 오픈스트리트맵 해안 지형 (© OpenStreetMap 기여자, ODbL · 2026-10-03 내려받음) ───
    방파제·도류제·부두·안벽은 구조물 층(육지 취급)으로, 해변·암반·갯벌·암초 등은 그림과 커서 정보로 쓴다. */
 const OSM = { list: [], lab: [] };
@@ -936,7 +937,7 @@ function osmAt(mx, my) {   // 커서 위치의 OSM 면 (가장 작은 것)
   }
   return best;
 }
-
+// 07_import.js — 좌표 정규화, 수심 파일 불러오기, 이 브라우저에 저장
 /* ── 좌표 정규화 (경위도 또는 평면직각좌표) ─────────── */
 function toLatLon(a, b) {   // GeoJSON 순서 [x(lon), y(lat)]
   let lon = a, lat = b;
@@ -1057,7 +1058,7 @@ function loadDepth() {
     if (s) { const m = a => a.map(([lo, la]) => [mxOf(lo), myOf(la)]); s.l.forEach(a => addStructLine(m(a), false)); s.p.forEach(a => addStructLine(m(a), true)); }
   } catch (e) {}
 }
-
+// 08_depth_api.js — 공공 수심 API 불러오기
 /* ── 공공 수심 API (국립해양조사원 자연과학용 수심정보, BADA2024) ─────
    요청 주소·파라미터 이름은 추측하지 않는다. 사용자가 공공데이터포털에서 받은 "요청 주소 예시"를 그대로 쓰고,
    그 안의 파라미터 중 어떤 것이 범위(최소·최대 위도·경도)인지 사용자가 지정한다. */
@@ -1138,7 +1139,7 @@ async function apiLoadViewport() {
   apiBusy = false; dirty = true; analyzeSection(); updateDataCount();
   apiMsg(`BADA2024 ${total.toLocaleString()}점을 ${done}개 타일에서 불러왔습니다` + (want.length > 16 ? ` (남은 ${want.length - 16}개 타일은 다시 누르면 이어서 불러옵니다)` : '') + '.');
 }
-
+// 09_rocks.js — 낚시 제한구역과 갯바위 포인트
 /* ── 낚시 제한구역 (국립해양조사원 전자해도 제한구역, 2024.11.30 제작분) — 그리지 않고, 안에 있는 포인트만 뺀다 ─ */
 const BAN = BAN_AREAS.map(r => ({ r, x1: Math.min(...r.map(p => p[0])), x2: Math.max(...r.map(p => p[0])), y1: Math.min(...r.map(p => p[1])), y2: Math.max(...r.map(p => p[1])) }));
 function inBan(lat, lon) {
@@ -1206,7 +1207,7 @@ function rockInfoHTML(p) {
   const rows = [['접근', ACC_NAME[p.access]], ['지역', p.area || p.addr], ['수심 범위 (자료)', p.depth], ['주요 대상어 (자료)', p.targets], ['조석 (자료)', p.tide], ['낚시 방법 (자료)', p.method]].filter(r => r[1]);
   return `<dl class="rock">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`;
 }
-
+// 10_tide.js — 조석: 예보지점·물때·조위 보간
 /* ── 조석: 국립해양조사원 조석예보(고, 저조) 예보지점 166곳, 오늘부터 15일 ─
    물때 이름은 음력 날짜로 정한다 (서해 7물때식: 음력 1일 = 7물, 그 밖 8물때식: 음력 1일 = 8물).
    물때 세기(%)는 그 지점의 15일(사리~조금 한 주기) 중 하루 조차가 가장 큰 날을 100으로 본 그날 조차 비율. */
@@ -1245,6 +1246,7 @@ function getTide() {
   const st = STATIONS[S.st], tA = S.day * 24 + S.t, r = tideAt(st, tA);
   return { eta: (r.cm - st.msl) / 100, u: r.rate / st.maxRate, cm: r.cm, rate: r.rate, tA };
 }
+// 11_current.js — 조류 예보(물돌이·최강)와 해 뜨고 지는 시각
 /* ── 조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」 (공공데이터포털, 199개 예보 지점) ──
    지점마다 전류(물돌이, 유속 0)와 최강 유속 시각·유향·유속(cm/s)이 번갈아 있다. 그 사이는 사인 곡선으로 보간한다.
    유향은 물이 흘러가는 방향(북=0°, 시계 방향). 바람·하천·해류 영향은 들어 있지 않은 천문 조류 예측값이다. */
@@ -1310,7 +1312,7 @@ function sunTimes(lat, lon, dayIdx) {
   const noon = 720 - 4 * lon - eq + 540;
   return [(noon - 4 * ha) / 60, (noon + 4 * ha) / 60];
 }
-
+// 12_fish.js — 대상어 정보와 물고기 그림
 /* ── 대상어 ───────────────────────────────────────────── */
 // season: 10월 시즌 점수(0~1), reg: [동해, 남해, 서해, 제주] 출현 점수, cur: 물살 선호(1=물때 영향 큼)
 const FISH = [
@@ -1381,7 +1383,7 @@ function fishSVG(f, id) {
   if (f.barbel) s += `<path d="M${x0 + 3} ${cy + 5} q 0 6 -3 8" stroke="${f.top}" stroke-width="1.2" fill="none"/>`;
   return s + '</svg>';
 }
-
+// 13_forecast.js — 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선
 /* ── 계기판 (관측소·날짜·조석 곡선) ─────────────────── */
 const tc = $('tideChart'), tcx = tc.getContext('2d');
 /* ── 선택 포인트: 항·포구를 5 km 간격으로 골라 가장 가까운 관측소 조석과 연결 ─ */
@@ -1488,7 +1490,7 @@ function drawTideChart(tide) {
   tcx.fillStyle = '#fff'; tcx.beginPath(); tcx.arc(x, Y(tide.cm), 4, 0, 7); tcx.fill();
 }
 tc.addEventListener('pointerdown', e => { const set = ev => { const b = tc.getBoundingClientRect(); S.t = clamp((ev.clientX - b.left - 34) / (b.width - 42) * 24, 0, 23.99); $('tIn').value = S.t; }; tc.setPointerCapture(e.pointerId); set(e); tc.onpointermove = ev => { if (tc.hasPointerCapture(ev.pointerId)) set(ev); }; });
-
+// 14_bite.js — 시간별 입질 지수
 /* ── 시간별 조과 지수 (엄격한 규칙 기반 추정) ───────────
    시즌 × 해역 × 물때 세기 × 파고 × 시간대 밝기 × 그 시각 물흐름 세기를 곱한다.
    곱셈이라 조건이 하나만 나빠도 크게 내려가고, 해뜰녘·해질녘에 물이 적당히 흐를 때만 높게 나온다. */
@@ -1560,7 +1562,7 @@ function renderBite() {
   if (typeof renderBasis === 'function') renderBasis();
   if (typeof renderLog === 'function') renderLog();
 }
-
+// 15_view.js — 지도 표시 보조, 좌표 변환, 화면 보기 상태
 /* ── 지도 위 관측소 표시 ─────────────────────────────── */
 let stHits = [];
 function drawStations() {
@@ -1628,6 +1630,7 @@ function zoomAt(px, py, f) { const [mx, my] = toM(px, py); V.s *= f; clampView()
 /* ── 바탕 그리기 ───────────────────────────────────────── */
 const BANDS = [[10, '#64e6d4'], [30, '#43ccc3'], [50, '#2fb0b4'], [100, '#2194a5'], [150, '#1b8097'], [200, '#176e88'], [300, '#135d77'], [500, '#104e68'], [1000, '#0d405a'], [2000, '#0b344b'], [5000, '#0a2a3e'], [10000, '#082233'], [20000, '#071b2a']];
 const FAR = '#06141f';
+// 16_terrain.js — GEBCO 지형 격자와 바탕 지도 그리기
 /* ── GEBCO 2026 지형 격자 (15초 ≈ 460 m, 육지 표고 + 해저 수심) ───────────
    GEBCO Compilation Group (2026) GEBCO 2026 Grid. 공공 영역. 행마다 앞 칸과의 차이를 저장 후 deflate 압축. */
 let GE = null, GSH = null;   // GE: Int16 표고(m, 바다는 음수), GSH: 음영(0~1)
@@ -1892,6 +1895,7 @@ function renderBase() {
   for (let k = 0; k < NP; k++) spawn(k);
   fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height);
 }
+// 17_flow.js — 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표
 // 해안선과 나란한 방향장 (모식): 육지 마스크를 넓게 평균한 값의 기울기에 수직인 방향.
 // 예보 지점에서 먼 곳은 실제 조류 방향이 아니다 — 들물/날물에 따라 해안을 따라 오가는 모습만 나타낸다.
 const FC = 8; let FF = null, FFw = 0, FFh = 0;
@@ -1935,6 +1939,7 @@ function realField(tA) {
   }
   return RF;
 }
+
 /* ── 조류 입자 ─────────────────────────────────────────── */
 const NP = 900; const P = { x: new Float32Array(NP), y: new Float32Array(NP), age: new Float32Array(NP), max: new Float32Array(NP) };
 function spawn(k) { for (let t = 0; t < 25; t++) { const x = Math.random() * cw, y = Math.random() * ch; if (isSea(x | 0, y | 0)) { P.x[k] = x; P.y[k] = y; P.age[k] = 0; P.max[k] = 50 + Math.random() * 110; return; } } P.age[k] = 1e9; }
@@ -1965,6 +1970,34 @@ function stepParticles(tide, dt) {
   fctx.stroke();
 }
 
+// 조류 예보 지점 화살표: 그 시각 유향·유속 (길이 ∝ 유속)
+const crColor = kn => kn < .5 ? '#9ec9cf' : kn < 1.5 ? '#5ff0a8' : kn < 3 ? '#ffb84d' : '#ff7a6e';
+function drawCrnt(tide) {
+  if (!S.layers.flow || !CR.ready) return;
+  const r = DPR(); uctx.setTransform(r, 0, 0, r, 0, 0);
+  const gw = cw / pxPerGround(), showName = gw < 60000, big = gw < 400000;
+  uctx.font = '600 10.5px JetBrains Mono, monospace'; uctx.textBaseline = 'middle';
+  for (const c of CR.st) {
+    const [x, y] = toS(c.mx, c.my); if (x < -30 || y < -30 || x > cw + 30 || y > ch + 30) continue;
+    const q = crntAt(c, tide.tA); if (!q) continue;
+    const kn = q.sp * KN, col = crColor(kn);
+    uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.fillStyle = col;
+    if (kn < .2) { uctx.beginPath(); uctx.arc(x, y, big ? 4 : 2.5, 0, 7); uctx.fill(); uctx.stroke(); }
+    else {
+      const L = (big ? 10 : 6) + Math.min(big ? 30 : 14, kn * (big ? 8 : 4)), a = q.dir * D2R, dx = Math.sin(a), dy = -Math.cos(a);
+      const x0 = x - dx * L / 2, y0 = y - dy * L / 2, x1 = x + dx * L / 2, y1 = y + dy * L / 2, hw = big ? 5 : 3.5, hl = big ? 8 : 5;
+      uctx.beginPath(); uctx.moveTo(x0, y0); uctx.lineTo(x1 - dx * hl * .6, y1 - dy * hl * .6);
+      uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.lineWidth = 5; uctx.stroke(); uctx.strokeStyle = col; uctx.lineWidth = 2.5; uctx.stroke();
+      uctx.beginPath(); uctx.moveTo(x1, y1); uctx.lineTo(x1 - dx * hl - dy * hw, y1 - dy * hl + dx * hw); uctx.lineTo(x1 - dx * hl + dy * hw, y1 - dy * hl - dx * hw); uctx.closePath();
+      uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.stroke(); uctx.fill();
+    }
+    if (big) {
+      const t = (kn < .2 ? '물돌이' : kn.toFixed(1) + 'kn') + (showName ? ' ' + c.name : '');
+      uctx.lineWidth = 3; uctx.strokeStyle = 'rgba(6,15,19,.85)'; uctx.strokeText(t, x + 9, y + 9); uctx.fillStyle = col; uctx.fillText(t, x + 9, y + 9);
+    }
+  }
+}
+// 18_section.js — 단면(측면도) 분석과 그리기
 /* ── 단면 ──────────────────────────────────────────────── */
 const sec = $('sec'), sctx = sec.getContext('2d'); let sw = 0, shh = 0, SEC = null;
 function analyzeSection() {
@@ -2141,7 +2174,7 @@ function drawSection(now, tide) {
   }
 }
 const fmtD = m => m >= 1000 ? (m / 1000).toFixed(2) + ' km' : Math.round(m) + ' m';
-
+// 19_overlay.js — 평면도 위 표시(단면선·핀)
 /* ── 평면도 위 표시 ────────────────────────────────────── */
 function drawUI() {
   const r = DPR(); uctx.setTransform(r, 0, 0, r, 0, 0); uctx.clearRect(0, 0, cw, ch);
@@ -2160,34 +2193,7 @@ function drawUI() {
     uctx.beginPath(); uctx.moveTo(x - 13, y); uctx.lineTo(x - 4, y); uctx.moveTo(x + 4, y); uctx.lineTo(x + 13, y); uctx.moveTo(x, y - 13); uctx.lineTo(x, y - 4); uctx.moveTo(x, y + 4); uctx.lineTo(x, y + 13); uctx.stroke();
   }
 }
-
-// 조류 예보 지점 화살표: 그 시각 유향·유속 (길이 ∝ 유속)
-const crColor = kn => kn < .5 ? '#9ec9cf' : kn < 1.5 ? '#5ff0a8' : kn < 3 ? '#ffb84d' : '#ff7a6e';
-function drawCrnt(tide) {
-  if (!S.layers.flow || !CR.ready) return;
-  const r = DPR(); uctx.setTransform(r, 0, 0, r, 0, 0);
-  const gw = cw / pxPerGround(), showName = gw < 60000, big = gw < 400000;
-  uctx.font = '600 10.5px JetBrains Mono, monospace'; uctx.textBaseline = 'middle';
-  for (const c of CR.st) {
-    const [x, y] = toS(c.mx, c.my); if (x < -30 || y < -30 || x > cw + 30 || y > ch + 30) continue;
-    const q = crntAt(c, tide.tA); if (!q) continue;
-    const kn = q.sp * KN, col = crColor(kn);
-    uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.fillStyle = col;
-    if (kn < .2) { uctx.beginPath(); uctx.arc(x, y, big ? 4 : 2.5, 0, 7); uctx.fill(); uctx.stroke(); }
-    else {
-      const L = (big ? 10 : 6) + Math.min(big ? 30 : 14, kn * (big ? 8 : 4)), a = q.dir * D2R, dx = Math.sin(a), dy = -Math.cos(a);
-      const x0 = x - dx * L / 2, y0 = y - dy * L / 2, x1 = x + dx * L / 2, y1 = y + dy * L / 2, hw = big ? 5 : 3.5, hl = big ? 8 : 5;
-      uctx.beginPath(); uctx.moveTo(x0, y0); uctx.lineTo(x1 - dx * hl * .6, y1 - dy * hl * .6);
-      uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.lineWidth = 5; uctx.stroke(); uctx.strokeStyle = col; uctx.lineWidth = 2.5; uctx.stroke();
-      uctx.beginPath(); uctx.moveTo(x1, y1); uctx.lineTo(x1 - dx * hl - dy * hw, y1 - dy * hl + dx * hw); uctx.lineTo(x1 - dx * hl + dy * hw, y1 - dy * hl - dx * hw); uctx.closePath();
-      uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.stroke(); uctx.fill();
-    }
-    if (big) {
-      const t = (kn < .2 ? '물돌이' : kn.toFixed(1) + 'kn') + (showName ? ' ' + c.name : '');
-      uctx.lineWidth = 3; uctx.strokeStyle = 'rgba(6,15,19,.85)'; uctx.strokeText(t, x + 9, y + 9); uctx.fillStyle = col; uctx.fillText(t, x + 9, y + 9);
-    }
-  }
-}
+// 20_readouts.js — 계기판 값 표시
 /* ── 계기판 ────────────────────────────────────────────── */
 const fmtH = t => { t = ((t % 24) + 24) % 24; const h = Math.floor(t), m = Math.floor((t - h) * 60); return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'); };
 const setText = (id, v) => { const el = $(id); if (el.textContent !== v) el.textContent = v; };
@@ -2232,6 +2238,7 @@ function updateCrnt(pt, tide) {
   setText('crDay', ev.map(e => e.sp === 0 ? `${fmtH(e.h)} 물돌이` : `${fmtH(e.h)} 최강 ${dirName16(e.dir)} ${(e.sp * KN).toFixed(1)}kn`).join(' · ') || '—');
   setText('crSrc', `${nc.c.name} 예보 지점 · ${nc.km < 1 ? '1 km 이내' : nc.km.toFixed(1) + ' km'}${nc.km > CR_GOOD ? ' (떨어져 있어 세기·방향은 다를 수 있음)' : ''}`);
 }
+// 21_input.js — 화면 크기, 마우스·터치·버튼 입력, 이름 검색
 /* ── 크기 ──────────────────────────────────────────────── */
 function resize() {
   const r = DPR(), old = cw ? toM(cw / 2, ch / 2) : null, oldGW = cw ? cw / pxPerGround() : 0;
@@ -2383,7 +2390,7 @@ $('dmaxIn').addEventListener('change', () => { dirty = true; analyzeSection(); }
 $('slopeIn').addEventListener('change', e => { S.ratio = +e.target.value; dirty = true; analyzeSection(); });
 $('styleSeg').addEventListener('click', e => { const b = e.target.closest('[data-style]'); if (!b) return; S.mapStyle = b.dataset.style; for (const x of $('styleSeg').children) x.setAttribute('aria-pressed', x === b); dirty = true; });
 $('layerSeg').addEventListener('click', e => { const b = e.target.closest('[data-layer]'); if (!b) return; const k = b.dataset.layer; S.layers[k] = !S.layers[k]; b.setAttribute('aria-pressed', S.layers[k]); if (k === 'flow') { fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); } dirty = true; });
-
+// 22_catchlog.js — 내 조과 기록
 /* ── 내 조황 기록: 이 기기 브라우저(localStorage)에 저장. 로그인·서버 저장은 다음 단계 ── */
 function localCatches() {
   const K = 'nsg_catches', subs = [];
@@ -2428,7 +2435,7 @@ $('logList').addEventListener('click', async e => {
   const b = e.target.closest('[data-del]'); if (!b || !catchCol) return;
   try { await catchCol.doc(b.dataset.del).delete(); } catch (err) { $('logMsg').textContent = '삭제하지 못했습니다 (' + (err && err.code || '오류') + ').'; }
 });
-
+// 23_main.js — 예시 단면, 시작 처리, 매 프레임 갱신
 /* ── 예시 단면: 강릉 북쪽 동해안의 한 지점에서 바다 방향 ─── */
 function exampleSection(lon, lat) {
   const tx = mxOf(lon), ty = myOf(lat); let best = Infinity, br = null, bi = 0;
@@ -2513,7 +2520,6 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 })();
-
 </script>
 
 </body>

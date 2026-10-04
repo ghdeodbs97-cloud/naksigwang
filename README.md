@@ -7,7 +7,8 @@
 | 경로 | 내용 |
 |---|---|
 | `index.html` | 빌드 결과 (직접 고치지 말고 `python build.py`로 만듦) |
-| `src/app.js`, `src/template.html` | 앱 코드와 화면 |
+| `src/app/*.js`, `src/template.html` | 앱 코드(기능별 24개 파일)와 화면 — 지도는 `src/README.md` |
+| `tests/smoke.py` | 고친 뒤 빠른 동작 확인 |
 | `static/*.js` | 고정 자료: 해안선(OSM), 지형(GEBCO), 항·갯바위, OSM 시설, 조류 예보(2026년) |
 | `data/*.json` | 매일 갱신 자료 (수집기가 씀) |
 | `collector/` | 수집기 |
