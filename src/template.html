@@ -302,7 +302,7 @@ details.more[open] summary{margin-bottom:12px}
       <p class="tdNext" id="tdNext"></p>
     </div>
     <canvas id="todayChart" aria-label="오늘 하루 조석 곡선과 잘 맞는 시간"></canvas>
-    <p class="tdKey"><span class="k tideK"></span>조위 <span class="k bestK"></span>입질 지수 높은 시간 <span class="k nightK"></span>밤</p>
+    <p class="tdKey"><span class="k tideK"></span>바닷물 높이 <span class="k bestK"></span>입질 지수 높은 시간 <span class="k nightK"></span>밤</p>
     <dl class="tdFacts">
       <div><dt>물때</dt><dd id="tdMul">—</dd></div>
       <div><dt>바람</dt><dd id="tdWind">—</dd></div>
@@ -397,7 +397,7 @@ details.more[open] summary{margin-bottom:12px}
         <span>해안선 교차 <b id="sCross">—</b></span>
         <span>최대 수심 <b id="sMax">—</b></span>
         <span>실측·공공자료 구간 <b id="sMeas">—</b></span>
-        <span>예측 조위 <b id="sTide">—</b></span>
+        <span>예측 바닷물 높이 <b id="sTide">—</b></span>
         <button class="btn ghost" id="toSec" type="button">단면 위치로 이동</button>
       </div>
     </div>
@@ -407,7 +407,7 @@ details.more[open] summary{margin-bottom:12px}
       <span><i style="border-top:3px solid #8fd3ff"></i>전자해도·항만도</span>
       <span><i style="border-top:1.5px solid #c4b5ff"></i>BADA2024</span>
       <span><i style="border-top:2px dashed #7ff3e6"></i>해안거리 추정</span>
-      <span class="hint">흐린 실선 = 자료점 사이 보간 · 예측 조위는 기준면 일치가 확인되지 않아 수심에 더하지 않습니다</span>
+      <span class="hint">흐린 실선 = 자료점 사이 보간 · 예측 바닷물 높이는 기준면 일치가 확인되지 않아 수심에 더하지 않습니다</span>
     </div>
     <div id="secWrap"><canvas id="sec" aria-label="단면도"></canvas></div>
     <div id="secInfo"></div>
@@ -438,7 +438,7 @@ details.more[open] summary{margin-bottom:12px}
       <input type="range" id="tIn" min="0" max="23.99" step="0.05" value="6" aria-label="시각">
       <div><span class="chip in" id="tideChip">들물</span></div>
       <dl class="read">
-        <dt>조위 <small class="hint" style="display:block">기본수준면(대략 가장 낮은 간조면)에서 잰 바닷물 높이</small></dt><dd id="etaVal">—</dd>
+        <dt>바닷물 높이 <small class="hint" style="display:block">기본수준면(대략 가장 낮은 간조면)에서 잰 높이</small></dt><dd id="etaVal">—</dd>
         <dt>다음 만조</dt><dd id="nextHW">—</dd>
         <dt>다음 간조</dt><dd id="nextLW">—</dd>
         <dt>물흐름 세기 (그날 최강 대비)</dt><dd id="curVal">—</dd>
@@ -456,7 +456,7 @@ details.more[open] summary{margin-bottom:12px}
         <dt>현재 수온</dt><dd id="wxSst">—</dd>
       </dl>
       <details class="api"><summary>이 숫자들은 어디서 왔나요?</summary><p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · 마지막 갱신 <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
-      <p class="note">조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」(공공데이터포털 Open API, 2026년 10월 4일 내려받음, 199개 지점). 지점별 물돌이(전류)·최강 유속 시각과 유향·유속이며, 그 사이 유속은 사인 곡선으로 보간했습니다. 관측 조류를 조화분석한 천문 예측이라 바람·파도·하천 유량의 영향은 빠져 있고, 조류는 수로·곶마다 크게 달라 예보 지점에서 멀수록 세기와 방향이 어긋납니다. 15 km 안에 지점이 없으면(동해안 대부분) 조위 변화 속도로 추정합니다. 지도 화살표는 예보 지점의 그 시각 흐름이고, 흐름 입자는 예보 지점 근처에서는 그 방향을, 해안 가까이에서는 해안선을 따르도록 그린 그림이라 실제 유선은 아닙니다. 파고 예보가 없는 곳은 조과 지수에 파고를 반영하지 않습니다.</p></details>
+      <p class="note">조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」(공공데이터포털 Open API, 2026년 10월 4일 내려받음, 199개 지점). 지점별 물돌이(전류)·최강 유속 시각과 유향·유속이며, 그 사이 유속은 사인 곡선으로 보간했습니다. 관측 조류를 조화분석한 천문 예측이라 바람·파도·하천 유량의 영향은 빠져 있고, 조류는 수로·곶마다 크게 달라 예보 지점에서 멀수록 세기와 방향이 어긋납니다. 15 km 안에 지점이 없으면(동해안 대부분) 바닷물 높이 변화 속도로 추정합니다. 지도 화살표는 예보 지점의 그 시각 흐름이고, 흐름 입자는 예보 지점 근처에서는 그 방향을, 해안 가까이에서는 해안선을 따르도록 그린 그림이라 실제 유선은 아닙니다. 파고 예보가 없는 곳은 조과 지수에 파고를 반영하지 않습니다.</p></details>
     </div>
   </section>
 
@@ -474,7 +474,7 @@ details.more[open] summary{margin-bottom:12px}
     <div class="fishGrid" id="fishGrid"></div>
       <details class="basis">
       <summary>입질 지수는 어떻게 계산하나요?</summary>
-      <p class="note">실제 조과 통계가 아니라 규칙으로 만든 추정 지수입니다. 시간마다 <b>시즌(현재 10월 기준값) × 해역 출현 × 물때 세기 × 파고 × 수온 × 내 기록 보정 × 시간대 밝기 × 그 시각 물흐름</b>을 곱하고 0.9를 더 곱합니다. 수온은 국립해양조사원 조위관측소의 실측 수온(50 km 안, 24시간 안의 값만)과 FishBase의 어종별 서식 수온(AquaMaps 모델값)을 비교해, 범위를 1 ℃ 벗어날 때마다 0.1씩 낮춥니다(노래미·전갱이·대구·잿방어는 범위 자료가 한국 연안에 맞지 않아 반영하지 않음). 곱셈이라 조건 하나만 나빠도 크게 내려가며, 해뜰녘·해질녘(해 뜨고 지는 시각 ±1시간 15분)처럼 어종이 잘 무는 시간대에 물이 그날 최강 유속의 65% 안팎으로 흐를 때만 "높음"이 나옵니다. 물흐름은 15 km 안에 국립해양조사원 조류 예보 지점이 있으면 그 지점의 예보 유속을, 없으면 조위 변화 속도를 씁니다. <b>조차가 작은 바다</b>(가까운 조석 관측소의 7일 예보에서 최고·최저 조위 차가 60 cm 미만인 곳: 속초·주문진·묵호·후포·포항·울산·울릉도, 20~48 cm)는 조석 흐름이 약하고 물흐름이 주로 바람과 해류로 정해지므로, 물때 세기와 조위 변화 속도는 넣지 않고 그 평균값(중립)을 곱합니다. 대신 풍속을 반영해 7 m/s 초과 0.85배, 10 m/s 초과 0.6배, 13 m/s 초과(풍랑주의보 기준 14 m/s 부근) 0.35배로 낮추고, 수온은 1 ℃ 벗어날 때마다 0.15씩 낮춥니다. 이 기준값들도 제가 정한 값입니다. 파고는 1 m를 넘으면 감점, 2.5 m를 넘으면 크게 감점합니다. 갯바위 포인트 자료에 주요 대상어가 적혀 있으면 목록에 없는 어종은 0.55배로 낮춥니다. 시간대 성향(낮·밤·해뜰녘·해질녘)과 아래 점수는 일반적인 낚시 정보를 바탕으로 제가 정한 값이라 검증된 수치가 아닙니다. 물고기 그림은 실사 사진이 아닌 일러스트입니다.</p>
+      <p class="note">실제 조과 통계가 아니라 규칙으로 만든 추정 지수입니다. 시간마다 <b>시즌(현재 10월 기준값) × 해역 출현 × 물때 세기 × 파고 × 수온 × 내 기록 보정 × 시간대 밝기 × 그 시각 물흐름</b>을 곱하고 0.9를 더 곱합니다. 수온은 국립해양조사원 조위관측소의 실측 수온(50 km 안, 24시간 안의 값만)과 FishBase의 어종별 서식 수온(AquaMaps 모델값)을 비교해, 범위를 1 ℃ 벗어날 때마다 0.1씩 낮춥니다(노래미·전갱이·대구·잿방어는 범위 자료가 한국 연안에 맞지 않아 반영하지 않음). 곱셈이라 조건 하나만 나빠도 크게 내려가며, 해뜰녘·해질녘(해 뜨고 지는 시각 ±1시간 15분)처럼 어종이 잘 무는 시간대에 물이 그날 최강 유속의 65% 안팎으로 흐를 때만 "높음"이 나옵니다. 물흐름은 15 km 안에 국립해양조사원 조류 예보 지점이 있으면 그 지점의 예보 유속을, 없으면 바닷물 높이 변화 속도를 씁니다. <b>조차가 작은 바다</b>(가까운 조석 관측소의 7일 예보에서 최고·최저 바닷물 높이 차가 60 cm 미만인 곳: 속초·주문진·묵호·후포·포항·울산·울릉도, 20~48 cm)는 조석 흐름이 약하고 물흐름이 주로 바람과 해류로 정해지므로, 물때 세기와 바닷물 높이 변화 속도는 넣지 않고 그 평균값(중립)을 곱합니다. 대신 풍속을 반영해 7 m/s 초과 0.85배, 10 m/s 초과 0.6배, 13 m/s 초과(풍랑주의보 기준 14 m/s 부근) 0.35배로 낮추고, 수온은 1 ℃ 벗어날 때마다 0.15씩 낮춥니다. 이 기준값들도 제가 정한 값입니다. 파고는 1 m를 넘으면 감점, 2.5 m를 넘으면 크게 감점합니다. 갯바위 포인트 자료에 주요 대상어가 적혀 있으면 목록에 없는 어종은 0.55배로 낮춥니다. 시간대 성향(낮·밤·해뜰녘·해질녘)과 아래 점수는 일반적인 낚시 정보를 바탕으로 제가 정한 값이라 검증된 수치가 아닙니다. 물고기 그림은 실사 사진이 아닌 일러스트입니다.</p>
       <div class="tblWrap"><table id="basisTable"></table></div>
     </details>
     </div>

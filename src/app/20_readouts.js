@@ -10,7 +10,7 @@ function updateReadouts(tide) {
   const slack = Math.abs(tide.u) < .15, dd = STATIONS[S.st].days[S.day];
   const pt = POINTS[S.pt], fu = flowU(STATIONS[S.st], pt, S.day, tide.tA);
   setText('curVal', fu.real ? Math.round(fu.u * 100) + '% · ' + (fu.r.sp * KN < .2 ? '물돌이 무렵' : dirName16(fu.r.dir) + '쪽으로 흐름') + ' (조류 예보)'
-    : Math.round(Math.abs(tide.u) * 100) + '% · ' + (slack ? '정조 무렵' : tide.u > 0 ? '들물 중' : '날물 중') + (weakTide(STATIONS[S.st]) ? ' (조차가 작아 지수에 안 씀)' : ' (조위 변화로 추정)'));
+    : Math.round(Math.abs(tide.u) * 100) + '% · ' + (slack ? '정조 무렵' : tide.u > 0 ? '들물 중' : '날물 중') + (weakTide(STATIONS[S.st]) ? ' (조차가 작아 지수에 안 씀)' : ' (바닷물 높이 변화로 추정)'));
   updateCrnt(pt, tide);
   const wst = STATIONS[S.st]; setText('curDir', dd.mul + ' (물때 세기 ' + dd.pct + '%)' + (weakTide(wst) ? ` · 조차 ${Math.round(wst.maxCm - wst.minCm)} cm라 지수에 안 씀` : ''));
   const wx = wxAt(STATIONS[S.st], S.day, S.t, POINTS[S.pt]);
