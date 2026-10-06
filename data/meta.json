@@ -1,18 +1,45 @@
 {
- "errors": [],
+ "errors": [
+  "tide DT_0001 20261006: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide SO_0571 20261009: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide SO_0574 20261014: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide DT_0013 20261017: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0017 20261018: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0017 20261019: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide DT_0022 20261012: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide DT_0016 20261012: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0032 20261014: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide SO_0703 20261014: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide DT_0035 20261015: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide DT_0038 20261012: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide SO_0734 20261016: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide SO_1261 20261018: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide SO_0757 20261009: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide SO_1271 20261008: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide SO_1278 20261008: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide SO_0562 20261017: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide SO_1281 20261017: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide SO_1281 20261018: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "obs DT_0003 20261007: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "obs DT_0035 20261007: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "obs DT_0010 20261007: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "obs DT_0051 20261007: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "obs DT_0037 20261007: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "obs DT_0051 20261006: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)"
+ ],
  "tide.json": {
   "ok": 166,
   "requested": 166
  },
  "obs.json": {
-  "ok": 55,
+  "ok": 54,
   "requested": 55
  },
  "wx.json": {
   "ok": 615,
   "requested": 615
  },
- "generated": "2026-10-06T10:20+09:00",
- "seconds": 228,
- "error_count": 0
+ "generated": "2026-10-07T00:17+09:00",
+ "seconds": 933,
+ "error_count": 26
 }
