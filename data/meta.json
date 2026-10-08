@@ -1,10 +1,5 @@
 {
- "errors": [
-  "tide DT_0001 20261007: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
-  "tide DT_0018 20261019: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
-  "tide DT_0093 20261014: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
-  "tide SO_1248 20261008: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}"
- ],
+ "errors": [],
  "tide.json": {
   "ok": 166,
   "requested": 166
@@ -17,7 +12,7 @@
   "ok": 615,
   "requested": 615
  },
- "generated": "2026-10-08T00:37+09:00",
- "seconds": 450,
- "error_count": 4
+ "generated": "2026-10-08T09:15+09:00",
+ "seconds": 200,
+ "error_count": 0
 }
