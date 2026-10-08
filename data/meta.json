@@ -1,18 +1,38 @@
 {
- "errors": [],
+ "errors": [
+  "tide SO_0572 20261021: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide DT_0008 20261020: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide DT_0008 20261013: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0016 20261011: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0012 20261018: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0016 20261020: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide SO_0578 20261010: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0020 20261008: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide DT_0020 20261009: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide SO_0756 20261012: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0037 20261021: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0037 20261023: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide DT_0049 20261021: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide SO_1275 20261012: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}",
+  "tide SO_1275 20261009: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "tide SO_0758 20261012: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "obs DT_0004 20261009: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "obs DT_0001 20261009: HTTPSConnectionPool(host='apis.data.go.kr', port=443): Read timed out. (read timeout=30)",
+  "obs DT_0004 20261008: {\"OpenAPI_ServiceResponse\": {\"cmmMsgHeader\": {\"errMsg\": \"SERVICETIMEOUT_ERROR\", \"returnAuthMsg\": \"서비스 연결실패 에러\", \"returnReasonCode\": \"05\"}}}"
+ ],
  "tide.json": {
   "ok": 166,
   "requested": 166
  },
  "obs.json": {
-  "ok": 55,
+  "ok": 54,
   "requested": 55
  },
  "wx.json": {
   "ok": 615,
   "requested": 615
  },
- "generated": "2026-10-08T09:15+09:00",
- "seconds": 200,
- "error_count": 0
+ "generated": "2026-10-09T00:42+09:00",
+ "seconds": 698,
+ "error_count": 19
 }
