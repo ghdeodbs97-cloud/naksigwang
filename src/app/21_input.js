@@ -65,6 +65,7 @@ function updateHover() {
   const of = osmAt(mx, my), ofs = of ? ' · ' + OSM_NAME[of.c] + (of.name ? ` 「${of.name}」` : '') : '';
   setText('cursorRead', lat.toFixed(5) + '°N, ' + lon.toFixed(5) + '°E' + ofs + ' · ' + (land ? '육지·구조물' + (el != null && el > 5 ? ` · 표고 약 ${Math.round(el / 10) * 10} m (GEBCO)` : '') : '바다') + ' · 해안까지 ' + (isFinite(d) ? fmtD(d) : '20 km+'));
   setText('depthRead', q ? describeDepth(q) : '');
+  setText('depthDetail', depthDetails(q));
 }
 let dirtyHover = false;
 

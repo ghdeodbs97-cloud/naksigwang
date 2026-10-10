@@ -19,10 +19,11 @@
 | `01_geo.js` | 좌표계(웹 메르카토르)와 해안선 디코딩·육지 판정 | 67 | `decode`, `segDist`, `nearestCoast`, `inLand` |
 | `02_state.js` | 화면 상태(S)와 추정 수심 식 | 5 |  |
 | `03_userdata.js` | 내 자료: 항·포구 목록, CSV 읽기 | 164 | `readText`, `parseCSV`, `locate`, `parseDeg`, `getLL`, `importPorts`, `saveLocal`, `loadLocal` 외 |
-| `04_depth.js` | 수심 자료 층과 보간 | 87 | `layerOf`, `addDepthPt`, `clearLayers`, `crossesLand`, `depthQuery`, `modelDepth`, `estimateAt`, `fmtDepth` 외 |
+| `04_depth.js` | 자료집·기준면을 분리한 수심 보간과 공통 출처 schema | 가변 | `layerOf`, `addDepthPt`, `clearLayers`, `crossesLand`, `depthQuery`, `depthResult`, `modelDepth`, `estimateAt`, `fmtDepth`, `describeDepth`, `depthDetails` |
+| `04b_depth_tiles.js` | 공식 수심 지역 타일의 제한된 캐시·색인·실패 fallback | 가변 | `depthReadJSON`, `depthManifest`, `depthPrepareAreas`, `officialDepthCandidates`, `scheduleDepthArea` |
 | `05_struct.js` | 해안 구조물(방파제·부두) 층 | 48 | `addStructSeg`, `addStructLine`, `structDist`, `inStruct`, `structPath` |
 | `06_osm.js` | 오픈스트리트맵 해안 지형·이름 | 100 | `decodeOSM`, `osmPath`, `drawOSM`, `osmAt` |
-| `07_import.js` | 좌표 정규화, 수심 파일 불러오기, 이 브라우저에 저장 | 121 | `toLatLon`, `pickDepthKey`, `depthVal`, `importDepthRows`, `importDepthJSON`, `findRecords`, `importStructJSON`, `saveDepth` 외 |
+| `07_import.js` | 좌표 정규화, 수심·연도·기준면·보간 출처 불러오기와 로컬 보존 | 가변 | `toLatLon`, `pickDepthKey`, `depthVal`, `importDepthRows`, `importDepthJSON`, `findRecords`, `importStructJSON`, `saveDepth`, `loadDepth` |
 | `08_depth_api.js` | 공공 수심 API 불러오기 | 81 | `apiCfg`, `apiSave`, `apiLoad`, `apiParams`, `apiMsg`, `apiFetchTile`, `apiLoadViewport` |
 | `09_rocks.js` | 낚시 제한구역과 갯바위 포인트 | 68 | `inBan`, `nearestRing`, `accessAt`, `addRock`, `importRocks`, `saveRocks`, `loadRocks`, `rockInfoHTML` |
 | `10_tide.js` | 조석: 예보지점·물때·조위 보간 | 40 | `tideAt`, `getTide` |
@@ -31,13 +32,14 @@
 | `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 119 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
 | `14_bite.js` | 포인트별 입질 조건점수·자료 신뢰도·이유, 실제 시계의 분 단위 갱신 | 107 | `lightF`, `targetF`, `biteTemperature`, `biteDataQuality`, `myF`, `biteEvalAt`, `biteAt`, `biteReasons`, `spark`, `renderBite` |
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 68 | `drawStations`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
-| `16_terrain.js` | GEBCO 지형 격자와 바탕 지도 그리기 | 265 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
+| `16_terrain.js` | GEBCO 지형 배경과 지역 수심 준비 요청 (기준면 미확인 혼합 없음) | 가변 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
 | `17_flow.js` | 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표 | 102 | `buildFlowField`, `realField`, `spawn`, `stepParticles`, `drawCrnt` |
-| `18_section.js` | 단면(측면도) 분석과 그리기 | 177 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
+| `18_section.js` | 공식 수심을 함께 쓰는 A→B 단면, 기준면 경계의 특징분석 중단 | 가변 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
+| `18b_shore.js` | 실제 해안 교차가 있을 때만 해안 종류 판정 | 가변 | `osmDist`, `enclosed`, `classifyShore`, `setShore`, `autoShore` |
 | `19_overlay.js` | 평면도 위 표시(단면선·핀) | 19 | `drawUI` |
 | `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |
 | `20b_today.js` | 「오늘」 탭: 선택한 포인트의 오늘·지금 요약, 연속된 좋은 시간 구간 | 70 | `goodHourRanges`, `renderToday`, `drawToday` |
-| `21_input.js` | 화면 크기, 마우스·터치·버튼 입력, 이름 검색 | 158 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
+| `21_input.js` | 화면·터치·검색 입력과 간단 수심/출처 상세 표시 | 가변 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
 | `22_catchlog.js` | 내 조과 기록 | 45 | `localCatches`, `renderLog` |
 | `23_main.js` | 예시 단면, 시작 처리, 매 프레임 갱신 | 91 | `exampleSection`, `drawBiteChart`, `apiAutoKick`, `frame` |
 | `24_tabs.js` | 아래(휴대폰)·위(넓은 화면) 탭 전환. 주소 끝 #today · #map · #tide · #bite · #log 로 바로 열 수 있다 | 20 | `showTab` |

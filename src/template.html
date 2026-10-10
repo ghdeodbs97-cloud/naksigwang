@@ -369,8 +369,9 @@ details.more[open] summary{margin-bottom:12px}
         <span class="key">⚓ 항·포구</span><span class="key">🪨 갯바위 (흐릴수록 접근 어려움)</span>
         <span class="key"><span class="sw p"></span>조류 흐름</span>
       </div>
-      <p class="note" id="terrainNote">지형: GEBCO 2026 격자(15초 ≈ 460 m)의 육지 표고와 바다 수심에 북서쪽 빛 음영을 넣었습니다. 바다는 수심 구간(0·2·5·10·15·20·30·40·50·75·100·150·200·300·500 m…)별로 색을 나누고, 확대할수록 등심선이 2·5·10 m 단위까지 촘촘해지며 숫자가 붙습니다. 해안 150 m 안은 "추정 수심 설정"의 경사로 계산하고 800 m 밖은 GEBCO, 그 사이는 거리에 따라 섞습니다(커서 수심과 같은 식). 육지 등고선은 200 m 간격. 해안선·방파제·해변·갯바위·갯벌·등대·섬/항/방조제 이름은 오픈스트리트맵(ODbL) 자료입니다. 이름이 없는 방파제 묶음에는 가장 가까운 마을 이름으로 "○○리 앞 포구*"라고 표시했습니다(*는 실제 항 이름이 확인되지 않았다는 뜻). 그 밖의 지형은 그 안팎의 지형은 460 m 칸을 부드럽게 이은 것이라 항구 한 곳을 크게 확대하면 세부(방파제·갯바위·수중여)는 나오지 않습니다. 산 높이도 평균되어 실제보다 낮게 나옵니다(예: 한라산 1,947 m → 약 1,840 m).</p>
+      <p class="note" id="terrainNote">지형 배경은 GEBCO 2026의 약 460 m 격자와 해안거리 추정입니다. 가까운 해안의 색과 등심선은 추정이며 수중여·턱을 알 수 없습니다. 위치별 수심과 A→B 단면은 확보된 공식 자료를 우선 사용합니다. 배경의 등심선과 조회값은 다를 수 있습니다. 해안선·시설·이름은 오픈스트리트맵(ODbL) 자료이며 빠지거나 오래된 시설이 있을 수 있습니다. 이름 뒤 *는 실제 항 이름이 확인되지 않았다는 뜻입니다.</p>
       <div class="legend readout"><span id="cursorRead">커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다</span><span id="depthRead"></span></div>
+      <details class="more"><summary>수심 자료 자세히</summary><p class="note" id="depthDetail">지도에서 위치를 확인하면 자료 정보를 표시합니다.</p></details>
       <details class="api"><summary>추정 수심 설정</summary>
       <div class="sub">추정 수심 설정</div>
       <div class="field">
@@ -391,7 +392,7 @@ details.more[open] summary{margin-bottom:12px}
         <label for="dmaxIn">먼바다 수심 상한 <b id="dmaxOut">30 m</b></label>
         <input type="range" id="dmaxIn" min="5" max="80" step="1" value="30">
       </div>
-      <p class="note">실측·해도·BADA 수심이 없는 곳에서, 해안선 150 m 안쪽은 이 가정값을, 800 m 밖은 GEBCO 수심을 쓰고 그 사이는 거리에 따라 섞습니다. 해안선에서 멀어질수록 고른 경사로 깊어지다가 '상한'에 가까워지면 더 깊어지지 않게 계산합니다 (수심 = 상한 × (1 − e<sup>−거리/(상한×경사)</sup>)). 단면도에는 점선과 '추정'으로 표시됩니다.</p>
+      <p class="note">실측·공식 수심이 없는 곳에서는 해안 800 m 안쪽을 이 가정값으로 추정하고, 밖에서는 바다로 확인되는 GEBCO 수심을 씁니다. 기준면이 확인되지 않은 두 값을 섞지 않습니다. 해안에서 멀수록 고른 경사로 깊어지다가 상한에 가까워집니다 (수심 = 상한 × (1 − e<sup>−거리/(상한×경사)</sup>)). 단면도에는 점선과 '추정'으로 표시됩니다.</p>
       </details>
     </div>
     <section class="panel">
@@ -573,7 +574,8 @@ out geom;</pre>
       <h2 class="h2">자료 출처</h2>
       <div class="sources">
     <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
-    <p>수심은 사용자 실측 → 연안해역기본도 → 전자해도·항만도 → BADA2024 → GEBCO 2026(해안 가까이는 해안거리 추정과 혼합) 순으로 찾고, 높은 순위 자료가 있는 곳에서는 낮은 순위 자료와 섞지 않습니다. 보간 반경은 자료 해상도의 2배(BADA는 225 m)이며, 화면 안에서는 육지·구조물을 사이에 둔 자료점을 쓰지 않습니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대, 바다를 건너는 다리, 방조제 안쪽 호수(시화호·새만금호 등)는 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL) 자료를 2026년 10월 3일 내려받아 넣었고, 방파제·부두는 육지(구조물)로 처리해 항 안쪽과 바깥을 구분합니다. 오픈스트리트맵은 자원봉사자가 그린 지도라 빠지거나 오래된 시설이 있을 수 있습니다.</p>
+    <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → BADA 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. 현재 기본 탑재 수심은 GEBCO뿐입니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
+    <p>연안 자료 연결 준비: <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">국토지리정보원 연안해역기본도</a>(공공누리 제1유형, 원본 미확보), <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해양수산부 수심분포도</a>(공개 CSV 확인, 수심값이 없어 미탑재), <a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형, 사용자가 불러온 범위만 적용). 준비된 연결을 실제 고해상도 자료 확보로 해석하지 마세요.</p>
     <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
     <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
     <p>조석·수온은 해양수산부 국립해양조사원(<a href="https://www.data.go.kr/data/15156018/openapi.do" target="_blank" rel="noopener">조석예보(고, 저조)</a>, <a href="https://www.data.go.kr/data/15155508/openapi.do" target="_blank" rel="noopener">조위관측소 최신 관측데이터</a>), 풍향·풍속·파고는 <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noopener">기상청 단기예보 조회서비스</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다. 음력 날짜는 korean_lunar_calendar(한국천문연구원 음양력 기준)로 계산했습니다.</p>

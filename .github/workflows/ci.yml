@@ -1,4 +1,4 @@
-name: P0·P1 검증
+name: P0·P1·P2B 검증
 on:
   pull_request:
 permissions:
@@ -16,9 +16,10 @@ jobs:
         with:
           node-version: '22'
       - run: pip install requests korean_lunar_calendar playwright
+      - run: pip install -r tools/depth-data/requirements.txt
       - run: python -m playwright install --with-deps chromium
       - name: Python 문법 검사
-        run: python -m py_compile collector/collect.py tests/test_collector_resilience.py tests/smoke.py tests/smoke_degradation.py tests/test_bite_confidence.py build.py
+        run: python -m py_compile collector/collect.py tests/test_collector_resilience.py tests/smoke.py tests/smoke_degradation.py tests/test_bite_confidence.py tests/depth_probe.py tests/test_depth_converter.py tests/test_depth_foundation.py tools/depth-data/convert.py tools/depth-data/merge.py tools/depth-data/audit_mof.py build.py
       - name: 수집기 회귀
         run: python tests/test_collector_resilience.py
       - name: 초기 로딩 회귀
@@ -31,5 +32,9 @@ jobs:
         run: python tests/smoke_degradation.py
       - name: 입질 조건·자료 신뢰도 회귀
         run: python tests/test_bite_confidence.py
+      - name: 수심 GIS 변환 회귀
+        run: python tests/test_depth_converter.py
+      - name: 수심 자료 기반 브라우저 회귀
+        run: python tests/test_depth_foundation.py
       - name: 운영 자료 비변경 확인
         run: git diff --exit-code -- data
