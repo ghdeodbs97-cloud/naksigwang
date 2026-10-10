@@ -2,6 +2,18 @@
 const tdc = $('todayChart'), tdx = tdc.getContext('2d');
 let TD = null;   // 그림에 쓰는 오늘 자료 (renderToday가 만들고 drawToday가 그림)
 const kstHour = () => { const d = new Date(Date.now() + 9 * 36e5); return d.getUTCHours() + d.getUTCMinutes() / 60; };
+function goodHourRanges(scores) {
+  const ranges = [];
+  for (let h = 0; h < 24; h++) if (scores[h] >= 60) {
+    const last = ranges[ranges.length - 1];
+    if (last && last[1] === h) last[1] = h + 1;
+    else ranges.push([h, h + 1]);
+  }
+  // 끝은 포함하지 않는다. 23시 구간은 24시에서 끝내고 자정 구간과 합치지 않는다.
+  // 구간이 많으면 긴 세 구간만 시간순으로 표시해 카드 길이를 제한한다.
+  return ranges.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]) || a[0] - b[0]).slice(0, 3).sort((a, b) => a[0] - b[0])
+    .map(([a, b]) => `${String(a).padStart(2, '0')}~${String(b).padStart(2, '0')}시`).join(' · ');
+}
 function renderToday() {
   const pt = POINTS[S.pt], st = STATIONS[pt ? pt.st : S.st]; if (!st) return;
   const day = Math.min(TODAY_IDX, st.days.length - 1), d = st.days[day], h = kstHour(), tA = day * 24 + h;
@@ -31,8 +43,8 @@ function renderToday() {
   TD = { st, day, sr, ss, bestH, h };
   const top = rows.filter(o => o.mx > 0).slice(0, 4);
   $('tdBest').innerHTML = top.length ? top.map(o => {
-    const hiH = o.arr.map((p, hh) => p >= 60 ? hh : -1).filter(x => x >= 0), [lv, cls] = level(o.mx);
-    const when = hiH.length ? `${String(hiH[0]).padStart(2, '0')}~${String(hiH[hiH.length - 1] + 1).padStart(2, '0')}시가 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
+    const ranges = goodHourRanges(o.arr), [lv, cls] = level(o.mx);
+    const when = ranges ? `${ranges} 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
     return `<li class="${cls}"><span class="pic">${fishSVG(o.f.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}점<small>${lv}</small></span></li>`;
   }).join('') : '<li class="empty">오늘은 지수가 나오는 어종이 없습니다.</li>';
   drawToday();

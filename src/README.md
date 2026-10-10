@@ -29,14 +29,14 @@
 | `11_current.js` | 조류 예보(물돌이·최강)와 해 뜨고 지는 시각 | 66 | `loadCrnt`, `crntAt`, `crntDay`, `nearestCrnt`, `flowU`, `sunTimes` |
 | `12_fish.js` | 대상어 정보와 물고기 그림 | 71 | `fishSVG` |
 | `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 119 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
-| `14_bite.js` | 포인트별 입질 조건점수·자료 신뢰도·이유 | 105 | `lightF`, `targetF`, `biteTemperature`, `biteDataQuality`, `myF`, `biteEvalAt`, `biteAt`, `biteReasons`, `spark`, `renderBite` |
+| `14_bite.js` | 포인트별 입질 조건점수·자료 신뢰도·이유, 실제 시계의 분 단위 갱신 | 107 | `lightF`, `targetF`, `biteTemperature`, `biteDataQuality`, `myF`, `biteEvalAt`, `biteAt`, `biteReasons`, `spark`, `renderBite` |
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 68 | `drawStations`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
 | `16_terrain.js` | GEBCO 지형 격자와 바탕 지도 그리기 | 265 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
 | `17_flow.js` | 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표 | 102 | `buildFlowField`, `realField`, `spawn`, `stepParticles`, `drawCrnt` |
 | `18_section.js` | 단면(측면도) 분석과 그리기 | 177 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
 | `19_overlay.js` | 평면도 위 표시(단면선·핀) | 19 | `drawUI` |
 | `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |
-| `20b_today.js` | 「오늘」 탭: 선택한 포인트의 오늘·지금 요약 (물때 상태, 조석 띠, 바람·파고·수온·조류, 잘 맞는 시간) | 58 | `renderToday`, `drawToday` |
+| `20b_today.js` | 「오늘」 탭: 선택한 포인트의 오늘·지금 요약, 연속된 좋은 시간 구간 | 70 | `goodHourRanges`, `renderToday`, `drawToday` |
 | `21_input.js` | 화면 크기, 마우스·터치·버튼 입력, 이름 검색 | 158 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
 | `22_catchlog.js` | 내 조과 기록 | 45 | `localCatches`, `renderLog` |
 | `23_main.js` | 예시 단면, 시작 처리, 매 프레임 갱신 | 91 | `exampleSection`, `drawBiteChart`, `apiAutoKick`, `frame` |

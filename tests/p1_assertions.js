@@ -77,4 +77,19 @@ try {
   for (const k of Object.keys(OBS)) delete OBS[k]; Object.assign(OBS, savedObs); SST_C.clear();
   for (const k of Object.keys(META)) delete META[k]; Object.assign(META, savedMeta);
 }
+const goodScores = hours => Array.from({ length: 24 }, (_, h) => hours.includes(h) ? 60 : 59);
+for (const [hours, expected] of [
+  [[6, 7, 18, 19], '06~08시 · 18~20시'],
+  [[23], '23~24시'],
+  [[0, 23], '00~01시 · 23~24시'],
+  [Array.from({ length: 24 }, (_, h) => h), '00~24시'],
+  [[], ''],
+  [[0, 2, 4, 6, 7], '00~01시 · 02~03시 · 06~08시']
+]) { check(goodHourRanges(goodScores(hours)) === expected, '연속 시간 구간·24시 경계·긴 구간 우선'); count++; }
+const savedBiteAt = biteAt;
+try {
+  biteAt = (fish, pt, st, day, h) => goodScores([6, 7, 18, 19])[h];
+  renderToday();
+  check([...$('tdBest').querySelectorAll('.nm small')].every(el => el.textContent === '06~08시 · 18~20시 좋음'), '오늘 카드에서 비연속 구간 분리'); count++;
+} finally { biteAt = savedBiteAt; renderToday(); }
 return { checks: count, comparison };

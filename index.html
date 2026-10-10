@@ -1823,10 +1823,12 @@ function spark(arr, sel) {
   const w = 120, hh = 26, bw = w / 24;
   return `<svg class="spark" viewBox="0 0 ${w} ${hh}" aria-hidden="true">` + arr.map((p, i) => { const bh = Math.max(1, p / 100 * (hh - 2)), c = p >= 60 ? '#5ff0a8' : p >= 40 ? '#ffb84d' : p > 0 ? '#3d6670' : '#22343a'; return `<rect x="${(i * bw + .5).toFixed(1)}" y="${(hh - bh).toFixed(1)}" width="${(bw - 1).toFixed(1)}" height="${bh.toFixed(1)}" fill="${c}"${i === sel ? ' stroke="#fff" stroke-width="1"' : ''}/>`; }).join('') + '</svg>';
 }
-let biteHour = -1, BITE_H = null;
+let biteHour = -1, biteDataMinute = -1, BITE_H = null;
 function renderBite() {
   const st = STATIONS[S.st], d = st.days[S.day], pt = POINTS[S.pt], H = Math.floor(S.t);
   biteHour = H;
+  // 관측 만료·발표 자료의 24시간 경계와 수온 age를 최대 약 1분 안에 반영한다.
+  biteDataMinute = Math.floor(Date.now() / 60000);
   $('biteSub').textContent = `${pt ? pt.name : st.name} · ${d.date.slice(5).replace('-', '/')} ${String(H).padStart(2, '0')}시 · ${d.mul}`;
   const [sr, ss] = sunTimes(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon, S.day);
   const rows = FISH.map((f, i) => { const arr = Array.from({ length: 24 }, (_, h) => biteAt(f, pt, st, S.day, h)); const best = arr.indexOf(Math.max(...arr)); return { f, i, arr, p: arr[H], best, ev: biteEvalAt(f, pt, st, S.day, H) }; }).sort((a, b) => b.p - a.p || b.arr[b.best] - a.arr[a.best]);
@@ -2687,6 +2689,18 @@ function updateCrnt(pt, tide) {
 const tdc = $('todayChart'), tdx = tdc.getContext('2d');
 let TD = null;   // 그림에 쓰는 오늘 자료 (renderToday가 만들고 drawToday가 그림)
 const kstHour = () => { const d = new Date(Date.now() + 9 * 36e5); return d.getUTCHours() + d.getUTCMinutes() / 60; };
+function goodHourRanges(scores) {
+  const ranges = [];
+  for (let h = 0; h < 24; h++) if (scores[h] >= 60) {
+    const last = ranges[ranges.length - 1];
+    if (last && last[1] === h) last[1] = h + 1;
+    else ranges.push([h, h + 1]);
+  }
+  // 끝은 포함하지 않는다. 23시 구간은 24시에서 끝내고 자정 구간과 합치지 않는다.
+  // 구간이 많으면 긴 세 구간만 시간순으로 표시해 카드 길이를 제한한다.
+  return ranges.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]) || a[0] - b[0]).slice(0, 3).sort((a, b) => a[0] - b[0])
+    .map(([a, b]) => `${String(a).padStart(2, '0')}~${String(b).padStart(2, '0')}시`).join(' · ');
+}
 function renderToday() {
   const pt = POINTS[S.pt], st = STATIONS[pt ? pt.st : S.st]; if (!st) return;
   const day = Math.min(TODAY_IDX, st.days.length - 1), d = st.days[day], h = kstHour(), tA = day * 24 + h;
@@ -2716,8 +2730,8 @@ function renderToday() {
   TD = { st, day, sr, ss, bestH, h };
   const top = rows.filter(o => o.mx > 0).slice(0, 4);
   $('tdBest').innerHTML = top.length ? top.map(o => {
-    const hiH = o.arr.map((p, hh) => p >= 60 ? hh : -1).filter(x => x >= 0), [lv, cls] = level(o.mx);
-    const when = hiH.length ? `${String(hiH[0]).padStart(2, '0')}~${String(hiH[hiH.length - 1] + 1).padStart(2, '0')}시가 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
+    const ranges = goodHourRanges(o.arr), [lv, cls] = level(o.mx);
+    const when = ranges ? `${ranges} 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
     return `<li class="${cls}"><span class="pic">${fishSVG(o.f.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}점<small>${lv}</small></span></li>`;
   }).join('') : '<li class="empty">오늘은 지수가 나오는 어종이 없습니다.</li>';
   drawToday();
@@ -3023,7 +3037,7 @@ function frame(now) {
   if (S.playing) S.t = (S.t + dt * .7) % 24;
   for (const id of ['tIn', 'tIn2']) { const el = $(id); if (document.activeElement !== el && Math.abs(el.value - S.t) > .01) el.value = S.t; }
   const tide = getTide();
-  if (Math.floor(S.t) !== biteHour) renderBite();
+  if (Math.floor(S.t) !== biteHour || Math.floor(Date.now() / 60000) !== biteDataMinute) renderBite();
   if (TAB === 'map' || TAB === 'today') {               // 보이는 탭만 그린다 (휴대폰 전지 절약). 오늘 탭에도 지도가 있다
     if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
     setText('clock2', fmtH(S.t));

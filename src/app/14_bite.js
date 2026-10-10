@@ -84,10 +84,12 @@ function spark(arr, sel) {
   const w = 120, hh = 26, bw = w / 24;
   return `<svg class="spark" viewBox="0 0 ${w} ${hh}" aria-hidden="true">` + arr.map((p, i) => { const bh = Math.max(1, p / 100 * (hh - 2)), c = p >= 60 ? '#5ff0a8' : p >= 40 ? '#ffb84d' : p > 0 ? '#3d6670' : '#22343a'; return `<rect x="${(i * bw + .5).toFixed(1)}" y="${(hh - bh).toFixed(1)}" width="${(bw - 1).toFixed(1)}" height="${bh.toFixed(1)}" fill="${c}"${i === sel ? ' stroke="#fff" stroke-width="1"' : ''}/>`; }).join('') + '</svg>';
 }
-let biteHour = -1, BITE_H = null;
+let biteHour = -1, biteDataMinute = -1, BITE_H = null;
 function renderBite() {
   const st = STATIONS[S.st], d = st.days[S.day], pt = POINTS[S.pt], H = Math.floor(S.t);
   biteHour = H;
+  // 관측 만료·발표 자료의 24시간 경계와 수온 age를 최대 약 1분 안에 반영한다.
+  biteDataMinute = Math.floor(Date.now() / 60000);
   $('biteSub').textContent = `${pt ? pt.name : st.name} · ${d.date.slice(5).replace('-', '/')} ${String(H).padStart(2, '0')}시 · ${d.mul}`;
   const [sr, ss] = sunTimes(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon, S.day);
   const rows = FISH.map((f, i) => { const arr = Array.from({ length: 24 }, (_, h) => biteAt(f, pt, st, S.day, h)); const best = arr.indexOf(Math.max(...arr)); return { f, i, arr, p: arr[H], best, ev: biteEvalAt(f, pt, st, S.day, H) }; }).sort((a, b) => b.p - a.p || b.arr[b.best] - a.arr[a.best]);

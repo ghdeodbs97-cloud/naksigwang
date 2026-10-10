@@ -15,7 +15,38 @@ clock = dt.datetime.fromisoformat(json.loads((ROOT / 'data/meta.json').read_text
 assertions = (ROOT / 'tests/p1_assertions.js').read_text(encoding='utf-8')
 html = (ROOT / 'index.html').read_text(encoding='utf-8')
 pos = html.rindex('\n})();')
-html = html[:pos] + '\nwindow.__p1Ready = () => CR.ready; window.__p1Run = () => {' + assertions + '\n};\n' + html[pos:]
+refresh_probe = r'''
+// 같은 선택 시각에서 실제 시계만 이동한다. 운영 자료 대신 페이지 메모리의 만료 경계를 구성한다.
+let refreshCalls = 0;
+window.__p1ExpirySetup = () => {
+  const p = POINTS.find(p => sstForLocation(p));
+  if (!p) throw new Error('만료 검사에 유효 수온 포인트 필요');
+  S.pt = POINTS.indexOf(p); S.st = p.st; S.t = 9.5; S.playing = false;
+  const boundary = Date.now() - 24 * 36e5 + 30000;
+  const stamp = new Date(boundary + 9 * 36e5).toISOString().slice(0, 16);
+  for (const o of Object.values(OBS)) if (o.sst) o.sst[1] = stamp.replace('T', ' ');
+  META.generated = new Date(boundary).toISOString(); META.degraded = false;
+  for (const name of ['obs', 'wx', 'tide']) META[name + '.json'] = { status: 'ok' };
+  WXG.base = stamp.replace(/[-:T]/g, '');
+  for (const k in WXG.bases) WXG.bases[k] = WXG.base;
+  SST_C.clear();
+  const original = renderBite;
+  renderBite = () => { refreshCalls++; original(); };
+  renderBite();
+};
+window.__p1ExpirySnapshot = () => {
+  const p = POINTS[S.pt], st = STATIONS[S.st];
+  const evaluations = FISH.map(f => ({ name: f.n, ev: biteEvalAt(f, p, st, S.day, Math.floor(S.t)) }));
+  const cards = [...$('fishGrid').children];
+  return { calls: refreshCalls, t: S.t, evaluations, matches: evaluations.every(({ name, ev }) => {
+    const card = cards.find(c => c.querySelector('.fn').firstChild.textContent === name);
+    return card.querySelector('.fp b').textContent === ev.score + '점'
+      && card.querySelector('.biteConfidence').textContent === '자료 신뢰도 ' + ev.confidenceLevel
+      && card.querySelector('.biteReasons').textContent === biteReasons(ev);
+  }) };
+};
+'''
+html = html[:pos] + '\nwindow.__p1Ready = () => CR.ready; window.__p1Run = () => {' + assertions + '\n};\n' + refresh_probe + html[pos:]
 out = Path(os.environ['P1_OUTPUT']) if os.environ.get('P1_OUTPUT') else None
 if out:
     out.mkdir(parents=True, exist_ok=True)
@@ -46,8 +77,32 @@ try:
             assert '%' not in page.locator('.lvKey').inner_text()
             assert page.locator('.biteConfidence').count() == 18
             assert all(page.locator('.biteReasons').all_text_contents())
+            page.evaluate('window.__p1ExpirySetup()')
+            before = page.evaluate('window.__p1ExpirySnapshot()')
+            assert before['matches']
+            assert any(e['ev']['sources']['temperature']['observation'] for e in before['evaluations'])
+            page.wait_for_timeout(250)
+            assert page.evaluate('window.__p1ExpirySnapshot().calls') == before['calls'], '프레임마다 재계산 금지'
+            page.clock.set_fixed_time(clock + dt.timedelta(seconds=61))
+            page.wait_for_function('window.__p1ExpirySnapshot().calls > 1')
+            after = page.evaluate('window.__p1ExpirySnapshot()')
+            assert after['t'] == before['t'] == 9.5, '선택 시간 변경 없이 자동 갱신'
+            assert after['matches'], '만료 후 카드 점수·신뢰도·이유가 새 계산과 일치'
+            for old, new in zip(before['evaluations'], after['evaluations']):
+                ev = new['ev']
+                assert ev['sources']['temperature']['observation'] is None
+                assert ev['sources']['temperature']['stale'] and ev['sources']['weather']['stale']
+                assert ev['confidence'] < old['ev']['confidence']
+                if ev['score']:
+                    assert next(f for f in ev['factors'] if f['key'] == 'temperature')['effect'] == 0
+            page.wait_for_timeout(250)
+            assert page.evaluate('window.__p1ExpirySnapshot().calls') == after['calls'], '같은 분에서 중복 갱신 금지'
+            # 시계 역행·절전 후 복귀도 다음 프레임에서 반영한다.
+            page.clock.set_fixed_time(clock)
+            page.wait_for_function('window.__p1ExpirySnapshot().calls > 2')
+            assert page.evaluate('window.__p1ExpirySnapshot().matches')
             assert not errors, errors
-            print(f'{width}×{height}: P1 {result["checks"]}개 조건 검사 및 다섯 탭 통과')
+            print(f'{width}×{height}: P1 {result["checks"]}개 조건 검사·자료 만료 자동 갱신·다섯 탭 통과')
             if width == 390:
                 print(json.dumps(result, ensure_ascii=False, indent=2))
                 if out:

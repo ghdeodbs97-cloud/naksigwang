@@ -77,7 +77,7 @@ function frame(now) {
   if (S.playing) S.t = (S.t + dt * .7) % 24;
   for (const id of ['tIn', 'tIn2']) { const el = $(id); if (document.activeElement !== el && Math.abs(el.value - S.t) > .01) el.value = S.t; }
   const tide = getTide();
-  if (Math.floor(S.t) !== biteHour) renderBite();
+  if (Math.floor(S.t) !== biteHour || Math.floor(Date.now() / 60000) !== biteDataMinute) renderBite();
   if (TAB === 'map' || TAB === 'today') {               // 보이는 탭만 그린다 (휴대폰 전지 절약). 오늘 탭에도 지도가 있다
     if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
     setText('clock2', fmtH(S.t));
