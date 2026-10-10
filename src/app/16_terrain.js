@@ -74,9 +74,9 @@ function renderTerrain(path, gpp) {
       const a = (1 - tx) * (1 - ty), b = tx * (1 - ty), c = (1 - tx) * ty, d = tx * ty;
       const e = GE[k] * a + GE[k + 1] * b + GE[k + w] * c + GE[k + w + 1] * d;
       const sh = (GSH[k] * a + GSH[k + 1] * b + GSH[k + w] * c + GSH[k + w + 1] * d) / 255;
-      // 수심: 해안 150 m 안은 경사 추정, 800 m 밖은 GEBCO, 사이는 거리로 섞음 (커서 수심과 같은 식)
+      // 배경 수심: 해안거리 근사로 추정/GEBCO 중 하나만 사용. 정밀 조회는 depthQuery에서 따로 한다.
       const kk = j * W + i, dG = md[kk * 4 + 3] > 127 ? 0 : (DT[kk] >= BIG ? 1e6 : DT[kk] * pxm), est = depthAt(dG), wg = Math.max(0, Math.min(1, (dG - 150) / 650));
-      const dm = md[kk * 4 + 3] > 127 ? NaN : (-e < 1 && wg < 1) ? est : wg * Math.max(.5, -e) + (1 - wg) * est; D[kk] = dm;
+      const dm = md[kk * 4 + 3] > 127 ? NaN : wg < 1 || -e <= 0 ? est : -e; D[kk] = dm;
       const dv = dm === dm ? Math.min(3500, dm) | 0 : 0, si = STEP_OF[dv], dep = Math.round((DEPTH_STEPS[si] * .35 + DEPTH_STEPS[si + 1] * .65)) , fs = .62 + .55 * sh;
       // 남한 해안선 밖인데 GEBCO가 육지인 곳(북한·일본 등)은 회갈색으로. 해안 근처의 낮은 값은 바다색에 가깝게 둔다.
       // 북한·대마도 쪽에서만 GEBCO 육지를 회갈색으로 칠한다 (남한 연안의 거친 칸이 바다에 땅처럼 번지지 않게)
@@ -177,6 +177,7 @@ function buildPath(rings, margin) {
 }
 
 function renderBase() {
+  scheduleDepthArea();
   dirty = false;
   const r = DPR(), ppg = pxPerGround(), gpp = 1 / ppg, diag = Math.hypot(cw, ch);
   const lod = gpp > 2000 ? LOD.low : gpp > 35 ? LOD.mid : LOD.full;

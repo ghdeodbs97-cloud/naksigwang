@@ -376,8 +376,9 @@ details.more[open] summary{margin-bottom:12px}
         <span class="key">⚓ 항·포구</span><span class="key">🪨 갯바위 (흐릴수록 접근 어려움)</span>
         <span class="key"><span class="sw p"></span>조류 흐름</span>
       </div>
-      <p class="note" id="terrainNote">지형: GEBCO 2026 격자(15초 ≈ 460 m)의 육지 표고와 바다 수심에 북서쪽 빛 음영을 넣었습니다. 바다는 수심 구간(0·2·5·10·15·20·30·40·50·75·100·150·200·300·500 m…)별로 색을 나누고, 확대할수록 등심선이 2·5·10 m 단위까지 촘촘해지며 숫자가 붙습니다. 해안 150 m 안은 "추정 수심 설정"의 경사로 계산하고 800 m 밖은 GEBCO, 그 사이는 거리에 따라 섞습니다(커서 수심과 같은 식). 육지 등고선은 200 m 간격. 해안선·방파제·해변·갯바위·갯벌·등대·섬/항/방조제 이름은 오픈스트리트맵(ODbL) 자료입니다. 이름이 없는 방파제 묶음에는 가장 가까운 마을 이름으로 "○○리 앞 포구*"라고 표시했습니다(*는 실제 항 이름이 확인되지 않았다는 뜻). 그 밖의 지형은 그 안팎의 지형은 460 m 칸을 부드럽게 이은 것이라 항구 한 곳을 크게 확대하면 세부(방파제·갯바위·수중여)는 나오지 않습니다. 산 높이도 평균되어 실제보다 낮게 나옵니다(예: 한라산 1,947 m → 약 1,840 m).</p>
+      <p class="note" id="terrainNote">지형 배경은 GEBCO 2026의 약 460 m 격자와 해안거리 추정입니다. 가까운 해안의 색과 등심선은 추정이며 수중여·턱을 알 수 없습니다. 위치별 수심과 A→B 단면은 확보된 공식 자료를 우선 사용합니다. 배경의 등심선과 조회값은 다를 수 있습니다. 해안선·시설·이름은 오픈스트리트맵(ODbL) 자료이며 빠지거나 오래된 시설이 있을 수 있습니다. 이름 뒤 *는 실제 항 이름이 확인되지 않았다는 뜻입니다.</p>
       <div class="legend readout"><span id="cursorRead">커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다</span><span id="depthRead"></span></div>
+      <details class="more"><summary>수심 자료 자세히</summary><p class="note" id="depthDetail">지도에서 위치를 확인하면 자료 정보를 표시합니다.</p></details>
       <details class="api"><summary>추정 수심 설정</summary>
       <div class="sub">추정 수심 설정</div>
       <div class="field">
@@ -398,7 +399,7 @@ details.more[open] summary{margin-bottom:12px}
         <label for="dmaxIn">먼바다 수심 상한 <b id="dmaxOut">30 m</b></label>
         <input type="range" id="dmaxIn" min="5" max="80" step="1" value="30">
       </div>
-      <p class="note">실측·해도·BADA 수심이 없는 곳에서, 해안선 150 m 안쪽은 이 가정값을, 800 m 밖은 GEBCO 수심을 쓰고 그 사이는 거리에 따라 섞습니다. 해안선에서 멀어질수록 고른 경사로 깊어지다가 '상한'에 가까워지면 더 깊어지지 않게 계산합니다 (수심 = 상한 × (1 − e<sup>−거리/(상한×경사)</sup>)). 단면도에는 점선과 '추정'으로 표시됩니다.</p>
+      <p class="note">실측·공식 수심이 없는 곳에서는 해안 800 m 안쪽을 이 가정값으로 추정하고, 밖에서는 바다로 확인되는 GEBCO 수심을 씁니다. 기준면이 확인되지 않은 두 값을 섞지 않습니다. 해안에서 멀수록 고른 경사로 깊어지다가 상한에 가까워집니다 (수심 = 상한 × (1 − e<sup>−거리/(상한×경사)</sup>)). 단면도에는 점선과 '추정'으로 표시됩니다.</p>
       </details>
     </div>
     <section class="panel">
@@ -580,7 +581,8 @@ out geom;</pre>
       <h2 class="h2">자료 출처</h2>
       <div class="sources">
     <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
-    <p>수심은 사용자 실측 → 연안해역기본도 → 전자해도·항만도 → BADA2024 → GEBCO 2026(해안 가까이는 해안거리 추정과 혼합) 순으로 찾고, 높은 순위 자료가 있는 곳에서는 낮은 순위 자료와 섞지 않습니다. 보간 반경은 자료 해상도의 2배(BADA는 225 m)이며, 화면 안에서는 육지·구조물을 사이에 둔 자료점을 쓰지 않습니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대, 바다를 건너는 다리, 방조제 안쪽 호수(시화호·새만금호 등)는 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL) 자료를 2026년 10월 3일 내려받아 넣었고, 방파제·부두는 육지(구조물)로 처리해 항 안쪽과 바깥을 구분합니다. 오픈스트리트맵은 자원봉사자가 그린 지도라 빠지거나 오래된 시설이 있을 수 있습니다.</p>
+    <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → BADA 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. 현재 기본 탑재 수심은 GEBCO뿐입니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
+    <p>연안 자료 연결 준비: <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">국토지리정보원 연안해역기본도</a>(공공누리 제1유형, 원본 미확보), <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해양수산부 수심분포도</a>(공개 CSV 확인, 수심값이 없어 미탑재), <a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형, 사용자가 불러온 범위만 적용). 준비된 연결을 실제 고해상도 자료 확보로 해석하지 마세요.</p>
     <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
     <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
     <p>조석·수온은 해양수산부 국립해양조사원(<a href="https://www.data.go.kr/data/15156018/openapi.do" target="_blank" rel="noopener">조석예보(고, 저조)</a>, <a href="https://www.data.go.kr/data/15155508/openapi.do" target="_blank" rel="noopener">조위관측소 최신 관측데이터</a>), 풍향·풍속·파고는 <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noopener">기상청 단기예보 조회서비스</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다. 음력 날짜는 korean_lunar_calendar(한국천문연구원 음양력 기준)로 계산했습니다.</p>
@@ -938,39 +940,42 @@ function drawPortsAndSoundings(gpp) {
 }
 // 04_depth.js — 수심 자료 층과 보간
 /* ── 수심 자료 층 ─────────────────────────────────────────
-   우선순위: 1 사용자 실측 > 2 연안해역기본도 > 3 전자해도·항만도 > 4 BADA2024 > 5 해안거리 추정
+   우선순위: 내 입력 > 연안해역기본도 > 해수부 등심선 > 공개 해도 > BADA > GEBCO/추정
    위 순서대로 찾고, 높은 순위 자료가 반경 안에 있으면 그 자료만으로 보간한다(낮은 순위와 섞지 않음). */
 const DTYPES = {
-  survey:  { pri: 1, label: '사용자 실측',     short: '실측',   res: 10,  color: '#d6fff9' },
+  survey:  { pri: 1, label: '내 수심 입력 (검수 미확인)', short: '내 입력', res: 10, color: '#d6fff9' },
   coastal: { pri: 2, label: '연안해역기본도',  short: '연안',   res: 30,  color: '#7ff3e6' },
   chart:   { pri: 3, label: '전자해도·항만도', short: '해도',   res: 50,  color: '#8fd3ff' },
   bada:    { pri: 4, label: 'BADA2024',        short: 'BADA',   res: 150, color: '#c4b5ff' },
   gebco:   { pri: 5, label: 'GEBCO 2026',      short: 'GEBCO',  res: 460, color: '#e2c48a' },
 };
-const DORDER = ['survey', 'coastal', 'chart', 'bada'];
+DTYPES.mof = { pri: 3, label: '해양수산부 수심분포도', short: '등심선', res: 50, color: '#80caff' };
+const DORDER = ['survey', 'coastal', 'mof', 'chart', 'bada'];
 const MAX_PTS = 600000;
 const LAYERS = {};
 function layerOf(type) {
-  if (!LAYERS[type]) LAYERS[type] = { type, n: 0, mx: [], my: [], d: [], res: [], src: [], yr: [], idx: new Map(), cell: Math.max(60, DTYPES[type].res * 2.5), resMax: 0 };
+  if (!LAYERS[type]) LAYERS[type] = { type, n: 0, mx: [], my: [], d: [], res: [], src: [], yr: [], meta: [], idx: new Map(), cell: Math.max(60, DTYPES[type].res * 2.5), resMax: 0 };
   return LAYERS[type];
 }
 const totalPts = () => DORDER.reduce((s, t) => s + (LAYERS[t] ? LAYERS[t].n : 0), 0);
-function addDepthPt(type, mx, my, d, res, src, yr) {
+function addDepthPt(type, mx, my, d, res, src, yr, meta = {}) {
+  if (!DTYPES[type] || ![mx, my, d, res].every(Number.isFinite) || d < 0 || res <= 0) return false;
   if (totalPts() >= MAX_PTS) return false;
   const L = layerOf(type), i = L.n++;
   L.mx.push(mx); L.my.push(my); L.d.push(d); L.res.push(res); L.src.push(src || ''); L.yr.push(yr || '');
+  L.meta.push({ ...meta, datasetId: meta.datasetId || src || 'local-' + type, verticalDatum: meta.verticalDatum || 'unknown' });
   if (res > L.resMax) L.resMax = res;
   const k = Math.floor(mx / L.cell) * 1000000 + Math.floor(my / L.cell); let a = L.idx.get(k); if (!a) L.idx.set(k, a = []); a.push(i);
   return true;
 }
 function clearLayers() { for (const t of DORDER) delete LAYERS[t]; }
 
-// 화면 안에서 두 점 사이에 육지·구조물이 끼어 있는지 (화면 밖은 판단하지 않음)
+// 지도 좌표에서 판정한다. 화면 크기·확대·이동 및 화면 마스크와 무관하다.
 function crossesLand(mx1, my1, mx2, my2) {
-  for (let s = 1; s <= 4; s++) {
-    const f = s / 5, [x, y] = toS(mx1 + (mx2 - mx1) * f, my1 + (my2 - my1) * f);
-    if (x < 0 || y < 0 || x >= cw || y >= ch) continue;
-    if (!isSea(x | 0, y | 0)) return true;
+  const steps = Math.max(5, Math.ceil(Math.hypot(mx2 - mx1, my2 - my1) / kAt(latOf(my1)) / 5));
+  for (let s = 1; s < steps; s++) {
+    const f = s / steps;
+    if (inLand(mx1 + (mx2 - mx1) * f, my1 + (my2 - my1) * f)) return true;
   }
   return false;
 }
@@ -978,50 +983,181 @@ const searchRadius = (type, L) => type === 'bada' ? 1.5 * Math.max(150, L.resMax
 function depthQuery(mx, my) {
   const k = kAt(latOf(my));
   for (const type of DORDER) {
-    const L = LAYERS[type]; if (!L || !L.n) continue;
-    const R = searchRadius(type, L), r = R * k, c = Math.ceil(r / L.cell), gx = Math.floor(mx / L.cell), gy = Math.floor(my / L.cell);
     const cand = [];
-    for (let dx = -c; dx <= c; dx++) for (let dy = -c; dy <= c; dy++) {
-      const a = L.idx.get((gx + dx) * 1000000 + gy + dy); if (!a) continue;
-      for (const i of a) { const d = Math.hypot(L.mx[i] - mx, L.my[i] - my); if (d <= r) cand.push([d, i]); }
+    const L = LAYERS[type];
+    if (L && L.n) {
+      const R = searchRadius(type, L), r = R * k, c = Math.ceil(r / L.cell), gx = Math.floor(mx / L.cell), gy = Math.floor(my / L.cell);
+      for (let dx = -c; dx <= c; dx++) for (let dy = -c; dy <= c; dy++) {
+        const a = L.idx.get((gx + dx) * 1000000 + gy + dy); if (!a) continue;
+        for (const i of a) { const d = Math.hypot(L.mx[i] - mx, L.my[i] - my); if (d <= r) cand.push({ d, mx: L.mx[i], my: L.my[i], depth: L.d[i], res: L.res[i], src: L.src[i], yr: L.yr[i], ...L.meta[i] }); }
+      }
     }
+    cand.push(...officialDepthCandidates(type, mx, my));
     if (!cand.length) continue;
-    cand.sort((a, b) => a[0] - b[0]);
+    cand.sort((a, b) => a.d - b.d || String(a.datasetId).localeCompare(String(b.datasetId)));
     const use = [];
-    for (const [d, i] of cand) { if (use.length >= 6) break; if (d > 2 * k && crossesLand(mx, my, L.mx[i], L.my[i])) continue; use.push([d, i]); }
+    for (const p of cand) {
+      if (use.length >= 6) break;
+      if (p.d > 2 * k && crossesLand(mx, my, p.mx, p.my)) continue;
+      // 기준면이 같아도 서로 다른 자료집은 합치지 않는다. unknown도 자료집별로 격리한다.
+      if (use.length && (p.datasetId !== use[0].datasetId || p.verticalDatum !== use[0].verticalDatum)) continue;
+      use.push(p);
+    }
     if (!use.length) continue;
-    const [d0, i0] = use[0], resN = L.res[i0], distG = d0 / k;
+    const p0 = use[0], resN = p0.res, distG = p0.d / k;
     let depth;
-    if (distG < .5) depth = L.d[i0];
-    else { let ws = 0, vs = 0; for (const [d, i] of use) { const w = 1 / (d * d); ws += w; vs += w * L.d[i]; } depth = vs / ws; }
-    const interp = distG > resN;
+    if (distG < .5) depth = p0.depth;
+    else { let ws = 0, vs = 0; for (const p of use) { const w = 1 / (p.d * p.d); ws += w; vs += w * p.depth; } depth = vs / ws; }
+    const interp = distG >= .5 || !!p0.interpolated;
     const conf = type === 'bada' ? (distG <= 150 ? '중간' : '낮음') : type === 'chart' ? '중간' : (interp ? '중간' : '높음');
-    return { depth, type, label: DTYPES[type].label, res: resN, dist: distG, n: use.length, conf, interp, src: L.src[i0], yr: L.yr[i0] };
+    return depthResult({ depth, type, label: DTYPES[type].label, res: resN, dist: distG, n: distG < .5 ? 1 : use.length, conf, interp, src: p0.src, yr: p0.yr,
+      verticalDatum: p0.verticalDatum, datasetId: p0.datasetId, sourceType: p0.sourceType, estimated: (distG < .5 ? [p0] : use).some(p => p.estimated),
+      contributingSources: (distG < .5 ? [p0] : use).map(p => ({ source: p.src, surveyYear: p.yr || null, resolution: p.res, distance: p.d / k, interpolated: !!p.interpolated })),
+      confidenceReason: type === 'survey' ? '이 기기의 입력값이며 관리자 검수가 확인되지 않았습니다.' : '자료점 거리·해상도 기반 등급이며 정확도 보증이 아닙니다.' });
   }
   return null;
 }
-// 공식 수심 자료가 없을 때: 해안 150 m 안은 경사 추정, 800 m 밖은 GEBCO, 그 사이는 거리에 따라 섞는다
+// 공식 수심 자료가 없을 때: 해안 800 m 안은 추정, 밖은 GEBCO. 기준면 미확인 자료를 혼합하지 않는다.
 function modelDepth(mx, my, dG) {
   const est = estimateAt(dG); if (!GE || !isFinite(dG)) return est;
   const e = gebcoAt(latOf(my), lonOf(mx)); if (e == null) return est;
-  const w = Math.max(0, Math.min(1, (dG - 150) / 650)), g = -e;
-  if (w === 0 || (g < 1 && w < 1)) return est;   // 해안 가까이에서 GEBCO 칸이 육지로 잡힌 경우는 추정만 사용
-  return { depth: w * Math.max(.5, g) + (1 - w) * est.depth, type: 'gebco', label: 'GEBCO 2026', res: 460, dist: null, conf: '낮음', interp: true, mix: w < 1 };
+  const g = -e;
+  // GEBCO의 평균해면 가정과 해안 추정의 기준면이 같다고 볼 수 없어 혼합하지 않는다.
+  if (dG < 800 || g <= 0) return est;
+  return depthResult({ depth: g, type: 'gebco', label: 'GEBCO 2026', res: 460, dist: null, conf: '낮음', interp: true, verticalDatum: 'MSL_assumed', estimated: true });
 }
-function estimateAt(dG) { return { depth: depthAt(dG), type: 'est', label: '해안거리 기반 추정', res: null, dist: null, conf: '낮음', interp: true }; }
+function estimateAt(dG) { return depthResult({ depth: depthAt(dG), type: 'est', label: '해안거리 기반 추정', res: null, dist: null, conf: '낮음', interp: false, estimated: true }); }
+// 기존 type/label/res/dist/n/conf/interp/src/yr는 화면 호환용으로 함께 유지한다.
+function depthResult(r) {
+  const types = { survey: 'crowd_pending', coastal: 'coastal_official', mof: 'mof_contour', chart: 'chart_public', bada: 'bada', gebco: 'gebco', est: 'model_estimate' };
+  const sourceType = r.sourceType || types[r.type];
+  const datum = r.verticalDatum || 'unknown';
+  const conf = sourceType === 'crowd_pending' || datum === 'unknown' ? '낮음' : r.conf;
+  return { ...r, conf, sourceType, source: r.src || r.label, resolution: r.res ?? null,
+    distanceToSource: r.dist ?? null, interpolated: !!r.interp, estimated: !!r.estimated,
+    confidence: conf, confidenceReason: (r.confidenceReason || (r.estimated ? '저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다.' : '자료점 거리·해상도 기반 등급')) +
+      (datum === 'unknown' ? ' 바닷물 높이 기준면 미확인.' : ''),
+    verticalDatum: datum, surveyYear: r.yr || null, measurementCount: r.n ?? 0 };
+}
 function fmtDepth(r) {
   if (!r) return '—';
-  if (r.type === 'survey') return (r.interp ? '약 ' : '') + r.depth.toFixed(1) + ' m';
+  if (r.type === 'survey') return '약 ' + r.depth.toFixed(1) + ' m';
   if ((r.type === 'coastal' || r.type === 'chart') && r.res <= 10 && !r.interp) return r.depth.toFixed(1) + ' m';
   return '약 ' + Math.round(r.depth) + ' m';
 }
 function describeDepth(r) {
   if (!r) return '';
-  if (r.type === 'est') return `추정 수심 ${fmtDepth(r)} · 출처: 해안거리 기반 추정 · 신뢰도: 낮음`;
-  if (r.type === 'gebco') return `수심 ${fmtDepth(r)} · 출처: GEBCO 2026 (약 460 m 격자${r.mix ? ', 해안 가까이는 경사 추정과 혼합' : ''}) · 신뢰도: 낮음 · 수중여·턱 표현 불가`;
-  let s = `수심 ${fmtDepth(r)} · 출처: ${r.label}${r.src ? ' (' + r.src + ')' : ''} · 신뢰도: ${r.conf} · 최근 자료점 ${Math.round(r.dist)} m · ${r.type === 'bada' ? '격자' : '자료'} 해상도 약 ${r.res} m`;
-  if (r.type === 'bada') s += ' · 세부 수중여·턱 표현 불가';
-  return s;
+  return `수심 ${fmtDepth(r)} · 출처: ${r.label} · 신뢰도: ${r.conf}${r.estimated ? ' · 추정' : ''}`;
+}
+function depthDetails(r) {
+  if (!r) return '';
+  return `자료해상도: ${r.res == null ? '알 수 없음' : '약 ' + r.res + ' m'} · 조사연도: ${r.surveyYear || '미확인'} · 보간: ${r.interpolated ? '예' : '아니요'} · ${r.estimated ? '추정' : r.sourceType === 'crowd_pending' ? '검수 전 입력' : '공식자료'} · 기준면: ${r.verticalDatum} · ${r.confidenceReason}`;
+}
+// 04b_depth_tiles.js — 지도 표현과 분리한 공식 수심 지역 자료 로더
+const OFFICIAL_DEPTH = { manifest: null, init: null, cache: new Map(), signature: '', generation: 0,
+  maxTiles: 12, maxPoints: 60000, maxBytes: 8 * 1024 * 1024, error: '', timer: null };
+const OFFICIAL_TYPES = { coastal_official: 'coastal', mof_contour: 'mof', chart_public: 'chart', bada: 'bada' };
+async function depthReadJSON(url, limit) {
+  const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = await fetch(url, { signal: controller.signal, cache: url.endsWith('manifest.json') ? 'no-cache' : 'default' });
+    if (!response.ok) throw Error('수심 자료 HTTP ' + response.status);
+    const reader = response.body.getReader(), chunks = []; let size = 0;
+    for (;;) {
+      const { done, value } = await reader.read(); if (done) break;
+      size += value.length;
+      if (size > limit) { await reader.cancel(); throw Error('수심 자료 크기 제한'); }
+      chunks.push(value);
+    }
+    const buf = new Uint8Array(size); let offset = 0;
+    for (const chunk of chunks) { buf.set(chunk, offset); offset += chunk.length; }
+    return JSON.parse(new TextDecoder().decode(buf));
+  } finally { clearTimeout(timeout); }
+}
+async function depthManifest() {
+  if (!OFFICIAL_DEPTH.init) OFFICIAL_DEPTH.init = (async () => {
+    try {
+      const m = await depthReadJSON('static/depth/manifest.json', 1024 * 1024);
+      if (m.version !== 1 || !Array.isArray(m.tiles) || !Array.isArray(m.datasets)) throw Error('수심 목록 형식');
+      const datasetIds = new Set(), files = new Set();
+      for (const ds of m.datasets) {
+        if (!OFFICIAL_TYPES[ds.sourceType] || typeof ds.id !== 'string' || !ds.id || datasetIds.has(ds.id) || typeof ds.source !== 'string' || !ds.source ||
+          !Number.isFinite(ds.resolution) || !(ds.resolution > 0 && ds.resolution <= 1000) || typeof ds.verticalDatum !== 'string' || !ds.verticalDatum) throw Error('수심 출처 정보');
+        datasetIds.add(ds.id);
+      }
+      for (const t of m.tiles) {
+        if (!/^[a-zA-Z0-9_/-]+\.json$/.test(t.file) || t.file.includes('..') || files.has(t.file) || !Array.isArray(t.bbox) || t.bbox.length !== 4 || !t.bbox.every(Number.isFinite) ||
+          t.bbox[0] > t.bbox[2] || t.bbox[1] > t.bbox[3] || !Number.isInteger(t.count) || !(t.count > 0 && t.count <= 12000) || !Number.isInteger(t.bytes) || !(t.bytes > 0 && t.bytes <= 1024 * 1024)) throw Error('수심 타일 정보');
+        files.add(t.file);
+      }
+      OFFICIAL_DEPTH.manifest = m; return m;
+    } catch (e) { OFFICIAL_DEPTH.error = e.message; return null; }
+  })();
+  return OFFICIAL_DEPTH.init;
+}
+// 경위도 범위 배열만 받는다. Canvas/화면 좌표를 알 필요가 없다.
+async function depthPrepareAreas(areas) {
+  const m = await depthManifest(); if (!m || !m.tiles.length) return false;
+  const pad = Math.max(...m.datasets.map(d => d.resolution * (d.sourceType === 'bada' ? 1.5 : 2)), 0) / 80000;
+  const boxes = areas.filter(b => b.every(Number.isFinite) && b[2] - b[0] <= .6 && b[3] - b[1] <= .6);
+  const wants = m.tiles.filter(t => boxes.some(b => t.bbox[0] <= b[2] + pad && t.bbox[2] >= b[0] - pad && t.bbox[1] <= b[3] + pad && t.bbox[3] >= b[1] - pad));
+  // 큰 범위는 일부만 싣지 않는다. 더 확대하면 완전한 지역 묶음을 읽는다.
+  const signature = wants.map(t => t.file).sort().join('|');
+  if (signature === OFFICIAL_DEPTH.signature) return false;
+  OFFICIAL_DEPTH.signature = signature;
+  const generation = ++OFFICIAL_DEPTH.generation;
+  if (wants.length > OFFICIAL_DEPTH.maxTiles || wants.reduce((n, t) => n + t.count, 0) > OFFICIAL_DEPTH.maxPoints || wants.reduce((n, t) => n + t.bytes, 0) > OFFICIAL_DEPTH.maxBytes) {
+    OFFICIAL_DEPTH.cache.clear(); OFFICIAL_DEPTH.error = '공식 수심 자료는 지도를 더 확대하면 불러옵니다.'; return true;
+  }
+  let changed = false;
+  const keep = new Set(wants.map(t => t.file));
+  for (const key of OFFICIAL_DEPTH.cache.keys()) if (!keep.has(key)) { OFFICIAL_DEPTH.cache.delete(key); changed = true; }
+  for (const tile of wants) {
+    if (generation !== OFFICIAL_DEPTH.generation) return changed;
+    if (OFFICIAL_DEPTH.cache.has(tile.file)) continue;
+    try {
+      const doc = await depthReadJSON('static/depth/' + tile.file, 1024 * 1024);
+      if (generation !== OFFICIAL_DEPTH.generation) return changed;
+      if (doc.version !== 1 || !Array.isArray(doc.points) || doc.points.length !== tile.count) throw Error('수심 타일 점 개수');
+      const idx = new Map(); let maxRadius = 0;
+      for (const row of doc.points) {
+        const [lon, lat, depth, dataset, year, interpolated] = row, ds = m.datasets[dataset];
+        if (!ds || ![lon, lat, depth].every(Number.isFinite) || lon < 123.5 || lon > 132.5 || lat < 32 || lat > 39.5 || depth < 0 ||
+          lon < tile.bbox[0] || lon > tile.bbox[2] || lat < tile.bbox[1] || lat > tile.bbox[3] || typeof interpolated !== 'boolean') throw Error('수심 타일 좌표/속성');
+        const radius = ds.resolution * (ds.sourceType === 'bada' ? 1.5 : 2);
+        maxRadius = Math.max(maxRadius, radius);
+        const p = { mx: mxOf(lon), my: myOf(lat), depth, res: ds.resolution, src: ds.source, yr: year ?? ds.surveyYear,
+          datasetId: ds.id, sourceType: ds.sourceType, verticalDatum: ds.verticalDatum, interpolated, estimated: !!ds.estimated, radius };
+        const key = Math.floor(p.mx / 1000) + ',' + Math.floor(p.my / 1000);
+        if (!idx.has(key)) idx.set(key, []); idx.get(key).push(p);
+      }
+      OFFICIAL_DEPTH.cache.set(tile.file, { idx, maxRadius }); changed = true; OFFICIAL_DEPTH.error = '';
+    } catch (e) { OFFICIAL_DEPTH.error = e.message; /* 다음 이동/재확대에서 다시 시도한다. 조회는 기존 자료로 계속한다. */ }
+  }
+  return changed;
+}
+function officialDepthCandidates(type, mx, my) {
+  const out = [], k = kAt(latOf(my)), gx = Math.floor(mx / 1000), gy = Math.floor(my / 1000);
+  for (const tile of OFFICIAL_DEPTH.cache.values()) {
+    const n = Math.ceil(tile.maxRadius * k / 1000);
+    for (let x = gx - n; x <= gx + n; x++) for (let y = gy - n; y <= gy + n; y++) {
+      for (const p of tile.idx.get(x + ',' + y) || []) {
+        if (OFFICIAL_TYPES[p.sourceType] !== type) continue;
+        const d = Math.hypot(mx - p.mx, my - p.my);
+        if (d <= p.radius * k) out.push({ ...p, d });
+      }
+    }
+  }
+  return out;
+}
+// 화면 어댑터. 미래 위성지도에서는 이 범위 생성 부분만 교체하면 된다.
+function scheduleDepthArea() {
+  clearTimeout(OFFICIAL_DEPTH.timer);
+  OFFICIAL_DEPTH.timer = setTimeout(async () => {
+    const a = toM(0, ch), b = toM(cw, 0), areas = [[lonOf(a[0]), latOf(a[1]), lonOf(b[0]), latOf(b[1])]];
+    if (S.A && S.B) areas.push([Math.min(lonOf(S.A[0]), lonOf(S.B[0])), Math.min(latOf(S.A[1]), latOf(S.B[1])), Math.max(lonOf(S.A[0]), lonOf(S.B[0])), Math.max(latOf(S.A[1]), latOf(S.B[1]))]);
+    if (await depthPrepareAreas(areas)) { dirty = true; dirtyHover = true; analyzeSection(); }
+  }, 250);
 }
 // 05_struct.js — 해안 구조물(방파제·부두) 층
 /* ── 해안 구조물(방파제·부두 등) 층 ─────────────────── */
@@ -1194,13 +1330,13 @@ function importDepthRows(rows, type) {
   const dc = findCol(H, DEPTH_KEYS);
   if (L.wkt < 0 && (L.la < 0 || L.lo < 0) && (L.xc < 0 || L.yc < 0)) return { ok: 0, msg: '위도·경도 열을 찾지 못했습니다. 머리글: ' + H.slice(0, 10).join(', ') };
   if (dc < 0) return { ok: 0, msg: '수심 열을 찾지 못했습니다. 머리글: ' + H.slice(0, 10).join(', ') };
-  const sc = findCol(H, [/^source$/i, /출처/]), rc = findCol(H, [/^resolution$/i, /해상도/]), yc = findCol(H, [/조사년도|연도|year/i]);
+  const sc = findCol(H, [/^source$/i, /출처/]), rc = findCol(H, [/^resolution$/i, /해상도/]), yc = findCol(H, [/조사년도|연도|year/i]), vc = findCol(H, [/^verticalDatum$/i, /기준면/]);
   let ok = 0, bad = 0, full = false;
   for (const r of rows.slice(1)) {
     const ll = getLL(r, L), d = Math.abs(num(r[dc]));
     if (!ll || !isFinite(d)) { bad++; continue; }
     const res = rc >= 0 && isFinite(num(r[rc])) ? num(r[rc]) : DTYPES[type].res;
-    if (!addDepthPt(type, mxOf(ll[1]), myOf(ll[0]), d, res, sc >= 0 ? r[sc] : '', yc >= 0 ? r[yc] : '')) { full = true; break; }
+    if (!addDepthPt(type, mxOf(ll[1]), myOf(ll[0]), d, res, sc >= 0 ? r[sc] : '', yc >= 0 ? r[yc] : '', { verticalDatum: vc >= 0 ? r[vc] : 'unknown' })) { full = true; break; }
     ok++;
   }
   return { ok, msg: ok ? `${DTYPES[type].label} 수심 ${ok.toLocaleString()}점을 불러왔습니다 (열: ${H[dc]})` + (bad ? `, ${bad}건 제외` : '') + (full ? `. 최대 ${MAX_PTS.toLocaleString()}점에서 멈췄습니다` : '') : '불러온 수심점이 없습니다.' };
@@ -1208,14 +1344,14 @@ function importDepthRows(rows, type) {
 function importDepthJSON(obj, type) {
   const res0 = DTYPES[type].res;
   let ok = 0, lines = 0, bad = 0, keyUsed = null, full = false;
-  const add = (lat, lon, d, res, src, yr) => { if (!addDepthPt(type, mxOf(lon), myOf(lat), d, res, src, yr)) { full = true; return false; } ok++; return true; };
-  const sampleLine = (coords, d, res, src, yr) => {   // 등심선: 자료 해상도 간격으로만 샘플링
+  const add = (lat, lon, d, res, src, yr, meta) => { if (!addDepthPt(type, mxOf(lon), myOf(lat), d, res, src, yr, meta)) { full = true; return false; } ok++; return true; };
+  const sampleLine = (coords, d, res, src, yr, meta) => {   // 등심선: 자료 해상도 간격으로만 샘플링
     lines++; const step = Math.max(10, res);
     let carry = 0;
     for (let i = 0; i < coords.length - 1 && !full; i++) {
       const a = toLatLon(coords[i][0], coords[i][1]), b = toLatLon(coords[i + 1][0], coords[i + 1][1]); if (!a || !b) { bad++; continue; }
       const segG = Math.hypot((b[0] - a[0]) * 111000, (b[1] - a[1]) * 111000 * Math.cos(a[0] * D2R));
-      let t = carry; while (t <= segG) { const f = segG ? t / segG : 0; if (!add(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, d, res, src, yr)) break; t += step; }
+      let t = carry; while (t <= segG) { const f = segG ? t / segG : 0; if (!add(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, d, res, src, yr, { ...meta, interpolated: true })) break; t += step; }
       carry = t - segG;
     }
   };
@@ -1224,12 +1360,13 @@ function importDepthJSON(obj, type) {
     const key = pickDepthKey(props); keyUsed = keyUsed || key;
     let d = key ? depthVal(props, key) : NaN;
     const res = isFinite(num(props && (props.resolution ?? props['해상도']))) ? num(props.resolution ?? props['해상도']) : res0;
-    const src = props && (props.source || props['출처']) || '', yr = props && (props['조사년도'] || props.year) || '';
-    const pt = c => { const dd = isFinite(d) ? d : (c.length > 2 && isFinite(c[2]) ? Math.abs(c[2]) : NaN); const ll = toLatLon(c[0], c[1]); if (!ll || !isFinite(dd)) { bad++; return; } add(ll[0], ll[1], dd, res, src, yr); };
+    const src = props && (props.source || props['출처']) || '', yr = props && (props.surveyYear || props['조사년도'] || props.year) || '';
+    const meta = { verticalDatum: props.verticalDatum || props['기준면'] || 'unknown', datasetId: props.datasetId || src || 'local-' + type };
+    const pt = c => { const dd = isFinite(d) ? d : (c.length > 2 && isFinite(c[2]) ? Math.abs(c[2]) : NaN); const ll = toLatLon(c[0], c[1]); if (!ll || !isFinite(dd)) { bad++; return; } add(ll[0], ll[1], dd, res, src, yr, meta); };
     if (g.type === 'Point') pt(g.coordinates);
     else if (g.type === 'MultiPoint') g.coordinates.forEach(pt);
-    else if (g.type === 'LineString') { if (isFinite(d)) sampleLine(g.coordinates, d, res, src, yr); else bad++; }
-    else if (g.type === 'MultiLineString') { if (isFinite(d)) g.coordinates.forEach(c => sampleLine(c, d, res, src, yr)); else bad++; }
+    else if (g.type === 'LineString') { if (isFinite(d)) sampleLine(g.coordinates, d, res, src, yr, meta); else bad++; }
+    else if (g.type === 'MultiLineString') { if (isFinite(d)) g.coordinates.forEach(c => sampleLine(c, d, res, src, yr, meta)); else bad++; }
     else if (g.type === 'GeometryCollection') g.geometries.forEach(x => handle(x, props));
     else bad++;
   };
@@ -1241,7 +1378,7 @@ function importDepthJSON(obj, type) {
     const r0 = recs[0], la = pickKey(r0, [/^lat(itude)?$/i, /위도/, /lat/i]), lo = pickKey(r0, [/^(lon|lng|longitude)$/i, /경도/, /lon|lng/i]), dk = pickDepthKey(r0);
     if (!la || !lo || !dk) return { ok: 0, msg: '목록에서 위도·경도·수심 항목을 찾지 못했습니다. 항목: ' + Object.keys(r0).slice(0, 10).join(', ') };
     keyUsed = dk;
-    for (const r of recs) { const ll = toLatLon(num(r[lo]), num(r[la])), d = depthVal(r, dk); if (!ll || !isFinite(d)) { bad++; continue; } if (!add(ll[0], ll[1], d, res0, r.source || '', '')) break; }
+    for (const r of recs) { const ll = toLatLon(num(r[lo]), num(r[la])), d = depthVal(r, dk); if (!ll || !isFinite(d)) { bad++; continue; } if (!add(ll[0], ll[1], d, res0, r.source || '', r.surveyYear || r.year || '', { verticalDatum: r.verticalDatum || 'unknown' })) break; }
   }
   return { ok, msg: ok ? `${DTYPES[type].label} 수심 ${ok.toLocaleString()}점을 불러왔습니다` + (lines ? ` (등심선 ${lines}개를 약 ${Math.max(10, res0)} m 간격으로 샘플링)` : '') + (keyUsed ? `, 수심 속성: ${keyUsed}` : '') + (bad ? `, ${bad}건 제외` : '') + (full ? `. 최대 ${MAX_PTS.toLocaleString()}점에서 멈췄습니다` : '')
     : '불러온 수심점이 없습니다. 수심 속성(수심, depth, VALSOU, VALDCO 등)과 좌표를 확인하세요.' };
@@ -1271,7 +1408,7 @@ function importStructJSON(obj) {
 /* ── 저장 (이 브라우저에만) ──────────────────────────── */
 function saveDepth() {
   try {
-    const o = {}; for (const t of DORDER) { const L = LAYERS[t]; if (L && L.n && L.n <= 150000) o[t] = L.d.map((d, i) => [+latOf(L.my[i]).toFixed(6), +lonOf(L.mx[i]).toFixed(6), d, L.res[i], L.src[i]]); }
+    const o = {}; for (const t of DORDER) { const L = LAYERS[t]; if (L && L.n && L.n <= 150000) o[t] = L.d.map((d, i) => [latOf(L.my[i]), lonOf(L.mx[i]), d, L.res[i], L.src[i], L.yr[i], L.meta[i]]); }
     localStorage.setItem('ps_depth2', JSON.stringify(o));
   } catch (e) {}
   try {
@@ -1282,7 +1419,7 @@ function saveDepth() {
 function loadDepth() {
   try {
     const o = JSON.parse(localStorage.getItem('ps_depth2') || '{}');
-    for (const t of DORDER) for (const [la, lo, d, res, src] of (o[t] || [])) addDepthPt(t, mxOf(lo), myOf(la), d, res, src, '');
+    for (const t of DORDER) for (const [la, lo, d, res, src, yr, meta] of (o[t] || [])) addDepthPt(t, mxOf(lo), myOf(la), d, res, src, yr, meta);
     const old = JSON.parse(localStorage.getItem('ps_sound') || '[]');     // 이전 버전의 실측 기록
     for (const [la, lo, d] of old) addDepthPt('survey', mxOf(lo), myOf(la), d, 10, '이전 버전 실측', '');
     if (old.length) { localStorage.removeItem('ps_sound'); saveDepth(); }
@@ -2060,9 +2197,9 @@ function renderTerrain(path, gpp) {
       const a = (1 - tx) * (1 - ty), b = tx * (1 - ty), c = (1 - tx) * ty, d = tx * ty;
       const e = GE[k] * a + GE[k + 1] * b + GE[k + w] * c + GE[k + w + 1] * d;
       const sh = (GSH[k] * a + GSH[k + 1] * b + GSH[k + w] * c + GSH[k + w + 1] * d) / 255;
-      // 수심: 해안 150 m 안은 경사 추정, 800 m 밖은 GEBCO, 사이는 거리로 섞음 (커서 수심과 같은 식)
+      // 배경 수심: 해안거리 근사로 추정/GEBCO 중 하나만 사용. 정밀 조회는 depthQuery에서 따로 한다.
       const kk = j * W + i, dG = md[kk * 4 + 3] > 127 ? 0 : (DT[kk] >= BIG ? 1e6 : DT[kk] * pxm), est = depthAt(dG), wg = Math.max(0, Math.min(1, (dG - 150) / 650));
-      const dm = md[kk * 4 + 3] > 127 ? NaN : (-e < 1 && wg < 1) ? est : wg * Math.max(.5, -e) + (1 - wg) * est; D[kk] = dm;
+      const dm = md[kk * 4 + 3] > 127 ? NaN : wg < 1 || -e <= 0 ? est : -e; D[kk] = dm;
       const dv = dm === dm ? Math.min(3500, dm) | 0 : 0, si = STEP_OF[dv], dep = Math.round((DEPTH_STEPS[si] * .35 + DEPTH_STEPS[si + 1] * .65)) , fs = .62 + .55 * sh;
       // 남한 해안선 밖인데 GEBCO가 육지인 곳(북한·일본 등)은 회갈색으로. 해안 근처의 낮은 값은 바다색에 가깝게 둔다.
       // 북한·대마도 쪽에서만 GEBCO 육지를 회갈색으로 칠한다 (남한 연안의 거친 칸이 바다에 땅처럼 번지지 않게)
@@ -2163,6 +2300,7 @@ function buildPath(rings, margin) {
 }
 
 function renderBase() {
+  scheduleDepthArea();
   dirty = false;
   const r = DPR(), ppg = pxPerGround(), gpp = 1 / ppg, diag = Math.hypot(cw, ch);
   const lod = gpp > 2000 ? LOD.low : gpp > 35 ? LOD.mid : LOD.full;
@@ -2364,6 +2502,7 @@ function drawCrnt(tide) {
 /* ── 단면 ──────────────────────────────────────────────── */
 const sec = $('sec'), sctx = sec.getContext('2d'); let sw = 0, shh = 0, SEC = null;
 function analyzeSection() {
+  scheduleDepthArea();
   dirty = true;   // 아이콘이 새 단면선을 피해 다시 놓이도록 바탕을 다시 그림
   if (!S.A || !S.B) { SEC = null; renderSecInfo(); return; }
   autoShore();   // 해안 종류에 맞춰 추정 경사·수심 상한을 먼저 정한다 (18b_shore.js)
@@ -2383,7 +2522,7 @@ function analyzeSection() {
   SEC.prof = profileFeatures(SEC);
   renderSecInfo();
 }
-const isPub = t => t === 'survey' || t === 'coastal' || t === 'chart';
+const isPub = t => t === 'survey' || t === 'coastal' || t === 'mof' || t === 'chart';
 // 해안선에서 바다 쪽으로 진행하는 수심 프로파일에서 지형 특징을 찾는다
 function profileFeatures(sec) {
   const { pts, cross } = sec;
@@ -2392,9 +2531,12 @@ function profileFeatures(sec) {
   const s0 = pts[c0].s, seq = [];
   for (let k = c0; k >= 0 && k < pts.length; k += dir) { const p = pts[k]; if (p.land) { if (seq.length) break; continue; } seq.push({ x: Math.abs(p.s - s0), d: p.r.depth, t: p.r.type }); }
   const out = { items: [], note: '', cast: [] };
+  if (!cross.length) { out.note = '해안 교차가 없어 해안 기준 캐스팅 거리와 해안 지형을 판정하지 않았습니다.'; return out; }
   if (seq.length < 10) { out.note = '바다 구간이 짧아 분석하지 않았습니다.'; return out; }
   const types = new Set(seq.map(q => q.t)), onlyEst = types.size === 1 && types.has('est'), pubShare = seq.filter(q => isPub(q.t)).length / seq.length;
   for (const m of [50, 100, 150]) { const q = seq.find(q => q.x >= m); out.cast.push({ m, q }); }
+  const refs = new Set(pts.filter(p => !p.land).map(p => p.r.datasetId + '|' + p.r.verticalDatum));
+  if (refs.size > 1) { out.note = '서로 다른 자료·기준면 구간을 연결해 급심이나 수중여를 판정하지 않았습니다. 각 위치의 수심은 해당 출처 기준입니다.'; return out; }
   if ([...types].every(x => x === 'est' || x === 'gebco') && types.has('gebco')) { out.note = '이 단면은 GEBCO 460 m 격자와 추정값뿐이라 수십 m 단위의 급심·수중여는 찾을 수 없습니다. 아래 결과는 큰 흐름만 참고하세요.'; }
   if (onlyEst) { out.note = '이 단면은 추정 모델만 있어 해저지형 특징을 분석하지 않았습니다. 실측·공공 수심을 불러오면 분석합니다.'; return out; }
   if (pubShare < .5 && !out.note) out.note = '세부 급심/수중여 탐지 신뢰도 낮음 (고해상도 연안 자료가 부족하고 BADA 150 m 격자·추정값 위주인 구간).';
@@ -2499,9 +2641,9 @@ function drawSection(now, tide) {
   const flush = () => { if (!seg) return; sctx.globalAlpha = seg.st.a ?? 1; sctx.setLineDash(seg.st.dash); sctx.strokeStyle = seg.st.c; sctx.lineWidth = seg.st.w; sctx.stroke(); sctx.setLineDash([]); sctx.globalAlpha = 1; seg = null; };
   for (let k = 0; k <= N; k++) {
     const p = pts[k]; if (p.land) { flush(); continue; }
-    const st = lineStyle(p.r), key = st.c + st.w + (st.a ?? 1) + st.dash.join();
+    const st = lineStyle(p.r), ref = p.r.datasetId + '|' + p.r.verticalDatum, key = ref + st.c + st.w + (st.a ?? 1) + st.dash.join();
     const x = xk(k), y = Y(zs[k]);
-    if (!seg || seg.key !== key) { const prev = seg && seg.last; flush(); sctx.beginPath(); if (prev) sctx.moveTo(prev[0], prev[1]); else sctx.moveTo(x, y); seg = { key, st }; }
+    if (!seg || seg.key !== key) { const prev = seg && seg.ref === ref && seg.last; flush(); sctx.beginPath(); if (prev) sctx.moveTo(prev[0], prev[1]); else sctx.moveTo(x, y); seg = { key, st, ref }; }
     sctx.lineTo(x, y); seg.last = [x, y];
   }
   flush();
@@ -2588,7 +2730,7 @@ function classifyShore(A, B) {
   const N = 200, at = f => [A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f], Lg = Math.hypot(B[0] - A[0], B[1] - A[1]) / kAt(latOf(A[1]));
   let prev = inLand(...A), P = null, dirF = 1;
   for (let i = 1; i <= N; i++) { const f = i / N, l = inLand(...at(f)); if (l !== prev) { P = f; dirF = prev ? 1 : -1; break; } prev = l; }
-  if (P == null) { if (prev) return null; P = 0; dirF = 1; }   // 해안을 지나지 않으면 A 쪽을 해안으로 본다
+  if (P == null) return null;   // 모두 바다인 단면의 A를 가짜 해안으로 만들지 않는다
   const shore = at(P), sea = at(clamp(P + dirF * 30 / Math.max(Lg, 1), 0, 1));
   const sla = latOf(shore[1]), slo = lonOf(shore[0]); let rp = null, rd = Infinity;
   for (const p of POINTS) if (p.kind === 'rock') { const d = gdist(p, { lat: sla, lon: slo }) * 1000; if (d < rd) { rd = d; rp = p; } }
@@ -2822,6 +2964,7 @@ function updateHover() {
   const of = osmAt(mx, my), ofs = of ? ' · ' + OSM_NAME[of.c] + (of.name ? ` 「${of.name}」` : '') : '';
   setText('cursorRead', lat.toFixed(5) + '°N, ' + lon.toFixed(5) + '°E' + ofs + ' · ' + (land ? '육지·구조물' + (el != null && el > 5 ? ` · 표고 약 ${Math.round(el / 10) * 10} m (GEBCO)` : '') : '바다') + ' · 해안까지 ' + (isFinite(d) ? fmtD(d) : '20 km+'));
   setText('depthRead', q ? describeDepth(q) : '');
+  setText('depthDetail', depthDetails(q));
 }
 let dirtyHover = false;
 

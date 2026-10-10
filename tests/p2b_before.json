@@ -1,0 +1,258 @@
+[
+  {
+    "name": "거진",
+    "point": "거진항",
+    "lat": 38.44264,
+    "lon": 128.45633,
+    "eastOffsetM": 0,
+    "queryLon": 128.45632999999998,
+    "coastDistanceM": 61.30254239595814,
+    "depth": 6.76243566383799,
+    "type": "est",
+    "source": "해안거리 기반 추정",
+    "sourceType": null,
+    "estimated": true,
+    "eastSamples": [
+      {
+        "distance": 500,
+        "lon": 128.46206467668256,
+        "land": false,
+        "depth": 16.703857350455188,
+        "type": "gebco",
+        "mix": true
+      },
+      {
+        "distance": 1000,
+        "lon": 128.4677993533651,
+        "land": false,
+        "depth": 14.360035531455768,
+        "type": "gebco",
+        "mix": true
+      }
+    ]
+  },
+  {
+    "name": "아야진",
+    "point": "아야진항",
+    "lat": 38.27216,
+    "lon": 128.55765,
+    "eastOffsetM": 0,
+    "queryLon": 128.55765000000002,
+    "coastDistanceM": 30.494975961419822,
+    "depth": 3.5796384998338873,
+    "type": "est",
+    "source": "해안거리 기반 추정",
+    "sourceType": null,
+    "estimated": true,
+    "eastSamples": [
+      {
+        "distance": 500,
+        "lon": 128.5633711890938,
+        "land": false,
+        "depth": 18.18186732159444,
+        "type": "gebco",
+        "mix": true
+      },
+      {
+        "distance": 1000,
+        "lon": 128.5690923781876,
+        "land": false,
+        "depth": 10.445397611081136,
+        "type": "gebco",
+        "mix": true
+      }
+    ]
+  },
+  {
+    "name": "봉포",
+    "point": "봉포해변 갯바위",
+    "lat": 38.252767,
+    "lon": 128.568649,
+    "eastOffsetM": 50,
+    "queryLon": 128.56922096620318,
+    "coastDistanceM": 26.513435302468526,
+    "depth": 3.1376753417127166,
+    "type": "est",
+    "source": "해안거리 기반 추정",
+    "sourceType": null,
+    "estimated": true,
+    "eastSamples": [
+      {
+        "distance": 500,
+        "lon": 128.57494062823523,
+        "land": false,
+        "depth": 17.358509313082592,
+        "type": "gebco",
+        "mix": true
+      },
+      {
+        "distance": 1000,
+        "lon": 128.58066029026725,
+        "land": false,
+        "depth": 12.263039156265732,
+        "type": "est",
+        "mix": false
+      }
+    ]
+  },
+  {
+    "name": "속초",
+    "point": "속초항 (OSM 첫 좌표)",
+    "lat": 38.208539999999964,
+    "lon": 128.5947,
+    "eastOffsetM": 0,
+    "queryLon": 128.5947,
+    "coastDistanceM": 18.164422224715217,
+    "depth": 2.1867565860609672,
+    "type": "est",
+    "source": "해안거리 기반 추정",
+    "sourceType": null,
+    "estimated": true,
+    "eastSamples": [
+      {
+        "distance": 500,
+        "lon": 128.6004161849642,
+        "land": false,
+        "depth": 14.515624525831546,
+        "type": "gebco",
+        "mix": true
+      },
+      {
+        "distance": 1000,
+        "lon": 128.60613236992836,
+        "land": false,
+        "depth": 18.1533868850494,
+        "type": "gebco",
+        "mix": true
+      }
+    ]
+  },
+  {
+    "name": "대포",
+    "point": "대포항",
+    "lat": 38.17376,
+    "lon": 128.60884,
+    "eastOffsetM": 200,
+    "queryLon": 128.61112538238595,
+    "coastDistanceM": 41.04270660701203,
+    "depth": 4.715637942591103,
+    "type": "est",
+    "source": "해안거리 기반 추정",
+    "sourceType": null,
+    "estimated": true,
+    "eastSamples": [
+      {
+        "distance": 500,
+        "lon": 128.61683883835087,
+        "land": false,
+        "depth": 15.93597154921513,
+        "type": "gebco",
+        "mix": true
+      },
+      {
+        "distance": 1000,
+        "lon": 128.6225522943158,
+        "land": false,
+        "depth": 17.01845395315989,
+        "type": "gebco",
+        "mix": false
+      }
+    ]
+  },
+  {
+    "name": "문암",
+    "point": "문암2리항 갯바위",
+    "lat": 38.296859,
+    "lon": 128.549894,
+    "eastOffsetM": 50,
+    "queryLon": 128.5504663136096,
+    "coastDistanceM": 33.968110250237466,
+    "depth": 3.9592247356710564,
+    "type": "est",
+    "source": "해안거리 기반 추정",
+    "sourceType": null,
+    "estimated": true,
+    "eastSamples": [
+      {
+        "distance": 500,
+        "lon": 128.5561894497058,
+        "land": false,
+        "depth": 19.37919445130072,
+        "type": "gebco",
+        "mix": true
+      },
+      {
+        "distance": 1000,
+        "lon": 128.561912585802,
+        "land": false,
+        "depth": 13.511881361583681,
+        "type": "gebco",
+        "mix": false
+      }
+    ]
+  },
+  {
+    "name": "남애",
+    "point": "남애항",
+    "lat": 37.94162,
+    "lon": 128.7888,
+    "eastOffsetM": 0,
+    "queryLon": 128.78879999999998,
+    "coastDistanceM": 60.633624598757905,
+    "depth": 6.697578570907176,
+    "type": "est",
+    "source": "해안거리 기반 추정",
+    "sourceType": null,
+    "estimated": true,
+    "eastSamples": [
+      {
+        "distance": 500,
+        "lon": 128.7944953613427,
+        "land": false,
+        "depth": 17.70305212520014,
+        "type": "gebco",
+        "mix": true
+      },
+      {
+        "distance": 1000,
+        "lon": 128.80019072268541,
+        "land": false,
+        "depth": 9.836946273822111,
+        "type": "gebco",
+        "mix": false
+      }
+    ]
+  },
+  {
+    "name": "주문진",
+    "point": "주문진항 (OSM 첫 좌표)",
+    "lat": 37.89191999999999,
+    "lon": 128.83015,
+    "eastOffsetM": 100,
+    "queryLon": 128.8312883028771,
+    "coastDistanceM": 43.89113871329299,
+    "depth": 5.013950802172829,
+    "type": "est",
+    "source": "해안거리 기반 추정",
+    "sourceType": null,
+    "estimated": true,
+    "eastSamples": [
+      {
+        "distance": 500,
+        "lon": 128.83697981726257,
+        "land": false,
+        "depth": 17.161343615962714,
+        "type": "gebco",
+        "mix": true
+      },
+      {
+        "distance": 1000,
+        "lon": 128.84267133164803,
+        "land": false,
+        "depth": 6.656547580763999,
+        "type": "gebco",
+        "mix": true
+      }
+    ]
+  }
+]

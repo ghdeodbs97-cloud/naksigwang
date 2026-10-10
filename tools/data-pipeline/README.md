@@ -17,3 +17,7 @@
 필요한 파이썬 패키지: shapely, pyosmium(`osmium`), pyproj, numpy, tifffile.
 
 **연말 할 일:** 조류 예보는 2026-12-31까지다. 2027년 자료를 `crnt_download.ps1` → `build_crnt.py`로 다시 만들어 `static/crnt.js`를 바꾸고, `11_current.js`의 기준 날짜(`2026-09-30`)를 맞춘다.
+
+## 공식 수심 데이터 기반 (P2B)
+
+SHP/GeoJSON/CSV-WKT의 명시적 CRS 변환, 지역별 정적 자료, 확보 여부·기준면·조사연도·향후 사용자 실측 설계는 [../depth-data/README.md](../depth-data/README.md)를 따른다. 현재 연안 고해상도 수심 타일은 미탑재이며 `data/` 수집 파일을 손으로 수정하지 않는다.

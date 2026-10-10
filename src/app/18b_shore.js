@@ -47,7 +47,7 @@ function classifyShore(A, B) {
   const N = 200, at = f => [A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f], Lg = Math.hypot(B[0] - A[0], B[1] - A[1]) / kAt(latOf(A[1]));
   let prev = inLand(...A), P = null, dirF = 1;
   for (let i = 1; i <= N; i++) { const f = i / N, l = inLand(...at(f)); if (l !== prev) { P = f; dirF = prev ? 1 : -1; break; } prev = l; }
-  if (P == null) { if (prev) return null; P = 0; dirF = 1; }   // 해안을 지나지 않으면 A 쪽을 해안으로 본다
+  if (P == null) return null;   // 모두 바다인 단면의 A를 가짜 해안으로 만들지 않는다
   const shore = at(P), sea = at(clamp(P + dirF * 30 / Math.max(Lg, 1), 0, 1));
   const sla = latOf(shore[1]), slo = lonOf(shore[0]); let rp = null, rd = Infinity;
   for (const p of POINTS) if (p.kind === 'rock') { const d = gdist(p, { lat: sla, lon: slo }) * 1000; if (d < rd) { rd = d; rp = p; } }
