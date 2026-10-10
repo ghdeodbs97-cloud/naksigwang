@@ -93,6 +93,8 @@ def valid_doc(name, doc):
                    for o in doc.values())
     if name == 'wx.json':
         cells = doc.get('cells')
+        if 'bases' in doc and (not isinstance(doc['bases'], dict) or not all(isinstance(v, str) for v in doc['bases'].values())):
+            return False
         return isinstance(doc.get('base'), str) and isinstance(cells, dict) and bool(cells) and all(
             isinstance(o, dict) and bool(o) and all(isinstance(v, list) and len(v) == 3
             and all(x is None or finite(x) for x in v) for v in o.values()) for o in cells.values())
@@ -290,14 +292,22 @@ def wx():
 
     def one(cell):
         nx, ny = cell
-        rows, page = [], 1
+        rows, page, expected = [], 1, None
         try:
             while True:
                 b = get(url, {'base_date': bd, 'base_time': bt, 'nx': nx, 'ny': ny, 'dataType': 'JSON', 'numOfRows': 1000, 'pageNo': page})
-                rows += items(b)
-                if page * 1000 >= int(b.get('totalCount') or 0):
+                count = int(b.get('totalCount') or 0)
+                if expected is None:
+                    expected = count
+                batch = items(b)
+                if expected <= 0 or count != expected or not batch:
+                    raise ValueError('기상 예보 페이지 누락 또는 전체 건수 변경')
+                rows += batch
+                if page * 1000 >= expected:
                     break
                 page += 1
+            if len(rows) != expected:
+                raise ValueError('기상 예보 전체 수신 건수 불일치')
         except Exception as e:
             LOG['errors'].append(f'wx {nx},{ny}: {type(e).__name__}')
             return cell, None
@@ -322,6 +332,8 @@ def wx():
     out = dict(fresh_out)
     prev_doc = read_prev('wx.json') or {}
     prev = prev_doc.get('cells') or {}
+    previous_bases = prev_doc.get('bases') or {}
+    bases = {k: bd + bt for k in fresh_out}
     today = NOW.strftime('%Y%m%d') + '00'
 
     # 성공한 격자는 새 발표에 없는 오늘의 지난 시각만 이전 값으로 보완한다.
@@ -338,15 +350,16 @@ def wx():
         k = f'{nx},{ny}'
         if k not in out and k in prev:
             out[k] = prev[k]
+            bases[k] = previous_bases.get(k) or prev_doc['base']
             fallback += 1
-    return {'base': bd + bt, 'cells': out}, stat(len(fresh_out), fallback, len(cells))
+    return {'base': bd + bt, 'bases': bases, 'cells': out}, stat(len(fresh_out), fallback, len(cells))
 
 
 def save(name, data, stats):
     """신선 데이터 비율이 너무 낮으면 기존 정상 파일을 보존한다."""
     fresh, fallback, requested = stats['fresh'], stats['fallback'], stats['requested']
     ratio = fresh / requested if requested else 0
-    info = dict(stats, fresh_ratio=round(ratio, 4),
+    info = dict(stats, unrecovered=max(0, requested - fresh - fallback), fresh_ratio=round(ratio, 4),
                 error=sum(e.startswith(name[:-5] + ' ') for e in LOG['errors']))
 
     # workflow_dispatch의 LIMIT은 시험용이다. 운영 data/*.json을 절대 덮어쓰지 않는다.
@@ -389,10 +402,11 @@ def main():
     if tide_needed():
         td, st = tide(); save('tide.json', td, st)
     else:
-        LOG['tide.json'] = dict(stat(0, 0, 0), error=0, status='skipped_today_data_exists')
+        LOG['tide.json'] = dict(stat(0, 0, 0), error=0, unrecovered=0, status='skipped_today_data_exists')
     ob, st = obs(); save('obs.json', ob, st)
     w, st = wx(); save('wx.json', w, st)
 
+    # generated는 실행 시각이며 보존·복구 자료의 실제 발표 시각이 아니다.
     LOG['generated'] = NOW.isoformat(timespec='minutes')
     LOG['seconds'] = round(time.time() - t0)
     LOG['error_count'] = len(LOG['errors'])

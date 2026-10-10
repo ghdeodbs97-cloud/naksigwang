@@ -197,6 +197,93 @@ class CollectorResilienceTest(unittest.TestCase):
             data, stats = collect.wx()
         self.assertEqual(stats, collect.stat(0, 2, 2))
 
+    def test_wx_empty_later_page_falls_back_without_publishing_partial_rows(self):
+        collect.PTS['cells'] = [[1, 1]]
+        old = {'base': '202610010800', 'cells': {'1,1': {'2026101012': [90, 3, 1], '2026101013': [90, 3, 1]}}}
+        write_json(self.out / 'wx.json', old)
+        before = (self.out / 'wx.json').read_bytes()
+        def response(url, params):
+            if params['pageNo'] == 2:
+                return {'totalCount': 0, 'items': {'item': []}}
+            return {'totalCount': 1001, 'items': {'item': [{'category': 'PTY'}] * 999 + [
+                {'category': 'WSD', 'fcstDate': '20261010', 'fcstTime': '1200', 'fcstValue': '8'}]}}
+        with patch.object(collect, 'get', response):
+            data, stats = collect.wx()
+        self.assertEqual(stats, collect.stat(0, 1, 1))
+        self.assertEqual(data['cells'], old['cells'])
+        self.assertEqual(data['bases'], {'1,1': old['base']})
+        self.assertFalse(collect.save('wx.json', data, stats))
+        self.assertEqual((self.out / 'wx.json').read_bytes(), before)
+
+    def test_wx_incomplete_without_previous_is_unrecovered(self):
+        collect.PTS['cells'] = [[1, 1]]
+        with patch.object(collect, 'get', return_value={'totalCount': 2, 'items': {'item': [
+                {'category': 'WSD', 'fcstDate': '20261010', 'fcstTime': '1200', 'fcstValue': '8'}]}}):
+            data, stats = collect.wx()
+        self.assertEqual(stats, collect.stat(0, 0, 1))
+        self.assertFalse(collect.save('wx.json', data, stats))
+        self.assertEqual(collect.LOG['wx.json']['unrecovered'], 1)
+        self.assertFalse((self.out / 'wx.json').exists())
+
+    def test_wx_mixed_bases_saved_and_legacy_fallback_supported(self):
+        collect.PTS['cells'] = [[i, 1] for i in range(10)]
+        today = collect.NOW.strftime('%Y%m%d')
+        old = {'base': '202610010800', 'cells': {f'{i},1': {today + '12': [90, 3, 1]} for i in range(10)}}
+        def response(url, params):
+            if params['nx'] == 9:
+                raise RuntimeError('실패')
+            return {'totalCount': 1, 'items': {'item': [
+                {'category': 'WSD', 'fcstDate': today, 'fcstTime': '1200', 'fcstValue': '8'}]}}
+        for bases in [None, {'9,1': '202609300500'}]:
+            with self.subTest(bases=bases):
+                previous = dict(old)
+                if bases is not None:
+                    previous['bases'] = bases
+                write_json(self.out / 'wx.json', previous)
+                with patch.object(collect, 'get', response):
+                    data, stats = collect.wx()
+                self.assertEqual(stats, collect.stat(9, 1, 10))
+                self.assertEqual(data['bases']['0,1'], ''.join(collect.base_time()))
+                self.assertEqual(data['bases']['9,1'], bases['9,1'] if bases else old['base'])
+                self.assertTrue(collect.save('wx.json', data, stats))
+                saved = json.loads((self.out / 'wx.json').read_text(encoding='utf-8'))
+                self.assertEqual(len(saved['cells']), 10)
+                self.assertEqual(saved['bases'], data['bases'])
+                self.assertEqual(collect.LOG['wx.json']['status'], 'merged_fallback')
+
+    def test_wx_all_fallback_preserves_original_bases_and_file(self):
+        previous = {'base': '202610010800', 'bases': {'1,1': '202609300500', '2,2': '202609301100'},
+                    'cells': {'1,1': {'2026101012': [90, 3, 1]}, '2,2': {'2026101012': [90, 3, 1]}}}
+        write_json(self.out / 'wx.json', previous)
+        before = (self.out / 'wx.json').read_bytes()
+        with patch.object(collect, 'get', side_effect=RuntimeError('실패')):
+            data, stats = collect.wx()
+        self.assertEqual(stats, collect.stat(0, 2, 2))
+        self.assertEqual(data['bases'], previous['bases'])
+        self.assertFalse(collect.save('wx.json', data, stats))
+        self.assertEqual((self.out / 'wx.json').read_bytes(), before)
+        self.assertEqual(collect.LOG['wx.json']['status'], 'kept_previous_low_fresh_ratio')
+
+    def test_wx_complete_multiple_pages_are_fresh(self):
+        collect.PTS['cells'] = [[1, 1]]
+        row = {'category': 'WSD', 'fcstDate': '20261010', 'fcstTime': '1200', 'fcstValue': '8'}
+        def response(url, params):
+            return {'totalCount': 1001, 'items': {'item': [row] * (1000 if params['pageNo'] == 1 else 1)}}
+        with patch.object(collect, 'get', response):
+            data, stats = collect.wx()
+        self.assertEqual(stats, collect.stat(1, 0, 1))
+
+    def test_high_fresh_incomplete_policy_is_explicit(self):
+        old = {'O1': {'lat': 35, 'lon': 129}}
+        write_json(self.out / 'obs.json', old)
+        before = (self.out / 'obs.json').read_bytes()
+        self.assertFalse(collect.save('obs.json', old, collect.stat(99, 0, 100)))
+        info = collect.LOG['obs.json']
+        self.assertEqual(info['status'], 'kept_previous_incomplete')
+        self.assertEqual(info['unrecovered'], 1)
+        self.assertEqual(info['fresh_ratio'], .99)
+        self.assertEqual((self.out / 'obs.json').read_bytes(), before)
+
 
 if __name__ == '__main__':
     unittest.main()
