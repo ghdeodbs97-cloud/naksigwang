@@ -10,14 +10,14 @@ function updateReadouts(tide) {
   const slack = Math.abs(tide.u) < .15, dd = STATIONS[S.st].days[S.day];
   const pt = POINTS[S.pt], fu = flowU(STATIONS[S.st], pt, S.day, tide.tA);
   setText('curVal', fu.real ? Math.round(fu.u * 100) + '% · ' + (fu.r.sp * KN < .2 ? '물돌이 무렵' : dirName16(fu.r.dir) + '쪽으로 흐름') + ' (조류 예보)'
-    : Math.round(Math.abs(tide.u) * 100) + '% · ' + (slack ? '정조 무렵' : tide.u > 0 ? '들물 중' : '날물 중') + (weakTide(STATIONS[S.st]) ? ' (조차가 작아 지수에 안 씀)' : ' (바닷물 높이 변화로 추정)'));
+    : Math.round(Math.abs(tide.u) * 100) + '% · ' + (slack ? '정조 무렵' : tide.u > 0 ? '들물 중' : '날물 중') + (weakTide(STATIONS[S.st]) ? ' (조차가 작아 점수에 작게 반영)' : ' (바닷물 높이 변화로 추정)'));
   updateCrnt(pt, tide);
-  const wst = STATIONS[S.st]; setText('curDir', dd.mul + ' (물때 세기 ' + dd.pct + '%)' + (weakTide(wst) ? ` · 조차 ${Math.round(wst.maxCm - wst.minCm)} cm라 지수에 안 씀` : ''));
+  const wst = STATIONS[S.st]; setText('curDir', dd.mul + ' (물때 세기 ' + dd.pct + '%)' + (weakTide(wst) ? ` · 조차 ${Math.round(wst.maxCm - wst.minCm)} cm라 점수에 작게 반영` : ''));
   const wx = wxAt(STATIONS[S.st], S.day, S.t, POINTS[S.pt]);
   S.hs = wx && wx.wave != null ? wx.wave : .5;
   setText('wxWind', wx ? wx.dir + '풍 ' + (wx.sp == null ? '(세기 정성 예보)' : wx.sp.toFixed(1) + ' m/s') : '자료 없음');
   setText('wxWave', wx && wx.wave != null ? wx.wave.toFixed(2) + ' m' : '자료 없음');
-  const sw = sstFor(STATIONS[S.st]); setText('wxSst', sw ? `${sw[0].toFixed(1)} ℃ (${sw[2]} ${sw[3]} km · ${sw[1]} 관측)` : '50 km 안 최근 관측 없음');
+  const sw = sstFor(pt || STATIONS[S.st]); setText('wxSst', sw ? `${sw[0].toFixed(1)} ℃ (${sw[2]} ${sw[3]} km · ${sw[1]} 관측)` : '50 km 안 최근 관측 없음');
   setText('wxSlot', wx ? String(wx.slot).padStart(2, '0') + '시 예보 · ' + wx.from + (wx.near ? ` (약 ${wx.km} km 옆 격자)` : '') : S.day <= TODAY_IDX ? '이 시각 예보 없음 (이미 지난 시각)' : '이 시각 예보 없음 (기상청 단기예보는 3~5일 뒤까지)');
   const chip = $('tideChip');
   const label = slack ? (tide.eta > 0 ? '만조 전후 · 정조' : '간조 전후 · 정조') : tide.u > 0 ? '들물' : '날물';

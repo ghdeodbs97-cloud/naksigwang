@@ -29,22 +29,29 @@ function wxAt(st, day, h, pt) {
     const base = WXG.bases?.[r.key] || WXG.base;
     const issued = Date.parse(`${base.slice(0, 4)}-${base.slice(4, 6)}-${base.slice(6, 8)}T${base.slice(8, 10)}:${base.slice(10, 12)}:00+09:00`);
     const source = Number.isFinite(issued) ? `기상청 ${base.slice(0, 4)}/${base.slice(4, 6)}/${base.slice(6, 8)} ${base.slice(8, 10)}시 발표${Date.now() - issued > 24 * 36e5 ? ' (이전 발표)' : ''}` : '기상청 발표 시각 확인 불가';
-    if (v) return { dir: v[0] == null ? '—' : dirName(v[0]), deg: v[0], sp: v[1], wave: v[2], slot: hh, from: source, near: r.near > 0, km: r.near };
+    if (v) return { dir: v[0] == null ? '—' : dirName(v[0]), deg: v[0], sp: v[1], wave: v[2], slot: hh, from: source, near: r.near > 0, km: r.near, grid: r.key, requestedGrid: kmaGrid(p.lat, p.lon).join(','), base, ageHours: Number.isFinite(issued) ? Math.max(0, (Date.now() - issued) / 36e5) : null, lagHours: Math.floor(h) - hh };
   }
   return null;
 }
 /* ── 바다 수온: 국립해양조사원 조위관측소 실측 (50 km 안, 현재 시각 기준 24시간 안의 값만) ── */
 const SST_C = new Map();
-function sstFor(st) {
-  const cached = SST_C.get(st.id);
-  if (cached && Date.now() <= cached.until) return cached.value;
-  const t0 = new Date(); let r = null, bd = 50, until = Infinity;
-  for (const o of Object.values(OBS)) {
-    if (!o.sst || !(o.sst[0] > 1 && o.sst[0] < 33)) continue; const age = (t0 - new Date(o.sst[1].replace(' ', 'T') + ':00+09:00')) / 36e5; if (!Number.isFinite(age) || age < 0 || age > 24) continue;
-    const d = gdist(st, o); if (d < bd) { bd = d; until = +t0 + (24 - age) * 36e5; r = [o.sst[0], o.sst[1].slice(5).replace('-', '/'), o.name, Math.round(d)]; }
+function sstForLocation(p) {
+  const now = Date.now(), key = p.lat + ',' + p.lon, cached = SST_C.get(key);
+  // 같은 위치라도 시계가 바뀌거나 관측이 만료되면 다시 찾는다. age는 매번 갱신한다.
+  if (cached && now >= cached.at && now < cached.until) return cached.value ? { ...cached.value, ageHours: (now - cached.value.observedAt) / 36e5 } : null;
+  let value = null, bd = 50, until = now + 60000;
+  for (const [id, o] of Object.entries(OBS)) {
+    if (!o.sst || !(o.sst[0] > 1 && o.sst[0] < 33)) continue;
+    const observedAt = Date.parse(o.sst[1].replace(' ', 'T') + ':00+09:00'), ageHours = (now - observedAt) / 36e5;
+    if (!Number.isFinite(ageHours) || ageHours < 0 || ageHours > 24) continue;
+    const km = gdist(p, o);
+    if (km <= bd) { bd = km; value = { value: o.sst[0], id, name: o.name, km, observedAt, time: o.sst[1], ageHours, quality: 'measured' }; }
   }
-  SST_C.set(st.id, { value: r, until }); return r;
+  if (value) until = Math.min(until, value.observedAt + 24 * 36e5);
+  SST_C.set(key, { value, at: now, until }); return value;
 }
+// 기존 계기판의 배열 인터페이스를 유지한다.
+function sstFor(p) { const w = sstForLocation(p); return w ? [w.value, w.time.slice(5).replace('-', '/'), w.name, Math.round(w.km)] : null; }
 function buildPoints() {
   setTimeout(fillNameList, 0);
   const cand = PORTS.slice().sort((a, b) => portPri(a.type) - portPri(b.type) || a.name.localeCompare(b.name, 'ko'));

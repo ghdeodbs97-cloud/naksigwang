@@ -43,7 +43,7 @@ function drawBiteChart() {
   const x = X(S.t), b = best[Math.floor(S.t)];
   bcx.strokeStyle = '#fff'; bcx.lineWidth = 1.5; bcx.beginPath(); bcx.moveTo(x, mt - 4); bcx.lineTo(x, h - mb); bcx.stroke();
   bcx.fillStyle = '#fff'; bcx.beginPath(); bcx.arc(x, h - mb, 6, 0, 7); bcx.fill();
-  const label = `${fmtH(S.t)} · ${b ? b.n + ' ' + b.p + '%' : ''}`;
+  const label = `${fmtH(S.t)} · ${b ? b.n + ' ' + b.p + '점' : ''}`;
   bcx.font = '600 11px JetBrains Mono, monospace';
   const lw = bcx.measureText(label).width + 12, lx = clamp(x - lw / 2, 0, w - lw);
   bcx.fillStyle = 'rgba(6,15,19,.92)'; bcx.fillRect(lx, 2, lw, 18); bcx.fillStyle = '#d5ecee'; bcx.fillText(label, lx + 6, 5);

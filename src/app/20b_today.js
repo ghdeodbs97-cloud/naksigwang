@@ -17,8 +17,8 @@ function renderToday() {
   if (nx) { const left = nx[0] - tA, hh = Math.floor(left), mm = Math.round((left - hh) * 60); $('tdNext').innerHTML = `다음 ${nx[2] === 'H' ? '만조' : '간조'} <b>${fmtH(nx[0] % 24)}</b> · ${nx[1]} cm, ${hh ? hh + '시간 ' : ''}${mm}분 뒤`; }
   else $('tdNext').textContent = '';
   // 사실들
-  const wx = wxAt(st, day, h, pt), sw = sstFor(st), [sr, ss] = sunTimes(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon, day);
-  $('tdMul').innerHTML = `${d.mul}<small>물때 세기 ${d.pct}%${weak ? ' · 지수에 안 씀' : ''}</small>`;
+  const wx = wxAt(st, day, h, pt), sw = sstFor(pt || st), [sr, ss] = sunTimes(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon, day);
+  $('tdMul').innerHTML = `${d.mul}<small>물때 세기 ${d.pct}%${weak ? ' · 점수에 작게 반영' : ''}</small>`;
   $('tdWind').innerHTML = wx ? `${wx.dir}풍 ${wx.sp == null ? '' : wx.sp.toFixed(1) + ' m/s'}<small>${wx.sp == null ? '세기는 정성 예보' : wx.sp <= 4 ? '약한 바람' : wx.sp < 9 ? '약간 강한 바람' : '강한 바람'}</small>` : '예보 없음';
   $('tdWave').innerHTML = wx && wx.wave != null ? `${wx.wave.toFixed(1)} m<small>${wx.wave <= 1 ? '잔잔한 편' : wx.wave <= 2 ? '조금 높음' : '높음, 갯바위 주의'}</small>` : '예보 없음';
   $('tdSst').innerHTML = sw ? `${sw[0].toFixed(1)} ℃<small>${sw[2]} ${sw[3]} km · ${sw[1].slice(-5)} 관측</small>` : '관측 없음<small>50 km 안 최근 관측 없음</small>';
@@ -33,7 +33,7 @@ function renderToday() {
   $('tdBest').innerHTML = top.length ? top.map(o => {
     const hiH = o.arr.map((p, hh) => p >= 60 ? hh : -1).filter(x => x >= 0), [lv, cls] = level(o.mx);
     const when = hiH.length ? `${String(hiH[0]).padStart(2, '0')}~${String(hiH[hiH.length - 1] + 1).padStart(2, '0')}시가 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
-    return `<li class="${cls}"><span class="pic">${fishSVG(o.f.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}%<small>${lv}</small></span></li>`;
+    return `<li class="${cls}"><span class="pic">${fishSVG(o.f.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}점<small>${lv}</small></span></li>`;
   }).join('') : '<li class="empty">오늘은 지수가 나오는 어종이 없습니다.</li>';
   drawToday();
 }
