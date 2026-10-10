@@ -15,7 +15,7 @@
 
 | 파일 | 하는 일 | 줄 수 | 주요 함수 |
 |---|---|---|---|
-| `00_boot.js` | 공통 도구와 매일 갱신 자료(data/*.json) 불러오기 | 12 | `loadJSON` |
+| `00_boot.js` | 조석 날짜·지점 검증, 선택 자료 실패 복구, 이전 자료 사용 안내 | 101 | `loadJSON`, `validBootData`, `bootNotice` |
 | `01_geo.js` | 좌표계(웹 메르카토르)와 해안선 디코딩·육지 판정 | 67 | `decode`, `segDist`, `nearestCoast`, `inLand` |
 | `02_state.js` | 화면 상태(S)와 추정 수심 식 | 5 |  |
 | `03_userdata.js` | 내 자료: 항·포구 목록, CSV 읽기 | 164 | `readText`, `parseCSV`, `locate`, `parseDeg`, `getLL`, `importPorts`, `saveLocal`, `loadLocal` 외 |
@@ -28,7 +28,7 @@
 | `10_tide.js` | 조석: 예보지점·물때·조위 보간 | 40 | `tideAt`, `getTide` |
 | `11_current.js` | 조류 예보(물돌이·최강)와 해 뜨고 지는 시각 | 66 | `loadCrnt`, `crntAt`, `crntDay`, `nearestCrnt`, `flowU`, `sunTimes` |
 | `12_fish.js` | 대상어 정보와 물고기 그림 | 71 | `fishSVG` |
-| `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 107 | `kmaGrid`, `wxCell`, `wxAt`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
+| `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 112 | `kmaGrid`, `wxCell`, `wxAt`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
 | `14_bite.js` | 시간별 입질 지수 | 73 | `lightF`, `targetF`, `tempF`, `myF`, `biteAt`, `spark`, `renderBite` |
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 68 | `drawStations`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
 | `16_terrain.js` | GEBCO 지형 격자와 바탕 지도 그리기 | 265 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
@@ -61,3 +61,9 @@
 ## 고정 자료 (`static/`)
 
 `coast.js` 해안선 · `ports.js` 항·포구 716곳 · `rocks.js` 갯바위 1,076곳 · `ban.js` 낚시 제한구역 · `access.js` 차량 접근 섬 · `gebco.js` 지형 격자 · `osm.js` 방파제·등대 등 · `crnt.js` 조류 예보(2026년) · `fish_temp.js` 어종별 서식 수온
+
+## P0 데이터 보호
+
+수집기는 fresh 90% 이상과 모든 요청의 fresh/fallback 복구를 함께 요구합니다. 하나라도 복구되지 않으면 기존 정상 파일 전체를 보존합니다. 메타의 `unrecovered`와 `kept_previous_incomplete`로 원인을 구분합니다. `generated`는 수집 실행 시각입니다. 화면은 보존·복구 상태와 24시간 이상 지난 실행/기상 발표를 안내합니다. 수온은 현재 시각 기준 24시간 이내 관측만 씁니다.
+
+기상 자료의 `cells` 형식은 유지하고 `bases[격자]`에 실제 발표 시각을 저장합니다. 구형 파일은 전역 `base`로 대체합니다. 날짜가 빠진 조석 지점은 제외하고, 현재 날짜가 없는 조석 파일은 명확한 안내 후 시작을 중단합니다.

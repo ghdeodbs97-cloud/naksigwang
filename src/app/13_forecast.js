@@ -17,8 +17,8 @@ function kmaGrid(lat, lon) {   // 기상청 람베르트 정각원추도법 격�
 const WX_CELL = new Map();
 function wxCell(lat, lon) {
   const [x, y] = kmaGrid(lat, lon), key = x + ',' + y; if (WX_CELL.has(key)) return WX_CELL.get(key);
-  let r = WXG.cells[key] ? { c: WXG.cells[key], near: 0 } : null;
-  if (!r) { let bd = 4.5; for (const k in WXG.cells) { const [a, b] = k.split(',').map(Number), d = (a - x) ** 2 + (b - y) ** 2; if (d <= bd) { bd = d; r = { c: WXG.cells[k], near: Math.round(Math.sqrt(d) * 5) }; } } }
+  let r = WXG.cells[key] ? { c: WXG.cells[key], key, near: 0 } : null;
+  if (!r) { let bd = 4.5; for (const k in WXG.cells) { const [a, b] = k.split(',').map(Number), d = (a - x) ** 2 + (b - y) ** 2; if (d <= bd) { bd = d; r = { c: WXG.cells[k], key: k, near: Math.round(Math.sqrt(d) * 5) }; } } }
   WX_CELL.set(key, r); return r;
 }
 function wxAt(st, day, h, pt) {
@@ -26,20 +26,24 @@ function wxAt(st, day, h, pt) {
   const date = dateAdd(DAY0, day).replace(/-/g, '');
   for (let hh = Math.floor(h); hh >= Math.max(0, Math.floor(h) - 2); hh--) {   // 4일째부터는 3시간 간격
     const v = r.c[date + String(hh).padStart(2, '0')];
-    if (v) return { dir: v[0] == null ? '—' : dirName(v[0]), deg: v[0], sp: v[1], wave: v[2], slot: hh, from: `기상청 ${+WXG.base.slice(6, 8)}일 ${WXG.base.slice(8, 10)}시 발표`, near: r.near > 0, km: r.near };
+    const base = WXG.bases?.[r.key] || WXG.base;
+    const issued = Date.parse(`${base.slice(0, 4)}-${base.slice(4, 6)}-${base.slice(6, 8)}T${base.slice(8, 10)}:${base.slice(10, 12)}:00+09:00`);
+    const source = Number.isFinite(issued) ? `기상청 ${base.slice(0, 4)}/${base.slice(4, 6)}/${base.slice(6, 8)} ${base.slice(8, 10)}시 발표${Date.now() - issued > 24 * 36e5 ? ' (이전 발표)' : ''}` : '기상청 발표 시각 확인 불가';
+    if (v) return { dir: v[0] == null ? '—' : dirName(v[0]), deg: v[0], sp: v[1], wave: v[2], slot: hh, from: source, near: r.near > 0, km: r.near };
   }
   return null;
 }
-/* ── 바다 수온: 국립해양조사원 조위관측소 실측 (50 km 안, 수집 시각 기준 24시간 안의 값만) ── */
+/* ── 바다 수온: 국립해양조사원 조위관측소 실측 (50 km 안, 현재 시각 기준 24시간 안의 값만) ── */
 const SST_C = new Map();
 function sstFor(st) {
-  if (SST_C.has(st.id)) return SST_C.get(st.id);
-  const t0 = new Date(META.generated); let r = null, bd = 50;
+  const cached = SST_C.get(st.id);
+  if (cached && Date.now() <= cached.until) return cached.value;
+  const t0 = new Date(); let r = null, bd = 50, until = Infinity;
   for (const o of Object.values(OBS)) {
-    if (!o.sst || !(o.sst[0] > 1 && o.sst[0] < 33)) continue; const age = (t0 - new Date(o.sst[1].replace(' ', 'T') + ':00+09:00')) / 36e5; if (age > 24) continue;
-    const d = gdist(st, o); if (d < bd) { bd = d; r = [o.sst[0], o.sst[1].slice(5).replace('-', '/'), o.name, Math.round(d)]; }
+    if (!o.sst || !(o.sst[0] > 1 && o.sst[0] < 33)) continue; const age = (t0 - new Date(o.sst[1].replace(' ', 'T') + ':00+09:00')) / 36e5; if (!Number.isFinite(age) || age < 0 || age > 24) continue;
+    const d = gdist(st, o); if (d < bd) { bd = d; until = +t0 + (24 - age) * 36e5; r = [o.sst[0], o.sst[1].slice(5).replace('-', '/'), o.name, Math.round(d)]; }
   }
-  SST_C.set(st.id, r); return r;
+  SST_C.set(st.id, { value: r, until }); return r;
 }
 function buildPoints() {
   setTimeout(fillNameList, 0);
@@ -85,7 +89,7 @@ function renderDays() {
   const d = st.days[S.day];
   $('dayEvents').innerHTML = d.ev.map(([h, cm, k]) => `<span class="ev ${k}">${k === 'H' ? '만조' : '간조'} <b>${fmtH(h)}</b> ${cm}cm</span>`).join('') + `<span class="ev">음력 ${d.lunar}</span>`;
 }
-function setDay(i) { S.day = i; renderDays(); renderBite(); }
+function setDay(i) { if (!Number.isInteger(i) || !STATIONS[S.st]?.days[i] || i >= NDAYS) return; S.day = i; renderDays(); renderBite(); }
 function drawTideChart(tide) {
   const r = DPR(), w = tc.clientWidth, h = 130; if (tc.width !== Math.round(w * r)) { tc.width = Math.round(w * r); tc.height = Math.round(h * r); }
   tcx.setTransform(r, 0, 0, r, 0, 0); tcx.clearRect(0, 0, w, h);

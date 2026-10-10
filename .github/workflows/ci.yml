@@ -1,0 +1,33 @@
+name: P0 검증
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  p0:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: pip install requests korean_lunar_calendar playwright
+      - run: python -m playwright install --with-deps chromium
+      - name: Python 문법 검사
+        run: python -m py_compile collector/collect.py tests/test_collector_resilience.py tests/smoke.py tests/smoke_degradation.py build.py
+      - name: 수집기 회귀
+        run: python tests/test_collector_resilience.py
+      - name: 초기 로딩 회귀
+        run: node tests/boot_degradation.mjs
+      - name: 빌드
+        run: python build.py
+      - name: 기본 브라우저 검사
+        run: python tests/smoke.py
+      - name: 자료 실패 브라우저 검사
+        run: python tests/smoke_degradation.py
+      - name: 운영 자료 비변경 확인
+        run: git diff --exit-code -- data

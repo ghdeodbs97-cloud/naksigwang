@@ -321,7 +321,7 @@ details.more[open] summary{margin-bottom:12px}
       <button class="btn ghost" type="button" data-go="bite">어종별 지수</button>
       <a class="btn ghost" id="kakaoLink" href="https://map.kakao.com/" target="_blank" rel="noopener" title="새 창에서 카카오맵이 열립니다. 오른쪽 위 스카이뷰를 누르면 위성사진으로 볼 수 있습니다">카카오맵에서 보기 ↗</a>
     </div>
-    <p class="note" id="tdNote">입질 지수는 규칙으로 만든 추정값입니다. 실제 조과 통계가 아닙니다. 자료 갱신 <b id="dataTime2">—</b></p>
+    <p class="note" id="tdNote">입질 지수는 규칙으로 만든 추정값입니다. 실제 조과 통계가 아닙니다. <b id="dataTime2">—</b></p>
   </section>
 
   <section class="view" id="v-map" aria-label="지도">
@@ -460,7 +460,7 @@ details.more[open] summary{margin-bottom:12px}
         <dt>파고</dt><dd id="wxWave">—</dd>
         <dt>현재 수온</dt><dd id="wxSst">—</dd>
       </dl>
-      <details class="api"><summary>이 숫자들은 어디서 왔나요?</summary><p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · 마지막 갱신 <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
+      <details class="api"><summary>이 숫자들은 어디서 왔나요?</summary><p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
       <p class="note">조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」(공공데이터포털 Open API, 2026년 10월 4일 내려받음, 199개 지점). 지점별 물돌이(전류)·최강 유속 시각과 유향·유속이며, 그 사이 유속은 사인 곡선으로 보간했습니다. 관측 조류를 조화분석한 천문 예측이라 바람·파도·하천 유량의 영향은 빠져 있고, 조류는 수로·곶마다 크게 달라 예보 지점에서 멀수록 세기와 방향이 어긋납니다. 15 km 안에 지점이 없으면(동해안 대부분) 바닷물 높이 변화 속도로 추정합니다. 지도 화살표는 예보 지점의 그 시각 흐름이고, 흐름 입자는 예보 지점 근처에서는 그 방향을, 해안 가까이에서는 해안선을 따르도록 그린 그림이라 실제 유선은 아닙니다. 파고 예보가 없는 곳은 조과 지수에 파고를 반영하지 않습니다.</p></details>
     </div>
   </section>
