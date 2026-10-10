@@ -1,4 +1,4 @@
-name: P0 검증
+name: P0·P1 검증
 on:
   pull_request:
 permissions:
@@ -18,7 +18,7 @@ jobs:
       - run: pip install requests korean_lunar_calendar playwright
       - run: python -m playwright install --with-deps chromium
       - name: Python 문법 검사
-        run: python -m py_compile collector/collect.py tests/test_collector_resilience.py tests/smoke.py tests/smoke_degradation.py build.py
+        run: python -m py_compile collector/collect.py tests/test_collector_resilience.py tests/smoke.py tests/smoke_degradation.py tests/test_bite_confidence.py build.py
       - name: 수집기 회귀
         run: python tests/test_collector_resilience.py
       - name: 초기 로딩 회귀
@@ -29,5 +29,7 @@ jobs:
         run: python tests/smoke.py
       - name: 자료 실패 브라우저 검사
         run: python tests/smoke_degradation.py
+      - name: 입질 조건·자료 신뢰도 회귀
+        run: python tests/test_bite_confidence.py
       - name: 운영 자료 비변경 확인
         run: git diff --exit-code -- data

@@ -2,6 +2,18 @@
 const tdc = $('todayChart'), tdx = tdc.getContext('2d');
 let TD = null;   // 그림에 쓰는 오늘 자료 (renderToday가 만들고 drawToday가 그림)
 const kstHour = () => { const d = new Date(Date.now() + 9 * 36e5); return d.getUTCHours() + d.getUTCMinutes() / 60; };
+function goodHourRanges(scores) {
+  const ranges = [];
+  for (let h = 0; h < 24; h++) if (scores[h] >= 60) {
+    const last = ranges[ranges.length - 1];
+    if (last && last[1] === h) last[1] = h + 1;
+    else ranges.push([h, h + 1]);
+  }
+  // 끝은 포함하지 않는다. 23시 구간은 24시에서 끝내고 자정 구간과 합치지 않는다.
+  // 구간이 많으면 긴 세 구간만 시간순으로 표시해 카드 길이를 제한한다.
+  return ranges.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]) || a[0] - b[0]).slice(0, 3).sort((a, b) => a[0] - b[0])
+    .map(([a, b]) => `${String(a).padStart(2, '0')}~${String(b).padStart(2, '0')}시`).join(' · ');
+}
 function renderToday() {
   const pt = POINTS[S.pt], st = STATIONS[pt ? pt.st : S.st]; if (!st) return;
   const day = Math.min(TODAY_IDX, st.days.length - 1), d = st.days[day], h = kstHour(), tA = day * 24 + h;
@@ -17,8 +29,8 @@ function renderToday() {
   if (nx) { const left = nx[0] - tA, hh = Math.floor(left), mm = Math.round((left - hh) * 60); $('tdNext').innerHTML = `다음 ${nx[2] === 'H' ? '만조' : '간조'} <b>${fmtH(nx[0] % 24)}</b> · ${nx[1]} cm, ${hh ? hh + '시간 ' : ''}${mm}분 뒤`; }
   else $('tdNext').textContent = '';
   // 사실들
-  const wx = wxAt(st, day, h, pt), sw = sstFor(st), [sr, ss] = sunTimes(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon, day);
-  $('tdMul').innerHTML = `${d.mul}<small>물때 세기 ${d.pct}%${weak ? ' · 지수에 안 씀' : ''}</small>`;
+  const wx = wxAt(st, day, h, pt), sw = sstFor(pt || st), [sr, ss] = sunTimes(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon, day);
+  $('tdMul').innerHTML = `${d.mul}<small>물때 세기 ${d.pct}%${weak ? ' · 점수에 작게 반영' : ''}</small>`;
   $('tdWind').innerHTML = wx ? `${wx.dir}풍 ${wx.sp == null ? '' : wx.sp.toFixed(1) + ' m/s'}<small>${wx.sp == null ? '세기는 정성 예보' : wx.sp <= 4 ? '약한 바람' : wx.sp < 9 ? '약간 강한 바람' : '강한 바람'}</small>` : '예보 없음';
   $('tdWave').innerHTML = wx && wx.wave != null ? `${wx.wave.toFixed(1)} m<small>${wx.wave <= 1 ? '잔잔한 편' : wx.wave <= 2 ? '조금 높음' : '높음, 갯바위 주의'}</small>` : '예보 없음';
   $('tdSst').innerHTML = sw ? `${sw[0].toFixed(1)} ℃<small>${sw[2]} ${sw[3]} km · ${sw[1].slice(-5)} 관측</small>` : '관측 없음<small>50 km 안 최근 관측 없음</small>';
@@ -31,9 +43,9 @@ function renderToday() {
   TD = { st, day, sr, ss, bestH, h };
   const top = rows.filter(o => o.mx > 0).slice(0, 4);
   $('tdBest').innerHTML = top.length ? top.map(o => {
-    const hiH = o.arr.map((p, hh) => p >= 60 ? hh : -1).filter(x => x >= 0), [lv, cls] = level(o.mx);
-    const when = hiH.length ? `${String(hiH[0]).padStart(2, '0')}~${String(hiH[hiH.length - 1] + 1).padStart(2, '0')}시가 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
-    return `<li class="${cls}"><span class="pic">${fishSVG(o.f.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}%<small>${lv}</small></span></li>`;
+    const ranges = goodHourRanges(o.arr), [lv, cls] = level(o.mx);
+    const when = ranges ? `${ranges} 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
+    return `<li class="${cls}"><span class="pic">${fishSVG(o.f.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}점<small>${lv}</small></span></li>`;
   }).join('') : '<li class="empty">오늘은 지수가 나오는 어종이 없습니다.</li>';
   drawToday();
 }

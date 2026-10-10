@@ -28,16 +28,16 @@
 | `10_tide.js` | 조석: 예보지점·물때·조위 보간 | 40 | `tideAt`, `getTide` |
 | `11_current.js` | 조류 예보(물돌이·최강)와 해 뜨고 지는 시각 | 66 | `loadCrnt`, `crntAt`, `crntDay`, `nearestCrnt`, `flowU`, `sunTimes` |
 | `12_fish.js` | 대상어 정보와 물고기 그림 | 71 | `fishSVG` |
-| `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 112 | `kmaGrid`, `wxCell`, `wxAt`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
-| `14_bite.js` | 시간별 입질 지수 | 73 | `lightF`, `targetF`, `tempF`, `myF`, `biteAt`, `spark`, `renderBite` |
+| `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 119 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
+| `14_bite.js` | 포인트별 입질 조건점수·자료 신뢰도·이유, 실제 시계의 분 단위 갱신 | 107 | `lightF`, `targetF`, `biteTemperature`, `biteDataQuality`, `myF`, `biteEvalAt`, `biteAt`, `biteReasons`, `spark`, `renderBite` |
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 68 | `drawStations`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
 | `16_terrain.js` | GEBCO 지형 격자와 바탕 지도 그리기 | 265 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
 | `17_flow.js` | 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표 | 102 | `buildFlowField`, `realField`, `spawn`, `stepParticles`, `drawCrnt` |
 | `18_section.js` | 단면(측면도) 분석과 그리기 | 177 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
 | `19_overlay.js` | 평면도 위 표시(단면선·핀) | 19 | `drawUI` |
 | `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |
-| `20b_today.js` | 「오늘」 탭: 선택한 포인트의 오늘·지금 요약 (물때 상태, 조석 띠, 바람·파고·수온·조류, 잘 맞는 시간) | 58 | `renderToday`, `drawToday` |
-| `21_input.js` | 화면 크기, 마우스·터치·버튼 입력, 이름 검색 | 155 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
+| `20b_today.js` | 「오늘」 탭: 선택한 포인트의 오늘·지금 요약, 연속된 좋은 시간 구간 | 70 | `goodHourRanges`, `renderToday`, `drawToday` |
+| `21_input.js` | 화면 크기, 마우스·터치·버튼 입력, 이름 검색 | 158 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
 | `22_catchlog.js` | 내 조과 기록 | 45 | `localCatches`, `renderLog` |
 | `23_main.js` | 예시 단면, 시작 처리, 매 프레임 갱신 | 91 | `exampleSection`, `drawBiteChart`, `apiAutoKick`, `frame` |
 | `24_tabs.js` | 아래(휴대폰)·위(넓은 화면) 탭 전환. 주소 끝 #today · #map · #tide · #bite · #log 로 바로 열 수 있다 | 20 | `showTab` |
@@ -67,3 +67,11 @@
 수집기는 fresh 90% 이상과 모든 요청의 fresh/fallback 복구를 함께 요구합니다. 하나라도 복구되지 않으면 기존 정상 파일 전체를 보존합니다. 메타의 `unrecovered`와 `kept_previous_incomplete`로 원인을 구분합니다. `generated`는 수집 실행 시각입니다. 화면은 보존·복구 상태와 24시간 이상 지난 실행/기상 발표를 안내합니다. 수온은 현재 시각 기준 24시간 이내 관측만 씁니다.
 
 기상 자료의 `cells` 형식은 유지하고 `bases[격자]`에 실제 발표 시각을 저장합니다. 구형 파일은 전역 `base`로 대체합니다. 날짜가 빠진 조석 지점은 제외하고, 현재 날짜가 없는 조석 파일은 명확한 안내 후 시작을 중단합니다.
+
+## P1 입질 조건과 자료 신뢰도
+
+`biteEvalAt(fish, pt, st, day, h)`는 `score`, `rawScore`, `confidence`, `confidenceLevel`, `factors`, `sources`를 반환합니다. `biteAt`은 score만 반환하는 호환 함수입니다. 기여분 합계에 내 조황기록 보정을 적용하고 1~99점으로 제한·반올림합니다(시즌·해역 부적합은 0점). 반올림이나 조건 기여의 상쇄로 같은 정수 점수가 나올 수 있으며 위치별 상수는 없습니다.
+
+수온은 실제 좌표 캐시와 50 km/24시간 제한을 사용합니다. 자료 신뢰도 배점은 수온 25·풍속 15·파고 20·조류 25·조석 15입니다. 수온 거리/나이와 미래 날짜, 인접 격자/시간 보간/이전 발표, P0 파일 단위 fallback/stale 메타에 따라 감쇠합니다. 조류 추정은 7점입니다. 등급 경계는 높음 80·보통 55이며 적중 확률이 아닙니다. 원천 누락은 기여 0점이고 내 조황기록은 신뢰도와 무관합니다.
+
+`python tests/test_bite_confidence.py`는 앱에 검사 함수를 테스트 중에만 주입하여 실제 동해 항 5곳을 위도 구간별로 고르고(서로 15 km 이상) 동일 시각·감성돔 조건을 비교합니다. 원점수와 기여분의 차이를 검사하며 모든 점수가 고유해야 한다고 강제하지 않습니다. `P1_OUTPUT`으로 JSON 보고서와 모바일/PC 5개 탭 화면을 저장할 수 있습니다.

@@ -144,7 +144,7 @@ $('stSel').addEventListener('change', e => selectPoint(+e.target.value, true));
 for (const id of ['dayStrip', 'biteDays']) $(id).addEventListener('click', e => { const b = e.target.closest('[data-day]'); if (b) setDay(+b.dataset.day); });
 function renderBasis() {
   const st = STATIONS[S.st];
-  $('basisTable').innerHTML = '<tr><th>대상어</th><th>10월 시즌</th><th>동해</th><th>남해</th><th>서해</th><th>제주</th><th>물때 영향</th><th>서식 수온</th><th>지금 수온 보정</th><th>내 기록 보정</th></tr>' + FISH.map(f => { const r = TEMP_PREF[f.n], m = myF(f, st); return `<tr><td>${f.n}</td><td>${f.season}</td>${f.reg.map(v => `<td>${v}</td>`).join('')}<td>${f.cur}</td><td>${r[0]}~${r[1]} ℃${r[2] ? '' : ' (안 씀)'}</td><td>×${tempF(f, st).toFixed(2)}</td><td>${m.n ? `×${m.f.toFixed(2)} (${m.n}회 중 ${m.hit})` : '—'}</td></tr>`; }).join('');
+  $('basisTable').innerHTML = '<tr><th>대상어</th><th>10월 시즌</th><th>동해</th><th>남해</th><th>서해</th><th>제주</th><th>물때 영향</th><th>서식 수온</th><th>수온 기여(점)</th><th>내 기록 보정</th></tr>' + FISH.map(f => { const r = TEMP_PREF[f.n], m = myF(f, st); return `<tr><td>${f.n}</td><td>${f.season}</td>${f.reg.map(v => `<td>${v}</td>`).join('')}<td>${f.cur}</td><td>${r[0]}~${r[1]} ℃${r[2] ? '' : ' (안 씀)'}</td><td>${biteTemperature(f, POINTS[S.pt] || st, st, S.day).effect.toFixed(1)}</td><td>${m.n ? `×${m.f.toFixed(2)} (${m.n}회 중 ${m.hit})` : '—'}</td></tr>`; }).join('');
 }
 renderBasis();
 $('play').addEventListener('click', () => { S.playing = !S.playing; $('play').textContent = S.playing ? '정지' : '재생'; });
