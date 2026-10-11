@@ -6,6 +6,7 @@ function resize() {
   cw = stage.clientWidth;                               // 휴대폰: 화면 높이에 맞춰 길게, 넓은 화면: 가로 비율 0.72 (화면 높이 안에서)
   ch = Math.round(S.lock ? cw * (cw < 560 ? .85 : .5) : cw < 560 ? clamp(innerHeight - 290, 320, cw * 1.3) : Math.min(cw * .72, Math.max(380, innerHeight - 240)));   // 오늘 탭에서는 낮게
   stage.style.height = ch + 'px';
+  providerSync();
   for (const c of [base, flow, ui]) { c.width = Math.round(cw * r); c.height = Math.round(ch * r); c.style.width = cw + 'px'; c.style.height = ch + 'px'; }
   mask.width = Math.ceil(cw / 2); mask.height = Math.ceil(ch / 2);
   sw = $('secWrap').clientWidth; shh = sw < 560 ? 240 : 300;
@@ -79,6 +80,7 @@ function setMode(m) {
 }
 $('mLine').addEventListener('click', () => setMode('line'));
 $('mPan').addEventListener('click', () => setMode('pan'));
+$('providerModes').addEventListener('click', e => { const b = e.target.closest('[data-provider-mode]'); if (b) providerSetMode(b.dataset.providerMode); });
 const normName = v => v.replace(/\s+/g, '').replace(/\(.*?\)/g, '').toLowerCase();
 function fillNameList() {
   const seen = new Set(), opts = [];

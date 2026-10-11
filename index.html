@@ -6,6 +6,7 @@
 </head>
 <body>
 <title>낚시광</title>
+<meta name="naver-map-key-id" content="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -54,6 +55,9 @@ body{font-family:var(--font-ui);font-size:14px;line-height:1.55}
 .coord .msg{font-size:12px;color:var(--amber)}
 .stage{position:relative;width:100%;border-radius:4px;overflow:hidden;background:#06131d}
 .stage canvas{position:absolute;inset:0;display:block}
+#providerMap{position:absolute;inset:0;visibility:hidden}
+.provider-active canvas{clip-path:inset(0 0 28px 0)} /* SDK 하단 출처·로고를 가리지 않는다 */
+#providerNotice{font-size:12px;color:var(--muted);margin:6px 0}
 #ui{touch-action:none;cursor:crosshair}
 #ui.pan{cursor:grab}
 .warn{position:absolute;left:12px;bottom:46px;font-size:11px;white-space:nowrap;color:var(--amber);background:rgba(6,15,19,.85);border:1px solid color-mix(in srgb,var(--amber) 40%,transparent);border-radius:4px;padding:4px 9px;max-width:calc(100% - 76px);pointer-events:none}
@@ -362,7 +366,13 @@ details.more[open] summary{margin-bottom:12px}
         </div>
       </div>
       <div class="mapTime"><span class="t" id="clock2">—</span><input type="range" id="tIn2" min="0" max="23.99" step="0.05" value="6" aria-label="시각 (조류 흐름)"></div>
+      <div class="seg" id="providerModes" role="group" aria-label="온라인 지도 종류">
+        <button type="button" data-provider-mode="normal" aria-pressed="true">일반</button>
+        <button type="button" data-provider-mode="satellite" aria-pressed="false">위성</button>
+      </div>
+      <p id="providerNotice" role="status">온라인 지도 설정 전 · 기본 지형지도로 표시합니다.</p>
       <div class="stage" id="stage">
+        <div id="providerMap" aria-label="NAVER 배경 지도"></div>
         <canvas id="base"></canvas>
         <canvas id="flow"></canvas>
         <canvas id="ui" aria-label="평면도: 드래그해서 단면선 지정"></canvas>
@@ -376,7 +386,7 @@ details.more[open] summary{margin-bottom:12px}
         <span class="key">⚓ 항·포구</span><span class="key">🪨 갯바위 (흐릴수록 접근 어려움)</span>
         <span class="key"><span class="sw p"></span>조류 흐름</span>
       </div>
-      <p class="note" id="terrainNote">지형 배경은 GEBCO 2026의 약 460 m 격자와 해안거리 추정입니다. 가까운 해안의 색과 등심선은 추정이며 수중여·턱을 알 수 없습니다. 위치별 수심과 A→B 단면은 확보된 공식 자료를 우선 사용합니다. 배경의 등심선과 조회값은 다를 수 있습니다. 해안선·시설·이름은 오픈스트리트맵(ODbL) 자료이며 빠지거나 오래된 시설이 있을 수 있습니다. 이름 뒤 *는 실제 항 이름이 확인되지 않았다는 뜻입니다.</p>
+      <p class="note" id="terrainNote">기본 지형지도 배경은 GEBCO 2026의 약 460 m 격자와 해안거리 추정입니다. 가까운 해안의 색과 등심선은 추정이며 수중여·턱을 알 수 없습니다. 위치별 수심과 A→B 단면은 확보된 공식 자료를 우선 사용합니다. 배경의 등심선과 조회값은 다를 수 있습니다. 기본 지도의 해안선·시설·이름은 오픈스트리트맵(ODbL) 자료이며 빠지거나 오래된 시설이 있을 수 있습니다. 이름 뒤 *는 실제 항 이름이 확인되지 않았다는 뜻입니다.</p>
       <div class="legend readout"><span id="cursorRead">커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다</span><span id="depthRead"></span></div>
       <details class="more"><summary>수심 자료 자세히</summary><p class="note" id="depthDetail">지도에서 위치를 확인하면 자료 정보를 표시합니다.</p></details>
       <details class="api"><summary>추정 수심 설정</summary>
@@ -579,6 +589,7 @@ out geom;</pre>
     </details>
     <div class="panel">
       <h2 class="h2">자료 출처</h2>
+      <p>온라인 일반·위성 배경: NAVER Maps JavaScript API v3 (설정한 경우). 배경 영상은 수심 자료로 사용하지 않습니다.</p>
       <div class="sources">
     <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
     <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → 국립해양조사원 자연과학용 자료(KHOA/BADA) 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. KHOA는 유효 자료점으로 둘러싸인 곳만 보간하고 수집 범위 밖에서는 기존 자료로 돌아갑니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
@@ -2151,6 +2162,116 @@ function zoomAt(px, py, f) { const [mx, my] = toM(px, py); V.s *= f; clampView()
 /* ── 바탕 그리기 ───────────────────────────────────────── */
 const BANDS = [[10, '#64e6d4'], [30, '#43ccc3'], [50, '#2fb0b4'], [100, '#2194a5'], [150, '#1b8097'], [200, '#176e88'], [300, '#135d77'], [500, '#104e68'], [1000, '#0d405a'], [2000, '#0b344b'], [5000, '#0a2a3e'], [10000, '#082233'], [20000, '#071b2a']];
 const FAR = '#06141f';
+// 15b_map_provider.js — 공식 온라인 지도 어댑터와 좌표 정합 확인, 실패 시 기본 지형 유지
+// 수심 계산·자료 요청·단면 상태는 이 파일에서 변경하지 않는다.
+class NaverMapAdapter {
+  constructor(maps) { this.sdk = maps; this.map = null; this.listeners = []; }
+  init(container) {
+    const n = this.sdk;
+    this.container = container;
+    this.imageError = e => { if (e.target?.tagName === 'IMG') this.onFailure?.(); };
+    container.addEventListener('error', this.imageError, true);
+    this.map = new n.Map(container, { center: new n.LatLng(latOf(V.cy), lonOf(V.cx)), zoom: 10,
+      draggable: false, scrollWheel: false, pinchZoom: false, keyboardShortcuts: false,
+      disableDoubleClickZoom: true, zoomControl: false, mapDataControl: true, logoControl: true });
+  }
+  setMode(mode) { this.map.setMapTypeId(this.sdk.MapTypeId[mode === 'satellite' ? 'HYBRID' : 'NORMAL']); }
+  syncFromAppViewport() {
+    const n = this.sdk;
+    this.map.setCenter(new n.LatLng(latOf(V.cy), lonOf(V.cx)));
+    // SDK 자체 투영으로 현재 배율을 측정한다. Mercator zoom 공식은 적용하지 않는다.
+    const a = this.project(lonOf(V.cx), latOf(V.cy)), b = this.project(lonOf(V.cx + 1000), latOf(V.cy));
+    const scale = Math.hypot(b[0] - a[0], b[1] - a[1]) / 1000;
+    if (!(scale > 0)) throw Error('지도 좌표 변환 실패');
+    const z = Math.max(6, Math.min(21, Math.round(this.map.getZoom() + Math.log2(V.s / scale))));
+    this.map.setZoom(z, false);
+  }
+  getBounds() { return this.map.getBounds(); }
+  project(lon, lat) { const p = this.map.getProjection().fromCoordToOffset(new this.sdk.LatLng(lat, lon)); return [p.x, p.y]; }
+  unproject(x, y) { const p = this.map.getProjection().fromOffsetToCoord(new this.sdk.Point(x, y)); return [p.lng(), p.lat()]; }
+  resize() { this.map.setSize(new this.sdk.Size(cw, ch)); }
+  onTilesLoaded(fn) { this.listeners.push(this.sdk.Event.addListener(this.map, 'tilesloaded', fn)); }
+  destroy() { for (const l of this.listeners) this.sdk.Event.removeListener(l); this.listeners = []; this.container?.removeEventListener('error', this.imageError, true); this.map?.destroy(); this.map = null; }
+}
+
+const PROVIDER_MAP = { adapter: null, active: false, failed: false, started: false, mode: 'normal',
+  signature: '', loaded: false, timer: null, alignment: null };
+try { if (localStorage.getItem('naksigwang-map-mode') === 'satellite') PROVIDER_MAP.mode = 'satellite'; } catch (_) { /* 저장 제한 시 기본값 */ }
+
+function providerNotice(text) { $('providerNotice').textContent = text; }
+function providerFallback() {
+  PROVIDER_MAP.failed = true; PROVIDER_MAP.active = false; clearTimeout(PROVIDER_MAP.timer);
+  $('providerMap').style.visibility = 'hidden'; dirty = true;
+  stage.classList.remove('provider-active');
+  providerNotice('온라인 지도를 불러오지 못해 기본 지형지도로 표시합니다.');
+}
+function providerAlignment(adapter) {
+  // 화면 중앙·모서리·변 중점 9곳을 CSS pixel로 비교한다. 실영상 기준점 검사는 별도로 필요하다.
+  let max = 0;
+  for (const x of [0, cw / 2, cw]) for (const y of [0, ch / 2, ch]) {
+    const [mx, my] = toM(x, y), p = adapter.project(lonOf(mx), latOf(my));
+    const error = Math.hypot(p[0] - x, p[1] - y);
+    if (!Number.isFinite(error)) throw Error('지도 좌표 변환 실패');
+    max = Math.max(max, error);
+  }
+  return max;
+}
+function providerCheck() {
+  const p = PROVIDER_MAP;
+  if (!p.adapter || p.failed || !p.loaded) return;
+  try {
+    p.alignment = providerAlignment(p.adapter); p.active = p.alignment <= 2;
+    $('providerMap').style.visibility = p.active ? 'visible' : 'hidden'; dirty = true;
+    stage.classList.toggle('provider-active', p.active);
+    providerNotice(p.active ? (p.mode === 'satellite' ? 'NAVER 위성지도 · 수심은 별도 공공자료와 추정값입니다.' : 'NAVER 일반지도 · 수심은 별도 공공자료와 추정값입니다.')
+      : '온라인 지도와 분석 표시의 위치를 맞추지 못해 기본 지형지도로 표시합니다.');
+  } catch (_) { providerFallback(); }
+}
+function providerSync() {
+  const p = PROVIDER_MAP;
+  if (!p.adapter || p.failed) return;
+  const key = [V.cx, V.cy, V.s, cw, ch].join(',');
+  if (key === p.signature) return;
+  p.signature = key; p.active = false; p.loaded = false; $('providerMap').style.visibility = 'hidden';
+  stage.classList.remove('provider-active'); dirty = true;
+  clearTimeout(p.timer); p.timer = setTimeout(providerFallback, 12000);
+  try { p.adapter.resize(); p.adapter.syncFromAppViewport(); } catch (_) { providerFallback(); }
+}
+function providerSetMode(mode) {
+  const p = PROVIDER_MAP; p.mode = mode === 'satellite' ? 'satellite' : 'normal';
+  try { localStorage.setItem('naksigwang-map-mode', p.mode); } catch (_) { /* 저장 제한 */ }
+  for (const b of $('providerModes').children) b.setAttribute('aria-pressed', b.dataset.providerMode === p.mode);
+  if (p.adapter && !p.failed) {
+    // 같은 지도 인스턴스의 배경만 바꾼다. dirty/단면/수심 로더를 건드리지 않는다.
+    p.loaded = false; clearTimeout(p.timer); p.timer = setTimeout(providerFallback, 12000);
+    try { p.adapter.setMode(p.mode); } catch (_) { providerFallback(); }
+  }
+}
+async function providerStart() {
+  const p = PROVIDER_MAP; if (p.started) return; p.started = true;
+  providerSetMode(p.mode);
+  // 배포 또는 로컬에서 별도로 제공하는 공개 브라우저 설정. 저장소에는 credential을 넣지 않는다.
+  let key = document.querySelector('meta[name="naver-map-key-id"]')?.content.trim();
+  try { key ||= localStorage.getItem('naksigwang-naver-key-id')?.trim(); } catch (_) { /* 로컬 설정 제한 */ }
+  if (!key) { providerNotice('온라인 지도 설정 전 · 기본 지형지도로 표시합니다.'); return; }
+  try {
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script'); const timer = setTimeout(() => { script.remove(); reject(Error('SDK timeout')); }, 12000);
+      const finish = fn => { clearTimeout(timer); script.onload = script.onerror = null; fn(); };
+      window.navermap_authFailure = () => { finish(() => reject(Error('SDK 인증 실패'))); providerFallback(); };
+      window.naksigwangProviderReady = () => finish(resolve);
+      script.onerror = () => finish(() => reject(Error('SDK 로드 실패')));
+      script.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + encodeURIComponent(key) + '&callback=naksigwangProviderReady';
+      document.head.append(script);
+    });
+    if (p.failed) return;
+    p.adapter = new NaverMapAdapter(window.naver.maps); p.adapter.init($('providerMap'));
+    p.adapter.onFailure = providerFallback;
+    addEventListener('offline', providerFallback, { once: true });
+    p.adapter.onTilesLoaded(() => { if (p.failed) return; p.loaded = true; clearTimeout(p.timer); providerCheck(); });
+    p.adapter.setMode(p.mode); providerSync();
+  } catch (_) { providerFallback(); }
+}
 // 16_terrain.js — GEBCO 지형 격자와 바탕 지도 그리기
 // 남한 해안선 자료 밖의 북한·대마도 쪽 구역 (여기서 GEBCO가 육지면 남의 땅으로 본다)
 const foreignZone = (plat, plon) => (plat > 37.55 && plon < 126.0 && !(plat < 37.705 && plon > 125.55 && plon < 125.8) && !(plon < 124.82)) || (plat > 37.78 && plon < 126.35) || (plat > 37.86 && plon < 127.2) || (plat > 38.3 && plon < 128.2) || plat > 38.62 || (plon > 128.9 && plat < 34.8);
@@ -2344,6 +2465,10 @@ function renderBase() {
   const vis = lod.filter(q => q.maxx >= vx1 && q.minx <= vx2 && q.maxy >= vy1 && q.miny <= vy2);
   const path = buildPath(vis, margin);
   bctx.setTransform(r, 0, 0, r, 0, 0);
+  bctx.clearRect(0, 0, cw, ch);
+  bctx.save();
+  // 온라인 배경이 정합 검사를 통과해도 기존 육지 마스크·분석 격자는 그대로 만든다.
+  if (PROVIDER_MAP.active) { bctx.beginPath(); bctx.rect(0, 0, 0, 0); bctx.clip(); }
   bctx.fillStyle = bg; bctx.fillRect(0, 0, cw, ch);
   bctx.lineJoin = 'round'; bctx.lineCap = 'round';
   if (TER) renderTerrain(path, gpp);
@@ -2381,6 +2506,7 @@ function renderBase() {
     bctx.font = '500 12px IBM Plex Sans KR, sans-serif'; bctx.textBaseline = 'middle';
     for (const [nm, la, lo] of CITIES) { const [x, y] = toS(mxOf(lo), myOf(la)); if (x < 0 || y < 0 || x > cw || y > ch) continue; bctx.fillStyle = '#ffb84d'; bctx.beginPath(); bctx.arc(x, y, 2.5, 0, 7); bctx.fill(); bctx.fillStyle = 'rgba(230,245,246,.9)'; bctx.fillText(nm, x + 6, y); }
   }
+  bctx.restore();
   drawPortsAndSoundings(gpp);
   drawStations();
   // 축척, 방위
@@ -2414,6 +2540,7 @@ function renderBase() {
   $('bandLegend').innerHTML = TER ? DEPTH_STEPS.slice(0, -1).map((d, k) => { const v = Math.round(d * .35 + DEPTH_STEPS[k + 1] * .65), c = `rgb(${SEA_LUT[v * 3]},${SEA_LUT[v * 3 + 1]},${SEA_LUT[v * 3 + 2]})`; return `<span class="b"><i style="background:${c}"></i>${d >= 1000 ? d / 1000 + 'k' : d}~</span>`; }).join('') + '<span class="b">m</span>' + '<span class="b"><i style="background:#728c56"></i>육지 200m</span><span class="b"><i style="background:#a08c72"></i>1000m</span>'
     : BANDS_.filter(([d]) => d * ppg >= 3).slice(0, 8).map(([d, c]) => `<span class="b"><i style="background:${c}"></i>${d >= 1000 ? d / 1000 + 'km' : d + 'm'}</span>`).join('');
   $('viewSize').textContent = '보이는 폭 ' + (gw >= 1000 ? (gw / 1000).toFixed(gw >= 10000 ? 0 : 1) + ' km' : Math.round(gw) + ' m');
+  if (PROVIDER_MAP.active) { $('bandTitle').textContent = '온라인 지도'; $('bandLegend').textContent = '배경 영상은 수심 자료가 아닙니다.'; }
   $('warn').hidden = gw > 1500;
   flowStale = true;   // 흐름장·입자는 지도 움직임이 멈춘 뒤 stepParticles에서 다시 만든다
 }
@@ -2935,6 +3062,7 @@ function resize() {
   cw = stage.clientWidth;                               // 휴대폰: 화면 높이에 맞춰 길게, 넓은 화면: 가로 비율 0.72 (화면 높이 안에서)
   ch = Math.round(S.lock ? cw * (cw < 560 ? .85 : .5) : cw < 560 ? clamp(innerHeight - 290, 320, cw * 1.3) : Math.min(cw * .72, Math.max(380, innerHeight - 240)));   // 오늘 탭에서는 낮게
   stage.style.height = ch + 'px';
+  providerSync();
   for (const c of [base, flow, ui]) { c.width = Math.round(cw * r); c.height = Math.round(ch * r); c.style.width = cw + 'px'; c.style.height = ch + 'px'; }
   mask.width = Math.ceil(cw / 2); mask.height = Math.ceil(ch / 2);
   sw = $('secWrap').clientWidth; shh = sw < 560 ? 240 : 300;
@@ -3008,6 +3136,7 @@ function setMode(m) {
 }
 $('mLine').addEventListener('click', () => setMode('line'));
 $('mPan').addEventListener('click', () => setMode('pan'));
+$('providerModes').addEventListener('click', e => { const b = e.target.closest('[data-provider-mode]'); if (b) providerSetMode(b.dataset.providerMode); });
 const normName = v => v.replace(/\s+/g, '').replace(/\(.*?\)/g, '').toLowerCase();
 function fillNameList() {
   const seen = new Set(), opts = [];
@@ -3203,6 +3332,7 @@ fitLonLat([124.4, 32.9, 131.95, 38.7]);
 buildPoints();
 { const z = { lat: 37.9, lon: 128.83 }; let bi = 0, bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, z); if (d < bd) { bd = d; bi = i; } }); selectPoint(bi, false); }
 exampleSection(128.93, 37.80);
+providerStart();
 
 let last = performance.now();
 function frame(now) {
@@ -3212,6 +3342,7 @@ function frame(now) {
   const tide = getTide();
   if (Math.floor(S.t) !== biteHour || Math.floor(Date.now() / 60000) !== biteDataMinute) renderBite();
   if (TAB === 'map' || TAB === 'today') {               // 보이는 탭만 그린다 (휴대폰 전지 절약). 오늘 탭에도 지도가 있다
+    providerSync();
     if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
     setText('clock2', fmtH(S.t));
     updateHover(); drawUI(); drawCrnt(tide); stepParticles(tide, dt); drawSection(now, tide);
@@ -3253,7 +3384,7 @@ $('tabbar').addEventListener('click', e => { const b = e.target.closest('[data-t
 document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) showTab(b.dataset.go, false, b.dataset.go === 'map'); });
 if (matchMedia('(pointer: coarse)').matches) setMode('pan');   // 손가락으로 쓰는 기기는 처음에 「지도 이동」
 addEventListener('hashchange', () => showTab(location.hash.slice(1), true));
-addEventListener('resize', () => { if (TAB === 'today') drawToday(); });
+addEventListener('resize', () => { if (TAB === 'map' || TAB === 'today') resize(); if (TAB === 'today') drawToday(); });
 new ResizeObserver(() => document.documentElement.style.setProperty('--top-h', document.querySelector('.top').offsetHeight + 'px')).observe(document.querySelector('.top'));
 showTab(location.hash.slice(1) || 'today', true);
 })();

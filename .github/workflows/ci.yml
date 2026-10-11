@@ -9,6 +9,13 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: P3 수심 변경금지
+        if: startsWith(github.head_ref, 'feat/p3-')
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python3 tests/p3_depth_guard.py "$PR_BASE_SHA"
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -28,6 +35,10 @@ jobs:
         run: python build.py
       - name: 기본 브라우저 검사
         run: python tests/smoke.py
+      - name: P3 지도 어댑터·모바일·DPR 회귀 (실 API 없음)
+        run: python tests/test_map_provider.py
+      - name: 빌드 결과 일치
+        run: git diff --exit-code -- index.html
       - name: 자료 실패 브라우저 검사
         run: python tests/smoke_degradation.py
       - name: 입질 조건·자료 신뢰도 회귀

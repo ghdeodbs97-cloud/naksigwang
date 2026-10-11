@@ -1,0 +1,347 @@
+{
+  "baseSha": "a6732f02272e9a2beacf40c04c0e9f78d1dc35e1",
+  "existingSuite": [
+    {
+      "command": "tests/boot_degradation.mjs",
+      "exit": 0
+    },
+    {
+      "command": "build.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_collector_resilience.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/smoke.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/smoke_degradation.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_bite_confidence.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_depth_converter.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_depth_foundation.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_khoa_fetch.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_khoa_depth.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_khoa_coverage.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_khoa_coverage_browser.py",
+      "exit": 0
+    }
+  ],
+  "p3Matrix": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 1
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.25,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.5,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 1
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1.25,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1.5,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 2,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.25,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.5,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1365,
+        768
+      ],
+      "dpr": 1,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1365,
+        768
+      ],
+      "dpr": 1.25,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1365,
+        768
+      ],
+      "dpr": 1.5,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1365,
+        768
+      ],
+      "dpr": 2,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.25,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.5,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "errors": [],
+      "checks": 15,
+      "failedRequests": [
+        "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      ],
+      "depthToggleFetches": 2
+    },
+    {
+      "failure": "404",
+      "passed": true
+    },
+    {
+      "failure": "429",
+      "passed": true
+    },
+    {
+      "failure": "offline",
+      "passed": true
+    },
+    {
+      "failure": "timeout",
+      "passed": true
+    },
+    {
+      "failure": "auth",
+      "passed": true
+    }
+  ],
+  "protectedPathsChanged": [],
+  "protectedSha256": {
+    "static/depth/manifest.json": "90c4edfa3f337e648af465191a2e90853e584640edfffb595d0676c00c4c3df4",
+    "src/app/04_depth.js": "b24367ee32035bb6f240598288a000857224d816ed162afacde1396cc4dd9715",
+    "src/app/04b_depth_tiles.js": "bdd68c8540d2746762f5cfb5844ae6b39703b8349e6fe4c40a3c1f729557a3e7",
+    "src/app/18_section.js": "cea995b4168a9055421647ce485b1fdd2640a233dd0968c99939f44993964462"
+  },
+  "depthBaselineMatched": true,
+  "sectionBaselineMatched": true,
+  "buildConsistency": true,
+  "realNaverConnection": false,
+  "realImageAlignmentMeasured": false
+}

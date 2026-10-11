@@ -70,6 +70,7 @@ fitLonLat([124.4, 32.9, 131.95, 38.7]);
 buildPoints();
 { const z = { lat: 37.9, lon: 128.83 }; let bi = 0, bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, z); if (d < bd) { bd = d; bi = i; } }); selectPoint(bi, false); }
 exampleSection(128.93, 37.80);
+providerStart();
 
 let last = performance.now();
 function frame(now) {
@@ -79,6 +80,7 @@ function frame(now) {
   const tide = getTide();
   if (Math.floor(S.t) !== biteHour || Math.floor(Date.now() / 60000) !== biteDataMinute) renderBite();
   if (TAB === 'map' || TAB === 'today') {               // 보이는 탭만 그린다 (휴대폰 전지 절약). 오늘 탭에도 지도가 있다
+    providerSync();
     if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
     setText('clock2', fmtH(S.t));
     updateHover(); drawUI(); drawCrnt(tide); stepParticles(tide, dt); drawSection(now, tide);
