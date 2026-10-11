@@ -343,5 +343,6 @@
   "sectionBaselineMatched": true,
   "buildConsistency": true,
   "realNaverConnection": false,
-  "realImageAlignmentMeasured": false
+  "realImageAlignmentMeasured": false,
+  "crossPlatformBuildConsistency": true
 }
