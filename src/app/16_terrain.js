@@ -191,6 +191,10 @@ function renderBase() {
   const vis = lod.filter(q => q.maxx >= vx1 && q.minx <= vx2 && q.maxy >= vy1 && q.miny <= vy2);
   const path = buildPath(vis, margin);
   bctx.setTransform(r, 0, 0, r, 0, 0);
+  bctx.clearRect(0, 0, cw, ch);
+  bctx.save();
+  // 온라인 배경이 정합 검사를 통과해도 기존 육지 마스크·분석 격자는 그대로 만든다.
+  if (PROVIDER_MAP.active) { bctx.beginPath(); bctx.rect(0, 0, 0, 0); bctx.clip(); }
   bctx.fillStyle = bg; bctx.fillRect(0, 0, cw, ch);
   bctx.lineJoin = 'round'; bctx.lineCap = 'round';
   if (TER) renderTerrain(path, gpp);
@@ -228,6 +232,7 @@ function renderBase() {
     bctx.font = '500 12px IBM Plex Sans KR, sans-serif'; bctx.textBaseline = 'middle';
     for (const [nm, la, lo] of CITIES) { const [x, y] = toS(mxOf(lo), myOf(la)); if (x < 0 || y < 0 || x > cw || y > ch) continue; bctx.fillStyle = '#ffb84d'; bctx.beginPath(); bctx.arc(x, y, 2.5, 0, 7); bctx.fill(); bctx.fillStyle = 'rgba(230,245,246,.9)'; bctx.fillText(nm, x + 6, y); }
   }
+  bctx.restore();
   drawPortsAndSoundings(gpp);
   drawStations();
   // 축척, 방위
@@ -261,6 +266,7 @@ function renderBase() {
   $('bandLegend').innerHTML = TER ? DEPTH_STEPS.slice(0, -1).map((d, k) => { const v = Math.round(d * .35 + DEPTH_STEPS[k + 1] * .65), c = `rgb(${SEA_LUT[v * 3]},${SEA_LUT[v * 3 + 1]},${SEA_LUT[v * 3 + 2]})`; return `<span class="b"><i style="background:${c}"></i>${d >= 1000 ? d / 1000 + 'k' : d}~</span>`; }).join('') + '<span class="b">m</span>' + '<span class="b"><i style="background:#728c56"></i>육지 200m</span><span class="b"><i style="background:#a08c72"></i>1000m</span>'
     : BANDS_.filter(([d]) => d * ppg >= 3).slice(0, 8).map(([d, c]) => `<span class="b"><i style="background:${c}"></i>${d >= 1000 ? d / 1000 + 'km' : d + 'm'}</span>`).join('');
   $('viewSize').textContent = '보이는 폭 ' + (gw >= 1000 ? (gw / 1000).toFixed(gw >= 10000 ? 0 : 1) + ' km' : Math.round(gw) + ' m');
+  if (PROVIDER_MAP.active) { $('bandTitle').textContent = '온라인 지도'; $('bandLegend').textContent = '배경 영상은 수심 자료가 아닙니다.'; }
   $('warn').hidden = gw > 1500;
   flowStale = true;   // 흐름장·입자는 지도 움직임이 멈춘 뒤 stepParticles에서 다시 만든다
 }

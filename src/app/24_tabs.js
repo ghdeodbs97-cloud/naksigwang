@@ -29,6 +29,6 @@ $('tabbar').addEventListener('click', e => { const b = e.target.closest('[data-t
 document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) showTab(b.dataset.go, false, b.dataset.go === 'map'); });
 if (matchMedia('(pointer: coarse)').matches) setMode('pan');   // 손가락으로 쓰는 기기는 처음에 「지도 이동」
 addEventListener('hashchange', () => showTab(location.hash.slice(1), true));
-addEventListener('resize', () => { if (TAB === 'today') drawToday(); });
+addEventListener('resize', () => { if (TAB === 'map' || TAB === 'today') resize(); if (TAB === 'today') drawToday(); });
 new ResizeObserver(() => document.documentElement.style.setProperty('--top-h', document.querySelector('.top').offsetHeight + 'px')).observe(document.querySelector('.top'));
 showTab(location.hash.slice(1) || 'today', true);
