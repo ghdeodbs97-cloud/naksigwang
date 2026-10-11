@@ -124,5 +124,5 @@ function describeDepth(r) {
 }
 function depthDetails(r) {
   if (!r) return '';
-  return `자료해상도: ${r.res == null ? '알 수 없음' : '약 ' + r.res + ' m'} · 조사연도: ${r.surveyYear || '미확인'} · 보간: ${r.interpolated ? '예' : '아니요'} · ${r.estimated ? '추정' : r.sourceType === 'crowd_pending' ? '검수 전 입력' : '공식자료'} · 기준면: ${r.verticalDatum} · ${r.confidenceReason}`;
+  return `${r.sourceType === 'khoa' ? 'KHOA 150 m 격자 · ' : ''}자료해상도: ${r.res == null ? '알 수 없음' : '약 ' + r.res + ' m'} · 가까운 자료점: ${r.distanceToSource == null ? '미확인' : Math.round(r.distanceToSource) + ' m'} · 조사연도: ${r.surveyYear || '미확인'} · 보간: ${r.interpolated ? '예' : '아니요'} · ${r.estimated ? '추정' : r.sourceType === 'crowd_pending' ? '검수 전 입력' : '공식자료'} · 기준면: ${r.verticalDatum} · ${r.confidenceReason}`;
 }

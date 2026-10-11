@@ -19,7 +19,7 @@ jobs:
       - run: pip install -r tools/depth-data/requirements.txt
       - run: python -m playwright install --with-deps chromium
       - name: Python 문법 검사
-        run: python -m py_compile collector/collect.py tests/test_collector_resilience.py tests/smoke.py tests/smoke_degradation.py tests/test_bite_confidence.py tests/depth_probe.py tests/test_depth_converter.py tests/test_depth_foundation.py tests/test_khoa_fetch.py tests/test_khoa_depth.py tools/depth-data/convert.py tools/depth-data/merge.py tools/depth-data/audit_mof.py tools/depth-data/fetch_khoa.py tools/depth-data/convert_khoa.py tools/depth-data/compare_khoa.py build.py
+        run: python -m py_compile collector/collect.py tests/test_collector_resilience.py tests/smoke.py tests/smoke_degradation.py tests/test_bite_confidence.py tests/depth_probe.py tests/test_depth_converter.py tests/test_depth_foundation.py tests/test_khoa_fetch.py tests/test_khoa_depth.py tests/test_khoa_coverage.py tests/test_khoa_coverage_browser.py tools/depth-data/convert.py tools/depth-data/merge.py tools/depth-data/audit_mof.py tools/depth-data/fetch_khoa.py tools/depth-data/convert_khoa.py tools/depth-data/compare_khoa.py tools/depth-data/plan_east_khoa.py tools/depth-data/fetch_khoa_batch.py tools/depth-data/publish_khoa_coverage.py tools/depth-data/audit_east_coverage.py build.py
       - name: 수집기 회귀
         run: python tests/test_collector_resilience.py
       - name: 초기 로딩 회귀
@@ -40,5 +40,9 @@ jobs:
         run: python tests/test_khoa_fetch.py
       - name: KHOA 지도·단면 출처 연결 mock 회귀
         run: python tests/test_khoa_depth.py
+      - name: KHOA 연안 캐시·재개·병합 mock 회귀
+        run: python tests/test_khoa_coverage.py
+      - name: KHOA 지역 이동·퇴거·중복 요청·로딩 제한 mock 회귀
+        run: python tests/test_khoa_coverage_browser.py
       - name: 운영 자료 비변경 확인
         run: git diff --exit-code -- data

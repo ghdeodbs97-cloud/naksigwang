@@ -1,0 +1,1798 @@
+{
+  "version": 1,
+  "baseMain": "f8533cb",
+  "existing": [
+    {
+      "id": "khoa-jumunjin-namae-20261011-0",
+      "bbox": [
+        128.7,
+        37.8,
+        128.95,
+        38.0
+      ]
+    },
+    {
+      "id": "khoa-ayajin-20261011-0",
+      "bbox": [
+        128.545,
+        38.26,
+        128.58,
+        38.285
+      ]
+    },
+    {
+      "id": "khoa-sokcho-20261011-0",
+      "bbox": [
+        128.585,
+        38.2,
+        128.615,
+        38.225
+      ]
+    },
+    {
+      "id": "khoa-geojin-20261011-0",
+      "bbox": [
+        128.45,
+        38.43,
+        128.48,
+        38.455
+      ]
+    }
+  ],
+  "parents": [
+    {
+      "id": "east-01",
+      "region": "거진·대진",
+      "bbox": [
+        128.4161,
+        38.46335,
+        128.4985,
+        38.519
+      ],
+      "anchors": [
+        {
+          "name": "대진항",
+          "lat": 38.501,
+          "lon": 128.4281,
+          "origin": "ports"
+        },
+        {
+          "name": "화진포해수욕장",
+          "lat": 38.48134999999999,
+          "lon": 128.4385,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "2274434090e2867b"
+      ]
+    },
+    {
+      "id": "east-02",
+      "region": "거진·대진",
+      "bbox": [
+        128.44433,
+        38.40223,
+        128.52407,
+        38.46064
+      ],
+      "anchors": [
+        {
+          "name": "거진항",
+          "lat": 38.44264,
+          "lon": 128.45633,
+          "origin": "ports"
+        },
+        {
+          "name": "반암해수욕장",
+          "lat": 38.42023,
+          "lon": 128.46407,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [
+        "khoa-geojin-20261011-0"
+      ],
+      "requestIds": [
+        "4f6c4970dacf9b11",
+        "8d30146ded946f63",
+        "0141f887fd825ffa",
+        "529266f9499b0651"
+      ]
+    },
+    {
+      "id": "east-03",
+      "region": "아야진·봉포",
+      "bbox": [
+        128.54565,
+        38.23491,
+        128.62587,
+        38.29016
+      ],
+      "anchors": [
+        {
+          "name": "아야진항",
+          "lat": 38.27216,
+          "lon": 128.55765,
+          "origin": "ports"
+        },
+        {
+          "name": "봉포해변",
+          "lat": 38.25290999999999,
+          "lon": 128.56587,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [
+        "khoa-ayajin-20261011-0"
+      ],
+      "requestIds": [
+        "a540b17c59bf6511",
+        "a3aa00eeb39bbafa",
+        "5afbe076db6d76ed"
+      ]
+    },
+    {
+      "id": "east-04",
+      "region": "속초·대포",
+      "bbox": [
+        128.5827,
+        38.16656,
+        128.66856,
+        38.22654
+      ],
+      "anchors": [
+        {
+          "name": "속초항",
+          "lat": 38.208539999999964,
+          "lon": 128.5947,
+          "origin": "osm"
+        },
+        {
+          "name": "속초해수욕장",
+          "lat": 38.184560000000005,
+          "lon": 128.60856,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [
+        "khoa-sokcho-20261011-0"
+      ],
+      "requestIds": [
+        "d347fc2607d482f6",
+        "560bba361576f7ba",
+        "530458c28add4840",
+        "269d7bd44a784f9e"
+      ]
+    },
+    {
+      "id": "east-05",
+      "region": "속초·대포",
+      "bbox": [
+        128.59602,
+        38.15576,
+        128.66884,
+        38.20219
+      ],
+      "anchors": [
+        {
+          "name": "대포항",
+          "lat": 38.17376,
+          "lon": 128.60884,
+          "origin": "ports"
+        },
+        {
+          "name": "외옹치해변",
+          "lat": 38.184189999999994,
+          "lon": 128.60802,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [
+        "khoa-sokcho-20261011-0"
+      ],
+      "requestIds": [
+        "72bc12ce48a2d46d",
+        "d9e18f918c297e93",
+        "136ff10cbe8418e0"
+      ]
+    },
+    {
+      "id": "east-06",
+      "region": "양양·낙산",
+      "bbox": [
+        128.61909,
+        38.06017,
+        128.73566,
+        38.14039
+      ],
+      "anchors": [
+        {
+          "name": "수산항",
+          "lat": 38.07817,
+          "lon": 128.67566,
+          "origin": "ports"
+        },
+        {
+          "name": "낙산해수욕장",
+          "lat": 38.12239,
+          "lon": 128.63109,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "9a02b07573e52c11"
+      ]
+    },
+    {
+      "id": "east-07",
+      "region": "남애",
+      "bbox": [
+        128.7768,
+        37.9218,
+        128.84906,
+        37.95962
+      ],
+      "anchors": [
+        {
+          "name": "남애항",
+          "lat": 37.94162,
+          "lon": 128.7888,
+          "origin": "ports"
+        },
+        {
+          "name": "남애항 남측 갯바위",
+          "lat": 37.9398,
+          "lon": 128.789057,
+          "origin": "points"
+        }
+      ],
+      "existingOverlaps": [
+        "khoa-jumunjin-namae-20261011-0"
+      ],
+      "requestIds": []
+    },
+    {
+      "id": "east-08",
+      "region": "주문진",
+      "bbox": [
+        128.80921,
+        37.87392,
+        128.89015,
+        37.92742
+      ],
+      "anchors": [
+        {
+          "name": "주문진항",
+          "lat": 37.89191999999999,
+          "lon": 128.83015,
+          "origin": "osm"
+        },
+        {
+          "name": "주문진해수욕장",
+          "lat": 37.909420000000004,
+          "lon": 128.82121000000004,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [
+        "khoa-jumunjin-namae-20261011-0"
+      ],
+      "requestIds": []
+    },
+    {
+      "id": "east-09",
+      "region": "강릉·안목·사천",
+      "bbox": [
+        128.93811,
+        37.75365,
+        129.01336,
+        37.78971
+      ],
+      "anchors": [
+        {
+          "name": "강릉항",
+          "lat": 37.77165,
+          "lon": 128.95336,
+          "origin": "ports"
+        },
+        {
+          "name": "안목해수욕장",
+          "lat": 37.771709999999985,
+          "lon": 128.95011,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "39d92b5688868289"
+      ]
+    },
+    {
+      "id": "east-10",
+      "region": "강릉·안목·사천",
+      "bbox": [
+        128.86515,
+        37.81395,
+        128.93763,
+        37.85222
+      ],
+      "anchors": [
+        {
+          "name": "사천진항",
+          "lat": 37.83422,
+          "lon": 128.87715,
+          "origin": "ports"
+        },
+        {
+          "name": "사천해변",
+          "lat": 37.83195000000001,
+          "lon": 128.87763,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [
+        "khoa-jumunjin-namae-20261011-0"
+      ],
+      "requestIds": []
+    },
+    {
+      "id": "east-11",
+      "region": "정동진",
+      "bbox": [
+        128.97883,
+        37.69081,
+        129.07315,
+        37.75383
+      ],
+      "anchors": [
+        {
+          "name": "안인항",
+          "lat": 37.73582999999999,
+          "lon": 128.99083,
+          "origin": "osm"
+        },
+        {
+          "name": "정동진해변",
+          "lat": 37.70881,
+          "lon": 129.01314999999997,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "65e09bd3a179dbd0",
+        "3046c90c5abd1beb"
+      ]
+    },
+    {
+      "id": "east-12",
+      "region": "묵호·동해",
+      "bbox": [
+        129.11019,
+        37.47103,
+        129.18461,
+        37.53914
+      ],
+      "anchors": [
+        {
+          "name": "동해항",
+          "lat": 37.48902999999999,
+          "lon": 129.12461,
+          "origin": "osm"
+        },
+        {
+          "name": "한섬해수욕장",
+          "lat": 37.52114000000001,
+          "lon": 129.12219000000002,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "26eccdd82b165cb6"
+      ]
+    },
+    {
+      "id": "east-13",
+      "region": "묵호·동해",
+      "bbox": [
+        129.10469,
+        37.54223,
+        129.18065,
+        37.58731
+      ],
+      "anchors": [
+        {
+          "name": "어달리항 남측 갯바위",
+          "lat": 37.560226,
+          "lon": 129.120646,
+          "origin": "points"
+        },
+        {
+          "name": "어달해수욕장",
+          "lat": 37.569309999999994,
+          "lon": 129.11669,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "27682e45f64d0484"
+      ]
+    },
+    {
+      "id": "east-14",
+      "region": "삼척",
+      "bbox": [
+        129.1548,
+        37.41788,
+        129.25174,
+        37.48749
+      ],
+      "anchors": [
+        {
+          "name": "삼척항",
+          "lat": 37.435880000000004,
+          "lon": 129.19174,
+          "origin": "osm"
+        },
+        {
+          "name": "삼척해수욕장",
+          "lat": 37.46949,
+          "lon": 129.1668,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "d55e1498ffa32560",
+        "d1965a7271d2eb9a"
+      ]
+    },
+    {
+      "id": "east-15",
+      "region": "울진·후포",
+      "bbox": [
+        129.40116,
+        37.02622,
+        129.48,
+        37.068
+      ],
+      "anchors": [
+        {
+          "name": "죽변항",
+          "lat": 37.05,
+          "lon": 129.42,
+          "origin": "ports"
+        },
+        {
+          "name": "봉평해수욕장",
+          "lat": 37.04422,
+          "lon": 129.41316,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "64936b04a5276a76"
+      ]
+    },
+    {
+      "id": "east-16",
+      "region": "울진·후포",
+      "bbox": [
+        129.43285,
+        36.65865,
+        129.52611,
+        36.69756
+      ],
+      "anchors": [
+        {
+          "name": "후포항 동쪽 갓바위",
+          "lat": 36.679555,
+          "lon": 129.466113,
+          "origin": "points"
+        },
+        {
+          "name": "후포해수욕장",
+          "lat": 36.676649999999995,
+          "lon": 129.44485,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "1c451461464f6002"
+      ]
+    },
+    {
+      "id": "east-17",
+      "region": "영덕",
+      "bbox": [
+        129.40181,
+        36.49243,
+        129.5094,
+        36.61629
+      ],
+      "anchors": [
+        {
+          "name": "축산항",
+          "lat": 36.51043,
+          "lon": 129.4494,
+          "origin": "ports"
+        },
+        {
+          "name": "고래불해수욕장",
+          "lat": 36.59828999999999,
+          "lon": 129.41381,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "94ccf005e8aa26cb"
+      ]
+    },
+    {
+      "id": "east-18",
+      "region": "영덕",
+      "bbox": [
+        129.37603,
+        36.33747,
+        129.45261,
+        36.37466
+      ],
+      "anchors": [
+        {
+          "name": "강구항",
+          "lat": 36.356660000000005,
+          "lon": 129.39261,
+          "origin": "osm"
+        },
+        {
+          "name": "오포3리해수욕장",
+          "lat": 36.355470000000004,
+          "lon": 129.38803,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "8f9fcd7da21d033f"
+      ]
+    },
+    {
+      "id": "east-19",
+      "region": "포항",
+      "bbox": [
+        129.36522,
+        36.03408,
+        129.43789,
+        36.07042
+      ],
+      "anchors": [
+        {
+          "name": "포항구항",
+          "lat": 36.052080000000004,
+          "lon": 129.37722,
+          "origin": "osm"
+        },
+        {
+          "name": "영일대 해수욕장",
+          "lat": 36.05242,
+          "lon": 129.37789,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "d817e25a8cf74eb4"
+      ]
+    },
+    {
+      "id": "east-20",
+      "region": "포항",
+      "bbox": [
+        129.55021,
+        36.00467,
+        129.64,
+        36.09857
+      ],
+      "anchors": [
+        {
+          "name": "대보항",
+          "lat": 36.08057,
+          "lon": 129.56221,
+          "origin": "ports"
+        },
+        {
+          "name": "석병방파제 갯바위",
+          "lat": 36.022667,
+          "lon": 129.58,
+          "origin": "points"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "55a2926f11a44983"
+      ]
+    },
+    {
+      "id": "east-21",
+      "region": "포항",
+      "bbox": [
+        129.54355,
+        35.96919,
+        129.6255,
+        36.014
+      ],
+      "anchors": [
+        {
+          "name": "구룡포항",
+          "lat": 35.987189999999984,
+          "lon": 129.55555,
+          "origin": "osm"
+        },
+        {
+          "name": "구룡포해변",
+          "lat": 35.99600000000001,
+          "lon": 129.56549999999996,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "771f6ed52d56c753",
+        "2a6a3714793f3001"
+      ]
+    },
+    {
+      "id": "east-22",
+      "region": "경주 감포",
+      "bbox": [
+        129.4972,
+        35.792,
+        129.57,
+        35.84255
+      ],
+      "anchors": [
+        {
+          "name": "감포항",
+          "lat": 35.81,
+          "lon": 129.51,
+          "origin": "ports"
+        },
+        {
+          "name": "오류고아라해변",
+          "lat": 35.82454999999999,
+          "lon": 129.5092,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "d3b01a947828d80c"
+      ]
+    },
+    {
+      "id": "east-23",
+      "region": "울산 동해안",
+      "bbox": [
+        129.44191,
+        35.54779,
+        129.5157,
+        35.63374
+      ],
+      "anchors": [
+        {
+          "name": "정자항",
+          "lat": 35.61574,
+          "lon": 129.45391,
+          "origin": "ports"
+        },
+        {
+          "name": "주전몽돌해변",
+          "lat": 35.565794,
+          "lon": 129.455703,
+          "origin": "points"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "ddb8af300a30b80b"
+      ]
+    },
+    {
+      "id": "east-24",
+      "region": "울산 동해안",
+      "bbox": [
+        129.4174,
+        35.46268,
+        129.4908,
+        35.51248
+      ],
+      "anchors": [
+        {
+          "name": "방어진항",
+          "lat": 35.48068,
+          "lon": 129.4294,
+          "origin": "ports"
+        },
+        {
+          "name": "일산해수욕장 (Ilsan beach)",
+          "lat": 35.49448000000001,
+          "lon": 129.4308,
+          "origin": "osm"
+        }
+      ],
+      "existingOverlaps": [],
+      "requestIds": [
+        "d074cb2d7f46f940"
+      ]
+    }
+  ],
+  "jobs": [
+    {
+      "id": "2274434090e2867b",
+      "parentId": "east-01",
+      "region": "거진·대진",
+      "bbox": [
+        128.4161,
+        38.46335,
+        128.4985,
+        38.519
+      ],
+      "areaKm2": 44.47708805384215,
+      "maxGridPoints": 1977,
+      "maxPages": 7,
+      "seaFraction": 0.84375,
+      "maxCoastDistanceSampleM": 5243.7741105794385,
+      "estimatedPoints": 1668,
+      "estimatedPages": 6
+    },
+    {
+      "id": "4f6c4970dacf9b11",
+      "parentId": "east-02",
+      "region": "거진·대진",
+      "bbox": [
+        128.44433,
+        38.40223,
+        128.45,
+        38.46064
+      ],
+      "areaKm2": 3.214947772271639,
+      "maxGridPoints": 143,
+      "maxPages": 1,
+      "seaFraction": 0,
+      "maxCoastDistanceSampleM": 0,
+      "estimatedPoints": 0,
+      "estimatedPages": 1
+    },
+    {
+      "id": "8d30146ded946f63",
+      "parentId": "east-02",
+      "region": "거진·대진",
+      "bbox": [
+        128.48,
+        38.40223,
+        128.52407,
+        38.46064
+      ],
+      "areaKm2": 24.98813903430479,
+      "maxGridPoints": 1111,
+      "maxPages": 4,
+      "seaFraction": 1,
+      "maxCoastDistanceSampleM": 4904.2975174898,
+      "estimatedPoints": 1111,
+      "estimatedPages": 4
+    },
+    {
+      "id": "0141f887fd825ffa",
+      "parentId": "east-02",
+      "region": "거진·대진",
+      "bbox": [
+        128.45,
+        38.40223,
+        128.48,
+        38.43
+      ],
+      "areaKm2": 8.088964106820132,
+      "maxGridPoints": 360,
+      "maxPages": 2,
+      "seaFraction": 0.390625,
+      "maxCoastDistanceSampleM": 1248.2323560588873,
+      "estimatedPoints": 141,
+      "estimatedPages": 1
+    },
+    {
+      "id": "529266f9499b0651",
+      "parentId": "east-02",
+      "region": "거진·대진",
+      "bbox": [
+        128.45,
+        38.455,
+        128.48,
+        38.46064
+      ],
+      "areaKm2": 1.6418944993851128,
+      "maxGridPoints": 73,
+      "maxPages": 1,
+      "seaFraction": 0.671875,
+      "maxCoastDistanceSampleM": 1310.1502038162773,
+      "estimatedPoints": 49,
+      "estimatedPages": 1
+    },
+    {
+      "id": "a540b17c59bf6511",
+      "parentId": "east-03",
+      "region": "아야진·봉포",
+      "bbox": [
+        128.58,
+        38.23491,
+        128.62587,
+        38.29016
+      ],
+      "areaKm2": 24.65911346040153,
+      "maxGridPoints": 1096,
+      "maxPages": 4,
+      "seaFraction": 1,
+      "maxCoastDistanceSampleM": 5122.833001169157,
+      "estimatedPoints": 1096,
+      "estimatedPages": 4
+    },
+    {
+      "id": "a3aa00eeb39bbafa",
+      "parentId": "east-03",
+      "region": "아야진·봉포",
+      "bbox": [
+        128.54565,
+        38.23491,
+        128.58,
+        38.26
+      ],
+      "areaKm2": 8.387527664140245,
+      "maxGridPoints": 373,
+      "maxPages": 2,
+      "seaFraction": 0.28125,
+      "maxCoastDistanceSampleM": 615.8876541795643,
+      "estimatedPoints": 105,
+      "estimatedPages": 1
+    },
+    {
+      "id": "5afbe076db6d76ed",
+      "parentId": "east-03",
+      "region": "아야진·봉포",
+      "bbox": [
+        128.54565,
+        38.285,
+        128.58,
+        38.29016
+      ],
+      "areaKm2": 1.7240231320761354,
+      "maxGridPoints": 77,
+      "maxPages": 1,
+      "seaFraction": 0.875,
+      "maxCoastDistanceSampleM": 1714.8202615553785,
+      "estimatedPoints": 67,
+      "estimatedPages": 1
+    },
+    {
+      "id": "d347fc2607d482f6",
+      "parentId": "east-04",
+      "region": "속초·대포",
+      "bbox": [
+        128.5827,
+        38.16656,
+        128.585,
+        38.22654
+      ],
+      "areaKm2": 1.343521859407306,
+      "maxGridPoints": 60,
+      "maxPages": 1,
+      "seaFraction": 0.125,
+      "maxCoastDistanceSampleM": 63.93601197203723,
+      "estimatedPoints": 8,
+      "estimatedPages": 1
+    },
+    {
+      "id": "560bba361576f7ba",
+      "parentId": "east-04",
+      "region": "속초·대포",
+      "bbox": [
+        128.615,
+        38.16656,
+        128.66856,
+        38.22654
+      ],
+      "areaKm2": 31.286535125761294,
+      "maxGridPoints": 1391,
+      "maxPages": 5,
+      "seaFraction": 1,
+      "maxCoastDistanceSampleM": 5177.396049145858,
+      "estimatedPoints": 1391,
+      "estimatedPages": 5
+    },
+    {
+      "id": "530458c28add4840",
+      "parentId": "east-04",
+      "region": "속초·대포",
+      "bbox": [
+        128.585,
+        38.16656,
+        128.615,
+        38.2
+      ],
+      "areaKm2": 9.771856635715295,
+      "maxGridPoints": 435,
+      "maxPages": 2,
+      "seaFraction": 0.34375,
+      "maxCoastDistanceSampleM": 618.5758362452668,
+      "estimatedPoints": 150,
+      "estimatedPages": 1
+    },
+    {
+      "id": "269d7bd44a784f9e",
+      "parentId": "east-04",
+      "region": "속초·대포",
+      "bbox": [
+        128.585,
+        38.225,
+        128.615,
+        38.22654
+      ],
+      "areaKm2": 0.44975712757620623,
+      "maxGridPoints": 20,
+      "maxPages": 1,
+      "seaFraction": 0.84375,
+      "maxCoastDistanceSampleM": 1565.405219347711,
+      "estimatedPoints": 17,
+      "estimatedPages": 1
+    },
+    {
+      "id": "72bc12ce48a2d46d",
+      "parentId": "east-05",
+      "region": "속초·대포",
+      "bbox": [
+        128.66856,
+        38.15576,
+        128.66884,
+        38.20219
+      ],
+      "areaKm2": 0.12664030247930408,
+      "maxGridPoints": 6,
+      "maxPages": 1,
+      "seaFraction": 1,
+      "maxCoastDistanceSampleM": 5003.575344904161,
+      "estimatedPoints": 6,
+      "estimatedPages": 1
+    },
+    {
+      "id": "d9e18f918c297e93",
+      "parentId": "east-05",
+      "region": "속초·대포",
+      "bbox": [
+        128.615,
+        38.15576,
+        128.66856,
+        38.16656
+      ],
+      "areaKm2": 5.636190923073993,
+      "maxGridPoints": 251,
+      "maxPages": 1,
+      "seaFraction": 1,
+      "maxCoastDistanceSampleM": 4729.161839645361,
+      "estimatedPoints": 251,
+      "estimatedPages": 1
+    },
+    {
+      "id": "136ff10cbe8418e0",
+      "parentId": "east-05",
+      "region": "속초·대포",
+      "bbox": [
+        128.59602,
+        38.15576,
+        128.615,
+        38.16656
+      ],
+      "areaKm2": 1.9972909581764453,
+      "maxGridPoints": 89,
+      "maxPages": 1,
+      "seaFraction": 0.28125,
+      "maxCoastDistanceSampleM": 382.05764799313016,
+      "estimatedPoints": 25,
+      "estimatedPages": 1
+    },
+    {
+      "id": "9a02b07573e52c11",
+      "parentId": "east-06",
+      "region": "양양·낙산",
+      "bbox": [
+        128.61909,
+        38.06017,
+        128.73566,
+        38.14039
+      ],
+      "areaKm2": 91.19122693627259,
+      "maxGridPoints": 4053,
+      "maxPages": 14,
+      "seaFraction": 0.71875,
+      "maxCoastDistanceSampleM": 7292.214501187378,
+      "estimatedPoints": 2913,
+      "estimatedPages": 10
+    },
+    {
+      "id": "39d92b5688868289",
+      "parentId": "east-09",
+      "region": "강릉·안목·사천",
+      "bbox": [
+        128.93811,
+        37.75365,
+        129.01336,
+        37.78971
+      ],
+      "areaKm2": 26.580144968407094,
+      "maxGridPoints": 1182,
+      "maxPages": 4,
+      "seaFraction": 0.84375,
+      "maxCoastDistanceSampleM": 4867.766096361343,
+      "estimatedPoints": 997,
+      "estimatedPages": 4
+    },
+    {
+      "id": "65e09bd3a179dbd0",
+      "parentId": "east-11",
+      "region": "정동진",
+      "bbox": [
+        129.01336,
+        37.69081,
+        129.07315,
+        37.75383
+      ],
+      "areaKm2": 36.93360766510913,
+      "maxGridPoints": 1642,
+      "maxPages": 6,
+      "seaFraction": 0.953125,
+      "maxCoastDistanceSampleM": 6554.889168864222,
+      "estimatedPoints": 1565,
+      "estimatedPages": 6
+    },
+    {
+      "id": "3046c90c5abd1beb",
+      "parentId": "east-11",
+      "region": "정동진",
+      "bbox": [
+        128.97883,
+        37.69081,
+        129.01336,
+        37.75365
+      ],
+      "areaKm2": 21.26904850260389,
+      "maxGridPoints": 946,
+      "maxPages": 4,
+      "seaFraction": 0.390625,
+      "maxCoastDistanceSampleM": 2168.403962513033,
+      "estimatedPoints": 370,
+      "estimatedPages": 2
+    },
+    {
+      "id": "26eccdd82b165cb6",
+      "parentId": "east-12",
+      "region": "묵호·동해",
+      "bbox": [
+        129.11019,
+        37.47103,
+        129.18461,
+        37.53914
+      ],
+      "areaKm2": 49.82921180822959,
+      "maxGridPoints": 2215,
+      "maxPages": 8,
+      "seaFraction": 0.703125,
+      "maxCoastDistanceSampleM": 4887.293745502554,
+      "estimatedPoints": 1557,
+      "estimatedPages": 6
+    },
+    {
+      "id": "27682e45f64d0484",
+      "parentId": "east-13",
+      "region": "묵호·동해",
+      "bbox": [
+        129.10469,
+        37.54223,
+        129.18065,
+        37.58731
+      ],
+      "areaKm2": 33.636031808993394,
+      "maxGridPoints": 1495,
+      "maxPages": 5,
+      "seaFraction": 0.859375,
+      "maxCoastDistanceSampleM": 5281.532840185534,
+      "estimatedPoints": 1285,
+      "estimatedPages": 5
+    },
+    {
+      "id": "d55e1498ffa32560",
+      "parentId": "east-14",
+      "region": "삼척",
+      "bbox": [
+        129.18461,
+        37.41788,
+        129.25174,
+        37.48749
+      ],
+      "areaKm2": 45.97018917979014,
+      "maxGridPoints": 2044,
+      "maxPages": 7,
+      "seaFraction": 0.9375,
+      "maxCoastDistanceSampleM": 6116.89825099731,
+      "estimatedPoints": 1916,
+      "estimatedPages": 7
+    },
+    {
+      "id": "d1965a7271d2eb9a",
+      "parentId": "east-14",
+      "region": "삼척",
+      "bbox": [
+        129.1548,
+        37.41788,
+        129.18461,
+        37.47103
+      ],
+      "areaKm2": 15.588381779188778,
+      "maxGridPoints": 693,
+      "maxPages": 3,
+      "seaFraction": 0.078125,
+      "maxCoastDistanceSampleM": 395.16724316405066,
+      "estimatedPoints": 54,
+      "estimatedPages": 1
+    },
+    {
+      "id": "64936b04a5276a76",
+      "parentId": "east-15",
+      "region": "울진·후포",
+      "bbox": [
+        129.40116,
+        37.02622,
+        129.48,
+        37.068
+      ],
+      "areaKm2": 32.5792249226905,
+      "maxGridPoints": 1448,
+      "maxPages": 5,
+      "seaFraction": 0.765625,
+      "maxCoastDistanceSampleM": 5057.450831597403,
+      "estimatedPoints": 1109,
+      "estimatedPages": 4
+    },
+    {
+      "id": "1c451461464f6002",
+      "parentId": "east-16",
+      "region": "울진·후포",
+      "bbox": [
+        129.43285,
+        36.65865,
+        129.52611,
+        36.69756
+      ],
+      "areaKm2": 36.064469736098076,
+      "maxGridPoints": 1603,
+      "maxPages": 6,
+      "seaFraction": 0.796875,
+      "maxCoastDistanceSampleM": 5236.3594982769855,
+      "estimatedPoints": 1277,
+      "estimatedPages": 5
+    },
+    {
+      "id": "94ccf005e8aa26cb",
+      "parentId": "east-17",
+      "region": "영덕",
+      "bbox": [
+        129.40181,
+        36.49243,
+        129.5094,
+        36.61629
+      ],
+      "areaKm2": 132.65478001499832,
+      "maxGridPoints": 5896,
+      "maxPages": 20,
+      "seaFraction": 0.734375,
+      "maxCoastDistanceSampleM": 7754.457952878569,
+      "estimatedPoints": 4330,
+      "estimatedPages": 15
+    },
+    {
+      "id": "8f9fcd7da21d033f",
+      "parentId": "east-18",
+      "region": "영덕",
+      "bbox": [
+        129.37603,
+        36.33747,
+        129.45261,
+        36.37466
+      ],
+      "areaKm2": 28.423126241396105,
+      "maxGridPoints": 1264,
+      "maxPages": 5,
+      "seaFraction": 0.828125,
+      "maxCoastDistanceSampleM": 5296.77826871208,
+      "estimatedPoints": 1047,
+      "estimatedPages": 4
+    },
+    {
+      "id": "d817e25a8cf74eb4",
+      "parentId": "east-19",
+      "region": "포항",
+      "bbox": [
+        129.36522,
+        36.03408,
+        129.43789,
+        36.07042
+      ],
+      "areaKm2": 26.4579445070468,
+      "maxGridPoints": 1176,
+      "maxPages": 4,
+      "seaFraction": 0.734375,
+      "maxCoastDistanceSampleM": 2540.5428751473955,
+      "estimatedPoints": 864,
+      "estimatedPages": 3
+    },
+    {
+      "id": "55a2926f11a44983",
+      "parentId": "east-20",
+      "region": "포항",
+      "bbox": [
+        129.55021,
+        36.00467,
+        129.64,
+        36.09857
+      ],
+      "areaKm2": 84.47205467675118,
+      "maxGridPoints": 3755,
+      "maxPages": 13,
+      "seaFraction": 0.765625,
+      "maxCoastDistanceSampleM": 6003.620261805348,
+      "estimatedPoints": 2875,
+      "estimatedPages": 10
+    },
+    {
+      "id": "771f6ed52d56c753",
+      "parentId": "east-21",
+      "region": "포항",
+      "bbox": [
+        129.54355,
+        35.96919,
+        129.55021,
+        36.014
+      ],
+      "areaKm2": 2.9922611434281774,
+      "maxGridPoints": 133,
+      "maxPages": 1,
+      "seaFraction": 0,
+      "maxCoastDistanceSampleM": 0,
+      "estimatedPoints": 0,
+      "estimatedPages": 1
+    },
+    {
+      "id": "2a6a3714793f3001",
+      "parentId": "east-21",
+      "region": "포항",
+      "bbox": [
+        129.55021,
+        35.96919,
+        129.6255,
+        36.00467
+      ],
+      "areaKm2": 26.785324287504718,
+      "maxGridPoints": 1191,
+      "maxPages": 4,
+      "seaFraction": 0.890625,
+      "maxCoastDistanceSampleM": 5239.559898077049,
+      "estimatedPoints": 1061,
+      "estimatedPages": 4
+    },
+    {
+      "id": "d3b01a947828d80c",
+      "parentId": "east-22",
+      "region": "경주 감포",
+      "bbox": [
+        129.4972,
+        35.792,
+        129.57,
+        35.84255
+      ],
+      "areaKm2": 36.97936883078384,
+      "maxGridPoints": 1644,
+      "maxPages": 6,
+      "seaFraction": 0.828125,
+      "maxCoastDistanceSampleM": 5026.506414431235,
+      "estimatedPoints": 1361,
+      "estimatedPages": 5
+    },
+    {
+      "id": "ddb8af300a30b80b",
+      "parentId": "east-23",
+      "region": "울산 동해안",
+      "bbox": [
+        129.44191,
+        35.54779,
+        129.5157,
+        35.63374
+      ],
+      "areaKm2": 63.91227264994076,
+      "maxGridPoints": 2841,
+      "maxPages": 10,
+      "seaFraction": 0.8125,
+      "maxCoastDistanceSampleM": 5037.994499774857,
+      "estimatedPoints": 2308,
+      "estimatedPages": 8
+    },
+    {
+      "id": "d074cb2d7f46f940",
+      "parentId": "east-24",
+      "region": "울산 동해안",
+      "bbox": [
+        129.4174,
+        35.46268,
+        129.4908,
+        35.51248
+      ],
+      "areaKm2": 36.88289197470139,
+      "maxGridPoints": 1640,
+      "maxPages": 6,
+      "seaFraction": 0.828125,
+      "maxCoastDistanceSampleM": 4575.9218025198625,
+      "estimatedPoints": 1358,
+      "estimatedPages": 5
+    }
+  ],
+  "representatives": [
+    {
+      "name": "대진항",
+      "lat": 38.501,
+      "lon": 128.4281,
+      "origin": "ports",
+      "region": "거진·대진",
+      "parentId": "east-01",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "화진포해수욕장",
+      "lat": 38.48134999999999,
+      "lon": 128.4385,
+      "origin": "osm",
+      "region": "거진·대진",
+      "parentId": "east-01",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "거진항",
+      "lat": 38.44264,
+      "lon": 128.45633,
+      "origin": "ports",
+      "region": "거진·대진",
+      "parentId": "east-02",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "반암해수욕장",
+      "lat": 38.42023,
+      "lon": 128.46407,
+      "origin": "osm",
+      "region": "거진·대진",
+      "parentId": "east-02",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "아야진항",
+      "lat": 38.27216,
+      "lon": 128.55765,
+      "origin": "ports",
+      "region": "아야진·봉포",
+      "parentId": "east-03",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "봉포해변",
+      "lat": 38.25290999999999,
+      "lon": 128.56587,
+      "origin": "osm",
+      "region": "아야진·봉포",
+      "parentId": "east-03",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "속초항",
+      "lat": 38.208539999999964,
+      "lon": 128.5947,
+      "origin": "osm",
+      "region": "속초·대포",
+      "parentId": "east-04",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "속초해수욕장",
+      "lat": 38.184560000000005,
+      "lon": 128.60856,
+      "origin": "osm",
+      "region": "속초·대포",
+      "parentId": "east-04",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "대포항",
+      "lat": 38.17376,
+      "lon": 128.60884,
+      "origin": "ports",
+      "region": "속초·대포",
+      "parentId": "east-05",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "외옹치해변",
+      "lat": 38.184189999999994,
+      "lon": 128.60802,
+      "origin": "osm",
+      "region": "속초·대포",
+      "parentId": "east-05",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "수산항",
+      "lat": 38.07817,
+      "lon": 128.67566,
+      "origin": "ports",
+      "region": "양양·낙산",
+      "parentId": "east-06",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "낙산해수욕장",
+      "lat": 38.12239,
+      "lon": 128.63109,
+      "origin": "osm",
+      "region": "양양·낙산",
+      "parentId": "east-06",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "남애항",
+      "lat": 37.94162,
+      "lon": 128.7888,
+      "origin": "ports",
+      "region": "남애",
+      "parentId": "east-07",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "남애항 남측 갯바위",
+      "lat": 37.9398,
+      "lon": 128.789057,
+      "origin": "points",
+      "region": "남애",
+      "parentId": "east-07",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "주문진항",
+      "lat": 37.89191999999999,
+      "lon": 128.83015,
+      "origin": "osm",
+      "region": "주문진",
+      "parentId": "east-08",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "주문진해수욕장",
+      "lat": 37.909420000000004,
+      "lon": 128.82121000000004,
+      "origin": "osm",
+      "region": "주문진",
+      "parentId": "east-08",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "강릉항",
+      "lat": 37.77165,
+      "lon": 128.95336,
+      "origin": "ports",
+      "region": "강릉·안목·사천",
+      "parentId": "east-09",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "안목해수욕장",
+      "lat": 37.771709999999985,
+      "lon": 128.95011,
+      "origin": "osm",
+      "region": "강릉·안목·사천",
+      "parentId": "east-09",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "사천진항",
+      "lat": 37.83422,
+      "lon": 128.87715,
+      "origin": "ports",
+      "region": "강릉·안목·사천",
+      "parentId": "east-10",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "사천해변",
+      "lat": 37.83195000000001,
+      "lon": 128.87763,
+      "origin": "osm",
+      "region": "강릉·안목·사천",
+      "parentId": "east-10",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "안인항",
+      "lat": 37.73582999999999,
+      "lon": 128.99083,
+      "origin": "osm",
+      "region": "정동진",
+      "parentId": "east-11",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "정동진해변",
+      "lat": 37.70881,
+      "lon": 129.01314999999997,
+      "origin": "osm",
+      "region": "정동진",
+      "parentId": "east-11",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "동해항",
+      "lat": 37.48902999999999,
+      "lon": 129.12461,
+      "origin": "osm",
+      "region": "묵호·동해",
+      "parentId": "east-12",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "한섬해수욕장",
+      "lat": 37.52114000000001,
+      "lon": 129.12219000000002,
+      "origin": "osm",
+      "region": "묵호·동해",
+      "parentId": "east-12",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "어달리항 남측 갯바위",
+      "lat": 37.560226,
+      "lon": 129.120646,
+      "origin": "points",
+      "region": "묵호·동해",
+      "parentId": "east-13",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "어달해수욕장",
+      "lat": 37.569309999999994,
+      "lon": 129.11669,
+      "origin": "osm",
+      "region": "묵호·동해",
+      "parentId": "east-13",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "삼척항",
+      "lat": 37.435880000000004,
+      "lon": 129.19174,
+      "origin": "osm",
+      "region": "삼척",
+      "parentId": "east-14",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "삼척해수욕장",
+      "lat": 37.46949,
+      "lon": 129.1668,
+      "origin": "osm",
+      "region": "삼척",
+      "parentId": "east-14",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "죽변항",
+      "lat": 37.05,
+      "lon": 129.42,
+      "origin": "ports",
+      "region": "울진·후포",
+      "parentId": "east-15",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "봉평해수욕장",
+      "lat": 37.04422,
+      "lon": 129.41316,
+      "origin": "osm",
+      "region": "울진·후포",
+      "parentId": "east-15",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "후포항 동쪽 갓바위",
+      "lat": 36.679555,
+      "lon": 129.466113,
+      "origin": "points",
+      "region": "울진·후포",
+      "parentId": "east-16",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "후포해수욕장",
+      "lat": 36.676649999999995,
+      "lon": 129.44485,
+      "origin": "osm",
+      "region": "울진·후포",
+      "parentId": "east-16",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "축산항",
+      "lat": 36.51043,
+      "lon": 129.4494,
+      "origin": "ports",
+      "region": "영덕",
+      "parentId": "east-17",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "고래불해수욕장",
+      "lat": 36.59828999999999,
+      "lon": 129.41381,
+      "origin": "osm",
+      "region": "영덕",
+      "parentId": "east-17",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "강구항",
+      "lat": 36.356660000000005,
+      "lon": 129.39261,
+      "origin": "osm",
+      "region": "영덕",
+      "parentId": "east-18",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "오포3리해수욕장",
+      "lat": 36.355470000000004,
+      "lon": 129.38803,
+      "origin": "osm",
+      "region": "영덕",
+      "parentId": "east-18",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "포항구항",
+      "lat": 36.052080000000004,
+      "lon": 129.37722,
+      "origin": "osm",
+      "region": "포항",
+      "parentId": "east-19",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "영일대 해수욕장",
+      "lat": 36.05242,
+      "lon": 129.37789,
+      "origin": "osm",
+      "region": "포항",
+      "parentId": "east-19",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "대보항",
+      "lat": 36.08057,
+      "lon": 129.56221,
+      "origin": "ports",
+      "region": "포항",
+      "parentId": "east-20",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "석병방파제 갯바위",
+      "lat": 36.022667,
+      "lon": 129.58,
+      "origin": "points",
+      "region": "포항",
+      "parentId": "east-20",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "구룡포항",
+      "lat": 35.987189999999984,
+      "lon": 129.55555,
+      "origin": "osm",
+      "region": "포항",
+      "parentId": "east-21",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "구룡포해변",
+      "lat": 35.99600000000001,
+      "lon": 129.56549999999996,
+      "origin": "osm",
+      "region": "포항",
+      "parentId": "east-21",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "감포항",
+      "lat": 35.81,
+      "lon": 129.51,
+      "origin": "ports",
+      "region": "경주 감포",
+      "parentId": "east-22",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "오류고아라해변",
+      "lat": 35.82454999999999,
+      "lon": 129.5092,
+      "origin": "osm",
+      "region": "경주 감포",
+      "parentId": "east-22",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "정자항",
+      "lat": 35.61574,
+      "lon": 129.45391,
+      "origin": "ports",
+      "region": "울산 동해안",
+      "parentId": "east-23",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "주전몽돌해변",
+      "lat": 35.565794,
+      "lon": 129.455703,
+      "origin": "points",
+      "region": "울산 동해안",
+      "parentId": "east-23",
+      "kind": "해변·갯바위 근처"
+    },
+    {
+      "name": "방어진항",
+      "lat": 35.48068,
+      "lon": 129.4294,
+      "origin": "ports",
+      "region": "울산 동해안",
+      "parentId": "east-24",
+      "kind": "항구·방파제 근처"
+    },
+    {
+      "name": "일산해수욕장 (Ilsan beach)",
+      "lat": 35.49448000000001,
+      "lon": 129.4308,
+      "origin": "osm",
+      "region": "울산 동해안",
+      "parentId": "east-24",
+      "kind": "해변·갯바위 근처"
+    }
+  ],
+  "policy": "실제 낚시 좌표 주변 서쪽 0.012도·동쪽 0.060도·남북 0.018도 여유. 기존/앞선 bbox를 차감. 원 좌표 정밀도/수심 유지.",
+  "maxRequestsThisRun": 1000,
+  "dailyQuotaNote": "공식 기본 개발 한도 10,000회 중 이 작업 상한 1,000회. 다른 사용량은 알 수 없음.",
+  "estimate": {
+    "newPoints": 34332,
+    "newPages": 135,
+    "allWaterGridPoints": 44323,
+    "allWaterPages": 165,
+    "method": "150m 격자 면적 및 저장소 육지 판정 8x8 샘플. API totalCount가 아닌 계획 추정.",
+    "maxCoastDistanceSampleM": 7754.457952878569,
+    "totalProductionPoints": 46034,
+    "productionBytes": 1868287
+  }
+}
