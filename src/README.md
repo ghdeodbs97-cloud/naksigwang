@@ -31,13 +31,13 @@
 | `12_fish.js` | 대상어 정보와 물고기 그림 | 71 | `fishSVG` |
 | `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 119 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
 | `14_bite.js` | 포인트별 입질 조건점수·자료 신뢰도·이유, 실제 시계의 분 단위 갱신 | 107 | `lightF`, `targetF`, `biteTemperature`, `biteDataQuality`, `myF`, `biteEvalAt`, `biteAt`, `biteReasons`, `spark`, `renderBite` |
-| `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 68 | `drawStations`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
-| `15b_map_provider.js` | NAVER 공식 SDK 어댑터, 일반/위성 전환, CSS 좌표 정합 검사와 기본 지형 복구 | 가변 | `NaverMapAdapter`, `providerStart`, `providerSync`, `providerAlignment`, `providerSetMode`, `providerFallback` |
-| `16_terrain.js` | GEBCO 지형 배경과 지역 수심 준비 요청, 온라인 배경 활성 시 분석 마스크 보존 | 가변 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
+| `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 가변 | `rawToS`, `rawToM`, `toS`, `toM`, `viewBounds`, `drawStations`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
+| `15b_map_provider.js` | NAVER SDK 표시 투영·정수 줌/입력 동기화, 독립 정합 검사·로컬 진단·기본 지형 복구 | 가변 | `NaverMapAdapter`, `providerStart`, `providerSync`, `providerAlignment`, `providerReadView`, `providerZoomAt`, `providerPanAnchor`, `scheduleDisplayDepthArea`, `providerSetMode`, `providerFallback` |
+| `16_terrain.js` | GEBCO 배경·SDK 화면 수심 범위 요청, 비선형 해안 마스크 | 가변 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
 | `17_flow.js` | 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표 | 102 | `buildFlowField`, `realField`, `spawn`, `stepParticles`, `drawCrnt` |
 | `18_section.js` | KHOA 출처를 보존하는 A→B 단면, 기준면 경계의 특징분석 중단 | 가변 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
 | `18b_shore.js` | 실제 해안 교차가 있을 때만 해안 종류 판정 | 가변 | `osmDist`, `enclosed`, `classifyShore`, `setShore`, `autoShore` |
-| `19_overlay.js` | 평면도 위 표시(단면선·핀) | 19 | `drawUI` |
+| `19_overlay.js` | 평면도 위 표시(자료 좌표에서 투영한 단면선·단면 표식·핀) | 가변 | `drawUI` |
 | `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |
 | `20b_today.js` | 「오늘」 탭: 선택한 포인트의 오늘·지금 요약, 연속된 좋은 시간 구간 | 70 | `goodHourRanges`, `renderToday`, `drawToday` |
 | `21_input.js` | 화면·터치·검색 입력, 온라인 배경 버튼과 크기 동기화, 수심/출처 상세 | 가변 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |

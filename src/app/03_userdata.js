@@ -120,7 +120,7 @@ function clearData() {
 function drawPortsAndSoundings(gpp) {
   // 수심 자료점 (확대했을 때만)
   if (totalPts() && gpp < 25) {
-    const [x1, y2] = toM(0, 0), [x2, y1] = toM(cw, ch), used = new Set(); let drawn = 0;
+    const [x1, y1, x2, y2] = viewBounds(), used = new Set(); let drawn = 0;
     bctx.font = '600 9.5px JetBrains Mono, monospace'; bctx.textBaseline = 'middle';
     for (const t of DORDER.slice().reverse()) {
       const Lr = LAYERS[t]; if (!Lr || !Lr.n) continue;

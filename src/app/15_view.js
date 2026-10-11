@@ -113,8 +113,19 @@ const bctx = base.getContext('2d'), fctx = flow.getContext('2d'), uctx = ui.getC
 const mask = document.createElement('canvas'), mctx = mask.getContext('2d', { willReadFrequently: true });
 let maskData = null, cw = 0, ch = 0, dirty = true;
 const V = { cx: mxOf(128), cy: myOf(36), s: 1e-3 };
-const toS = (mx, my) => [(mx - V.cx) * V.s + cw / 2, (V.cy - my) * V.s + ch / 2];
-const toM = (px, py) => [V.cx + (px - cw / 2) / V.s, V.cy - (py - ch / 2) / V.s];
+const rawToS = (mx, my) => [(mx - V.cx) * V.s + cw / 2, (V.cy - my) * V.s + ch / 2];
+const rawToM = (px, py) => [V.cx + (px - cw / 2) / V.s, V.cy - (py - ch / 2) / V.s];
+// 화면만 SDK 투영으로 바꾼다. 자료·분석 좌표는 계속 웹 메르카토르 미터다.
+const toS = (mx, my) => providerTransform() ? PROVIDER_MAP.adapter.project(lonOf(mx), latOf(my)) : rawToS(mx, my);
+const toM = (px, py) => { if (!providerTransform()) return rawToM(px, py); const ll = PROVIDER_MAP.adapter.unproject(px, py); return [mxOf(ll[0]), myOf(ll[1])]; };
+function viewBounds(margin = 0) {
+  if (!providerTransform()) { const a = rawToM(-margin, ch + margin), b = rawToM(cw + margin, -margin); return [a[0], a[1], b[0], b[1]]; }
+  const pts = [];
+  for (let i = 0; i <= 32; i++) { const x = -margin + (cw + 2 * margin) * i / 32, y = -margin + (ch + 2 * margin) * i / 32; pts.push(toM(x, -margin), toM(x, ch + margin), toM(-margin, y), toM(cw + margin, y)); }
+  const b = PROVIDER_MAP.adapter.getBounds();
+  pts.push([mxOf(b[0][0]), myOf(b[0][1])], [mxOf(b[1][0]), myOf(b[1][1])]);
+  return [Math.min(...pts.map(p => p[0])), Math.min(...pts.map(p => p[1])), Math.max(...pts.map(p => p[0])), Math.max(...pts.map(p => p[1]))];
+}
 const pxPerGround = () => V.s * kAt(latOf(V.cy));
 // 지도 범위 = 지형 자료(GEBCO) 범위. 이보다 넓게 축소하거나 밖으로 밀면 자료 없는 검은 곳이 보이므로 막는다
 const KB = { x1: mxOf(124.4), x2: mxOf(131.95), y1: myOf(32.9), y2: myOf(38.7) };
@@ -133,7 +144,7 @@ function clampView() {
 function fitBox(x1, y1, x2, y2, pad = .9) { V.cx = (x1 + x2) / 2; V.cy = (y1 + y2) / 2; V.s = Math.min(cw / Math.max(1, x2 - x1), ch / Math.max(1, y2 - y1)) * pad; clampView(); }
 function fitLonLat(bb) { fitBox(mxOf(bb[0]), myOf(bb[1]), mxOf(bb[2]), myOf(bb[3])); }
 function fitGround(lat, lon, widthG) { if (S.lock) widthG = TD_MAP_W; /* 오늘 탭 지도는 늘 같은 폭 */ V.cx = mxOf(lon); V.cy = myOf(lat); V.s = cw / (widthG * kAt(lat)); clampView(); }
-function zoomAt(px, py, f) { const [mx, my] = toM(px, py); V.s *= f; clampView(); const [nx, ny] = toM(px, py); V.cx += mx - nx; V.cy += my - ny; clampView(); }
+function zoomAt(px, py, f) { if (providerTransform()) { providerZoomAt(px, py, f); return; } const [mx, my] = toM(px, py); V.s *= f; clampView(); const [nx, ny] = toM(px, py); V.cx += mx - nx; V.cy += my - ny; clampView(); }
 
 /* ── 바탕 그리기 ───────────────────────────────────────── */
 const BANDS = [[10, '#64e6d4'], [30, '#43ccc3'], [50, '#2fb0b4'], [100, '#2194a5'], [150, '#1b8097'], [200, '#176e88'], [300, '#135d77'], [500, '#104e68'], [1000, '#0d405a'], [2000, '#0b344b'], [5000, '#0a2a3e'], [10000, '#082233'], [20000, '#071b2a']];

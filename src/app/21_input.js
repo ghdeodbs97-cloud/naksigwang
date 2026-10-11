@@ -6,13 +6,12 @@ function resize() {
   cw = stage.clientWidth;                               // 휴대폰: 화면 높이에 맞춰 길게, 넓은 화면: 가로 비율 0.72 (화면 높이 안에서)
   ch = Math.round(S.lock ? cw * (cw < 560 ? .85 : .5) : cw < 560 ? clamp(innerHeight - 290, 320, cw * 1.3) : Math.min(cw * .72, Math.max(380, innerHeight - 240)));   // 오늘 탭에서는 낮게
   stage.style.height = ch + 'px';
-  providerSync();
   for (const c of [base, flow, ui]) { c.width = Math.round(cw * r); c.height = Math.round(ch * r); c.style.width = cw + 'px'; c.style.height = ch + 'px'; }
   mask.width = Math.ceil(cw / 2); mask.height = Math.ceil(ch / 2);
   sw = $('secWrap').clientWidth; shh = sw < 560 ? 240 : 300;
   sec.width = Math.round(sw * r); sec.height = Math.round(shh * r); sec.style.height = shh + 'px';
   if (old) { V.cx = old[0]; V.cy = old[1]; V.s = cw / (oldGW * kAt(latOf(V.cy))); clampView(); }
-  dirty = true;
+  providerSync(); dirty = true;
 }
 
 /* ── 입력 ──────────────────────────────────────────────── */
@@ -23,7 +22,7 @@ ui.addEventListener('pointerdown', e => {
   if (ptrs.size === 2 && S.lock) { S.drag = null; return; }   // 오늘 탭 지도: 두 손가락 확대 안 함
   if (ptrs.size === 2) { S.drag = null; panStart = null; const [p, q] = [...ptrs.values()]; pinch = { d: Math.hypot(p[0] - q[0], p[1] - q[1]), c: [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2] }; return; }
   const [x, y] = local(e);
-  if (S.mode === 'pan' || e.pointerType === 'touch' && S.mode === 'pan') { panStart = { x, y, cx: V.cx, cy: V.cy }; ui.style.cursor = 'grabbing'; return; }
+  if (S.mode === 'pan' || e.pointerType === 'touch' && S.mode === 'pan') { panStart = { x, y, cx: V.cx, cy: V.cy, anchor: providerTransform() ? PROVIDER_MAP.adapter.unproject(x,y) : null }; ui.style.cursor = 'grabbing'; return; }
   const m = toM(x, y); S.drag = { A: m, B: m };
 });
 ui.addEventListener('pointermove', e => {
@@ -31,9 +30,12 @@ ui.addEventListener('pointermove', e => {
   if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, [x, y]);
   if (pinch && ptrs.size === 2) {
     const [p, q] = [...ptrs.values()], d = Math.hypot(p[0] - q[0], p[1] - q[1]), c = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
-    zoomAt(c[0], c[1], d / pinch.d); V.cx -= (c[0] - pinch.c[0]) / V.s; V.cy += (c[1] - pinch.c[1]) / V.s; clampView(); pinch = { d, c }; return;
+    const anchor = providerTransform() ? PROVIDER_MAP.adapter.unproject(...pinch.c) : null;
+    zoomAt(c[0], c[1], d / pinch.d);
+    if (anchor && providerTransform()) { providerPanAnchor(anchor,...c); pinch = {d,c}; return; }
+    V.cx -= (c[0] - pinch.c[0]) / V.s; V.cy += (c[1] - pinch.c[1]) / V.s; clampView(); pinch = { d, c }; return;
   }
-  if (panStart) { V.cx = panStart.cx - (x - panStart.x) / V.s; V.cy = panStart.cy + (y - panStart.y) / V.s; clampView(); return; }
+  if (panStart) { if (panStart.anchor && providerTransform()) { providerPanAnchor(panStart.anchor,x,y); return; } V.cx = panStart.cx - (x - panStart.x) / V.s; V.cy = panStart.cy + (y - panStart.y) / V.s; clampView(); return; }
   if (S.drag) { S.drag.B = toM(x, y); return; }
   hoverAt = [x, y];
 });

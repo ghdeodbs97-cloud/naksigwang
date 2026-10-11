@@ -161,7 +161,7 @@ function buildPath(rings, margin) {
   const sx = new Float64Array(0);
   for (const r of rings) {
     const n = r.n, X = new Float64Array(n), Y = new Float64Array(n), C = new Uint8Array(n);
-    for (let i = 0; i < n; i++) { X[i] = (r.xs[i] - V.cx) * V.s + cw / 2; Y[i] = (V.cy - r.ys[i]) * V.s + ch / 2; C[i] = oc(X[i], Y[i]); }
+    for (let i = 0; i < n; i++) { [X[i], Y[i]] = toS(r.xs[i], r.ys[i]); C[i] = oc(X[i], Y[i]); }
     let lx = X[0], ly = Y[0], lc = C[0];
     p.moveTo(lx, ly);
     for (let i = 1; i < n; i++) {
@@ -177,7 +177,7 @@ function buildPath(rings, margin) {
 }
 
 function renderBase() {
-  scheduleDepthArea();
+  scheduleDisplayDepthArea();
   dirty = false;
   const r = DPR(), ppg = pxPerGround(), gpp = 1 / ppg, diag = Math.hypot(cw, ch);
   const lod = gpp > 2000 ? LOD.low : gpp > 35 ? LOD.mid : LOD.full;
@@ -187,14 +187,16 @@ function renderBase() {
   // 화면 중심이 해안에서 아주 먼 경우의 바탕색
   const dC = groundToCoast(V.cx, V.cy, 25000);
   let bg = FAR; for (const [d, c] of BANDS_) if (d * ppg > 3 * diag && dC < d) { bg = c; break; }
-  const [vx1, vy1] = toM(-margin, ch + margin), [vx2, vy2] = toM(cw + margin, -margin);
+  const [vx1, vy1, vx2, vy2] = viewBounds(margin);
   const vis = lod.filter(q => q.maxx >= vx1 && q.minx <= vx2 && q.maxy >= vy1 && q.miny <= vy2);
   const path = buildPath(vis, margin);
   bctx.setTransform(r, 0, 0, r, 0, 0);
   bctx.clearRect(0, 0, cw, ch);
   bctx.save();
-  // 온라인 배경이 정합 검사를 통과해도 기존 육지 마스크·분석 격자는 그대로 만든다.
-  if (PROVIDER_MAP.active) { bctx.beginPath(); bctx.rect(0, 0, 0, 0); bctx.clip(); }
+  // 온라인 배경에서도 육지·구조물 마스크는 같은 SDK 투영으로 만든다.
+  let sPoly = null, sLine = null;
+  if (STRUCT.n) [sPoly, sLine] = structPath(margin);
+  if (!PROVIDER_MAP.active) {
   bctx.fillStyle = bg; bctx.fillRect(0, 0, cw, ch);
   bctx.lineJoin = 'round'; bctx.lineCap = 'round';
   if (TER) renderTerrain(path, gpp);
@@ -203,8 +205,7 @@ function renderBase() {
     bctx.fillStyle = '#141b19'; bctx.fill(path, 'evenodd');
   }
   drawOSM('under', gpp, TER);
-  let sPoly = null, sLine = null;
-  if (STRUCT.n) { [sPoly, sLine] = structPath(margin); const sw0 = Math.max(gpp > 60 ? 1 : 2, 8 * ppg); bctx.fillStyle = TER ? '#a9b1af' : '#3a4744'; bctx.fill(sPoly); bctx.strokeStyle = TER ? '#eef2f1' : '#c9d6d2'; bctx.lineWidth = gpp > 60 ? .5 : 1; bctx.stroke(sPoly); bctx.lineCap = 'butt'; bctx.strokeStyle = TER ? '#c3cac8' : '#b9c7c3'; bctx.lineWidth = sw0; bctx.stroke(sLine); bctx.lineCap = 'round'; }
+  if (STRUCT.n) { const sw0 = Math.max(gpp > 60 ? 1 : 2, 8 * ppg); bctx.fillStyle = TER ? '#a9b1af' : '#3a4744'; bctx.fill(sPoly); bctx.strokeStyle = TER ? '#eef2f1' : '#c9d6d2'; bctx.lineWidth = gpp > 60 ? .5 : 1; bctx.stroke(sPoly); bctx.lineCap = 'butt'; bctx.strokeStyle = TER ? '#c3cac8' : '#b9c7c3'; bctx.lineWidth = sw0; bctx.stroke(sLine); bctx.lineCap = 'round'; }
   if (TER) {   // 실제 해안선 (OSM)
     bctx.strokeStyle = 'rgba(214,201,160,.35)'; bctx.lineWidth = gpp > 300 ? 1.5 : 3; bctx.stroke(path);
     bctx.strokeStyle = 'rgba(232,224,196,.75)'; bctx.lineWidth = gpp > 300 ? .5 : .9; bctx.stroke(path);
@@ -232,21 +233,23 @@ function renderBase() {
     bctx.font = '500 12px IBM Plex Sans KR, sans-serif'; bctx.textBaseline = 'middle';
     for (const [nm, la, lo] of CITIES) { const [x, y] = toS(mxOf(lo), myOf(la)); if (x < 0 || y < 0 || x > cw || y > ch) continue; bctx.fillStyle = '#ffb84d'; bctx.beginPath(); bctx.arc(x, y, 2.5, 0, 7); bctx.fill(); bctx.fillStyle = 'rgba(230,245,246,.9)'; bctx.fillText(nm, x + 6, y); }
   }
+  }
   bctx.restore();
   drawPortsAndSoundings(gpp);
   drawStations();
-  // 축척, 방위
+  // SDK 출처 영역 위에 축척과 미니맵을 둔다.
+  const mapBottom = ch - (PROVIDER_MAP.active ? 28 : 0);
   const bm = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000].find(m => m * ppg >= 70) || 100000;
   const bar = bm * ppg, lbl = bm >= 1000 ? bm / 1000 + ' km' : bm + ' m';
-  bctx.fillStyle = 'rgba(6,15,19,.7)'; bctx.fillRect(10, ch - 30, bar + 24 + lbl.length * 7, 20);
-  bctx.strokeStyle = '#d5ecee'; bctx.lineWidth = 2; bctx.beginPath(); bctx.moveTo(16, ch - 16); bctx.lineTo(16 + bar, ch - 16); bctx.stroke();
-  bctx.fillStyle = '#d5ecee'; bctx.font = '600 11px JetBrains Mono, monospace'; bctx.textBaseline = 'alphabetic'; bctx.fillText(lbl, 22 + bar, ch - 12);
+  bctx.fillStyle = 'rgba(6,15,19,.7)'; bctx.fillRect(10, mapBottom - 30, bar + 24 + lbl.length * 7, 20);
+  bctx.strokeStyle = '#d5ecee'; bctx.lineWidth = 2; bctx.beginPath(); bctx.moveTo(16, mapBottom - 16); bctx.lineTo(16 + bar, mapBottom - 16); bctx.stroke();
+  bctx.fillStyle = '#d5ecee'; bctx.font = '600 11px JetBrains Mono, monospace'; bctx.textBaseline = 'alphabetic'; bctx.fillText(lbl, 22 + bar, mapBottom - 12);
   bctx.fillText('N ↑', cw - 34, 20);
   // 위치 안내 미니맵
   const gw = cw * gpp;
   if (gw < 300000) {
     const mw = Math.min(130, cw * .22), bx1 = mxOf(124.4), bx2 = mxOf(131.95), by1 = myOf(32.9), by2 = myOf(38.7);
-    const ms = mw / (bx2 - bx1), mh = (by2 - by1) * ms, ox = cw - mw - 12, oy = ch - mh - 12;
+    const ms = mw / (bx2 - bx1), mh = (by2 - by1) * ms, ox = cw - mw - 12, oy = mapBottom - mh - 12;
     bctx.fillStyle = 'rgba(6,15,19,.85)'; bctx.fillRect(ox - 4, oy - 4, mw + 8, mh + 8);
     bctx.strokeStyle = 'rgba(79,227,211,.35)'; bctx.lineWidth = 1; bctx.strokeRect(ox - 4, oy - 4, mw + 8, mh + 8);
     bctx.fillStyle = '#2a3a37'; bctx.beginPath();

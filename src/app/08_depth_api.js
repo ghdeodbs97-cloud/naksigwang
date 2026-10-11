@@ -62,7 +62,7 @@ async function apiLoadViewport() {
   if (!cfg.map.minLat || !cfg.map.maxLat || !cfg.map.minLon || !cfg.map.maxLon) { apiMsg('최소·최대 위도·경도에 해당하는 파라미터를 모두 고르세요.'); return; }
   const gw = cw / pxPerGround(); if (gw > 15000) { apiMsg('지도 폭 15 km 이하로 확대한 뒤 불러오세요. 전국 자료를 한 번에 요청하지 않습니다.'); return; }
   if (apiBusy) return; apiBusy = true;
-  const [mx1, my1] = toM(0, ch), [mx2, my2] = toM(cw, 0), T = BADA.TILE;
+  const [mx1, my1, mx2, my2] = viewBounds(), T = BADA.TILE;
   const la1 = Math.floor(latOf(my1) / T) * T, la2 = latOf(my2), lo1 = Math.floor(lonOf(mx1) / T) * T, lo2 = lonOf(mx2);
   const want = []; for (let la = la1; la < la2; la += T) for (let lo = lo1; lo < lo2; lo += T) { const key = cfg.url.split('?')[0] + '|' + la.toFixed(3) + ',' + lo.toFixed(3); if (!BADA.tiles.has(key)) want.push([key, la, lo]); }
   if (!want.length) { apiMsg('이 화면 범위는 이미 불러왔습니다 (같은 범위는 다시 요청하지 않습니다).'); apiBusy = false; return; }
