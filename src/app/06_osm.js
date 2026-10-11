@@ -23,7 +23,7 @@ function decodeOSM() {
 }
 const LAB_PRI = { dk: 0, hn: 1, hb: 2, ma: 2, pi: 2, is: 3, lh: 4, il: 6, hu: 7 };
 function osmPath(pred, margin, close) {
-  const p = new Path2D(), [vx1, vy1] = toM(-margin, ch + margin), [vx2, vy2] = toM(cw + margin, -margin); let any = false;
+  const p = new Path2D(), [vx1, vy1, vx2, vy2] = viewBounds(margin); let any = false;
   for (const o of OSM.list) {
     if (!pred(o) || o.maxx < vx1 || o.minx > vx2 || o.maxy < vy1 || o.miny > vy2) continue;
     for (const r of o.R) { for (let i = 0; i < r.n; i++) { const [x, y] = toS(r.xs[i], r.ys[i]); i ? p.lineTo(x, y) : p.moveTo(x, y); } if (close) p.closePath(); }
