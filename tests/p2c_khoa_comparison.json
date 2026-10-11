@@ -1,0 +1,122 @@
+[
+  {
+    "name": "거진",
+    "anchor": {
+      "lat": 38.44264,
+      "lon": 128.45632999999998
+    },
+    "coordinate": {
+      "lat": 38.4431,
+      "lon": 128.4563,
+      "depth": 2.71
+    },
+    "sourcePointDistanceM": 51.216422833393395,
+    "source": "국립해양조사원 자연과학용 수심정보",
+    "datum": "평균해면하",
+    "datumNote": "공식 조회 UI 표기(사용자 제공). API 응답 기준면 필드 없음.",
+    "fetchedAt": "2026-10-11T00:53:34.734090+00:00",
+    "land": false,
+    "khoaDepth": 2.71,
+    "existingDepth": 5.0921657833662,
+    "difference": -2.3821657833662,
+    "existingSource": "model_estimate",
+    "existingDatum": "unknown",
+    "comparisonCoordinateDistanceM": 0
+  },
+  {
+    "name": "아야진",
+    "anchor": {
+      "lat": 38.27216,
+      "lon": 128.55765000000002
+    },
+    "coordinate": {
+      "lat": 38.2719,
+      "lon": 128.5569,
+      "depth": 4.47
+    },
+    "sourcePointDistanceM": 71.5716517579735,
+    "source": "국립해양조사원 자연과학용 수심정보",
+    "datum": "평균해면하",
+    "datumNote": "공식 조회 UI 표기(사용자 제공). API 응답 기준면 필드 없음.",
+    "fetchedAt": "2026-10-11T00:53:33.706671+00:00",
+    "land": false,
+    "khoaDepth": 4.47,
+    "existingDepth": 1.7386756442417461,
+    "difference": 2.731324355758254,
+    "existingSource": "model_estimate",
+    "existingDatum": "unknown",
+    "comparisonCoordinateDistanceM": 0
+  },
+  {
+    "name": "속초",
+    "anchor": {
+      "lat": 38.208539999999964,
+      "lon": 128.5947
+    },
+    "coordinate": {
+      "lat": 38.208,
+      "lon": 128.5954,
+      "depth": 5.96
+    },
+    "sourcePointDistanceM": 85.70977606758109,
+    "source": "국립해양조사원 자연과학용 수심정보",
+    "datum": "평균해면하",
+    "datumNote": "공식 조회 UI 표기(사용자 제공). API 응답 기준면 필드 없음.",
+    "fetchedAt": "2026-10-11T00:53:34.209851+00:00",
+    "land": false,
+    "khoaDepth": 5.96,
+    "existingDepth": 8.484970826296372,
+    "difference": -2.5249708262963724,
+    "existingSource": "model_estimate",
+    "existingDatum": "unknown",
+    "comparisonCoordinateDistanceM": 0
+  },
+  {
+    "name": "남애",
+    "anchor": {
+      "lat": 37.94162,
+      "lon": 128.78879999999998
+    },
+    "coordinate": {
+      "lat": 37.9411,
+      "lon": 128.7894,
+      "depth": 6.69
+    },
+    "sourcePointDistanceM": 78.1776029267242,
+    "source": "국립해양조사원 자연과학용 수심정보",
+    "datum": "평균해면하",
+    "datumNote": "공식 조회 UI 표기(사용자 제공). API 응답 기준면 필드 없음.",
+    "fetchedAt": "2026-10-11T00:53:33.031584+00:00",
+    "land": false,
+    "khoaDepth": 6.69,
+    "existingDepth": 10.557691726350782,
+    "difference": -3.867691726350782,
+    "existingSource": "model_estimate",
+    "existingDatum": "unknown",
+    "comparisonCoordinateDistanceM": 0
+  },
+  {
+    "name": "주문진",
+    "anchor": {
+      "lat": 37.89191999999999,
+      "lon": 128.8312883028771
+    },
+    "coordinate": {
+      "lat": 37.892,
+      "lon": 128.8312,
+      "depth": 4.81
+    },
+    "sourcePointDistanceM": 11.797237006493388,
+    "source": "국립해양조사원 자연과학용 수심정보",
+    "datum": "평균해면하",
+    "datumNote": "공식 조회 UI 표기(사용자 제공). API 응답 기준면 필드 없음.",
+    "fetchedAt": "2026-10-11T00:53:33.031584+00:00",
+    "land": false,
+    "khoaDepth": 4.81,
+    "existingDepth": 4.188144776963489,
+    "difference": 0.6218552230365102,
+    "existingSource": "model_estimate",
+    "existingDatum": "unknown",
+    "comparisonCoordinateDistanceM": 0
+  }
+]

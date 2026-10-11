@@ -29,7 +29,7 @@ function profileFeatures(sec) {
   let c0 = 0, dir = 1;
   if (cross.length) { const c = cross[0]; if (pts[c - 1].land && !pts[c].land) { c0 = c; dir = 1; } else { c0 = c - 1; dir = -1; } }
   const s0 = pts[c0].s, seq = [];
-  for (let k = c0; k >= 0 && k < pts.length; k += dir) { const p = pts[k]; if (p.land) { if (seq.length) break; continue; } seq.push({ x: Math.abs(p.s - s0), d: p.r.depth, t: p.r.type }); }
+  for (let k = c0; k >= 0 && k < pts.length; k += dir) { const p = pts[k]; if (p.land) { if (seq.length) break; continue; } seq.push({ x: Math.abs(p.s - s0), d: p.r.depth, t: p.r.type, sourceType: p.r.sourceType }); }
   const out = { items: [], note: '', cast: [] };
   if (!cross.length) { out.note = '해안 교차가 없어 해안 기준 캐스팅 거리와 해안 지형을 판정하지 않았습니다.'; return out; }
   if (seq.length < 10) { out.note = '바다 구간이 짧아 분석하지 않았습니다.'; return out; }
@@ -39,7 +39,7 @@ function profileFeatures(sec) {
   if (refs.size > 1) { out.note = '서로 다른 자료·기준면 구간을 연결해 급심이나 수중여를 판정하지 않았습니다. 각 위치의 수심은 해당 출처 기준입니다.'; return out; }
   if ([...types].every(x => x === 'est' || x === 'gebco') && types.has('gebco')) { out.note = '이 단면은 GEBCO 460 m 격자와 추정값뿐이라 수십 m 단위의 급심·수중여는 찾을 수 없습니다. 아래 결과는 큰 흐름만 참고하세요.'; }
   if (onlyEst) { out.note = '이 단면은 추정 모델만 있어 해저지형 특징을 분석하지 않았습니다. 실측·공공 수심을 불러오면 분석합니다.'; return out; }
-  if (pubShare < .5 && !out.note) out.note = '세부 급심/수중여 탐지 신뢰도 낮음 (고해상도 연안 자료가 부족하고 BADA 150 m 격자·추정값 위주인 구간).';
+  if (pubShare < .5 && !out.note) out.note = '세부 급심/수중여 탐지 신뢰도 낮음 (고해상도 연안 자료가 부족하고 KHOA/BADA 150 m 격자·추정값 위주인 구간).';
   // 평활 후 기울기
   const step = seq.length > 1 ? (seq[seq.length - 1].x - seq[0].x) / (seq.length - 1) : 1;
   const win = Math.max(1, Math.round(10 / step));
@@ -71,7 +71,7 @@ function renderSecInfo() {
   const box = $('secInfo');
   if (!SEC) { box.innerHTML = ''; return; }
   const P = SEC.prof || { items: [], cast: [], note: '' };
-  const cast = P.cast.map(({ m, q }) => `<span class="cast"><b>${m} m</b> ${q ? (q.t === 'est' ? '추정 약 ' + Math.round(q.d) + ' m' : q.t === 'gebco' ? '약 ' + Math.round(q.d) + ' m · GEBCO' : (q.t === 'bada' ? '약 ' + Math.round(q.d) : q.t === 'survey' ? q.d.toFixed(1) : '약 ' + Math.round(q.d)) + ' m · ' + DTYPES[q.t].short) : '단면 밖'}</span>`).join('');
+  const cast = P.cast.map(({ m, q }) => `<span class="cast"><b>${m} m</b> ${q ? (q.t === 'est' ? '추정 약 ' + Math.round(q.d) + ' m' : q.t === 'gebco' ? '약 ' + Math.round(q.d) + ' m · GEBCO' : (q.t === 'bada' ? '약 ' + Math.round(q.d) : q.t === 'survey' ? q.d.toFixed(1) : '약 ' + Math.round(q.d)) + ' m · ' + (q.sourceType === 'khoa' ? 'KHOA' : DTYPES[q.t].short)) : '단면 밖'}</span>`).join('');
   box.innerHTML = (cast ? `<div class="casts"><span class="hint">해안선에서 캐스팅 거리별 수심</span>${cast}</div>` : '') +
     `<ul class="feats">${P.items.map(t => `<li>${t}</li>`).join('')}</ul>` + (P.note ? `<p class="note warnTxt">${P.note}</p>` : '');
 }
@@ -173,7 +173,7 @@ function drawSection(now, tide) {
     const k = Math.round(S.secHover * N), x = xk(k), p = pts[k];
     sctx.strokeStyle = 'rgba(255,255,255,.6)'; sctx.lineWidth = 1; sctx.beginPath(); sctx.moveTo(x, mt); sctx.lineTo(x, h - mb); sctx.stroke();
     const lines = ['A에서 ' + fmtD(p.s), p.land ? '육지·구조물' : '해안에서 ' + (p.dG >= 8000 ? '8 km+' : fmtD(p.dG))];
-    if (!p.land) { const q = p.r; lines.push((q.type === 'est' ? '추정 수심 ' : '수심 ') + fmtDepth(q), '출처 ' + (q.type === 'est' ? '해안거리 추정' : DTYPES[q.type].label), '신뢰도 ' + q.conf); }
+    if (!p.land) { const q = p.r; lines.push((q.type === 'est' ? '추정 수심 ' : '수심 ') + fmtDepth(q), '출처 ' + (q.label || DTYPES[q.type].label), '신뢰도 ' + q.conf); }
     const bw = 168, bh = 8 + lines.length * 15, bx = x + bw + 12 > w ? x - bw - 8 : x + 8;
     sctx.fillStyle = 'rgba(6,15,19,.92)'; sctx.fillRect(bx, mt + 4, bw, bh);
     sctx.font = '600 11px JetBrains Mono, monospace';

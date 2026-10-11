@@ -1,0 +1,201 @@
+{
+  "baseMain": "9143465",
+  "collections": [
+    {
+      "name": "ayajin",
+      "bbox": [
+        128.545,
+        38.26,
+        128.58,
+        38.285
+      ],
+      "totalCount": 249,
+      "receivedCount": 249,
+      "uniqueCount": 249,
+      "duplicates": 0,
+      "pages": 1,
+      "calls": 1,
+      "complete": true,
+      "probeOnly": false,
+      "classification": "A",
+      "fetchedAt": "2026-10-11T00:53:33.706671+00:00",
+      "header": {
+        "resultCode": "00",
+        "resultMsg": "NORMAL_SERVICE"
+      },
+      "collectionSHA256": "5ea32ae2e8eb7db4717519b2c9db4a50d639274bee0505d216d8d24f2b07f4fb",
+      "rawFiles": 2,
+      "rawBytes": 36086
+    },
+    {
+      "name": "ayajin-probe",
+      "bbox": [
+        128.545,
+        38.26,
+        128.58,
+        38.285
+      ],
+      "totalCount": 249,
+      "receivedCount": 10,
+      "uniqueCount": 10,
+      "duplicates": 0,
+      "pages": 1,
+      "calls": 1,
+      "complete": false,
+      "probeOnly": true,
+      "classification": "A",
+      "fetchedAt": "2026-10-11T00:52:44.742072+00:00",
+      "header": {
+        "resultCode": "00",
+        "resultMsg": "NORMAL_SERVICE"
+      },
+      "collectionSHA256": "2305d6ca4ea92b959be627fb4b90c6ffeb2bf4148bc39e676eeefc23ce8469bd",
+      "rawFiles": 2,
+      "rawBytes": 2540
+    },
+    {
+      "name": "geojin",
+      "bbox": [
+        128.45,
+        38.43,
+        128.48,
+        38.455
+      ],
+      "totalCount": 218,
+      "receivedCount": 218,
+      "uniqueCount": 218,
+      "duplicates": 0,
+      "pages": 1,
+      "calls": 1,
+      "complete": true,
+      "probeOnly": false,
+      "classification": "A",
+      "fetchedAt": "2026-10-11T00:53:34.734090+00:00",
+      "header": {
+        "resultCode": "00",
+        "resultMsg": "NORMAL_SERVICE"
+      },
+      "collectionSHA256": "d6358e5e6fbb63182797602313842242827ea70e4429955cd81490c77355fcdf",
+      "rawFiles": 2,
+      "rawBytes": 31694
+    },
+    {
+      "name": "geojin-probe",
+      "bbox": [
+        128.45,
+        38.43,
+        128.48,
+        38.455
+      ],
+      "totalCount": 218,
+      "receivedCount": 10,
+      "uniqueCount": 10,
+      "duplicates": 0,
+      "pages": 1,
+      "calls": 1,
+      "complete": false,
+      "probeOnly": true,
+      "classification": "A",
+      "fetchedAt": "2026-10-11T00:53:01.012190+00:00",
+      "header": {
+        "resultCode": "00",
+        "resultMsg": "NORMAL_SERVICE"
+      },
+      "collectionSHA256": "34aaa6042fb704ad1b283223adb8d58b936b4baf9b3340d81841b503bc804f4b",
+      "rawFiles": 2,
+      "rawBytes": 2537
+    },
+    {
+      "name": "jumunjin-namae",
+      "bbox": [
+        128.7,
+        37.8,
+        128.95,
+        38.0
+      ],
+      "totalCount": 11018,
+      "receivedCount": 11018,
+      "uniqueCount": 11018,
+      "duplicates": 0,
+      "pages": 37,
+      "calls": 37,
+      "complete": true,
+      "probeOnly": false,
+      "classification": "A",
+      "fetchedAt": "2026-10-11T00:53:33.031584+00:00",
+      "header": {
+        "resultCode": "00",
+        "resultMsg": "NORMAL_SERVICE"
+      },
+      "collectionSHA256": "9740126328818b3b2d86bdbbd0e20d9e113f31ac2ec722f4a3ca2a42d3655659",
+      "rawFiles": 38,
+      "rawBytes": 1571741
+    },
+    {
+      "name": "sokcho",
+      "bbox": [
+        128.585,
+        38.2,
+        128.615,
+        38.225
+      ],
+      "totalCount": 217,
+      "receivedCount": 217,
+      "uniqueCount": 217,
+      "duplicates": 0,
+      "pages": 1,
+      "calls": 1,
+      "complete": true,
+      "probeOnly": false,
+      "classification": "A",
+      "fetchedAt": "2026-10-11T00:53:34.209851+00:00",
+      "header": {
+        "resultCode": "00",
+        "resultMsg": "NORMAL_SERVICE"
+      },
+      "collectionSHA256": "dadf0f31e29cd5fea93bb19a414c6b56d4f514490fc490a1b8f0763ffde38028",
+      "rawFiles": 2,
+      "rawBytes": 31557
+    },
+    {
+      "name": "sokcho-probe",
+      "bbox": [
+        128.585,
+        38.2,
+        128.615,
+        38.225
+      ],
+      "totalCount": 217,
+      "receivedCount": 10,
+      "uniqueCount": 10,
+      "duplicates": 0,
+      "pages": 1,
+      "calls": 1,
+      "complete": false,
+      "probeOnly": true,
+      "classification": "A",
+      "fetchedAt": "2026-10-11T00:53:00.258055+00:00",
+      "header": {
+        "resultCode": "00",
+        "resultMsg": "NORMAL_SERVICE"
+      },
+      "collectionSHA256": "11647c0a39f3e4fb06406fcd649d1a7516bb2b2fc5d8646b2988d960629df473",
+      "rawFiles": 2,
+      "rawBytes": 2525
+    }
+  ],
+  "actualApiCalls": 43,
+  "fullCollectionPoints": 11702,
+  "production": {
+    "files": 11,
+    "tiles": 10,
+    "datasets": 4,
+    "bytes": 455007,
+    "manifestBytes": 10642,
+    "tileBytes": 444365,
+    "maxTileBytes": 157257
+  },
+  "rawPolicy": "원본은 tools/depth-data/raw/khoa에 Git 제외. 요청 URL/키 저장 없음.",
+  "datum": "평균해면하",
+  "datumEvidence": "사용자가 제공한 공식 조회 UI 표기. API 원응답에는 기준면/조사연도 필드 없음. 영문 datum으로 번역하지 않음."
+}

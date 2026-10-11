@@ -19,8 +19,8 @@
 | `01_geo.js` | 좌표계(웹 메르카토르)와 해안선 디코딩·육지 판정 | 67 | `decode`, `segDist`, `nearestCoast`, `inLand` |
 | `02_state.js` | 화면 상태(S)와 추정 수심 식 | 5 |  |
 | `03_userdata.js` | 내 자료: 항·포구 목록, CSV 읽기 | 164 | `readText`, `parseCSV`, `locate`, `parseDeg`, `getLL`, `importPorts`, `saveLocal`, `loadLocal` 외 |
-| `04_depth.js` | 자료집·기준면을 분리한 수심 보간과 공통 출처 schema | 가변 | `layerOf`, `addDepthPt`, `clearLayers`, `crossesLand`, `depthQuery`, `depthResult`, `modelDepth`, `estimateAt`, `fmtDepth`, `describeDepth`, `depthDetails` |
-| `04b_depth_tiles.js` | 공식 수심 지역 타일의 제한된 캐시·색인·실패 fallback | 가변 | `depthReadJSON`, `depthManifest`, `depthPrepareAreas`, `officialDepthCandidates`, `scheduleDepthArea` |
+| `04_depth.js` | 자료집·기준면 분리 수심 보간·KHOA 외삽 차단·공통 출처 schema | 가변 | `layerOf`, `addDepthPt`, `clearLayers`, `crossesLand`, `depthQuery`, `depthInsideSupport`, `depthResult`, `modelDepth`, `estimateAt`, `fmtDepth`, `describeDepth`, `depthDetails` |
+| `04b_depth_tiles.js` | KHOA 수집 범위와 공식 수심 지역 타일의 제한된 캐시·색인·실패 fallback | 가변 | `depthReadJSON`, `depthManifest`, `depthPrepareAreas`, `officialDepthCandidates`, `scheduleDepthArea` |
 | `05_struct.js` | 해안 구조물(방파제·부두) 층 | 48 | `addStructSeg`, `addStructLine`, `structDist`, `inStruct`, `structPath` |
 | `06_osm.js` | 오픈스트리트맵 해안 지형·이름 | 100 | `decodeOSM`, `osmPath`, `drawOSM`, `osmAt` |
 | `07_import.js` | 좌표 정규화, 수심·연도·기준면·보간 출처 불러오기와 로컬 보존 | 가변 | `toLatLon`, `pickDepthKey`, `depthVal`, `importDepthRows`, `importDepthJSON`, `findRecords`, `importStructJSON`, `saveDepth`, `loadDepth` |
@@ -34,7 +34,7 @@
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 68 | `drawStations`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
 | `16_terrain.js` | GEBCO 지형 배경과 지역 수심 준비 요청 (기준면 미확인 혼합 없음) | 가변 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
 | `17_flow.js` | 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표 | 102 | `buildFlowField`, `realField`, `spawn`, `stepParticles`, `drawCrnt` |
-| `18_section.js` | 공식 수심을 함께 쓰는 A→B 단면, 기준면 경계의 특징분석 중단 | 가변 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
+| `18_section.js` | KHOA 출처를 보존하는 A→B 단면, 기준면 경계의 특징분석 중단 | 가변 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
 | `18b_shore.js` | 실제 해안 교차가 있을 때만 해안 종류 판정 | 가변 | `osmDist`, `enclosed`, `classifyShore`, `setShore`, `autoShore` |
 | `19_overlay.js` | 평면도 위 표시(단면선·핀) | 19 | `drawUI` |
 | `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |

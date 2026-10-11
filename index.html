@@ -419,7 +419,7 @@ details.more[open] summary{margin-bottom:12px}
       <span><i style="border-top:3px solid #d6fff9"></i>실측</span>
       <span><i style="border-top:3px solid #7ff3e6"></i>연안해역기본도</span>
       <span><i style="border-top:3px solid #8fd3ff"></i>전자해도·항만도</span>
-      <span><i style="border-top:1.5px solid #c4b5ff"></i>BADA2024</span>
+      <span><i style="border-top:1.5px solid #c4b5ff"></i>KHOA/BADA</span>
       <span><i style="border-top:2px dashed #7ff3e6"></i>해안거리 추정</span>
       <span class="hint">흐린 실선 = 자료점 사이 보간 · 예측 바닷물 높이는 기준면 일치가 확인되지 않아 수심에 더하지 않습니다</span>
     </div>
@@ -581,8 +581,8 @@ out geom;</pre>
       <h2 class="h2">자료 출처</h2>
       <div class="sources">
     <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
-    <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → BADA 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. 현재 기본 탑재 수심은 GEBCO뿐입니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
-    <p>연안 자료 연결 준비: <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">국토지리정보원 연안해역기본도</a>(공공누리 제1유형, 원본 미확보), <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해양수산부 수심분포도</a>(공개 CSV 확인, 수심값이 없어 미탑재), <a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형, 사용자가 불러온 범위만 적용). 준비된 연결을 실제 고해상도 자료 확보로 해석하지 마세요.</p>
+    <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → 국립해양조사원 자연과학용 자료(KHOA/BADA) 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. KHOA는 유효 자료점으로 둘러싸인 곳만 보간하고 수집 범위 밖에서는 기존 자료로 돌아갑니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
+    <p><a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형): 2026년 10월 11일 주문진·남애 및 아야진·속초·거진의 일부 범위에서 11,702점을 수집했습니다. 약 150 m 간격의 해양수치모델용 자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다. 기준면은 조회 화면의 ‘평균해면하’ 표기를 보존하며 조사연도는 미확인입니다. <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">연안해역기본도</a>는 원본 미확보, <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해수부 수심분포도</a>는 공개 CSV에 수심값이 없어 미탑재입니다.</p>
     <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
     <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
     <p>조석·수온은 해양수산부 국립해양조사원(<a href="https://www.data.go.kr/data/15156018/openapi.do" target="_blank" rel="noopener">조석예보(고, 저조)</a>, <a href="https://www.data.go.kr/data/15155508/openapi.do" target="_blank" rel="noopener">조위관측소 최신 관측데이터</a>), 풍향·풍속·파고는 <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noopener">기상청 단기예보 조회서비스</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다. 음력 날짜는 korean_lunar_calendar(한국천문연구원 음양력 기준)로 계산했습니다.</p>
@@ -1005,17 +1005,30 @@ function depthQuery(mx, my) {
     }
     if (!use.length) continue;
     const p0 = use[0], resN = p0.res, distG = p0.d / k;
+    // KHOA는 근처 유효 자료점으로 둘러싸인 곳만 보간한다. 경계/빈 구역 외삽 금지.
+    if (p0.sourceType === 'khoa' && p0.d > 1e-6 && !depthInsideSupport(use, mx, my)) continue;
     let depth;
     if (distG < .5) depth = p0.depth;
     else { let ws = 0, vs = 0; for (const p of use) { const w = 1 / (p.d * p.d); ws += w; vs += w * p.depth; } depth = vs / ws; }
     const interp = distG >= .5 || !!p0.interpolated;
     const conf = type === 'bada' ? (distG <= 150 ? '중간' : '낮음') : type === 'chart' ? '중간' : (interp ? '중간' : '높음');
-    return depthResult({ depth, type, label: DTYPES[type].label, res: resN, dist: distG, n: distG < .5 ? 1 : use.length, conf, interp, src: p0.src, yr: p0.yr,
+    return depthResult({ depth, type, label: p0.sourceType === 'khoa' ? p0.src : DTYPES[type].label, res: resN, dist: distG, n: distG < .5 ? 1 : use.length, conf, interp, src: p0.src, yr: p0.yr,
       verticalDatum: p0.verticalDatum, datasetId: p0.datasetId, sourceType: p0.sourceType, estimated: (distG < .5 ? [p0] : use).some(p => p.estimated),
       contributingSources: (distG < .5 ? [p0] : use).map(p => ({ source: p.src, surveyYear: p.yr || null, resolution: p.res, distance: p.d / k, interpolated: !!p.interpolated })),
-      confidenceReason: type === 'survey' ? '이 기기의 입력값이며 관리자 검수가 확인되지 않았습니다.' : '자료점 거리·해상도 기반 등급이며 정확도 보증이 아닙니다.' });
+      confidenceReason: type === 'survey' ? '이 기기의 입력값이며 관리자 검수가 확인되지 않았습니다.' : p0.sourceType === 'khoa' ? '약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.' : '자료점 거리·해상도 기반 등급이며 정확도 보증이 아닙니다.' });
   }
   return null;
+}
+// 자료점의 볼록껍질 안인지 판정한다. 수심 생성 모델이 아니라 외삽 차단 조건이다.
+function depthInsideSupport(points, mx, my) {
+  const sorted = points.slice().sort((a, b) => a.mx - b.mx || a.my - b.my);
+  if (sorted.length < 3) return false;
+  const cross = (a, b, c) => (b.mx - a.mx) * (c.my - a.my) - (b.my - a.my) * (c.mx - a.mx);
+  const half = list => { const h = []; for (const p of list) { while (h.length >= 2 && cross(h[h.length - 2], h[h.length - 1], p) <= 0) h.pop(); h.push(p); } return h; };
+  const lo = half(sorted), hi = half(sorted.slice().reverse()), hull = lo.slice(0, -1).concat(hi.slice(0, -1));
+  if (hull.length < 3) return false;
+  const q = { mx, my };
+  return hull.every((a, i) => cross(a, hull[(i + 1) % hull.length], q) >= 0);
 }
 // 공식 수심 자료가 없을 때: 해안 800 m 안은 추정, 밖은 GEBCO. 기준면 미확인 자료를 혼합하지 않는다.
 function modelDepth(mx, my, dG) {
@@ -1056,7 +1069,7 @@ function depthDetails(r) {
 // 04b_depth_tiles.js — 지도 표현과 분리한 공식 수심 지역 자료 로더
 const OFFICIAL_DEPTH = { manifest: null, init: null, cache: new Map(), signature: '', generation: 0,
   maxTiles: 12, maxPoints: 60000, maxBytes: 8 * 1024 * 1024, error: '', timer: null };
-const OFFICIAL_TYPES = { coastal_official: 'coastal', mof_contour: 'mof', chart_public: 'chart', bada: 'bada' };
+const OFFICIAL_TYPES = { coastal_official: 'coastal', mof_contour: 'mof', chart_public: 'chart', bada: 'bada', khoa: 'bada' };
 async function depthReadJSON(url, limit) {
   const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 8000);
   try {
@@ -1084,6 +1097,8 @@ async function depthManifest() {
         if (!OFFICIAL_TYPES[ds.sourceType] || typeof ds.id !== 'string' || !ds.id || datasetIds.has(ds.id) || typeof ds.source !== 'string' || !ds.source ||
           !Number.isFinite(ds.resolution) || !(ds.resolution > 0 && ds.resolution <= 1000) || typeof ds.verticalDatum !== 'string' || !ds.verticalDatum) throw Error('수심 출처 정보');
         datasetIds.add(ds.id);
+        if (ds.sourceType === 'khoa' && (!Array.isArray(ds.coverageBBox) || ds.coverageBBox.length !== 4 || !ds.coverageBBox.every(Number.isFinite) ||
+          ds.coverageBBox[0] >= ds.coverageBBox[2] || ds.coverageBBox[1] >= ds.coverageBBox[3] || ds.estimated !== true)) throw Error('KHOA 범위/격자 정보');
       }
       for (const t of m.tiles) {
         if (!/^[a-zA-Z0-9_/-]+\.json$/.test(t.file) || t.file.includes('..') || files.has(t.file) || !Array.isArray(t.bbox) || t.bbox.length !== 4 || !t.bbox.every(Number.isFinite) ||
@@ -1098,7 +1113,7 @@ async function depthManifest() {
 // 경위도 범위 배열만 받는다. Canvas/화면 좌표를 알 필요가 없다.
 async function depthPrepareAreas(areas) {
   const m = await depthManifest(); if (!m || !m.tiles.length) return false;
-  const pad = Math.max(...m.datasets.map(d => d.resolution * (d.sourceType === 'bada' ? 1.5 : 2)), 0) / 80000;
+  const pad = Math.max(...m.datasets.map(d => d.resolution * (OFFICIAL_TYPES[d.sourceType] === 'bada' ? 1.5 : 2)), 0) / 80000;
   const boxes = areas.filter(b => b.every(Number.isFinite) && b[2] - b[0] <= .6 && b[3] - b[1] <= .6);
   const wants = m.tiles.filter(t => boxes.some(b => t.bbox[0] <= b[2] + pad && t.bbox[2] >= b[0] - pad && t.bbox[1] <= b[3] + pad && t.bbox[3] >= b[1] - pad));
   // 큰 범위는 일부만 싣지 않는다. 더 확대하면 완전한 지역 묶음을 읽는다.
@@ -1124,10 +1139,10 @@ async function depthPrepareAreas(areas) {
         const [lon, lat, depth, dataset, year, interpolated] = row, ds = m.datasets[dataset];
         if (!ds || ![lon, lat, depth].every(Number.isFinite) || lon < 123.5 || lon > 132.5 || lat < 32 || lat > 39.5 || depth < 0 ||
           lon < tile.bbox[0] || lon > tile.bbox[2] || lat < tile.bbox[1] || lat > tile.bbox[3] || typeof interpolated !== 'boolean') throw Error('수심 타일 좌표/속성');
-        const radius = ds.resolution * (ds.sourceType === 'bada' ? 1.5 : 2);
+        const radius = ds.resolution * (OFFICIAL_TYPES[ds.sourceType] === 'bada' ? 1.5 : 2);
         maxRadius = Math.max(maxRadius, radius);
         const p = { mx: mxOf(lon), my: myOf(lat), depth, res: ds.resolution, src: ds.source, yr: year ?? ds.surveyYear,
-          datasetId: ds.id, sourceType: ds.sourceType, verticalDatum: ds.verticalDatum, interpolated, estimated: !!ds.estimated, radius };
+          datasetId: ds.id, sourceType: ds.sourceType, verticalDatum: ds.verticalDatum, interpolated, estimated: !!ds.estimated, radius, coverageBBox: ds.coverageBBox };
         const key = Math.floor(p.mx / 1000) + ',' + Math.floor(p.my / 1000);
         if (!idx.has(key)) idx.set(key, []); idx.get(key).push(p);
       }
@@ -1143,6 +1158,10 @@ function officialDepthCandidates(type, mx, my) {
     for (let x = gx - n; x <= gx + n; x++) for (let y = gy - n; y <= gy + n; y++) {
       for (const p of tile.idx.get(x + ',' + y) || []) {
         if (OFFICIAL_TYPES[p.sourceType] !== type) continue;
+        if (p.sourceType === 'khoa') {
+          const lon = lonOf(mx), lat = latOf(my), b = p.coverageBBox;
+          if (lon < b[0] || lon > b[2] || lat < b[1] || lat > b[3]) continue;
+        }
         const d = Math.hypot(mx - p.mx, my - p.my);
         if (d <= p.radius * k) out.push({ ...p, d });
       }
@@ -2529,7 +2548,7 @@ function profileFeatures(sec) {
   let c0 = 0, dir = 1;
   if (cross.length) { const c = cross[0]; if (pts[c - 1].land && !pts[c].land) { c0 = c; dir = 1; } else { c0 = c - 1; dir = -1; } }
   const s0 = pts[c0].s, seq = [];
-  for (let k = c0; k >= 0 && k < pts.length; k += dir) { const p = pts[k]; if (p.land) { if (seq.length) break; continue; } seq.push({ x: Math.abs(p.s - s0), d: p.r.depth, t: p.r.type }); }
+  for (let k = c0; k >= 0 && k < pts.length; k += dir) { const p = pts[k]; if (p.land) { if (seq.length) break; continue; } seq.push({ x: Math.abs(p.s - s0), d: p.r.depth, t: p.r.type, sourceType: p.r.sourceType }); }
   const out = { items: [], note: '', cast: [] };
   if (!cross.length) { out.note = '해안 교차가 없어 해안 기준 캐스팅 거리와 해안 지형을 판정하지 않았습니다.'; return out; }
   if (seq.length < 10) { out.note = '바다 구간이 짧아 분석하지 않았습니다.'; return out; }
@@ -2539,7 +2558,7 @@ function profileFeatures(sec) {
   if (refs.size > 1) { out.note = '서로 다른 자료·기준면 구간을 연결해 급심이나 수중여를 판정하지 않았습니다. 각 위치의 수심은 해당 출처 기준입니다.'; return out; }
   if ([...types].every(x => x === 'est' || x === 'gebco') && types.has('gebco')) { out.note = '이 단면은 GEBCO 460 m 격자와 추정값뿐이라 수십 m 단위의 급심·수중여는 찾을 수 없습니다. 아래 결과는 큰 흐름만 참고하세요.'; }
   if (onlyEst) { out.note = '이 단면은 추정 모델만 있어 해저지형 특징을 분석하지 않았습니다. 실측·공공 수심을 불러오면 분석합니다.'; return out; }
-  if (pubShare < .5 && !out.note) out.note = '세부 급심/수중여 탐지 신뢰도 낮음 (고해상도 연안 자료가 부족하고 BADA 150 m 격자·추정값 위주인 구간).';
+  if (pubShare < .5 && !out.note) out.note = '세부 급심/수중여 탐지 신뢰도 낮음 (고해상도 연안 자료가 부족하고 KHOA/BADA 150 m 격자·추정값 위주인 구간).';
   // 평활 후 기울기
   const step = seq.length > 1 ? (seq[seq.length - 1].x - seq[0].x) / (seq.length - 1) : 1;
   const win = Math.max(1, Math.round(10 / step));
@@ -2571,7 +2590,7 @@ function renderSecInfo() {
   const box = $('secInfo');
   if (!SEC) { box.innerHTML = ''; return; }
   const P = SEC.prof || { items: [], cast: [], note: '' };
-  const cast = P.cast.map(({ m, q }) => `<span class="cast"><b>${m} m</b> ${q ? (q.t === 'est' ? '추정 약 ' + Math.round(q.d) + ' m' : q.t === 'gebco' ? '약 ' + Math.round(q.d) + ' m · GEBCO' : (q.t === 'bada' ? '약 ' + Math.round(q.d) : q.t === 'survey' ? q.d.toFixed(1) : '약 ' + Math.round(q.d)) + ' m · ' + DTYPES[q.t].short) : '단면 밖'}</span>`).join('');
+  const cast = P.cast.map(({ m, q }) => `<span class="cast"><b>${m} m</b> ${q ? (q.t === 'est' ? '추정 약 ' + Math.round(q.d) + ' m' : q.t === 'gebco' ? '약 ' + Math.round(q.d) + ' m · GEBCO' : (q.t === 'bada' ? '약 ' + Math.round(q.d) : q.t === 'survey' ? q.d.toFixed(1) : '약 ' + Math.round(q.d)) + ' m · ' + (q.sourceType === 'khoa' ? 'KHOA' : DTYPES[q.t].short)) : '단면 밖'}</span>`).join('');
   box.innerHTML = (cast ? `<div class="casts"><span class="hint">해안선에서 캐스팅 거리별 수심</span>${cast}</div>` : '') +
     `<ul class="feats">${P.items.map(t => `<li>${t}</li>`).join('')}</ul>` + (P.note ? `<p class="note warnTxt">${P.note}</p>` : '');
 }
@@ -2673,7 +2692,7 @@ function drawSection(now, tide) {
     const k = Math.round(S.secHover * N), x = xk(k), p = pts[k];
     sctx.strokeStyle = 'rgba(255,255,255,.6)'; sctx.lineWidth = 1; sctx.beginPath(); sctx.moveTo(x, mt); sctx.lineTo(x, h - mb); sctx.stroke();
     const lines = ['A에서 ' + fmtD(p.s), p.land ? '육지·구조물' : '해안에서 ' + (p.dG >= 8000 ? '8 km+' : fmtD(p.dG))];
-    if (!p.land) { const q = p.r; lines.push((q.type === 'est' ? '추정 수심 ' : '수심 ') + fmtDepth(q), '출처 ' + (q.type === 'est' ? '해안거리 추정' : DTYPES[q.type].label), '신뢰도 ' + q.conf); }
+    if (!p.land) { const q = p.r; lines.push((q.type === 'est' ? '추정 수심 ' : '수심 ') + fmtDepth(q), '출처 ' + (q.label || DTYPES[q.type].label), '신뢰도 ' + q.conf); }
     const bw = 168, bh = 8 + lines.length * 15, bx = x + bw + 12 > w ? x - bw - 8 : x + 8;
     sctx.fillStyle = 'rgba(6,15,19,.92)'; sctx.fillRect(bx, mt + 4, bw, bh);
     sctx.font = '600 11px JetBrains Mono, monospace';

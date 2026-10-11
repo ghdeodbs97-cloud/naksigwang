@@ -65,17 +65,30 @@ function depthQuery(mx, my) {
     }
     if (!use.length) continue;
     const p0 = use[0], resN = p0.res, distG = p0.d / k;
+    // KHOA는 근처 유효 자료점으로 둘러싸인 곳만 보간한다. 경계/빈 구역 외삽 금지.
+    if (p0.sourceType === 'khoa' && p0.d > 1e-6 && !depthInsideSupport(use, mx, my)) continue;
     let depth;
     if (distG < .5) depth = p0.depth;
     else { let ws = 0, vs = 0; for (const p of use) { const w = 1 / (p.d * p.d); ws += w; vs += w * p.depth; } depth = vs / ws; }
     const interp = distG >= .5 || !!p0.interpolated;
     const conf = type === 'bada' ? (distG <= 150 ? '중간' : '낮음') : type === 'chart' ? '중간' : (interp ? '중간' : '높음');
-    return depthResult({ depth, type, label: DTYPES[type].label, res: resN, dist: distG, n: distG < .5 ? 1 : use.length, conf, interp, src: p0.src, yr: p0.yr,
+    return depthResult({ depth, type, label: p0.sourceType === 'khoa' ? p0.src : DTYPES[type].label, res: resN, dist: distG, n: distG < .5 ? 1 : use.length, conf, interp, src: p0.src, yr: p0.yr,
       verticalDatum: p0.verticalDatum, datasetId: p0.datasetId, sourceType: p0.sourceType, estimated: (distG < .5 ? [p0] : use).some(p => p.estimated),
       contributingSources: (distG < .5 ? [p0] : use).map(p => ({ source: p.src, surveyYear: p.yr || null, resolution: p.res, distance: p.d / k, interpolated: !!p.interpolated })),
-      confidenceReason: type === 'survey' ? '이 기기의 입력값이며 관리자 검수가 확인되지 않았습니다.' : '자료점 거리·해상도 기반 등급이며 정확도 보증이 아닙니다.' });
+      confidenceReason: type === 'survey' ? '이 기기의 입력값이며 관리자 검수가 확인되지 않았습니다.' : p0.sourceType === 'khoa' ? '약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.' : '자료점 거리·해상도 기반 등급이며 정확도 보증이 아닙니다.' });
   }
   return null;
+}
+// 자료점의 볼록껍질 안인지 판정한다. 수심 생성 모델이 아니라 외삽 차단 조건이다.
+function depthInsideSupport(points, mx, my) {
+  const sorted = points.slice().sort((a, b) => a.mx - b.mx || a.my - b.my);
+  if (sorted.length < 3) return false;
+  const cross = (a, b, c) => (b.mx - a.mx) * (c.my - a.my) - (b.my - a.my) * (c.mx - a.mx);
+  const half = list => { const h = []; for (const p of list) { while (h.length >= 2 && cross(h[h.length - 2], h[h.length - 1], p) <= 0) h.pop(); h.push(p); } return h; };
+  const lo = half(sorted), hi = half(sorted.slice().reverse()), hull = lo.slice(0, -1).concat(hi.slice(0, -1));
+  if (hull.length < 3) return false;
+  const q = { mx, my };
+  return hull.every((a, i) => cross(a, hull[(i + 1) % hull.length], q) >= 0);
 }
 // 공식 수심 자료가 없을 때: 해안 800 m 안은 추정, 밖은 GEBCO. 기준면 미확인 자료를 혼합하지 않는다.
 function modelDepth(mx, my, dG) {
