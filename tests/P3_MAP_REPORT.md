@@ -11,6 +11,7 @@
 - `src/app/16_terrain.js`: 배경 활성 시 기존 terrain 그림은 빈 clip으로 숨긴다. 육지 마스크·분석 격자 계산은 유지하고 항구·갯바위 등은 그 뒤에 그린다.
 - `src/app/21_input.js`, `23_main.js`, `24_tabs.js`: 버튼, 크기·보이는 viewport 동기화와 SDK 비동기 시작, 창 높이만 변경되어도 지도 크기 갱신. `src/README.md` 코드 지도 갱신.
 - `index.html`: `build.py`로 생성. 직접 편집하지 않음.
+- `build.py`, `tests/test_build_consistency.py`: Windows CRLF/Linux LF의 static JS 해시를 통일하고 생성 HTML은 LF로 고정한다. 첫 원격 CI에서 static 캐시 주소만 불일치한 문제를 수정했고 두 입력 형식의 빌드 결과 바이트 일치를 검사한다.
 - `.github/workflows/ci.yml`, `tests/p3_depth_guard.py`: P3 PR base와 HEAD 사이의 보호 경로 변경 차단, P3 검사와 빌드 일치 검사.
 - `tests/p3_baseline.py`, `p3_baseline.json`, `p3_provider_checks.js`, `test_map_provider.py`, `p3_run_suite.py`, `p3_validation.json`: main baseline, mock/회귀 검사 및 결과.
 
