@@ -8,7 +8,7 @@ from pathlib import Path
 import tempfile
 import shutil
 
-TYPES = ['coastal_official', 'mof_contour', 'chart_public', 'bada']
+TYPES = ['coastal_official', 'mof_contour', 'chart_public', 'bada', 'khoa']
 
 
 def records(path, encoding, geometry_field=None):

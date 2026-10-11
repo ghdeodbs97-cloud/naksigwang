@@ -1,0 +1,212 @@
+[
+  {
+    "name": "거진",
+    "coordinate": {
+      "lat": 38.4431,
+      "lon": 128.4563,
+      "depth": 2.71
+    },
+    "result": {
+      "depth": 2.71,
+      "type": "bada",
+      "label": "국립해양조사원 자연과학용 수심정보",
+      "res": 150,
+      "dist": 0,
+      "n": 1,
+      "conf": "중간",
+      "interp": false,
+      "src": "국립해양조사원 자연과학용 수심정보",
+      "yr": null,
+      "verticalDatum": "평균해면하",
+      "datasetId": "khoa-geojin-20261011-0",
+      "sourceType": "khoa",
+      "estimated": true,
+      "contributingSources": [
+        {
+          "source": "국립해양조사원 자연과학용 수심정보",
+          "surveyYear": null,
+          "resolution": 150,
+          "distance": 0,
+          "interpolated": false
+        }
+      ],
+      "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "resolution": 150,
+      "distanceToSource": 0,
+      "interpolated": false,
+      "confidence": "중간",
+      "surveyYear": null,
+      "measurementCount": 1
+    },
+    "cachedTiles": 1
+  },
+  {
+    "name": "아야진",
+    "coordinate": {
+      "lat": 38.2719,
+      "lon": 128.5569,
+      "depth": 4.47
+    },
+    "result": {
+      "depth": 4.47,
+      "type": "bada",
+      "label": "국립해양조사원 자연과학용 수심정보",
+      "res": 150,
+      "dist": 0,
+      "n": 1,
+      "conf": "중간",
+      "interp": false,
+      "src": "국립해양조사원 자연과학용 수심정보",
+      "yr": null,
+      "verticalDatum": "평균해면하",
+      "datasetId": "khoa-ayajin-20261011-0",
+      "sourceType": "khoa",
+      "estimated": true,
+      "contributingSources": [
+        {
+          "source": "국립해양조사원 자연과학용 수심정보",
+          "surveyYear": null,
+          "resolution": 150,
+          "distance": 0,
+          "interpolated": false
+        }
+      ],
+      "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "resolution": 150,
+      "distanceToSource": 0,
+      "interpolated": false,
+      "confidence": "중간",
+      "surveyYear": null,
+      "measurementCount": 1
+    },
+    "cachedTiles": 2
+  },
+  {
+    "name": "속초",
+    "coordinate": {
+      "lat": 38.208,
+      "lon": 128.5954,
+      "depth": 5.96
+    },
+    "result": {
+      "depth": 5.96,
+      "type": "bada",
+      "label": "국립해양조사원 자연과학용 수심정보",
+      "res": 150,
+      "dist": 0,
+      "n": 1,
+      "conf": "중간",
+      "interp": false,
+      "src": "국립해양조사원 자연과학용 수심정보",
+      "yr": null,
+      "verticalDatum": "평균해면하",
+      "datasetId": "khoa-sokcho-20261011-0",
+      "sourceType": "khoa",
+      "estimated": true,
+      "contributingSources": [
+        {
+          "source": "국립해양조사원 자연과학용 수심정보",
+          "surveyYear": null,
+          "resolution": 150,
+          "distance": 0,
+          "interpolated": false
+        }
+      ],
+      "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "resolution": 150,
+      "distanceToSource": 0,
+      "interpolated": false,
+      "confidence": "중간",
+      "surveyYear": null,
+      "measurementCount": 1
+    },
+    "cachedTiles": 3
+  },
+  {
+    "name": "남애",
+    "coordinate": {
+      "lat": 37.9411,
+      "lon": 128.7894,
+      "depth": 6.69
+    },
+    "result": {
+      "depth": 6.69,
+      "type": "bada",
+      "label": "국립해양조사원 자연과학용 수심정보",
+      "res": 150,
+      "dist": 0,
+      "n": 1,
+      "conf": "중간",
+      "interp": false,
+      "src": "국립해양조사원 자연과학용 수심정보",
+      "yr": null,
+      "verticalDatum": "평균해면하",
+      "datasetId": "khoa-jumunjin-namae-20261011-0",
+      "sourceType": "khoa",
+      "estimated": true,
+      "contributingSources": [
+        {
+          "source": "국립해양조사원 자연과학용 수심정보",
+          "surveyYear": null,
+          "resolution": 150,
+          "distance": 0,
+          "interpolated": false
+        }
+      ],
+      "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "resolution": 150,
+      "distanceToSource": 0,
+      "interpolated": false,
+      "confidence": "중간",
+      "surveyYear": null,
+      "measurementCount": 1
+    },
+    "cachedTiles": 1
+  },
+  {
+    "name": "주문진",
+    "coordinate": {
+      "lat": 37.892,
+      "lon": 128.8312,
+      "depth": 4.81
+    },
+    "result": {
+      "depth": 4.81,
+      "type": "bada",
+      "label": "국립해양조사원 자연과학용 수심정보",
+      "res": 150,
+      "dist": 0,
+      "n": 1,
+      "conf": "중간",
+      "interp": false,
+      "src": "국립해양조사원 자연과학용 수심정보",
+      "yr": null,
+      "verticalDatum": "평균해면하",
+      "datasetId": "khoa-jumunjin-namae-20261011-0",
+      "sourceType": "khoa",
+      "estimated": true,
+      "contributingSources": [
+        {
+          "source": "국립해양조사원 자연과학용 수심정보",
+          "surveyYear": null,
+          "resolution": 150,
+          "distance": 0,
+          "interpolated": false
+        }
+      ],
+      "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "resolution": 150,
+      "distanceToSource": 0,
+      "interpolated": false,
+      "confidence": "중간",
+      "surveyYear": null,
+      "measurementCount": 1
+    },
+    "cachedTiles": 1
+  }
+]

@@ -1,1 +1,335 @@
-{"version":1,"datasets":[],"tiles":[]}
+{
+  "version": 1,
+  "datasets": [
+    {
+      "id": "khoa-jumunjin-namae-20261011-0",
+      "sourceType": "khoa",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "resolution": 150,
+      "verticalDatum": "평균해면하",
+      "surveyYear": null,
+      "license": "공공누리 제1유형",
+      "sourceURL": "https://www.data.go.kr/data/15142498/openapi.do",
+      "inputCRS": "EPSG:4326",
+      "datasetId": "khoa-jumunjin-namae-20261011-0",
+      "coverageBBox": [
+        128.7,
+        37.8,
+        128.95,
+        38.0
+      ],
+      "datumNote": "공공데이터포털 공식 조회 UI의 수심(m)(평균해면하) 표기(사용자 제공). API 응답 자체에는 기준면 필드 없음. MSL/DL/LAT 변환하지 않음.",
+      "estimated": true,
+      "note": "150 m 간격 해양수치모델용 데이터. 원본 측심점/수직 정확도 보증이 아님."
+    },
+    {
+      "id": "khoa-ayajin-20261011-0",
+      "sourceType": "khoa",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "resolution": 150,
+      "verticalDatum": "평균해면하",
+      "surveyYear": null,
+      "license": "공공누리 제1유형",
+      "sourceURL": "https://www.data.go.kr/data/15142498/openapi.do",
+      "inputCRS": "EPSG:4326",
+      "datasetId": "khoa-ayajin-20261011-0",
+      "coverageBBox": [
+        128.545,
+        38.26,
+        128.58,
+        38.285
+      ],
+      "datumNote": "공공데이터포털 공식 조회 UI의 수심(m)(평균해면하) 표기(사용자 제공). API 응답 자체에는 기준면 필드 없음. MSL/DL/LAT 변환하지 않음.",
+      "estimated": true,
+      "note": "150 m 간격 해양수치모델용 데이터. 원본 측심점/수직 정확도 보증이 아님."
+    },
+    {
+      "id": "khoa-sokcho-20261011-0",
+      "sourceType": "khoa",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "resolution": 150,
+      "verticalDatum": "평균해면하",
+      "surveyYear": null,
+      "license": "공공누리 제1유형",
+      "sourceURL": "https://www.data.go.kr/data/15142498/openapi.do",
+      "inputCRS": "EPSG:4326",
+      "datasetId": "khoa-sokcho-20261011-0",
+      "coverageBBox": [
+        128.585,
+        38.2,
+        128.615,
+        38.225
+      ],
+      "datumNote": "공공데이터포털 공식 조회 UI의 수심(m)(평균해면하) 표기(사용자 제공). API 응답 자체에는 기준면 필드 없음. MSL/DL/LAT 변환하지 않음.",
+      "estimated": true,
+      "note": "150 m 간격 해양수치모델용 데이터. 원본 측심점/수직 정확도 보증이 아님."
+    },
+    {
+      "id": "khoa-geojin-20261011-0",
+      "sourceType": "khoa",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "resolution": 150,
+      "verticalDatum": "평균해면하",
+      "surveyYear": null,
+      "license": "공공누리 제1유형",
+      "sourceURL": "https://www.data.go.kr/data/15142498/openapi.do",
+      "inputCRS": "EPSG:4326",
+      "datasetId": "khoa-geojin-20261011-0",
+      "coverageBBox": [
+        128.45,
+        38.43,
+        128.48,
+        38.455
+      ],
+      "datumNote": "공공데이터포털 공식 조회 UI의 수심(m)(평균해면하) 표기(사용자 제공). API 응답 자체에는 기준면 필드 없음. MSL/DL/LAT 변환하지 않음.",
+      "estimated": true,
+      "note": "150 m 간격 해양수치모델용 데이터. 원본 측심점/수직 정확도 보증이 아님."
+    }
+  ],
+  "tiles": [
+    {
+      "file": "0/1287_379_0_3748edbd3232_3748edbd3232.json",
+      "bbox": [
+        128.7,
+        37.9,
+        128.8,
+        38.0
+      ],
+      "count": 998,
+      "bytes": 37456
+    },
+    {
+      "file": "0/1288_378_0_5f1e18dce3b0_5f1e18dce3b0.json",
+      "bbox": [
+        128.8,
+        37.8,
+        128.9,
+        37.9
+      ],
+      "count": 1567,
+      "bytes": 58845
+    },
+    {
+      "file": "0/1288_379_0_e638a31d4526_e638a31d4526.json",
+      "bbox": [
+        128.8,
+        37.9,
+        128.9,
+        38.0
+      ],
+      "count": 4143,
+      "bytes": 157257
+    },
+    {
+      "file": "0/1288_380_0_9aba9d5ab383_9aba9d5ab383.json",
+      "bbox": [
+        128.8,
+        38.0,
+        128.9,
+        38.1
+      ],
+      "count": 5,
+      "bytes": 201
+    },
+    {
+      "file": "0/1289_378_0_431a792cbc2a_431a792cbc2a.json",
+      "bbox": [
+        128.9,
+        37.8,
+        129.0,
+        37.9
+      ],
+      "count": 2135,
+      "bytes": 80962
+    },
+    {
+      "file": "0/1289_379_0_e8b799c89da3_e8b799c89da3.json",
+      "bbox": [
+        128.9,
+        37.9,
+        129.0,
+        38.0
+      ],
+      "count": 2170,
+      "bytes": 83949
+    },
+    {
+      "file": "1/1285_382_0_0cf5fe21efda_029d60afdec7.json",
+      "bbox": [
+        128.5,
+        38.2,
+        128.6,
+        38.3
+      ],
+      "count": 249,
+      "bytes": 9360
+    },
+    {
+      "file": "2/1285_382_0_f970de8cb6c1_2c80cdd2f730.json",
+      "bbox": [
+        128.5,
+        38.2,
+        128.6,
+        38.3
+      ],
+      "count": 57,
+      "bytes": 2126
+    },
+    {
+      "file": "2/1286_382_0_39d5f622794c_214d8235e235.json",
+      "bbox": [
+        128.6,
+        38.2,
+        128.7,
+        38.3
+      ],
+      "count": 160,
+      "bytes": 6033
+    },
+    {
+      "file": "3/1284_384_0_d9b04916ffc8_f91e4982bb71.json",
+      "bbox": [
+        128.4,
+        38.4,
+        128.5,
+        38.5
+      ],
+      "count": 218,
+      "bytes": 8176
+    }
+  ],
+  "provenance": [
+    {
+      "inputFile": "khoa-points.geojson",
+      "sha256": "496c9dce1fa16140626b7279d5da24c265615fbdb4f13d9a2f978be6bb44f75c",
+      "featureCount": 11018,
+      "pointCount": 11018,
+      "depthField": "depth",
+      "depthZ": false,
+      "elevation": false,
+      "inputFiles": {
+        "khoa-points.geojson": "496c9dce1fa16140626b7279d5da24c265615fbdb4f13d9a2f978be6bb44f75c"
+      },
+      "sourceType": "khoa",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "datasetId": "khoa-jumunjin-namae-20261011",
+      "verticalDatum": "평균해면하",
+      "datumNote": "공공데이터포털 공식 조회 UI의 수심(m)(평균해면하) 표기(사용자 제공). API 응답 자체에는 기준면 필드 없음. MSL/DL/LAT 변환하지 않음.",
+      "coverageBBox": [
+        128.7,
+        37.8,
+        128.95,
+        38.0
+      ],
+      "collectionSHA256": "9740126328818b3b2d86bdbbd0e20d9e113f31ac2ec722f4a3ca2a42d3655659",
+      "receivedCount": 11018,
+      "uniqueCount": 11018,
+      "calls": 37,
+      "fetchedAt": "2026-10-11T00:53:33.031584+00:00",
+      "fieldMapping": {
+        "lat": "lat",
+        "lot": "lon",
+        "dpwt": "depth"
+      }
+    },
+    {
+      "inputFile": "khoa-points.geojson",
+      "sha256": "d5f05a3b947d1805f2eb71cf38a2837e71e45766ec050bbc8f2f31d860d1122c",
+      "featureCount": 249,
+      "pointCount": 249,
+      "depthField": "depth",
+      "depthZ": false,
+      "elevation": false,
+      "inputFiles": {
+        "khoa-points.geojson": "d5f05a3b947d1805f2eb71cf38a2837e71e45766ec050bbc8f2f31d860d1122c"
+      },
+      "sourceType": "khoa",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "datasetId": "khoa-ayajin-20261011",
+      "verticalDatum": "평균해면하",
+      "datumNote": "공공데이터포털 공식 조회 UI의 수심(m)(평균해면하) 표기(사용자 제공). API 응답 자체에는 기준면 필드 없음. MSL/DL/LAT 변환하지 않음.",
+      "coverageBBox": [
+        128.545,
+        38.26,
+        128.58,
+        38.285
+      ],
+      "collectionSHA256": "5ea32ae2e8eb7db4717519b2c9db4a50d639274bee0505d216d8d24f2b07f4fb",
+      "receivedCount": 249,
+      "uniqueCount": 249,
+      "calls": 1,
+      "fetchedAt": "2026-10-11T00:53:33.706671+00:00",
+      "fieldMapping": {
+        "lat": "lat",
+        "lot": "lon",
+        "dpwt": "depth"
+      }
+    },
+    {
+      "inputFile": "khoa-points.geojson",
+      "sha256": "894449af87ec0eb2aaf0acadf47866c7b72f3fbfbfd9b4d0281bb1485a8e0280",
+      "featureCount": 217,
+      "pointCount": 217,
+      "depthField": "depth",
+      "depthZ": false,
+      "elevation": false,
+      "inputFiles": {
+        "khoa-points.geojson": "894449af87ec0eb2aaf0acadf47866c7b72f3fbfbfd9b4d0281bb1485a8e0280"
+      },
+      "sourceType": "khoa",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "datasetId": "khoa-sokcho-20261011",
+      "verticalDatum": "평균해면하",
+      "datumNote": "공공데이터포털 공식 조회 UI의 수심(m)(평균해면하) 표기(사용자 제공). API 응답 자체에는 기준면 필드 없음. MSL/DL/LAT 변환하지 않음.",
+      "coverageBBox": [
+        128.585,
+        38.2,
+        128.615,
+        38.225
+      ],
+      "collectionSHA256": "dadf0f31e29cd5fea93bb19a414c6b56d4f514490fc490a1b8f0763ffde38028",
+      "receivedCount": 217,
+      "uniqueCount": 217,
+      "calls": 1,
+      "fetchedAt": "2026-10-11T00:53:34.209851+00:00",
+      "fieldMapping": {
+        "lat": "lat",
+        "lot": "lon",
+        "dpwt": "depth"
+      }
+    },
+    {
+      "inputFile": "khoa-points.geojson",
+      "sha256": "ca9d2b265b7cef9d74870a5c923aa108de706c43eb688ccfce25f1b7e626a84d",
+      "featureCount": 218,
+      "pointCount": 218,
+      "depthField": "depth",
+      "depthZ": false,
+      "elevation": false,
+      "inputFiles": {
+        "khoa-points.geojson": "ca9d2b265b7cef9d74870a5c923aa108de706c43eb688ccfce25f1b7e626a84d"
+      },
+      "sourceType": "khoa",
+      "source": "국립해양조사원 자연과학용 수심정보",
+      "datasetId": "khoa-geojin-20261011",
+      "verticalDatum": "평균해면하",
+      "datumNote": "공공데이터포털 공식 조회 UI의 수심(m)(평균해면하) 표기(사용자 제공). API 응답 자체에는 기준면 필드 없음. MSL/DL/LAT 변환하지 않음.",
+      "coverageBBox": [
+        128.45,
+        38.43,
+        128.48,
+        38.455
+      ],
+      "collectionSHA256": "d6358e5e6fbb63182797602313842242827ea70e4429955cd81490c77355fcdf",
+      "receivedCount": 218,
+      "uniqueCount": 218,
+      "calls": 1,
+      "fetchedAt": "2026-10-11T00:53:34.734090+00:00",
+      "fieldMapping": {
+        "lat": "lat",
+        "lot": "lon",
+        "dpwt": "depth"
+      }
+    }
+  ]
+}

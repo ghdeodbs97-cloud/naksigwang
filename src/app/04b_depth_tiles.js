@@ -1,7 +1,7 @@
 // 04b_depth_tiles.js — 지도 표현과 분리한 공식 수심 지역 자료 로더
 const OFFICIAL_DEPTH = { manifest: null, init: null, cache: new Map(), signature: '', generation: 0,
   maxTiles: 12, maxPoints: 60000, maxBytes: 8 * 1024 * 1024, error: '', timer: null };
-const OFFICIAL_TYPES = { coastal_official: 'coastal', mof_contour: 'mof', chart_public: 'chart', bada: 'bada' };
+const OFFICIAL_TYPES = { coastal_official: 'coastal', mof_contour: 'mof', chart_public: 'chart', bada: 'bada', khoa: 'bada' };
 async function depthReadJSON(url, limit) {
   const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 8000);
   try {
@@ -29,6 +29,8 @@ async function depthManifest() {
         if (!OFFICIAL_TYPES[ds.sourceType] || typeof ds.id !== 'string' || !ds.id || datasetIds.has(ds.id) || typeof ds.source !== 'string' || !ds.source ||
           !Number.isFinite(ds.resolution) || !(ds.resolution > 0 && ds.resolution <= 1000) || typeof ds.verticalDatum !== 'string' || !ds.verticalDatum) throw Error('수심 출처 정보');
         datasetIds.add(ds.id);
+        if (ds.sourceType === 'khoa' && (!Array.isArray(ds.coverageBBox) || ds.coverageBBox.length !== 4 || !ds.coverageBBox.every(Number.isFinite) ||
+          ds.coverageBBox[0] >= ds.coverageBBox[2] || ds.coverageBBox[1] >= ds.coverageBBox[3] || ds.estimated !== true)) throw Error('KHOA 범위/격자 정보');
       }
       for (const t of m.tiles) {
         if (!/^[a-zA-Z0-9_/-]+\.json$/.test(t.file) || t.file.includes('..') || files.has(t.file) || !Array.isArray(t.bbox) || t.bbox.length !== 4 || !t.bbox.every(Number.isFinite) ||
@@ -43,7 +45,7 @@ async function depthManifest() {
 // 경위도 범위 배열만 받는다. Canvas/화면 좌표를 알 필요가 없다.
 async function depthPrepareAreas(areas) {
   const m = await depthManifest(); if (!m || !m.tiles.length) return false;
-  const pad = Math.max(...m.datasets.map(d => d.resolution * (d.sourceType === 'bada' ? 1.5 : 2)), 0) / 80000;
+  const pad = Math.max(...m.datasets.map(d => d.resolution * (OFFICIAL_TYPES[d.sourceType] === 'bada' ? 1.5 : 2)), 0) / 80000;
   const boxes = areas.filter(b => b.every(Number.isFinite) && b[2] - b[0] <= .6 && b[3] - b[1] <= .6);
   const wants = m.tiles.filter(t => boxes.some(b => t.bbox[0] <= b[2] + pad && t.bbox[2] >= b[0] - pad && t.bbox[1] <= b[3] + pad && t.bbox[3] >= b[1] - pad));
   // 큰 범위는 일부만 싣지 않는다. 더 확대하면 완전한 지역 묶음을 읽는다.
@@ -69,10 +71,10 @@ async function depthPrepareAreas(areas) {
         const [lon, lat, depth, dataset, year, interpolated] = row, ds = m.datasets[dataset];
         if (!ds || ![lon, lat, depth].every(Number.isFinite) || lon < 123.5 || lon > 132.5 || lat < 32 || lat > 39.5 || depth < 0 ||
           lon < tile.bbox[0] || lon > tile.bbox[2] || lat < tile.bbox[1] || lat > tile.bbox[3] || typeof interpolated !== 'boolean') throw Error('수심 타일 좌표/속성');
-        const radius = ds.resolution * (ds.sourceType === 'bada' ? 1.5 : 2);
+        const radius = ds.resolution * (OFFICIAL_TYPES[ds.sourceType] === 'bada' ? 1.5 : 2);
         maxRadius = Math.max(maxRadius, radius);
         const p = { mx: mxOf(lon), my: myOf(lat), depth, res: ds.resolution, src: ds.source, yr: year ?? ds.surveyYear,
-          datasetId: ds.id, sourceType: ds.sourceType, verticalDatum: ds.verticalDatum, interpolated, estimated: !!ds.estimated, radius };
+          datasetId: ds.id, sourceType: ds.sourceType, verticalDatum: ds.verticalDatum, interpolated, estimated: !!ds.estimated, radius, coverageBBox: ds.coverageBBox };
         const key = Math.floor(p.mx / 1000) + ',' + Math.floor(p.my / 1000);
         if (!idx.has(key)) idx.set(key, []); idx.get(key).push(p);
       }
@@ -88,6 +90,10 @@ function officialDepthCandidates(type, mx, my) {
     for (let x = gx - n; x <= gx + n; x++) for (let y = gy - n; y <= gy + n; y++) {
       for (const p of tile.idx.get(x + ',' + y) || []) {
         if (OFFICIAL_TYPES[p.sourceType] !== type) continue;
+        if (p.sourceType === 'khoa') {
+          const lon = lonOf(mx), lat = latOf(my), b = p.coverageBBox;
+          if (lon < b[0] || lon > b[2] || lat < b[1] || lat > b[3]) continue;
+        }
         const d = Math.hypot(mx - p.mx, my - p.my);
         if (d <= p.radius * k) out.push({ ...p, d });
       }
