@@ -1,12 +1,13 @@
 {
  "errors": [],
  "tide.json": {
-  "fresh": 0,
+  "fresh": 2656,
   "fallback": 0,
-  "requested": 0,
-  "error": 0,
+  "requested": 2656,
   "unrecovered": 0,
-  "status": "skipped_today_data_exists"
+  "fresh_ratio": 1.0,
+  "error": 0,
+  "status": "fresh"
  },
  "obs.json": {
   "fresh": 55,
@@ -26,7 +27,7 @@
   "error": 0,
   "status": "fresh"
  },
- "generated": "2026-10-11T23:57+09:00",
- "seconds": 195,
+ "generated": "2026-10-12T08:44+09:00",
+ "seconds": 203,
  "error_count": 0
 }
