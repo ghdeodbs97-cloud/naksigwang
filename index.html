@@ -582,7 +582,7 @@ out geom;</pre>
       <div class="sources">
     <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
     <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → 국립해양조사원 자연과학용 자료(KHOA/BADA) 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. KHOA는 유효 자료점으로 둘러싸인 곳만 보간하고 수집 범위 밖에서는 기존 자료로 돌아갑니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
-    <p><a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형): 2026년 10월 11일 주문진·남애 및 아야진·속초·거진의 일부 범위에서 11,702점을 수집했습니다. 약 150 m 간격의 해양수치모델용 자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다. 기준면은 조회 화면의 ‘평균해면하’ 표기를 보존하며 조사연도는 미확인입니다. <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">연안해역기본도</a>는 원본 미확보, <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해수부 수심분포도</a>는 공개 CSV에 수심값이 없어 미탑재입니다.</p>
+    <p><a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형): 2026년 10월 11일 주문진·남애 등 기존 자료를 보존하고 거진부터 울산까지 검증된 일부 연안 범위를 확대해 35,982점을 제공합니다. 대진·양양 및 포항·울산 일부에는 미탑재 범위가 있으며 동해 전체를 포함하지 않습니다. 약 150 m 간격의 해양수치모델용 자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다. 기준면은 조회 화면의 ‘평균해면하’ 표기를 보존하며 조사연도는 미확인입니다. <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">연안해역기본도</a>는 원본 미확보, <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해수부 수심분포도</a>는 공개 CSV에 수심값이 없어 미탑재입니다.</p>
     <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
     <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
     <p>조석·수온은 해양수산부 국립해양조사원(<a href="https://www.data.go.kr/data/15156018/openapi.do" target="_blank" rel="noopener">조석예보(고, 저조)</a>, <a href="https://www.data.go.kr/data/15155508/openapi.do" target="_blank" rel="noopener">조위관측소 최신 관측데이터</a>), 풍향·풍속·파고는 <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noopener">기상청 단기예보 조회서비스</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다. 음력 날짜는 korean_lunar_calendar(한국천문연구원 음양력 기준)로 계산했습니다.</p>
@@ -1064,11 +1064,11 @@ function describeDepth(r) {
 }
 function depthDetails(r) {
   if (!r) return '';
-  return `자료해상도: ${r.res == null ? '알 수 없음' : '약 ' + r.res + ' m'} · 조사연도: ${r.surveyYear || '미확인'} · 보간: ${r.interpolated ? '예' : '아니요'} · ${r.estimated ? '추정' : r.sourceType === 'crowd_pending' ? '검수 전 입력' : '공식자료'} · 기준면: ${r.verticalDatum} · ${r.confidenceReason}`;
+  return `${r.sourceType === 'khoa' ? 'KHOA 150 m 격자 · ' : ''}자료해상도: ${r.res == null ? '알 수 없음' : '약 ' + r.res + ' m'} · 가까운 자료점: ${r.distanceToSource == null ? '미확인' : Math.round(r.distanceToSource) + ' m'} · 조사연도: ${r.surveyYear || '미확인'} · 보간: ${r.interpolated ? '예' : '아니요'} · ${r.estimated ? '추정' : r.sourceType === 'crowd_pending' ? '검수 전 입력' : '공식자료'} · 기준면: ${r.verticalDatum} · ${r.confidenceReason}`;
 }
 // 04b_depth_tiles.js — 지도 표현과 분리한 공식 수심 지역 자료 로더
 const OFFICIAL_DEPTH = { manifest: null, init: null, cache: new Map(), signature: '', generation: 0,
-  maxTiles: 12, maxPoints: 60000, maxBytes: 8 * 1024 * 1024, error: '', timer: null };
+  maxTiles: 12, maxPoints: 60000, maxBytes: 8 * 1024 * 1024, error: '', timer: null, pending: new Map() };
 const OFFICIAL_TYPES = { coastal_official: 'coastal', mof_contour: 'mof', chart_public: 'chart', bada: 'bada', khoa: 'bada' };
 async function depthReadJSON(url, limit) {
   const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 8000);
@@ -1099,6 +1099,9 @@ async function depthManifest() {
         datasetIds.add(ds.id);
         if (ds.sourceType === 'khoa' && (!Array.isArray(ds.coverageBBox) || ds.coverageBBox.length !== 4 || !ds.coverageBBox.every(Number.isFinite) ||
           ds.coverageBBox[0] >= ds.coverageBBox[2] || ds.coverageBBox[1] >= ds.coverageBBox[3] || ds.estimated !== true)) throw Error('KHOA 범위/격자 정보');
+        if (ds.coverageBoxes !== undefined && (!Array.isArray(ds.coverageBoxes) || !ds.coverageBoxes.length || ds.coverageBoxes.some(b =>
+          !Array.isArray(b) || b.length !== 4 || !b.every(Number.isFinite) || b[0] >= b[2] || b[1] >= b[3] ||
+          b[0] < ds.coverageBBox[0] || b[1] < ds.coverageBBox[1] || b[2] > ds.coverageBBox[2] || b[3] > ds.coverageBBox[3]))) throw Error('수심 수집 범위 정보');
       }
       for (const t of m.tiles) {
         if (!/^[a-zA-Z0-9_/-]+\.json$/.test(t.file) || t.file.includes('..') || files.has(t.file) || !Array.isArray(t.bbox) || t.bbox.length !== 4 || !t.bbox.every(Number.isFinite) ||
@@ -1109,6 +1112,13 @@ async function depthManifest() {
     } catch (e) { OFFICIAL_DEPTH.error = e.message; return null; }
   })();
   return OFFICIAL_DEPTH.init;
+}
+async function depthTileDocument(tile) {
+  // 이동 중 요청 범위가 바뀌어도 진행 중인 같은 파일 요청은 함께 기다린다.
+  let task = OFFICIAL_DEPTH.pending.get(tile.file);
+  if (!task) { task = depthReadJSON('static/depth/' + tile.file, 1024 * 1024); OFFICIAL_DEPTH.pending.set(tile.file, task); }
+  try { return await task; }
+  finally { if (OFFICIAL_DEPTH.pending.get(tile.file) === task) OFFICIAL_DEPTH.pending.delete(tile.file); }
 }
 // 경위도 범위 배열만 받는다. Canvas/화면 좌표를 알 필요가 없다.
 async function depthPrepareAreas(areas) {
@@ -1131,7 +1141,7 @@ async function depthPrepareAreas(areas) {
     if (generation !== OFFICIAL_DEPTH.generation) return changed;
     if (OFFICIAL_DEPTH.cache.has(tile.file)) continue;
     try {
-      const doc = await depthReadJSON('static/depth/' + tile.file, 1024 * 1024);
+      const doc = await depthTileDocument(tile);
       if (generation !== OFFICIAL_DEPTH.generation) return changed;
       if (doc.version !== 1 || !Array.isArray(doc.points) || doc.points.length !== tile.count) throw Error('수심 타일 점 개수');
       const idx = new Map(); let maxRadius = 0;
@@ -1142,7 +1152,7 @@ async function depthPrepareAreas(areas) {
         const radius = ds.resolution * (OFFICIAL_TYPES[ds.sourceType] === 'bada' ? 1.5 : 2);
         maxRadius = Math.max(maxRadius, radius);
         const p = { mx: mxOf(lon), my: myOf(lat), depth, res: ds.resolution, src: ds.source, yr: year ?? ds.surveyYear,
-          datasetId: ds.id, sourceType: ds.sourceType, verticalDatum: ds.verticalDatum, interpolated, estimated: !!ds.estimated, radius, coverageBBox: ds.coverageBBox };
+          datasetId: ds.id, sourceType: ds.sourceType, verticalDatum: ds.verticalDatum, interpolated, estimated: !!ds.estimated, radius, coverageBBox: ds.coverageBBox, coverageBoxes: ds.coverageBoxes };
         const key = Math.floor(p.mx / 1000) + ',' + Math.floor(p.my / 1000);
         if (!idx.has(key)) idx.set(key, []); idx.get(key).push(p);
       }
@@ -1161,6 +1171,7 @@ function officialDepthCandidates(type, mx, my) {
         if (p.sourceType === 'khoa') {
           const lon = lonOf(mx), lat = latOf(my), b = p.coverageBBox;
           if (lon < b[0] || lon > b[2] || lat < b[1] || lat > b[3]) continue;
+          if (p.coverageBoxes && !p.coverageBoxes.some(b => lon >= b[0] && lon <= b[2] && lat >= b[1] && lat <= b[3])) continue;
         }
         const d = Math.hypot(mx - p.mx, my - p.my);
         if (d <= p.radius * k) out.push({ ...p, d });

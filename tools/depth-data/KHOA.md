@@ -46,3 +46,27 @@ python tools/depth-data/compare_khoa.py tools/depth-data/raw/khoa/jumunjin-namae
 ## CI
 
 `python tests/test_khoa_fetch.py`: 11,018건/37페이지/마지막 218건, 300건 경계, 단일 item/빈 자료/중복·충돌, API/HTTP/네트워크 오류, 재시도, 키 미설정·stdout/stderr/원본 마스킹·URL 인코딩, lot 매핑/숫자 검증, 기준면/coverage 보존. CI에는 실서비스 키를 전달하거나 실제 API를 호출하지 않는다.
+
+## P2C-2 작은 연안 bbox 묶음
+
+호출 전 계획은 `tests/p2c2_plan.json` / `tests/P2C2_PLAN.md`, 기존 영역과 요청 범위의 좌표 그림은 `tests/p2c2_coverage_plan.svg`다. 기존 bbox를 차감하며 새 자료집의 `coverageBoxes`가 있으면 실제로 성공한 조각만 차감한다. 원본 좌표/수심 precision은 유지한다. 지역 중심 전체 행정구역이나 먼바다 전역을 요청하지 않는다.
+
+```powershell
+# 키를 명령 인자에 쓰지 않는다. KHOA_SERVICE_KEY 환경변수만 사용.
+python tools/depth-data/fetch_khoa_batch.py tests/p2c2_plan.json --cache tools/depth-data/raw/khoa-east
+# 동일 명령 재실행으로 성공 페이지와 명시적 NODATA 응답을 재사용한다.
+# 값 검증 실패 bbox도 원본 전체 페이지를 보존하며 발행용 collection은 생성하지 않는다.
+# 종료 코드 1은 실패/미시도 bbox가 남았다는 뜻이다. batch.json에 누적 호출과 실패 내역이 있다.
+
+# 새 출력 폴더에서 검수. 기존 타일을 덮어쓰는 명령이 아니다.
+python tools/depth-data/publish_khoa_coverage.py --plan tests/p2c2_plan.json --cache tools/depth-data/raw/khoa-east --output test-output/east-release --report test-output/east-publication.json --allow-partial
+python tools/depth-data/audit_east_coverage.py
+```
+
+`--allow-partial`은 실패 bbox를 검수한 뒤 성공 영역만 발행하려는 명시적 선택이다. 옵션이 없으면 미완료 bbox가 있는 발행을 거부한다. 출력 보고서의 `unpublishedJobs`를 반드시 확인한다. NODATA_ERROR는 정상 0건으로 바꾸지 않는다. 재검증하려면 해당 ID의 보존 응답을 별도 위치에 백업한 뒤 새 캐시 루트를 사용한다. 일상 재개에서 오류 응답을 자동 삭제/재호출하지 않는다. 기존 응답/페이지 hash가 다르면 자동 복구하지 않고 검수를 요구한다. 묶음 호출 상한은 재시도 포함 1,000회이며 다른 작업의 당일 사용량은 별도 확인해야 한다.
+
+새 타일만 `east/`에 추가하고 기존 타일 파일/hash/자료집 인덱스를 그대로 보존한다. 겹친 좌표·기준면의 동일 수심은 제거하며 수심 충돌은 중단한다. 이미 발행한 자료에 재발행하면 신규 점 0개, manifest를 포함한 모든 JSON bytes가 동일하다. 실제 수집 조각/수집 hash/자료집 ID가 provenance에 남는다. 원본 응답은 Git 제외 경로에만 둔다.
+
+앱은 기존 캐시 상한과 viewport lazy loading을 유지하며 진행 중 같은 파일 요청을 공유한다. `coverageBoxes` 내부와 유효 후보 볼록껍질 안에서만 기존 보간을 허용한다. 자료집/기준면 격리와 육지 통과 차단은 유지한다. 자료가 가까워도 KHOA를 사용할 수 없는 해안 경계에서는 기존 GEBCO/모델 fallback이 남는다.
+
+최종 실측/미탑재 영역/48개 대표점/모바일 로딩/JS heap은 `tests/P2C2_REPORT.md`와 `tests/p2c2_validation.json`에 있다. 실기기 전체 메모리는 미측정이다. `tests/test_khoa_coverage.py`, `tests/test_khoa_coverage_browser.py`는 합성 응답/메모리 route로만 검사하며 CI에서 실행한다.

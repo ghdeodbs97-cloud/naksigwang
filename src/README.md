@@ -19,8 +19,8 @@
 | `01_geo.js` | 좌표계(웹 메르카토르)와 해안선 디코딩·육지 판정 | 67 | `decode`, `segDist`, `nearestCoast`, `inLand` |
 | `02_state.js` | 화면 상태(S)와 추정 수심 식 | 5 |  |
 | `03_userdata.js` | 내 자료: 항·포구 목록, CSV 읽기 | 164 | `readText`, `parseCSV`, `locate`, `parseDeg`, `getLL`, `importPorts`, `saveLocal`, `loadLocal` 외 |
-| `04_depth.js` | 자료집·기준면 분리 수심 보간·KHOA 외삽 차단·공통 출처 schema | 가변 | `layerOf`, `addDepthPt`, `clearLayers`, `crossesLand`, `depthQuery`, `depthInsideSupport`, `depthResult`, `modelDepth`, `estimateAt`, `fmtDepth`, `describeDepth`, `depthDetails` |
-| `04b_depth_tiles.js` | KHOA 수집 범위와 공식 수심 지역 타일의 제한된 캐시·색인·실패 fallback | 가변 | `depthReadJSON`, `depthManifest`, `depthPrepareAreas`, `officialDepthCandidates`, `scheduleDepthArea` |
+| `04_depth.js` | 자료집·기준면 분리 보간·KHOA 외삽 차단·출처/자료점 거리 상세 | 가변 | `layerOf`, `addDepthPt`, `clearLayers`, `crossesLand`, `depthQuery`, `depthInsideSupport`, `depthResult`, `modelDepth`, `estimateAt`, `fmtDepth`, `describeDepth`, `depthDetails` |
+| `04b_depth_tiles.js` | KHOA 실제 수집 bbox 묶음 검증·지역 타일 lazy loading·요청 공유·제한 캐시/퇴거·실패 fallback | 가변 | `depthReadJSON`, `depthManifest`, `depthTileDocument`, `depthPrepareAreas`, `officialDepthCandidates`, `scheduleDepthArea` |
 | `05_struct.js` | 해안 구조물(방파제·부두) 층 | 48 | `addStructSeg`, `addStructLine`, `structDist`, `inStruct`, `structPath` |
 | `06_osm.js` | 오픈스트리트맵 해안 지형·이름 | 100 | `decodeOSM`, `osmPath`, `drawOSM`, `osmAt` |
 | `07_import.js` | 좌표 정규화, 수심·연도·기준면·보간 출처 불러오기와 로컬 보존 | 가변 | `toLatLon`, `pickDepthKey`, `depthVal`, `importDepthRows`, `importDepthJSON`, `findRecords`, `importStructJSON`, `saveDepth`, `loadDepth` |

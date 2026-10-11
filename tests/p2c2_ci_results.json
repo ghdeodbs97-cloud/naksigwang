@@ -1,0 +1,91 @@
+{
+  "localWorkflowCommands": [
+    {
+      "command": "python -m py_compile collector/collect.py tests/test_collector_resilience.py tests/smoke.py tests/smoke_degradation.py tests/test_bite_confidence.py tests/depth_probe.py tests/test_depth_converter.py tests/test_depth_foundation.py tests/test_khoa_fetch.py tests/test_khoa_depth.py tests/test_khoa_coverage.py tests/test_khoa_coverage_browser.py tools/depth-data/convert.py tools/depth-data/merge.py tools/depth-data/audit_mof.py tools/depth-data/fetch_khoa.py tools/depth-data/convert_khoa.py tools/depth-data/compare_khoa.py tools/depth-data/plan_east_khoa.py tools/depth-data/fetch_khoa_batch.py tools/depth-data/publish_khoa_coverage.py tools/depth-data/audit_east_coverage.py build.py",
+      "exitCode": 0,
+      "seconds": 0.22,
+      "log": "00.log"
+    },
+    {
+      "command": "python tests/test_collector_resilience.py",
+      "exitCode": 0,
+      "seconds": 0.8,
+      "log": "01.log"
+    },
+    {
+      "command": "node tests/boot_degradation.mjs",
+      "exitCode": 0,
+      "seconds": 0.17,
+      "log": "02.log"
+    },
+    {
+      "command": "python build.py",
+      "exitCode": 0,
+      "seconds": 0.12,
+      "log": "03.log"
+    },
+    {
+      "command": "python tests/smoke.py",
+      "exitCode": 0,
+      "seconds": 8.34,
+      "log": "04.log"
+    },
+    {
+      "command": "python tests/smoke_degradation.py",
+      "exitCode": 0,
+      "seconds": 80.11,
+      "log": "05.log"
+    },
+    {
+      "command": "python tests/test_bite_confidence.py",
+      "exitCode": 0,
+      "seconds": 13.09,
+      "log": "06.log"
+    },
+    {
+      "command": "python tests/test_depth_converter.py",
+      "exitCode": 0,
+      "seconds": 1.2,
+      "log": "07.log"
+    },
+    {
+      "command": "python tests/test_depth_foundation.py",
+      "exitCode": 0,
+      "seconds": 10.41,
+      "log": "08.log"
+    },
+    {
+      "command": "python tests/test_khoa_fetch.py",
+      "exitCode": 0,
+      "seconds": 0.7,
+      "log": "09.log"
+    },
+    {
+      "command": "python tests/test_khoa_depth.py",
+      "exitCode": 0,
+      "seconds": 7.02,
+      "log": "10.log"
+    },
+    {
+      "command": "python tests/test_khoa_coverage.py",
+      "exitCode": 0,
+      "seconds": 1.08,
+      "log": "11.log"
+    },
+    {
+      "command": "python tests/test_khoa_coverage_browser.py",
+      "exitCode": 0,
+      "seconds": 6.83,
+      "log": "12.log"
+    },
+    {
+      "command": "git diff --exit-code -- data",
+      "exitCode": 0,
+      "seconds": 0.06,
+      "log": "13.log"
+    }
+  ],
+  "apiKeyRemovedFromTestEnvironment": true,
+  "visualReview": "390×844 / 1280×900 다섯 탭·위치조회·A→B 화면 확인",
+  "finalPublisherRegression": "12개 통과; 재발행 신규점 0, 모든 JSON bytes 동일"
+}
