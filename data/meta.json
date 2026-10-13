@@ -1,15 +1,13 @@
 {
- "errors": [
-  "tide DT_0007 20261015: RuntimeError"
- ],
+ "errors": [],
  "tide.json": {
-  "fresh": 2655,
-  "fallback": 1,
+  "fresh": 2656,
+  "fallback": 0,
   "requested": 2656,
   "unrecovered": 0,
-  "fresh_ratio": 0.9996,
-  "error": 1,
-  "status": "merged_fallback"
+  "fresh_ratio": 1.0,
+  "error": 0,
+  "status": "fresh"
  },
  "obs.json": {
   "fresh": 55,
@@ -29,7 +27,7 @@
   "error": 0,
   "status": "fresh"
  },
- "generated": "2026-10-13T03:01+09:00",
- "seconds": 278,
- "error_count": 1
+ "generated": "2026-10-13T11:06+09:00",
+ "seconds": 226,
+ "error_count": 0
 }
