@@ -1,5 +1,27 @@
 {
- "errors": [],
+ "errors": [
+  "wx 43,95: ValueError",
+  "wx 46,35: ValueError",
+  "wx 47,35: ValueError",
+  "wx 48,31: ValueError",
+  "wx 48,32: ValueError",
+  "wx 48,36: ValueError",
+  "wx 49,37: ValueError",
+  "wx 50,32: ValueError",
+  "wx 50,67: ValueError",
+  "wx 51,32: ValueError",
+  "wx 51,38: ValueError",
+  "wx 53,38: ValueError",
+  "wx 55,39: ValueError",
+  "wx 56,33: ValueError",
+  "wx 57,63: ValueError",
+  "wx 73,66: ValueError",
+  "wx 80,71: ValueError",
+  "wx 87,68: ValueError",
+  "wx 97,127: ValueError",
+  "wx 100,75: ValueError",
+  "wx 102,115: ValueError"
+ ],
  "tide.json": {
   "fresh": 2656,
   "fallback": 0,
@@ -19,15 +41,15 @@
   "status": "fresh"
  },
  "wx.json": {
-  "fresh": 615,
-  "fallback": 0,
+  "fresh": 594,
+  "fallback": 21,
   "requested": 615,
   "unrecovered": 0,
-  "fresh_ratio": 1.0,
-  "error": 0,
-  "status": "fresh"
+  "fresh_ratio": 0.9659,
+  "error": 21,
+  "status": "merged_fallback"
  },
- "generated": "2026-10-14T22:49+09:00",
- "seconds": 319,
- "error_count": 0
+ "generated": "2026-10-15T08:17+09:00",
+ "seconds": 202,
+ "error_count": 21
 }
