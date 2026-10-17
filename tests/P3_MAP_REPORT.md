@@ -261,7 +261,7 @@ DPR [1, 1.25, 1.5, 2]에서 명시적 이동/검색/범위 버튼 88개 측정�
 - SDK drag/pinch/zoom 시작부터 Canvas 3장을 함께 숨긴다(방법 A). 원본 좌표나 CSS origin에 offset을 더하지 않는다. 이전 포인트·핀·A/B·흐름 잔상을 표시하지 않는다.
 - native gesture 동안 SDK viewport polling·base/mask/흐름장·단면·수심 예약을 멈춘다. drag/pinch 종료 후 최종 idle, zoom 종료 또는 명시적 명령 뒤 표시 projection의 안정된 두 프레임을 확인한다. 이벤트 뒤 관찰은 최대 16프레임이고 정지 중에는 반복하지 않는다. 기존 명시적 fit의 pending/commandId/timeout 구조는 유지한다.
 - 마지막 SDK viewport를 한 번 읽어 호환 V·100m ground scale을 캐시한다. 최종 base와 UI를 같은 화면 갱신에서 그린 후 Canvas를 다시 보인다. 이동이 취소되어 SDK 이벤트가 없어도 bounded settle로 숨김을 해제한다.
-- base는 기존 `dirty`, UI·화살표·단면·계기판은 별도 상태 key, 흐름장은 `flowStale`로 무효화한다. viewport·LOD·구조물 변경이 없으면 Path/mask를 재사용한다. 수심 갱신만으로 mask readback을 반복하지 않는다. 이동 때문에 취소한 수심 예약은 최종 idle에 복구한다.
+- base는 기존 `dirty`, UI·화살표·단면·계기판은 별도 상태 key, 흐름장은 `flowStale`로 무효화한다. viewport·LOD·구조물 변경이 없으면 Path/mask를 재사용한다. 수심 갱신만으로 mask readback을 반복하지 않는다. 이동 때문에 취소한 수심 예약은 최종 idle에 복구한다. 수심 로딩 완료 후 기존 단면 함수가 예약을 다시 만들어도 다음 base 갱신이 SDK 네 면 범위를 다시 예약한다. 고의 changed 응답을 이용한 회귀에서 동일한 전체 viewport 범위가 유지되는지 확인한다.
 - SDK 투영 전에 화면 밖의 같은 쪽에 머무는 긴 해안 구간을 생략한다. 보이는 꼭짓점의 SDK 투영은 그대로 사용한다. 기존 구현과 raster mask를 직접 비교했다. 속초 10km 예: 해안 project 36,545 → 451회, 포항 10km 36,503 → 177회. 전국 화면은 남는 꼭짓점이 많아 절감 폭이 작다.
 - 입자는 900개에서 PC 시작 360개/휴대폰 180개, 할당 상한 480개로 줄였다. 실제 이전 frame 작업 시간이 20ms를 넘는 상황이 반복되면 25%씩 줄이며 최저 120개다. 그리기 상한은 PC 30Hz/휴대폰 20Hz다. 이동·비활성 지도 탭·background에서 정지하고 idle 후 한 번 respawn한다.
 - 조류 화살표 bitmap은 viewport·시간·조류 자료·DPR·크기가 바뀔 때만 다시 만든다. 단면과 readout은 자료·A/B·시간·hover·크기 변경에만 다시 그린다. 재생 중에는 시간 key를 제한한다. 정지 중 단면 물결도 매 프레임 그리지 않는다. 보호된 `18_section.js`는 수정하지 않았다.

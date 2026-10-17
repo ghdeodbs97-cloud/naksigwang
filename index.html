@@ -2832,7 +2832,7 @@ function buildPath(rings, margin) {
 function renderBase() {
   if(PROVIDER_MAP.providerMoving||PROVIDER_MAP.commandPending)return;
   const depthKey=JSON.stringify([PROVIDER_MAP.active,PROVIDER_MAP.signature,V,cw,ch,S.A,S.B]);
-  if(depthKey!==RENDER.depthKey){RENDER.depthKey=depthKey;scheduleDisplayDepthArea();}
+  if(depthKey!==RENDER.depthKey||!RENDER.depthQueued){RENDER.depthKey=depthKey;scheduleDisplayDepthArea();}
   dirty = false;
   const r = DPR(), ppg = pxPerGround(), gpp = 1 / ppg, diag = Math.hypot(cw, ch);
   const lod = gpp > 2000 ? LOD.low : gpp > 35 ? LOD.mid : LOD.full;
