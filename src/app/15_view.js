@@ -42,9 +42,13 @@ function seaDir(x, y) {
   return [vx / m, vy / m];
 }
 /* ── 지도 위 관측소 표시 ─────────────────────────────── */
-let stHits = [];
+let stHits = [], stationDrawStats={count:0,labels:0,ports:0,rocks:0,gpp:0};
+function stationDetailAllowed(st,gpp) {
+  const rock=st.kind==='rock',pr=rock?9:portPri(st.type);
+  return !(gpp>600 ? rock||pr>0 : gpp>250 ? (rock?st.access!=='car':pr>1) : gpp>80 ? (!rock&&pr>2) : false);
+}
 function drawStations() {
-  stHits = []; const placed = [];
+  stHits = []; stationDrawStats={count:0,labels:0,ports:0,rocks:0,gpp:1/pxPerGround()}; const placed = [];
   bctx.textBaseline = 'middle';
   const gpp = 1 / pxPerGround();
   const order = POINTS.map((p, i) => i).sort((a, b) => (a === S.pt ? -1 : b === S.pt ? 1 : portPri(POINTS[a].type) - portPri(POINTS[b].type)));
@@ -54,10 +58,7 @@ function drawStations() {
     const sel = i === S.pt, rock = st.kind === 'rock';
     // 축척에 따라 보여 줄 것을 줄인다: 넓게 볼수록 큰 항만, 확대할수록 작은 항·갯바위까지
     //   전국(1 px > 600 m): 국가어항만 · 지방(250~600 m): 지방어항까지 + 차로 가는 갯바위 · 해역(80~250 m): 정주어항까지 + 갯바위 전부 · 가까이: 전부
-    if (!sel) {
-      const pr = rock ? 9 : portPri(st.type);
-      if (gpp > 600 ? rock || pr > 0 : gpp > 250 ? (rock ? st.access !== 'car' : pr > 1) : gpp > 80 ? (!rock && pr > 2) : false) continue;
-    }
+    if (!sel && !stationDetailAllowed(st,gpp)) continue;
     const size = sel ? 24 : gpp > 600 ? 11 : gpp > 250 ? 13 : gpp > 80 ? 15 : 18;
     const x0 = x, y0 = y, dir = gpp < 20 ? seaDir(x0, y0) : null;   // 크게 확대하면 아이콘을 바다 쪽으로 비켜 그림
     if (dir) {
@@ -81,13 +82,13 @@ function drawStations() {
     // 갯바위 접근: 차량·도보는 진하게, 확인 필요는 조금 흐리게, 배로만은 흐리게
     drawIcon(bctx, rock ? 'rock' : 'port', x, y, size, rock ? (st.access === 'car' ? 1 : st.access === 'unk' ? .8 : .5) : 1);
     const r = size / 2;
-    stHits.push([x, y, i]);
+    stHits.push([x, y, i]);stationDrawStats.count++;stationDrawStats[rock?'rocks':'ports']++;
     bctx.font = (sel ? '700 12.5px' : '600 11.5px') + ' IBM Plex Sans KR, sans-serif';
     const left = dir && dir[0] < -.3, w = bctx.measureText(st.name).width;   // 바다가 왼쪽이면 이름도 왼쪽에 (육지를 덜 가림)
     const tx = left ? x - r - 4 - w : x + r + 4, box = [tx - 2, y - 9, tx + w + 2, y + 9];
     if (!sel && (gpp > 700 || placed.some(b => !(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3])))) continue;
     placed.push(box);
-    bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(st.name, tx, y);
+    stationDrawStats.labels++;bctx.lineWidth = 3; bctx.strokeStyle = 'rgba(6,15,19,.9)'; bctx.strokeText(st.name, tx, y);
     bctx.fillStyle = st.kind === 'rock' ? (sel ? '#f0a35e' : '#f6d2b0') : sel ? '#4fe3d3' : '#c9f6f0'; bctx.fillText(st.name, tx, y);
   }
 }
@@ -126,7 +127,7 @@ function viewBounds(margin = 0) {
   pts.push([mxOf(b[0][0]), myOf(b[0][1])], [mxOf(b[1][0]), myOf(b[1][1])]);
   return [Math.min(...pts.map(p => p[0])), Math.min(...pts.map(p => p[1])), Math.max(...pts.map(p => p[0])), Math.max(...pts.map(p => p[1]))];
 }
-const pxPerGround = () => V.s * kAt(latOf(V.cy));
+const pxPerGround = () => providerTransform() ? PROVIDER_MAP.adapter.getGroundScale() : V.s * kAt(latOf(V.cy));
 // 지도 범위 = 지형 자료(GEBCO) 범위. 이보다 넓게 축소하거나 밖으로 밀면 자료 없는 검은 곳이 보이므로 막는다
 const KB = { x1: mxOf(124.4), x2: mxOf(131.95), y1: myOf(32.9), y2: myOf(38.7) };
 let VIEW_T = 0;      // 마지막으로 지도를 옮기거나 확대·축소한 시각 (조류 입자를 잠깐 숨기는 데 씀)
@@ -135,15 +136,15 @@ function clampView() {
   VIEW_T = performance.now();
   const sMin = Math.max(cw / (KB.x2 - KB.x1), ch / (KB.y2 - KB.y1));   // 화면이 자료 범위 안에 들어가는 가장 작은 배율
   if (V.s < sMin) V.s = sMin;
-  const gw = cw / pxPerGround();
+  const gw = cw / (V.s*kAt(latOf(V.cy)));
   if (gw < 150) V.s *= gw / 150;
   const hx = cw / 2 / V.s, hy = ch / 2 / V.s;                          // 화면 가장자리가 범위 밖으로 나가지 않게
   V.cx = clamp(V.cx, KB.x1 + hx, KB.x2 - hx); V.cy = clamp(V.cy, KB.y1 + hy, KB.y2 - hy);
   dirty = true;
 }
-function fitBox(x1, y1, x2, y2, pad = .9) { V.cx = (x1 + x2) / 2; V.cy = (y1 + y2) / 2; V.s = Math.min(cw / Math.max(1, x2 - x1), ch / Math.max(1, y2 - y1)) * pad; clampView(); }
+function fitBox(x1, y1, x2, y2, pad = .9) { V.cx = (x1 + x2) / 2; V.cy = (y1 + y2) / 2; V.s = Math.min(cw / Math.max(1, x2 - x1), ch / Math.max(1, y2 - y1)) * pad; clampView(); providerApplyView({...V}); }
 function fitLonLat(bb) { fitBox(mxOf(bb[0]), myOf(bb[1]), mxOf(bb[2]), myOf(bb[3])); }
-function fitGround(lat, lon, widthG) { if (S.lock) widthG = TD_MAP_W; /* 오늘 탭 지도는 늘 같은 폭 */ V.cx = mxOf(lon); V.cy = myOf(lat); V.s = cw / (widthG * kAt(lat)); clampView(); }
+function fitGround(lat, lon, widthG) { if (S.lock) widthG = TD_MAP_W; /* 오늘 탭 지도는 늘 같은 폭 */ V.cx = mxOf(lon); V.cy = myOf(lat); V.s = cw / (widthG * kAt(lat)); clampView(); providerApplyView({...V}); }
 function zoomAt(px, py, f) { if (providerTransform()) { providerZoomAt(px, py, f); return; } const [mx, my] = toM(px, py); V.s *= f; clampView(); const [nx, ny] = toM(px, py); V.cx += mx - nx; V.cy += my - ny; clampView(); }
 
 /* ── 바탕 그리기 ───────────────────────────────────────── */

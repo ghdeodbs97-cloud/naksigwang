@@ -3,6 +3,7 @@ window.p3Ready = () => !!GE;
 window.p3SizeCheck = () => ch===Math.round(cw<560?clamp(innerHeight-290,320,cw*1.3):Math.min(cw*.72,Math.max(380,innerHeight-240)));
 // 앱 변환을 호출하지 않는 비선형 세계 좌표. 정수 줌과 회전·곡률을 함께 재현한다.
 const fakeWorld = (lon,lat) => { const y=myOf(lat), d=y-myOf(36); return [mxOf(lon)+.03*d+1e-7*d*d,y]; };
+const fakeDestination=(lon,lat,meter)=>{const a=meter/R,phi=lat*D2R,phi2=Math.asin(Math.sin(phi)*Math.cos(a));return [lon+Math.atan2(Math.sin(a)*Math.cos(phi),Math.cos(a)-Math.sin(phi)*Math.sin(phi2))/D2R,phi2/D2R];};
 const fakeCoord = (x,y) => { const d=y-myOf(36); return [lonOf(x-.03*d-1e-7*d*d),latOf(y)]; };
 class P3ProbeLL { constructor(lat,lon) {this.latitude=lat;this.longitude=lon;} lat(){return this.latitude;} lng(){return this.longitude;} }
 class P3ProbeXY { constructor(x,y) {this.x=x;this.y=y;} }
@@ -14,12 +15,18 @@ class P3NativeMarker {
     this.element.style.position='absolute';this.element.style.left=((w[0]-c[0])*2**f.z/200000+cw/2-anchor.x+(f.nativeOffset||0))+'px';this.element.style.top=((c[1]-w[1])*2**f.z/200000+ch/2-anchor.y)+'px';}
 }
 class FakeMapAdapter {
-  init(container) { this.container=container; this.instances=1; this.modes=[]; this.error=0; this.center=[128,36]; this.z=10; this.markers=new Set();this.sdk={LatLng:P3ProbeLL,Size:P3ProbeXY,Point:P3ProbeXY,Marker:P3NativeMarker};this.map={owner:this,setZoom:z=>{this.z=z;this.renderMarkers();}}; }
+  init(container) { this.container=container; this.instances=1; this.modes=[]; this.error=0; this.center=[128,36]; this.z=10; this.markers=new Set();this.sdk={LatLng:P3ProbeLL,Size:P3ProbeXY,Point:P3ProbeXY,Marker:P3NativeMarker};this.map={owner:this,setZoom:z=>{this.z=z;this.renderMarkers();},
+      panBy:p=>{const c=fakeWorld(...this.center),ll=fakeCoord(c[0]+p.x/this.scale(),c[1]-p.y/this.scale());this.setCenter(...ll);},
+      zoomBy:(delta,ll)=>{const p=this.referenceProject(ll.lng(),ll.lat()),w=fakeWorld(ll.lng(),ll.lat());this.z=Math.max(6,Math.min(21,this.z+delta));this.center=fakeCoord(w[0]-(p[0]-cw/2)/this.scale(),w[1]+(p[1]-ch/2)/this.scale());this.renderMarkers();this.viewportListener?.('zoom_changed');this.viewportListener?.('idle');}}; }
   setMode(mode) { this.modes.push(mode); this.loaded?.(); }
   createDebugMarker(lat,lon) {return NaverMapAdapter.prototype.createDebugMarker.call(this,lat,lon);}
   renderMarkers() {for(const m of this.markers)m.render();}
+  getGroundScale(){const c=this.unproject(cw/2,ch/2),e=fakeDestination(...c,100),a=this.project(...c),b=this.project(...e);return Math.hypot(b[0]-a[0],b[1]-a[1])/100;}
+  setInteraction(enabled){this.interactive=enabled;}
+  onViewportReady(fn){this.viewportListener=fn;}
+  panPixels(dx,dy){NaverMapAdapter.prototype.panPixels.call(this,dx,dy);}
   scale() { return 2**this.z/200000; }
-  syncFromAppViewport() { this.center=[lonOf(V.cx),latOf(V.cy)]; this.z=Math.max(6,Math.min(21,Math.round(Math.log2(V.s*200000)))); this.zoomTarget=this.z; this.viewport={...V,s:this.scale()}; this.renderMarkers();this.loaded?.(); }
+  syncFromAppViewport(view=V) { this.syncCalls=(this.syncCalls||0)+1;this.center=[lonOf(view.cx),latOf(view.cy)]; this.z=Math.max(6,Math.min(21,Math.round(Math.log2(view.s*200000)))); this.zoomTarget=this.z; this.viewport={...view,s:this.scale()}; this.renderMarkers();this.loaded?.(); }
   resize() { this.size=[cw,ch];this.renderMarkers(); }
   project(lon,lat) { const w=fakeWorld(lon,lat), c=fakeWorld(...this.center), s=this.scale(); return [(w[0]-c[0])*s+cw/2+this.error,(c[1]-w[1])*s+ch/2]; }
   referenceProject(lon,lat) { const w=fakeWorld(lon,lat), c=fakeWorld(...this.center); return [(w[0]-c[0])*2**this.z/200000+cw/2,(c[1]-w[1])*2**this.z/200000+ch/2]; }
@@ -27,7 +34,7 @@ class FakeMapAdapter {
   getBounds() { const pts=[this.unproject(0,0),this.unproject(cw,0),this.unproject(0,ch),this.unproject(cw,ch)]; return [[Math.min(...pts.map(p=>p[0])),Math.min(...pts.map(p=>p[1]))],[Math.max(...pts.map(p=>p[0])),Math.max(...pts.map(p=>p[1]))]]; }
   getCenter() { return this.center; }
   getZoom() { return this.z; }
-  setCenter(lon,lat) { this.center=[lon,lat];this.renderMarkers(); }
+  setCenter(lon,lat) { this.center=[lon,lat];this.renderMarkers();this.viewportListener?.('center_changed');this.viewportListener?.('idle'); }
   moveAnchor(ll,x,y) { NaverMapAdapter.prototype.moveAnchor.call(this,ll,x,y); }
   zoomAt(x,y,f) { NaverMapAdapter.prototype.zoomAt.call(this,x,y,f); }
   onTilesLoaded(fn) { this.loaded=fn; }
@@ -41,7 +48,7 @@ window.p3Test = async () => {
   const fake = new FakeMapAdapter(); fake.init($('providerMap'));
   Object.assign(PROVIDER_MAP, {adapter:fake,failed:false,signature:'',active:false});
   fake.onTilesLoaded(() => { PROVIDER_MAP.loaded=true; clearTimeout(PROVIDER_MAP.timer); providerCheck(); });
-  providerSync(); await pause();
+  providerApplyView({...V});providerSync(); await pause();
   check(PROVIDER_MAP.active && PROVIDER_MAP.alignment < 1e-6, 'mock 정합 통과');
   renderBase();
   const pixels=bctx.getImageData(0,0,base.width,base.height).data;let painted=0;
@@ -62,10 +69,10 @@ window.p3Test = async () => {
   const point=fake.project(128.8,37.9), ll=fake.unproject(...point);
   check(Math.abs(ll[0]-128.8)<1e-8 && Math.abs(ll[1]-37.9)<1e-8,'좌표 왕복');
   check(fake.getBounds().length===2,'범위');
-  V.cx+=100/V.s;clampView();providerSync();check(Math.abs(fake.viewport.cx-V.cx)<.001,'화면 이동 동기화');
-  zoomAt(cw/2,ch/2,1.8);providerSync();check(Math.abs(fake.scale()-V.s)<1e-10,'확대 동기화');
+  fake.setCenter(lonOf(V.cx+100/V.s),latOf(V.cy));providerSync();check(Math.abs(mxOf(fake.getCenter()[0])-V.cx)<.001,'SDK 화면 이동 동기화');
+  zoomAt(cw/2,ch/2,1.8);providerSync();check(Math.abs(fake.getGroundScale()-pxPerGround())<1e-10,'확대 동기화');
   const loaded=fake.loaded, clear=window.clearTimeout;let cleared=null;fake.loaded=null;window.clearTimeout=id=>{cleared=id;clear(id);};
-  V.cx+=10/V.s;providerSync();check(PROVIDER_MAP.active && cleared===PROVIDER_MAP.timer,'캐시된 타일 이동 시 timeout 해제');
+  fake.setCenter(lonOf(V.cx+10/V.s),latOf(V.cy));providerSync();check(PROVIDER_MAP.active && cleared===PROVIDER_MAP.timer,'캐시된 타일 이동 시 timeout 해제');
   fake.loaded=loaded;window.clearTimeout=clear;
   resize();check(fake.size[0]===cw && fake.size[1]===ch,'크기 일치');
   check(base.width===Math.round(cw*DPR()) && base.height===Math.round(ch*DPR()),'DPR 크기');
@@ -91,9 +98,10 @@ window.p3Test = async () => {
     pointer('pointerdown',31,cw*.35,ch*.4);pointer('pointermove',31,cw*.65,ch*.6);pointer('pointerup',31,cw*.65,ch*.6);
     check(Math.hypot(S.A[0]-a[0],S.A[1]-a[1])<.001&&Math.hypot(S.B[0]-b[0],S.B[1]-b[1])<.001,'A-B 입력 좌표');
     pointer('pointermove',32,cw*.5,ch*.5);dirtyHover=true;updateHover();check($('cursorRead').textContent.length>0,'hover 입력');
-    setMode('pan');const target=fake.unproject(cw*.4,ch*.5);
-    pointer('pointerdown',41,cw*.4,ch*.5);pointer('pointermove',41,cw*.5,ch*.55);pointer('pointerup',41,cw*.5,ch*.55);
-    screen=toS(mxOf(target[0]),myOf(target[1]));check(Math.hypot(screen[0]-cw*.5,screen[1]-ch*.55)<1e-5,'pan 이벤트');
+    setMode('pan');check(fake.interactive&&getComputedStyle(ui).pointerEvents==='none','이동 모드는 SDK 입력');
+    const target=fake.unproject(cw*.4,ch*.5);fake.map.panBy(new P3ProbeXY(-cw*.1,-ch*.05));providerSync();
+    screen=toS(mxOf(target[0]),myOf(target[1]));check(Math.hypot(screen[0]-cw*.5,screen[1]-ch*.55)<1e-5,'native pan');
+    setMode('line');check(!fake.interactive,'단면 모드는 Canvas 입력');
     const oldZoom=fake.getZoom();
     ui.dispatchEvent(new WheelEvent('wheel',{clientX:rect.left+cw/2,clientY:rect.top+ch/2,deltaY:-500,cancelable:true}));
     check(fake.getZoom()>oldZoom,'wheel 이벤트');
@@ -121,9 +129,11 @@ window.p3AdapterUnit = () => {
   const sdk={LatLng:LL,Point:XY,Size:XY,MapTypeId:{SATELLITE:'S',NORMAL:'N',HYBRID:'H'},Event:{addListener:()=>1,removeListener:l=>calls.push(['remove',l])},Map:class {
     constructor(c,o){instances++;this.z=o.zoom;this.c=o.center;}
     setMapTypeId(m){calls.push(m);}setCenter(c){this.c=c;calls.push('center');}getCenter(){return this.c;}
-    setZoom(z){this.z=z;}getZoom(){return this.z;}setSize(s){calls.push('size');}
+    setZoom(z){this.z=z;}getZoom(){return this.z;}setSize(s){calls.push('size');}setOptions(o){calls.push('options');}
+    fitBounds(b){this.c=new LL((b[0].lat()+b[1].lat())/2,(b[0].lng()+b[1].lng())/2);calls.push('fitBounds');}
     getBounds(){return {getSW:()=>new LL(33,124),getNE:()=>new LL(39,132)};}destroy(){calls.push('destroy');}
     getProjection(){const scale=2**this.z/200000, center=fakeWorld(this.c.lng(),this.c.lat()); return {
+      getDestinationCoord:(c,a,m)=>{const ll=fakeDestination(c.lng(),c.lat(),m);return new LL(ll[1],ll[0]);},
       fromCoordToPoint:c=>{const w=fakeWorld(c.lng(),c.lat());return new XY(...w);},
       fromPointToOffset:p=>new XY((p.x-center[0])*scale+cw/2,(center[1]-p.y)*scale+ch/2),
       fromCoordToOffset:c=>{const w=fakeWorld(c.lng(),c.lat());return new XY((w[0]-center[0])*scale+cw/2,(center[1]-w[1])*scale+ch/2);},

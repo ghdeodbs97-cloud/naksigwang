@@ -47,7 +47,7 @@ function providerProbeSample(d, frame) {
   const dx = valid ? canvasPixel[0] - nativeMarkerPixel[0] : null, dy = valid ? canvasPixel[1] - nativeMarkerPixel[1] : null;
   return {frame, time:performance.now(), nativeMarkerPixel, canvasPixel, dx, dy, errorPx:valid ? Math.hypot(dx, dy) : null,
     valid, visible, canvasDraw:d.lastDraw ? structuredClone(d.lastDraw) : null,
-    providerCenter:PROVIDER_MAP.adapter.getCenter(), providerZoom:PROVIDER_MAP.adapter.getZoom(), view:{...V}};
+    providerCenter:PROVIDER_MAP.adapter.getCenter(), providerZoom:PROVIDER_MAP.adapter.getZoom(), providerBounds:PROVIDER_MAP.adapter.getBounds(), pxPerGround:pxPerGround(), gpp:1/pxPerGround(), providerRect:providerRect($('providerMap')), canvasRect, baseFrame:structuredClone(PROVIDER_MAP.lastBaseFrame), stationDrawStats:{...stationDrawStats}, events:structuredClone(PROVIDER_MAP.events), view:{...V}};
 }
 function providerDiagnosticRectDeltas() {
   const origin = providerRect(ui), deltas = {};
@@ -62,7 +62,7 @@ function providerDiagnosticStyle(el) {
   for (const k of ['position','boxSizing','transform','transformOrigin','paddingLeft','paddingTop','paddingRight','paddingBottom','borderLeftWidth','borderTopWidth','borderRightWidth','borderBottomWidth','clipPath']) out[k] = s[k];
   return out;
 }
-async function providerMarkerDiagnostic(lat, lon) {
+async function providerMarkerDiagnostic(lat, lon, action) {
   if (!PROVIDER_DEV_HOST) throw Error('로컬 개발 환경에서만 사용할 수 있습니다.');
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < 32.5 || lat > 39 || lon < 123.8 || lon > 132.2) throw Error('한국 연안의 숫자 경위도를 입력하세요.');
   const a = PROVIDER_MAP.adapter;
@@ -76,12 +76,14 @@ async function providerMarkerDiagnostic(lat, lon) {
     PROVIDER_DEBUG = {lat, lon, native:a.createDebugMarker(lat, lon)};
     drawUI();
   }
-  const d = PROVIDER_DEBUG, timeline = [providerProbeSample(d, 0)];
+  const d = PROVIDER_DEBUG;
+  action?.();
+  const timeline = [providerProbeSample(d, 0)];
   for (let frame = 1; frame <= 8; frame++) {
     await new Promise(resolve => requestAnimationFrame(resolve));
     if (PROVIDER_DEBUG !== d) throw Error('다른 기준점 검사로 바뀌었습니다.');
     timeline.push(providerProbeSample(d, frame));
-    if (frame >= 2 && timeline.at(-1).valid && timeline.at(-2).valid) break;
+    /* 최소 8프레임을 모두 기록해 초기 오차와 최종 오차를 분리한다. */
   }
   const sample = timeline.at(-1), canvasRect = providerRect(ui), providerRect_ = providerRect($('providerMap'));
   return {providerMode:PROVIDER_MAP.mode, providerZoom:a.getZoom(), lat, lon,
@@ -99,6 +101,15 @@ if (PROVIDER_DEV_HOST) {
   window.naksigwangMapDiagnostic = (lat, lon) => lat === undefined && lon === undefined
     ? {...structuredClone(PROVIDER_MAP.diagnostic),measurement:'SDK 내부 일관성 검사',nativeMarkerMeasured:false} : providerMarkerDiagnostic(lat, lon);
   window.naksigwangMapDiagnostic.clear = providerClearDiagnostic;
+  // 같은 기준점을 남긴 채 명령 직후부터 8프레임을 기록한다.
+  window.naksigwangMapDiagnostic.pan = (dx,dy,lat=38.20854,lon=128.5947) => {
+    if(!Number.isFinite(dx)||!Number.isFinite(dy)||TAB!=='map'||S.lock)throw Error('지도 탭에서 숫자 CSS px 이동량을 입력하세요.');
+    return providerMarkerDiagnostic(lat,lon,()=>providerPanBy(dx,dy));
+  };
+  window.naksigwangMapDiagnostic.zoom = (factor,lat=38.20854,lon=128.5947) => {
+    if(!Number.isFinite(factor)||factor<=0||TAB!=='map'||S.lock)throw Error('지도 탭에서 양수 확대 비율을 입력하세요.');
+    return providerMarkerDiagnostic(lat,lon,()=>providerZoomAt(cw/2,ch/2,factor));
+  };
   window.naksigwangMapDiagnostic.fit = async (width, lat = 38.20854, lon = 128.5947) => {
     if (![1000,2000,5000,10000,60000,600000].includes(width)) throw Error('폭은 1000/2000/5000/10000/60000/600000 m 중에서 고르세요.');
     if (TAB !== 'map' || S.lock) throw Error('지도 탭에서 실행하세요.');

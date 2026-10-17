@@ -48,6 +48,8 @@ body{font-family:var(--font-ui);font-size:14px;line-height:1.55}
 .coord .msg{font-size:12px;color:var(--amber)}
 .stage{position:relative;width:100%;border-radius:4px;overflow:hidden;background:#06131d}
 .stage canvas{position:absolute;inset:0;display:block}
+#base,#flow{pointer-events:none}
+.provider-native #ui{pointer-events:none}
 #providerMap{position:absolute;inset:0;visibility:hidden}
 .provider-active canvas{clip-path:inset(0 0 28px 0)} /* SDK 하단 출처·로고를 가리지 않는다 */
 #providerNotice{font-size:12px;color:var(--muted);margin:6px 0}

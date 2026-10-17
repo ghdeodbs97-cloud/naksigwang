@@ -10,7 +10,7 @@ function resize() {
   mask.width = Math.ceil(cw / 2); mask.height = Math.ceil(ch / 2);
   sw = $('secWrap').clientWidth; shh = sw < 560 ? 240 : 300;
   sec.width = Math.round(sw * r); sec.height = Math.round(shh * r); sec.style.height = shh + 'px';
-  if (old) { V.cx = old[0]; V.cy = old[1]; V.s = cw / (oldGW * kAt(latOf(V.cy))); clampView(); }
+  if (old && !PROVIDER_MAP.active) { V.cx = old[0]; V.cy = old[1]; V.s = cw / (oldGW * kAt(latOf(V.cy))); clampView(); }
   providerSync(); dirty = true;
 }
 
@@ -18,6 +18,7 @@ function resize() {
 const ptrs = new Map(); let pinch = null, panStart = null;
 const local = e => { const b = ui.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
 ui.addEventListener('pointerdown', e => {
+  if(providerUseNativePan())return;
   ui.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, local(e));
   if (ptrs.size === 2 && S.lock) { S.drag = null; return; }   // 오늘 탭 지도: 두 손가락 확대 안 함
   if (ptrs.size === 2) { S.drag = null; panStart = null; const [p, q] = [...ptrs.values()]; pinch = { d: Math.hypot(p[0] - q[0], p[1] - q[1]), c: [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2] }; return; }
@@ -26,13 +27,13 @@ ui.addEventListener('pointerdown', e => {
   const m = toM(x, y); S.drag = { A: m, B: m };
 });
 ui.addEventListener('pointermove', e => {
+  if(providerUseNativePan())return;
   const [x, y] = local(e);
   if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, [x, y]);
   if (pinch && ptrs.size === 2) {
     const [p, q] = [...ptrs.values()], d = Math.hypot(p[0] - q[0], p[1] - q[1]), c = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
-    const anchor = providerTransform() ? PROVIDER_MAP.adapter.unproject(...pinch.c) : null;
+    if(providerTransform()){providerZoomAt(...pinch.c,d/pinch.d);providerPanBy(c[0]-pinch.c[0],c[1]-pinch.c[1]);pinch={d,c};return;}
     zoomAt(c[0], c[1], d / pinch.d);
-    if (anchor && providerTransform()) { providerPanAnchor(anchor,...c); pinch = {d,c}; return; }
     V.cx -= (c[0] - pinch.c[0]) / V.s; V.cy += (c[1] - pinch.c[1]) / V.s; clampView(); pinch = { d, c }; return;
   }
   if (panStart) { if (panStart.anchor && providerTransform()) { providerPanAnchor(panStart.anchor,x,y); return; } V.cx = panStart.cx - (x - panStart.x) / V.s; V.cy = panStart.cy + (y - panStart.y) / V.s; clampView(); return; }
@@ -56,7 +57,13 @@ function endPtr(e) {
 }
 ui.addEventListener('pointerup', endPtr); ui.addEventListener('pointercancel', endPtr);
 ui.addEventListener('pointerleave', () => { hoverAt = null; setText('cursorRead', '커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다'); });
-ui.addEventListener('wheel', e => { if (S.lock) return; e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
+ui.addEventListener('wheel', e => { if (providerUseNativePan() || S.lock) return; e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
+// 이동 모드에서는 SDK가 입력을 소유한다. 캡처 관찰은 hover와 짧은 탭 선택만 한다.
+let nativeTap=null;const nativePointers=new Set();
+stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;nativePointers.add(e.pointerId);nativeTap=nativePointers.size===1?local(e):null;},true);
+stage.addEventListener('pointermove',e=>{if(providerUseNativePan())hoverAt=local(e);},true);
+stage.addEventListener('pointerup',e=>{if(!providerUseNativePan())return;const p=local(e);if(nativeTap&&Math.hypot(p[0]-nativeTap[0],p[1]-nativeTap[1])<6){const i=stationAt(...p);if(i!=null)selectPoint(i,cw/pxPerGround()>60000);}nativeTap=null;nativePointers.delete(e.pointerId);},true);
+stage.addEventListener('pointercancel',e=>{nativeTap=null;nativePointers.delete(e.pointerId);},true);
 let hoverAt = null, hoverDone = null;
 function updateHover() {
   if (!hoverAt || (hoverDone && hoverDone[0] === hoverAt[0] && hoverDone[1] === hoverAt[1] && !dirtyHover)) return;
@@ -78,6 +85,7 @@ document.querySelectorAll('[data-bb]').forEach(b => b.addEventListener('click', 
 function setMode(m) {
   S.mode = m; $('mLine').setAttribute('aria-pressed', m === 'line'); $('mPan').setAttribute('aria-pressed', m === 'pan');
   ui.classList.toggle('pan', m === 'pan');
+  providerUpdateInput();
   $('modeHint').textContent = m === 'pan' ? '드래그해서 지도 이동 · 휠/두 손가락으로 확대' : '드래그해서 단면선 긋기 · 휠/두 손가락으로 확대';
 }
 $('mLine').addEventListener('click', () => setMode('line'));
