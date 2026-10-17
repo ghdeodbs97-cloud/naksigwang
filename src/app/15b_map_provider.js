@@ -8,10 +8,11 @@ class NaverMapAdapter {
     this.imageError = e => { if (e.target?.tagName === 'IMG') this.onFailure?.(); };
     container.addEventListener('error', this.imageError, true);
     this.map = new n.Map(container, { center: new n.LatLng(latOf(V.cy), lonOf(V.cx)), zoom: 10,
+      mapTypeId: n.MapTypeId[{satellite:'SATELLITE',hybrid:'HYBRID',normal:'NORMAL'}[PROVIDER_MAP.mode]],
       draggable: false, scrollWheel: false, pinchZoom: false, keyboardShortcuts: false,
       disableDoubleClickZoom: true, zoomControl: false, mapDataControl: true, logoControl: true });
   }
-  setMode(mode) { this.map.setMapTypeId(this.sdk.MapTypeId[mode === 'satellite' ? 'HYBRID' : 'NORMAL']); }
+  setMode(mode) { this.map.setMapTypeId(this.sdk.MapTypeId[{satellite:'SATELLITE',hybrid:'HYBRID',normal:'NORMAL'}[mode] || 'SATELLITE']); }
   syncFromAppViewport() {
     const n = this.sdk;
     this.map.setCenter(new n.LatLng(latOf(V.cy), lonOf(V.cx)));
@@ -39,14 +40,23 @@ class NaverMapAdapter {
   project(lon, lat) { const p = this.map.getProjection().fromCoordToOffset(new this.sdk.LatLng(lat, lon)); return [p.x, p.y]; }
   unproject(x, y) { const p = this.map.getProjection().fromOffsetToCoord(new this.sdk.Point(x, y)); return [p.lng(), p.lat()]; }
   resize() { this.map.setSize(new this.sdk.Size(cw, ch)); }
+  createDebugMarker(lat, lon) {
+    const n = this.sdk, element = document.createElement('div');
+    element.dataset.naksigwangNativeProbe = '';
+    element.style.cssText = 'width:20px;height:20px;box-sizing:border-box;border:2px solid #00ffff;border-radius:50%;pointer-events:none';
+    const marker = new n.Marker({position:new n.LatLng(lat,lon),map:this.map,clickable:false,zIndex:10000,
+      icon:{content:element,size:new n.Size(20,20),anchor:new n.Point(10,10)}});
+    return {marker,element};
+  }
   onViewportReady(fn) { this.listeners.push(this.sdk.Event.addListener(this.map, 'idle', fn)); }
   onTilesLoaded(fn) { this.listeners.push(this.sdk.Event.addListener(this.map, 'tilesloaded', fn)); }
   destroy() { for (const l of this.listeners) this.sdk.Event.removeListener(l); this.listeners = []; this.container?.removeEventListener('error', this.imageError, true); this.map?.destroy(); this.map = null; }
 }
 
-const PROVIDER_MAP = { adapter: null, active: false, failed: false, started: false, mode: 'normal',
+const PROVIDER_MAP = { adapter: null, active: false, failed: false, started: false, mode: 'satellite',
   signature: '', loaded: false, timer: null, alignment: null, checking: false, syncing: false, diagnostic: null };
-try { if (localStorage.getItem('naksigwang-map-mode') === 'satellite') PROVIDER_MAP.mode = 'satellite'; } catch (_) { /* 저장 제한 시 기본값 */ }
+// P3 개발 중 저장된 normal/HYBRID 값은 새 위성 기본값으로 한 번 전환한다.
+try { const saved = localStorage.getItem('naksigwang-map-mode-v2'); if (['satellite','hybrid','normal'].includes(saved)) PROVIDER_MAP.mode = saved; localStorage.removeItem('naksigwang-map-mode'); } catch (_) { /* 저장 제한 시 위성 기본값 */ }
 
 function providerNotice(text) { $('providerNotice').textContent = text; }
 function providerFallback() {
@@ -84,17 +94,22 @@ function providerAlignment(adapter) {
   PROVIDER_MAP.diagnostic = {view:{...V},zoom:adapter.getZoom(),viewport:{width:cw,height:ch},samples,references,maxError:max,rawSamples,rawMaxError:Math.max(...rawSamples.map(s=>s.error)),xScaleRatio:Math.hypot(ex[0]-o[0],ex[1]-o[1])/(100*V.s),yScaleRatio:Math.hypot(ey[0]-o[0],ey[1]-o[1])/(100*V.s),providerCenter:c,visibleBounds:adapter.getBounds()};
   return max;
 }
-// 로컬 개발에서만 공개. credential이나 SDK 객체는 반환하지 않는다.
-if (['localhost','127.0.0.1','[::1]'].includes(location.hostname)) window.naksigwangMapDiagnostic = () => structuredClone(PROVIDER_MAP.diagnostic);
+// 같은 SDK 내부 경로의 비교값은 실 Marker DOM 검증을 대신하지 않는다.
+function providerRect(el) { const r = el.getBoundingClientRect(); return {left:r.left,top:r.top,width:r.width,height:r.height}; }
+function providerRectError() {
+  const origin = providerRect(ui); let error = 0;
+  for (const el of [$('providerMap'),base,flow,stage]) { const rect = providerRect(el); for (const key of ['left','top','width','height']) error = Math.max(error,Math.abs(rect[key]-origin[key])); }
+  return error;
+}
 function providerCheck() {
   const p = PROVIDER_MAP;
   if (!p.adapter || p.failed || !p.loaded || p.syncing) return;
   try {
     clearTimeout(p.timer);
-    p.checking = true; p.alignment = providerAlignment(p.adapter); p.checking = false; p.active = p.alignment <= 2;
+    p.checking = true; p.alignment = Math.max(providerAlignment(p.adapter),providerRectError()); p.checking = false; p.active = p.alignment <= 2;
     $('providerMap').style.visibility = p.active ? 'visible' : 'hidden'; dirty = true;
     stage.classList.toggle('provider-active', p.active);
-    providerNotice(p.active ? (p.mode === 'satellite' ? 'NAVER 위성지도 · 수심은 별도 공공자료와 추정값입니다.' : 'NAVER 일반지도 · 수심은 별도 공공자료와 추정값입니다.')
+    providerNotice(p.active ? ('NAVER ' + {satellite:'위성지도',hybrid:'위성+지명',normal:'일반지도'}[p.mode] + ' · 수심은 별도 공공자료와 추정값입니다.')
       : '온라인 지도와 분석 표시의 위치를 맞추지 못해 기본 지형지도로 표시합니다.');
   } catch (_) { p.checking = false; providerFallback(); }
 }
@@ -130,8 +145,8 @@ function scheduleDisplayDepthArea() {
   },250);
 }
 function providerSetMode(mode) {
-  const p = PROVIDER_MAP; p.mode = mode === 'satellite' ? 'satellite' : 'normal';
-  try { localStorage.setItem('naksigwang-map-mode', p.mode); } catch (_) { /* 저장 제한 */ }
+  const p = PROVIDER_MAP; p.mode = ['satellite','hybrid','normal'].includes(mode) ? mode : 'satellite';
+  try { localStorage.setItem('naksigwang-map-mode-v2', p.mode); } catch (_) { /* 저장 제한 */ }
   for (const b of $('providerModes').children) b.setAttribute('aria-pressed', b.dataset.providerMode === p.mode);
   if (p.adapter && !p.failed) {
     // 같은 지도 인스턴스의 배경만 바꾼다. dirty/단면/수심 로더를 건드리지 않는다.

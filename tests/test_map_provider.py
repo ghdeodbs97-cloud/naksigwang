@@ -35,8 +35,10 @@ try:
         page.clock.set_fixed_time(dt.datetime.fromisoformat(json.loads((ROOT/'data/meta.json').read_text(encoding='utf-8'))['generated']))
         page.goto('http://localhost:8000/index.html',wait_until='domcontentloaded')
         page.wait_for_function('window.p3Ready?.()')
+        assert page.evaluate('window.p3Preference()')['mode']=='satellite','첫 진입 위성 기본값'
         assert page.evaluate('window.p3AdapterUnit()')
         result=page.evaluate('window.p3Test()')
+        result['nativeDiagnostic']=page.evaluate('window.p3NativeTest()')
         page.set_viewport_size({'width':width,'height':height-160});page.wait_for_timeout(350)
         assert page.evaluate('window.p3SizeCheck()'),'창 높이 변경 반영'
         page.set_viewport_size({'width':width,'height':height});page.wait_for_timeout(350)
@@ -57,6 +59,11 @@ try:
         results.append({'viewport':[width,height],'dpr':dpr,**result,'errors':errors,'failedRequests':failed,'depthToggleFetches':len(depth_requests)-count})
         print(f'{width}x{height} DPR {dpr}: 통과',flush=True)
         page.close()
+    page=browser.new_page(viewport={'width':390,'height':844},device_scale_factor=3)
+    page.route('https://**/*',lambda r:r.abort());page.route('**/index.html',lambda r:r.fulfill(content_type='text/html',body=html))
+    page.goto('http://localhost:8000/index.html',wait_until='domcontentloaded');page.wait_for_function('window.p3Ready?.()')
+    high=page.evaluate('window.p3NativeTest()');assert all(s['dpr']==3 and s['drawingDpr']==2 for s in high['samples'])
+    results.append({'highDprNative':high});page.close()
     # SDK 실패와 timeout은 메모리 route로 재현한다. 실제 credential/요청 없음.
     for failure in ['404','429','offline','timeout','auth']:
       print('SDK 실패 검사:',failure,flush=True)
@@ -80,6 +87,24 @@ try:
       assert not errors,errors
       results.append({'failure':failure,'passed':True})
       page.close()
+    # 이전 개발 설정은 이관하고 v2에서 사용자가 고른 모드는 보존한다.
+    for legacy,saved,expected in [('normal',None,'satellite'),('satellite',None,'satellite'),(None,'normal','normal'),(None,'hybrid','hybrid')]:
+      page=browser.new_page();page.route('https://**/*',lambda r:r.abort());page.route('**/index.html',lambda r:r.fulfill(content_type='text/html',body=html))
+      page.add_init_script("""const legacy=%s,saved=%s;if(legacy)localStorage.setItem('naksigwang-map-mode',legacy);if(saved)localStorage.setItem('naksigwang-map-mode-v2',saved);"""%(json.dumps(legacy),json.dumps(saved)))
+      page.goto('http://localhost:8000/index.html',wait_until='domcontentloaded');page.wait_for_function('window.p3Ready?.()');pref=page.evaluate('window.p3Preference()')
+      assert pref['mode']==expected and pref['pressed']==expected and pref['legacy'] is None,pref
+      results.append({'preference':expected,'legacy':legacy,'passed':True});page.close()
+    # 공개 호스트에는 진단 함수나 native debug Marker를 만들지 않는다. 모든 자료는 로컬 route로 제공한다.
+    from urllib.parse import urlparse
+    import mimetypes
+    page=browser.new_page();page.route('https://**/*',lambda r:r.abort())
+    def production(route):
+      name=urlparse(route.request.url).path.lstrip('/') or 'index.html'
+      if name=='index.html':route.fulfill(content_type='text/html',body=html)
+      else:route.fulfill(path=str(ROOT/name),content_type=mimetypes.guess_type(name)[0] or 'application/octet-stream')
+    page.route('http://production.example/**',production);page.goto('http://production.example/index.html',wait_until='domcontentloaded');page.wait_for_function('window.p3Ready?.()')
+    assert page.evaluate("typeof window.naksigwangMapDiagnostic==='undefined' && !document.querySelector('[data-naksigwang-native-probe]')")
+    results.append({'productionDebugAbsent':True,'passed':True});page.close()
     browser.close()
 finally:
   srv.shutdown();srv.server_close()

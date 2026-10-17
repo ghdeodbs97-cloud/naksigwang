@@ -29,6 +29,9 @@ try:
                 if case == 'empty_wx':
                     data['wx']['cells'] = {}
                 if case in ['merged', 'kept', 'incomplete']:
+                    # 실제 meta의 다른 원천 보존 상태가 합성 시나리오의 우선순위를 덮지 않게 한다.
+                    for name in ['tide', 'obs', 'wx']:
+                        data['meta'][name + '.json'] = {'status': 'fresh'}
                     status = {'merged': 'merged_fallback', 'kept': 'kept_previous_low_fresh_ratio', 'incomplete': 'kept_previous_incomplete'}[case]
                     data['meta']['wx.json'] = {'status': status}
                 if case == 'old_meta':

@@ -1,6 +1,38 @@
 # P3 NAVER 지도 표시 투영 수정 보고서
 
-2026-10-11. 기존 `feat/p3-map-foundation` / draft PR #6에서 계속 작업했다. 새 브랜치·PR과 merge는 없다. 실 credential은 사용하지 않았다. **실 NAVER 영상 ±2 CSS px 정합은 사용자 localhost 검증 전까지 미확인**이다.
+2026-10-17 갱신. 기존 `feat/p3-map-foundation` / draft PR #6에서 계속 작업했다. 새 브랜치·PR과 merge는 없다. 실 credential은 사용하지 않았다. **실 NAVER 영상 ±2 CSS px 정합은 사용자 localhost 검증 전까지 미확인**이다.
+
+## 위성 기본값과 세 가지 모드
+
+첫 진입 기본은 순수 위성 `SATELLITE`다. Map 생성 옵션에서부터 지도 유형을 지정해 처음에 일반 타일을 요청하는 경로도 없앴다. UI와 실제 SDK 매핑은 다음과 같다.
+
+| 화면 | 저장값 | SDK MapTypeId |
+|---|---|---|
+| 위성 | satellite | SATELLITE |
+| 위성+지명 | hybrid | HYBRID |
+| 일반 | normal | NORMAL |
+
+예전 `naksigwang-map-mode`는 개발 중 생성된 설정으로 보고 제거한다. 새 `naksigwang-map-mode-v2`가 없으면 위성으로 시작한다. 이후 사용자가 선택한 v2 값은 새로고침 후에도 유지한다. credential 저장 항목은 변경하지 않는다.
+
+## 이번에 확인한 원인과 아직 확인하지 못한 원인
+
+위성이 기본이 아니었던 원인은 mode의 초기값이 normal이고 satellite 버튼도 HYBRID에 연결되어 있던 코드다. 이를 SATELLITE 기본값과 세 가지 명시적인 매핑으로 고쳤다.
+
+이전 내부 정합 검사는 같은 SDK의 offset/세계 좌표 변환을 비교하므로 내부 일관성만 확인한다. 이 값이 거의 0이어도 실제 native Marker DOM, Canvas 원점·backing 크기, 지도 resize/center 반영 시점까지 맞았다는 증거가 되지 않는다. 사용자 실제 화면의 잔여 어긋남은 이 한계 때문에 아직 원인이 확정되지 않았다. 이번 작업은 독립적인 실제 렌더링 계측을 추가한 것이며, 실 NAVER 오차를 이미 해결했다고 주장하지 않는다. 하드코딩 offset이나 원자료 이동은 넣지 않았다.
+
+## native Marker와 실제 Canvas 픽셀 진단
+
+localhost에서 `await naksigwangMapDiagnostic(38.20854, 128.5947)`를 실행한다. 같은 lat/lon으로 SDK `new Marker({position:new LatLng(lat,lon),map:...})`의 청록색 HTML 원과 자료 mx/my → toS로 그린 자홍색 Canvas 십자선을 만든다.
+
+native 위치는 실제 HTML 원의 getBoundingClientRect 중심을 읽는다. Canvas 위치는 getImageData에서 실제 자홍색 픽셀을 찾아 alpha 가중 중심을 읽고 backing 크기로 나누어 CSS pixel로 환산한다. 양쪽 모두 ui Canvas 왼쪽 위를 기준으로 표현한다. SDK project 결과를 양쪽에 재사용하지 않는다. dx/dy는 Canvas minus native, errorPx는 두 값의 거리다. valid=true이고 errorPx≤2면 해당 좌표·뷰에서 두 렌더러의 정합이 확인된 것이다.
+
+반환 객체에는 providerMode/providerZoom, lat/lon, providerRect/baseRect/flowRect/canvasRect/stageRect, 각 사각형의 left/top/width/height 차이(rectDeltas), 실제 dpr와 canvasDpr(최대 2), nativeMarkerPixel/canvasPixel/dx/dy/errorPx, center/bounds가 있다. 경위도 배열은 [lon,lat], 화면 좌표는 [x,y] 순서다. CSS padding/border/transform/clipPath, backing/logical 크기, 프레임별 위치·마지막 Canvas 그린 시각·V/SDK 중심도 기록한다. 처음과 다음 두 프레임을 기록하고, 마커가 아직 준비되지 않았으면 최대 8프레임까지 기다린다. maxObservedErrorPx로 잠깐 발생한 차이를 볼 수 있다.
+
+provider·base·flow·ui·stage의 CSS 사각형도 2px guard에 포함했다. full viewport의 높이를 출처 때문에 줄이지 않는다. Canvas 하단 28px의 clip만 출처를 위해 유지한다. 완전한 십자선이 화면 밖/출처 영역에 있거나 마커가 준비되지 않았으면 valid=false, errorPx=null로 반환한다. 이 경우 0px 성공으로 취급하지 않는다. provider가 비활성이어도 DOM 사각형 차이는 반환한다.
+
+native Marker와 십자선은 로컬 호스트에서 사용자가 함수를 호출할 때만 만든다. 공개 호스트에는 window 진단 함수와 debug Marker가 없다. `naksigwangMapDiagnostic.clear()`로 지운다. 같은 좌표로 다시 호출하면 기존 Marker를 재사용해 pan/zoom 뒤 프레임 변화를 측정한다. 일반 pin·A/B·SEC는 진단 생성으로 변경하지 않는다. 반환값에 SDK 객체·credential·Client ID는 포함하지 않는다.
+
+인자 없는 `naksigwangMapDiagnostic()`는 이전 내부 비교값만 반환하며 nativeMarkerMeasured=false로 표시한다. **내부 maxError를 실제 marker-vs-Canvas errorPx로 해석하지 않는다.**
 
 ## 원인과 수정
 
@@ -28,17 +60,20 @@ localhost/127.0.0.1 개발자 콘솔에서 `naksigwangMapDiagnostic()`를 실행
 
 ## 이번 후속 수정 파일
 
-- `15_view.js`: raw/provider 변환 분리, 네 변 32분할 및 SDK bounds를 포함하는 viewBounds, provider zoom 연결.
-- `15b_map_provider.js`: 실제 V 배율 동기화, SDK 기준점 pan/zoom, idle, 독립 guard, 로컬 진단, SDK 화면 수심 요청 어댑터.
-- `03_userdata.js`, `05_struct.js`, `06_osm.js`, `08_depth_api.js`: 보이는 자료 선별·구조물·OSM·선택 API 범위를 viewBounds로 통일.
-- `16_terrain.js`: 비선형 해안 투영·범위 선별, 배경만 생략하고 분석 마스크 보존.
-- `19_overlay.js`: 자료 좌표 A→B 경로와 단면 표식 투영.
-- `21_input.js`: pan/wheel/pinch와 크기 동기화 순서.
-- `src/README.md`, `index.html`(build.py 생성), P3 mock·검사 결과·이 보고서.
+- `src/app/15b_map_provider.js`: SATELLITE 기본값·초기 생성 옵션, 세 가지 SDK 모드, v2 설정, native Marker 생성, DOM rect guard.
+- `src/app/15c_map_diagnostic.js`(신규): native DOM·실제 Canvas 픽셀·DPR·원점·프레임 진단, 로컬 전용 함수와 해제/폭 이동 보조 함수.
+- `src/app/19_overlay.js`: 로컬 debug 십자선 표시 연결. 기존 분석 좌표는 무변경.
+- `src/template.html`: 위성/위성+지명/일반 버튼과 초기 선택.
+- `src/README.md`, `index.html`(build.py 생성).
+- `tests/p3_provider_checks.js`, `tests/test_map_provider.py`: 세 모드·설정 이관·독립 native DOM mock·원점 오차·DPR 3·공개 호스트 진단 차단 검사.
+- `tests/smoke_degradation.py`: 최신 meta의 다른 원천 보존 상태가 합성 merged/kept/incomplete 시나리오를 덮지 않도록 fixture 상태를 분리한다. 기존 안내 문구 검증은 유지한다.
+- `tests/P3_MAP_REPORT.md`, `tests/p3_validation.json`: 절차와 결과.
 
 ## mock 및 회귀 검증
 
 mock은 앱 변환을 호출하지 않는 비선형 세계 좌표(방향 기울기·곡률)와 정수 줌을 쓴다. 390×844, 768×1024, 1280×900, 1365×768, 1920×1080 × DPR 1/1.25/1.5/2의 20개 조합을 검사한다. 각 조합은 네 항만 × 폭 1.5/9/60/600km를 검사한다. 기존 affine 방식이 2px를 넘는 경우도 검사하며 수정된 표시 변환의 오차는 1e-5 CSS px 미만이어야 한다. 최종 360개 화면 검사 최대 오차는 2.73e-09 CSS px, 기존 affine 비교 최대 오차는 35.507 CSS px였다. 정확한 실행 결과는 `p3_validation.json`에 기록한다. 실제 NAVER 측정값이 아니다.
+
+독립 native DOM mock은 20개 조합 × 전국/광역/10/5/2/1km 및 DPR 3 별도 검사를 합쳐 126개를 측정했다. 실제 Canvas 픽셀 기준 최대 errorPx는 0.247959 CSS px, 최대 DOM 사각형 차이는 0.000000px였다. 내부 비교가 통과해도 native DOM에 넣은 6px 이동과 provider DOM의 5px 원점 차이를 검출한다. SATELLITE 기본값·legacy 이관·세 모드 전환·공개 호스트 debug 부재도 통과했다. 이는 실제 NAVER 수치가 아니다.
 
 Canvas 이벤트 핸들러의 A→B·hover·pan·wheel·두 포인터 pinch, 작은 줌 누적, 줌 기준점, SDK 범위 안의 수심 요청, 3px 차단·복구, 실패 시 raw 복귀, 배경 투명·마스크·아이콘, 모드 전환 상태 보존을 검사한다. 합성 touch 이벤트는 물리 휴대폰 검증을 대신하지 않는다. 외부 HTTPS를 차단해 NAVER 요청과 실 credential을 CI에서 사용하지 않는다. SDK 404/429/offline/콜백 timeout/인증 실패도 mock으로 검사한다.
 
@@ -50,17 +85,47 @@ Canvas 이벤트 핸들러의 A→B·hover·pan·wheel·두 포인터 pinch, 작
 
 ## 사용자 localhost 실제 검증
 
-1. 이 브랜치를 pull하고 `python build.py`, `python -m http.server 8000` 실행 후 `http://localhost:8000/index.html#map`을 연다. 기존 localStorage `naksigwang-naver-key-id` 설정은 사용자 브라우저에서 유지한다. 실제 값을 복사하거나 보고서에 넣지 않는다.
-2. NAVER Console Web Dynamic Map 허용 URL은 `http://localhost`다(포트·경로 제외). 공개 호스트는 `https://ghdeodbs97-cloud.github.io`. SDK 설정은 공식 `ncpKeyId`를 사용하고 Client Secret을 사용하지 않는다. 127.0.0.1 사용 시 별도 호스트를 등록한다.
-3. 일반/위성을 각각 선택한다. 콘솔에서 `naksigwangMapDiagnostic()` 결과의 samples·references·maxError를 확인한다. maxError ≤2, SDK 중심과 V 경위도가 같고 viewport가 Canvas CSS 크기와 같은지 확인한다. `rawMaxError`는 클 수 있으며 실패를 뜻하지 않는다.
-4. 전국 → 동해안 광역 → 속초(38.20854,128.5947), 주문진(37.89192,128.8312883028771), 묵호(37.55,129.12), 포항(36.05,129.38) 순서로 이동한다. 좌표 검색은 lat,lon 순서이며 검색 직후 근접 화면이므로 축소 버튼으로 약 5~10km까지 넓힌다. 각 단계에서 진단 값을 기록한다.
-5. 항만별 약 1~2km 화면에서 원자료에 좌표가 있는 방파제 끝단/꺾임 두세 곳을 고른다. 항구 아이콘은 바다 쪽으로 비켜 그려지므로 **실제 위치 점/핀**을 사용한다. 독립 원자료 경위도를 검색해 핀 중심과 영상의 같은 지형점을 CSS px로 비교한다. A→B 끝점을 같은 두 곳에 놓고 선·단면 hover 표식도 확인한다. 수심을 영상에서 추정하거나 좌표를 임의 보정하지 않는다.
-6. 항만·모드·CSS viewport·DPR·zoom·기준점 경위도·관찰 dx/dy/max를 기록한다. 390×844와 1280×900에서 시행한다. 개발자 도구의 네트워크/Storage 패널에는 credential이 있으므로 캡처하지 않는다. 진단 반환 객체에는 credential이 없다.
-7. pan, wheel, pinch, 회전/크기 변경 직후 같은 기준점을 확인한다. 필요하면 화면 녹화의 연속 프레임으로 배경과 핀이 한 프레임을 넘겨 크게 어긋나는지 확인한다. 오늘/지도 왕복, 나머지 세 탭, 수심 hover와 A→B도 확인한다.
-8. 네트워크 offline 후 기본 지형·분석이 복구되는지 확인한다. offline 테스트 후 연결을 켜고 새로고침한다. 실 SDK 타일 캐시/오류 및 하단 출처·로고도 확인한다.
+1. 기존 브랜치의 최신 코드를 받아 `python build.py`를 실행한다. 저장소에서 `python -m http.server 8000`을 실행하고 `http://localhost:8000/index.html#map`을 강력 새로고침한다. 기존 localStorage `naksigwang-naver-key-id`는 그대로 둔다. 키를 채팅/보고서/캡처에 복사하지 않는다.
+2. 이전 P3 legacy 설정만 있던 브라우저와 신규 브라우저는 **위성**으로 열린다. 위성+지명/일반도 눌러 확인한다. 이후 직접 선택한 v2 값은 유지되는 것이 정상이다. 새 기본값만 다시 확인하려면 `localStorage.removeItem('naksigwang-map-mode-v2')` 후 새로고침한다. credential 항목은 지우지 않는다.
+3. 좌표 검색에 `38.20854, 128.5947`을 입력해 찾기를 누른다. 개발자 콘솔에서 다음을 실행한다.
 
-예상 동작: 전국/광역은 SDK 비선형 투영을 모든 위치에 적용한다. 항만 5~10km와 근접 1~2km도 같은 경로다. 정수 zoom 때문에 표시 폭은 요청 폭에서 단계적으로 달라질 수 있으며 V.s와 폭 안내가 실제 선택 배율로 갱신된다. wheel/pinch의 작은 변화는 누적해 다음 정수 단계로 넘어간다. 모드 전환으로 선택점·단면·수심 자료를 바꾸지 않는다. 실영상 잔차가 2px를 넘으면 SDK/Canvas 변환과 원자료 위치·영상 시점 차이를 구분해서 조사한다.
+```js
+const r = await naksigwangMapDiagnostic(38.20854, 128.5947);
+r
+```
 
-**실 NAVER ±2px: 미확인.** 사용자 브라우저의 후속 관찰 기록을 받기 전에는 성공으로 바꾸지 않는다.
+청록색 원은 native Marker, 자홍색 십자는 Canvas다. r.valid=true, r.errorPx≤2인지 확인한다. providerRect/baseRect/flowRect/canvasRect/stageRect와 rectDeltas가 같은 원점·크기인지 확인한다. dpr와 canvasDpr는 3과 2처럼 달라도 정상이며 환산된 CSS px를 비교한다. 타일 영상 대신 이 동일 경위도 기준점으로 projection 정합을 판단한다.
 
-공식 근거: [MapSystemProjection 화면/세계 좌표 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.MapSystemProjection.html), [지도 투영](https://navermaps.github.io/maps.js.ncp/docs/tutorial-Projection.html), [Map 줌·이벤트 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Map.html), [SDK 설정](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html), [허용 URL](https://guide.ncloud-docs.com/docs/en/maps-troubleshoot).
+4. 다음을 한 줄씩 실행해 전국/광역/10km/5km/2km/1km에서 기록한다. 정수 줌 때문에 실제 표시 폭은 요청 폭과 다를 수 있다. 전국에서는 속초가 화면 가장자리에 걸릴 수 있어 화면 안의 별도 정확한 좌표 36,128을 쓴다.
+
+```js
+await naksigwangMapDiagnostic.fit(600000, 36, 128)
+await naksigwangMapDiagnostic.fit(60000, 38.20854, 128.5947)
+await naksigwangMapDiagnostic.fit(10000, 38.20854, 128.5947)
+await naksigwangMapDiagnostic.fit(5000, 38.20854, 128.5947)
+await naksigwangMapDiagnostic.fit(2000, 38.20854, 128.5947)
+await naksigwangMapDiagnostic.fit(1000, 38.20854, 128.5947)
+```
+
+5. 같은 검사를 주문진 37.89192/128.8312883028771, 묵호 37.55/129.12, 포항 36.05/129.38에서도 10/5/2/1km로 반복한다. 위성·위성+지명·일반, 390×844와 1280×900에서 시행한다. UI 검색 pin도 동일 좌표로 입력해 십자선과 중심이 같은지 확인한다. 분석 선을 그어 A/B·단면 hover와 수심 readout이 유지되는지도 확인한다.
+6. pan/wheel/pinch·창 크기/방향 변경 직후 같은 좌표의 진단을 다시 실행한다. r.timeline과 r.maxObservedErrorPx에서 frame 0과 이후 프레임의 차이를 확인한다. 지속되는 오차와 한 프레임 지연을 구분한다. CSS transform/padding/border는 styles, DPR 환산은 backingSize/logicalSize/canvasDpr, SDK 중심 반영은 각 프레임의 providerCenter/view를 비교한다. 필요하면 연속 화면 녹화로 확인한다.
+7. projection이 ≤2px인 상태에서만 항구/갯바위 원자료와 위성의 구조물을 비교한다. 아이콘은 해안 밖으로 비켜 그리므로 연결선의 실제 위치 점을 사용한다. 데이터의 위치가 다르다고 전체 provider transform이나 항구 좌표에 offset을 넣지 않는다.
+8. 결과는 mode/zoom/viewport/DPR/lat/lon/dx/dy/errorPx/rectDeltas/timeline을 기록한다. 반환 객체에는 credential이 없다. Network/Storage 패널을 포함해 캡처하지 않는다. `naksigwangMapDiagnostic.clear()`로 debug를 지운다. offline 후 기본 지형 복귀, 오늘/지도 왕복과 나머지 세 탭도 확인한다.
+
+## 원자료 위치 오차와 projection 오차 구분
+
+| 대상 | 해석 |
+|---|---|
+| 같은 직접 입력 lat/lon의 native Marker와 Canvas 십자선이 >2px | 렌더링/DOM/DPR/SDK 갱신 시점 문제를 조사한다. 데이터 위치 이동으로 해결하지 않는다. |
+| 같은 lat/lon은 ≤2px인데 POINTS 항구/갯바위만 어긋남 | 포인트 생성·대표 좌표·간격에 따른 위치 정확도 문제일 수 있다. |
+| PORTS만 어긋남 | 원 항구 목록의 대표 위치와 방파제 끝점은 다를 수 있다. 원 출처 좌표를 확인한다. |
+| ROCKS만 어긋남 | 갯바위 위치·접근정보의 출처별 정확도를 확인한다. |
+| OSM 해안/구조물만 어긋남 | OSM 원자료·단순화 허용오차·위성 촬영/구조물 변경 시점 차이를 확인한다. |
+
+이 분류는 진단 순서이며 이번 작업에서 각 dataset의 실제 m 오차를 측정한 결과는 아니다. 임의 일괄 보정, 수심/해안의 영상 추론은 하지 않았다.
+
+## 남은 한계
+
+**실 NAVER native-vs-Canvas errorPx는 미확인이다.** Codex는 사용자 credential을 사용하지 않았고 실 실행 결과를 받지 않았다. mock 수치로 실 SDK 성공을 주장하지 않는다. native-vs-Canvas 정합은 두 렌더러가 같은 경위도를 찍는지 확인하며 영상/측량 또는 원자료의 위치 정확도를 보증하지 않는다. 화면 밖·출처 영역은 측정 불가로 반환한다. 합성 touch와 mock DOM은 실제 기기·SDK 프레임 검증을 대신하지 않는다. 임의 회전 CSS transform을 적용한 레이아웃은 현재 제품에서 사용하지 않으며, 그런 변경은 별도 실검증이 필요하다. 공개 방문자의 NAVER 설정 주입 단계는 별도이며 설정이 없으면 기본 지형으로 동작한다.
+
+공식 근거: [MapSystemProjection 화면/세계 좌표 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.MapSystemProjection.html), [지도 유형](https://navermaps.github.io/maps.js.ncp/docs/tutorial-MapTypes.html), [Marker HTML 아이콘·anchor](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Marker.html), [지도 투영](https://navermaps.github.io/maps.js.ncp/docs/tutorial-Projection.html), [Map 줌·이벤트 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Map.html), [SDK 설정](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html), [허용 URL](https://guide.ncloud-docs.com/docs/en/maps-troubleshoot).
