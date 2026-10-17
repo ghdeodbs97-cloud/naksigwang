@@ -60,7 +60,8 @@ ui.addEventListener('pointerleave', () => { hoverAt = null; setText('cursorRead'
 ui.addEventListener('wheel', e => { if (providerUseNativePan() || S.lock) return; e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
 // 이동 모드에서는 SDK가 입력을 소유한다. 캡처 관찰은 hover와 짧은 탭 선택만 한다.
 let nativeTap=null;const nativePointers=new Set();
-stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;nativePointers.add(e.pointerId);nativeTap=nativePointers.size===1?local(e):null;},true);
+stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;providerCancelViewCommand('interrupted');nativePointers.add(e.pointerId);nativeTap=nativePointers.size===1?local(e):null;},true);
+stage.addEventListener('wheel',()=>{if(providerUseNativePan())providerCancelViewCommand('interrupted');},true);
 stage.addEventListener('pointermove',e=>{if(providerUseNativePan())hoverAt=local(e);},true);
 stage.addEventListener('pointerup',e=>{if(!providerUseNativePan())return;const p=local(e);if(nativeTap&&Math.hypot(p[0]-nativeTap[0],p[1]-nativeTap[1])<6){const i=stationAt(...p);if(i!=null)selectPoint(i,cw/pxPerGround()>60000);}nativeTap=null;nativePointers.delete(e.pointerId);},true);
 stage.addEventListener('pointercancel',e=>{nativeTap=null;nativePointers.delete(e.pointerId);},true);

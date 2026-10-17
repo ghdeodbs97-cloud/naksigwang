@@ -1,6 +1,20 @@
 # P3 NAVER 지도 표시 투영·이동 동기화 수정 보고서
 
-2026-10-17 갱신. 기존 `feat/p3-map-foundation` / draft PR #6에서 계속 작업했다. 새 브랜치·PR과 merge는 없다. 실 credential은 사용하지 않았다. **실 NAVER 영상 ±2 CSS px 정합은 사용자 localhost 검증 전까지 미확인**이다.
+2026-10-17 갱신. 기존 `feat/p3-map-foundation` / draft PR #6에서 계속 작업했다. 새 브랜치·PR과 merge는 없다. Codex는 실 credential을 사용하지 않았다. 사용자가 현재 서해안 viewport의 같은 좌표에서 **valid=true, errorPx≈0.0377 CSS px, domMismatchPx=0, satellite**를 보고했다. 이 성공 결과와 별개로 **실 NAVER 속초/포항 명시적 이동은 재검증 전까지 미확인**이다.
+
+## 명시적 viewport 이동 transaction 수정
+
+이전 커밋 `695a760`에서 fitGround는 V를 목표로 먼저 바꾸고 fitBounds 직후 providerSync가 옛 SDK projection을 읽어 V에 복사했다. diagnostic.fit은 이동 완료 여부를 확인하지 않고 frame 0~8을 측정했다. 이전 빌드에 20 RAF 지연 SDK를 주입하면 서해안 `[126.5,36.15]`에서 속초 `[128.5947,38.20854]`를 요청해도 서해안 center·V, valid=false/errorPx=null로 조기 반환했다. 이는 요청 완료와 표시 측정 사이의 race를 재현한 것이다. **옛 V 복사만으로 SDK 이동이 취소되었다거나 실 SDK fitBounds 미반영의 원인까지 확정한 것은 아니다.** 실 SDK의 요청/반영 순서는 새 command.trace로 확인해야 한다.
+
+fitGround/fitBox/fitLonLat와 탭 복원은 온라인 목표를 V와 분리해 순수 request로 만든다. providerApplyView는 Promise를 반환하고 commandId/requestedView/commandPending을 저장한 뒤 SDK fitBounds를 호출한다. providerSync는 pending 동안 현재 SDK 화면 재그리기는 허용하지만 V를 확정하지 않는다. 이벤트의 idle만 믿지 않고 매 RAF 실제 projection에서 목표가 viewport/bounds 안인지, 표시 중심과 보고 중심이 맞는지, 요청 범위의 배율이 적절한지, viewport key가 연속 두 프레임 안정적인지 검사한다. zoom 보고값이 먼저 바뀌는 경우에는 SDK 세계 좌표 1단위의 CSS pixel 크기도 확인해 옛 zoom projection을 완료 처리하지 않는다.
+
+도착 후 V compatibility·lastSettledView를 갱신하고 dirty를 설정해 기존 Canvas redraw와 수심 viewport 예약을 수행한다. 새 명령은 이전 명령을 superseded로 취소하며 오래된 idle은 새 목표를 확정할 수 없다. 사용자 pan/zoom은 미완료 fit을 interrupted로 취소한다. 기본 timeout은 8초이며 미도착 시 `reason="requested viewport not reached"`, 요청 목표와 관측 center/renderCenter/bounds/trace를 반환한다. 미도착만으로 projection 실패나 terrain fallback으로 분류하지 않는다. SDK 자체 오류는 기존 fallback으로 복귀한다. credential/SDK 객체는 반환하지 않는다.
+
+세계 좌표 배율·목표 포함 검사는 명령 완료를 판단하는 내부 상태 검사다. 실제 정합 판정은 계속 독립 native Marker DOM 중심과 실제 Canvas 픽셀로 수행한다.
+
+diagnostic.fit은 이 Promise가 성공한 뒤 native Marker 측정을 시작한다. 실패하면 이동 실패 이유와 command 기록을 반환하며 native 측정을 성공처럼 표시하지 않는다. 검색창 submit과 다섯 범위 버튼도 같은 transaction을 사용한다. fallback 지도는 기존 V 기반 이동·입력을 유지한다.
+
+추가 mock은 fitBounds를 2~5 RAF 늦추고 center/zoom/idle을 먼저 보고한다. 홍원→속초 10km, 속초→포항 10km, 포항→전국, 전국→주문진 2km, 같은 중심 zoom만 변경, 좌표 검색 10회, 빠른 검색 10회(이전 9개 취소), 홍원항 이름 검색, 전국/동해안/남해안/서해안/제주 버튼을 검사한다. 12 RAF 지연 진단 대기, no-op timeout/복구도 별도로 검사한다. 각 완료 후 목표 포함·중심·settled V·native DOM/실제 Canvas ≤2px·A/B 보존을 확인한다. 이 기록은 실 NAVER 이동 성공의 증거가 아니다.
 
 ## 위성 기본값과 세 가지 모드
 
@@ -95,6 +109,17 @@ Canvas 이벤트 핸들러의 A→B·hover·pan·wheel·두 포인터 pinch, 작
 
 ## 사용자 localhost 실제 검증
 
+이번 수정의 우선 재검증은 아래 두 명령이다. 실제 화면이 해당 항만으로 바뀌는지 확인하고 command.status/target/center/renderCenter, trace의 reached/zoomPending/occupancy와 최종 errorPx를 기록한다. 실패하면 reason과 command.trace를 함께 전달한다. 이 객체에 credential은 없다. 검색창의 같은 좌표와 홍원항 이름, 다섯 범위 버튼도 반복한다.
+
+```js
+var sokcho = await naksigwangMapDiagnostic.fit(10000,38.20854,128.5947)
+console.log(sokcho.valid,sokcho.errorPx,sokcho.reason,sokcho.command)
+console.table(sokcho.command.trace)
+var pohang = await naksigwangMapDiagnostic.fit(10000,36.05,129.38)
+console.log(pohang.valid,pohang.errorPx,pohang.reason,pohang.command)
+console.table(pohang.command.trace)
+```
+
 1. 기존 브랜치의 최신 코드를 받아 `python build.py`를 실행한다. 저장소에서 `python -m http.server 8000`을 실행하고 `http://localhost:8000/index.html#map`을 강력 새로고침한다. 기존 localStorage `naksigwang-naver-key-id`는 그대로 둔다. 키를 채팅/보고서/캡처에 복사하지 않는다.
 2. 이전 P3 legacy 설정만 있던 브라우저와 신규 브라우저는 **위성**으로 열린다. 위성+지명/일반도 눌러 확인한다. 이후 직접 선택한 v2 값은 유지되는 것이 정상이다. 새 기본값만 다시 확인하려면 `localStorage.removeItem('naksigwang-map-mode-v2')` 후 새로고침한다. credential 항목은 지우지 않는다.
 3. 좌표 검색에 `38.20854, 128.5947`을 입력해 찾기를 누른다. 개발자 콘솔에서 다음을 실행한다.
@@ -148,7 +173,7 @@ await naksigwangMapDiagnostic.zoom(0.5)
 
 ## 남은 한계
 
-**실 NAVER native-vs-Canvas errorPx는 미확인이다.** Codex는 사용자 credential을 사용하지 않았고 실 실행 결과를 받지 않았다. mock 수치로 실 SDK 성공을 주장하지 않는다. native-vs-Canvas 정합은 두 렌더러가 같은 경위도를 찍는지 확인하며 영상/측량 또는 원자료의 위치 정확도를 보증하지 않는다. 화면 밖·출처 영역은 측정 불가로 반환한다. 합성 touch와 mock DOM은 실제 기기·SDK 프레임 검증을 대신하지 않는다. 임의 회전 CSS transform을 적용한 레이아웃은 현재 제품에서 사용하지 않으며, 그런 변경은 별도 실검증이 필요하다. 공개 방문자의 NAVER 설정 주입 단계는 별도이며 설정이 없으면 기본 지형으로 동작한다.
+사용자는 현재 서해안 viewport의 동일 좌표 native-vs-Canvas 약 0.0377px 정합을 확인했다. **실 NAVER 속초/포항 fit과 연속 이동은 재검증 전까지 미확인이다.** Codex는 사용자 credential을 사용하지 않았다. mock 수치로 실 SDK 이동 성공을 주장하지 않는다. native-vs-Canvas 정합은 두 렌더러가 같은 경위도를 찍는지 확인하며 영상/측량 또는 원자료의 위치 정확도를 보증하지 않는다. 화면 밖·출처 영역은 측정 불가로 반환한다. 합성 touch와 mock DOM은 실제 기기·SDK 프레임 검증을 대신하지 않는다. 공개 방문자의 NAVER 설정 주입 단계는 별도이며 설정이 없으면 기본 지형으로 동작한다.
 
 공식 근거: [MapSystemProjection 화면/세계 좌표 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.MapSystemProjection.html), [지도 유형](https://navermaps.github.io/maps.js.ncp/docs/tutorial-MapTypes.html), [Marker HTML 아이콘·anchor](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Marker.html), [지도 투영](https://navermaps.github.io/maps.js.ncp/docs/tutorial-Projection.html), [Map 줌·이벤트 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Map.html), [SDK 설정](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html), [허용 URL](https://guide.ncloud-docs.com/docs/en/maps-troubleshoot).
 
@@ -166,3 +191,16 @@ await naksigwangMapDiagnostic.zoom(0.5)
 | 1km | 0 | 0 | 606 | 1.199 |
 
 1280×900 mock 기준이다. 근거리 기준점(38.20854,128.5947) 주위의 목록에 지점이 없으면 화면 개수는 0일 수 있으며 좌표나 가짜 지점을 추가하지 않았다. eligible은 화면 범위와 무관한 LOD 허용 개수로 확대 시 상세 단계가 늘어남을 검증한다.
+
+## 이번 명시적 이동 검사 결과
+
+DPR [1, 1.25, 1.5, 2]에서 명시적 이동/검색/범위 버튼 88개 측정이 통과했다. native DOM/실제 Canvas 최대 오차는 0.221596 CSS px였다. 빠른 검색의 이전 9개 취소, 같은 중심의 옛 zoom 차단, 미도착 이유 구분과 재검색 복구도 각 DPR에서 통과했다. 12 RAF 지연 fit은 측정 시작 전 각각 [13, 13, 13, 13]프레임을 관찰했다.
+
+| DPR | 속초 fit errorPx | 포항 fit errorPx | timeout reason |
+|---|---:|---:|---|
+| 1 | 0.000000 | 0.000000 | requested viewport not reached |
+| 1.25 | 0.046187 | 0.221596 | requested viewport not reached |
+| 1.5 | 0.000000 | 0.000000 | requested viewport not reached |
+| 2 | 0.000000 | 0.000000 | requested viewport not reached |
+
+기존 native DOM 검사 126건, 연속 이동 264단계와 20개 화면/DPR 검사도 통과했다. 이 결과는 mock이며 사용자 보고의 현재 viewport 0.0377px와 구분한다.

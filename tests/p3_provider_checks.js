@@ -22,6 +22,7 @@ class FakeMapAdapter {
   createDebugMarker(lat,lon) {return NaverMapAdapter.prototype.createDebugMarker.call(this,lat,lon);}
   renderMarkers() {for(const m of this.markers)m.render();}
   getGroundScale(){const c=this.unproject(cw/2,ch/2),e=fakeDestination(...c,100),a=this.project(...c),b=this.project(...e);return Math.hypot(b[0]-a[0],b[1]-a[1])/100;}
+  getViewportScale(){return this.scale();}
   setInteraction(enabled){this.interactive=enabled;}
   onViewportReady(fn){this.viewportListener=fn;}
   panPixels(dx,dy){NaverMapAdapter.prototype.panPixels.call(this,dx,dy);}
@@ -78,9 +79,9 @@ window.p3Test = async () => {
   check(base.width===Math.round(cw*DPR()) && base.height===Math.round(ch*DPR()),'DPR 크기');
   const errors=[];
   for(const [name,lon,lat] of [['속초',128.6,38.2],['주문진',128.83,37.89],['묵호',129.12,37.55],['포항',129.38,36.05]]) {
-    for(const width of [1500,9000,60000,600000]) {fitGround(lat,lon,width);providerSync();errors.push({name,width,error:providerAlignment(fake),rawError:PROVIDER_MAP.diagnostic.rawMaxError});}
+    for(const width of [1500,9000,60000,600000]) {await fitGround(lat,lon,width);providerSync();errors.push({name,width,error:providerAlignment(fake),rawError:PROVIDER_MAP.diagnostic.rawMaxError});}
   }
-  for(const [name,bb] of [['전국',[124.4,32.9,131.95,38.7]],['동해안',[128.4,35.8,129.6,38.5]]]) { fitLonLat(bb);providerSync();errors.push({name,error:providerAlignment(fake),rawError:PROVIDER_MAP.diagnostic.rawMaxError}); }
+  for(const [name,bb] of [['전국',[124.4,32.9,131.95,38.7]],['동해안',[128.4,35.8,129.6,38.5]]]) {await fitLonLat(bb);providerSync();errors.push({name,error:providerAlignment(fake),rawError:PROVIDER_MAP.diagnostic.rawMaxError});}
   check(errors.every(e=>e.error<1e-5),'전국·광역·항만·근접 비선형 정합');
   check(errors.some(e=>e.rawError>2),'기존 affine 변환의 비선형 실패 재현');
   const anchor=fake.unproject(cw*.3,ch*.6);
@@ -145,6 +146,7 @@ window.p3AdapterUnit = () => {
   const p=a.project(129,37),ll=a.unproject(...p);
   if(instances!==1 || calls[0]!=='S' || calls[1]!=='H' || calls[2]!=='N' || Math.abs(ll[0]-129)>1e-8 || Math.abs(ll[1]-37)>1e-8 || a.getBounds()[0][0]!==124)throw Error('NAVER 어댑터 계약');
   const ref=a.referenceProject(129,37);if(Math.hypot(ref[0]-p[0],ref[1]-p[1])>1e-6)throw Error('독립 세계 좌표 경로');
+  if(Math.abs(a.getViewportScale()-2**a.getZoom()/200000)>1e-8)throw Error('실제 SDK 세계 좌표 화면 배율');
   a.destroy();if(a.map!==null || !calls.includes('destroy'))throw Error('NAVER 해제');
   return true;
 };

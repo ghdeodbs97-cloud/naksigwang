@@ -13,7 +13,7 @@ ROOT=Path(__file__).resolve().parent.parent
 OUT=ROOT/'test-output'/'p3'
 OUT.mkdir(parents=True,exist_ok=True)
 html=(ROOT/'index.html').read_text(encoding='utf-8')
-probe=PROBE+CHECK+(ROOT/'tests/p3_provider_checks.js').read_text(encoding='utf-8')+(ROOT/'tests/p3_viewport_checks.js').read_text(encoding='utf-8')
+probe=PROBE+CHECK+''.join((ROOT/'tests'/name).read_text(encoding='utf-8') for name in ['p3_provider_checks.js','p3_viewport_checks.js','p3_command_checks.js'])
 pos=html.rindex('\n})();')
 html=html[:pos]+probe+html[pos:]
 http.server.SimpleHTTPRequestHandler.log_message=lambda *a:None
@@ -39,7 +39,9 @@ try:
         assert page.evaluate('window.p3AdapterUnit()')
         result=page.evaluate('window.p3Test()')
         result['nativeDiagnostic']=page.evaluate('window.p3NativeTest()')
-        if width==1280:result['continuousViewport']=page.evaluate('window.p3ViewportTest()')
+        if width==1280:
+          result['continuousViewport']=page.evaluate('window.p3ViewportTest()')
+          result['viewportCommands']=page.evaluate('window.p3CommandTest()')
         page.set_viewport_size({'width':width,'height':height-160});page.wait_for_timeout(350)
         assert page.evaluate('window.p3SizeCheck()'),'창 높이 변경 반영'
         page.set_viewport_size({'width':width,'height':height});page.wait_for_timeout(350)
