@@ -364,7 +364,78 @@ await naksigwangMapDiagnostic.fit(10000,36.15983,126.50376); // 홍원
 ### 남은 한계
 
 - 사용자 localhost의 실제 NAVER pan/zoom 렉·시각 안정성·idle 지연과 연속 포항 fit 성공은 아직 미확인이다. mock 통과로 실사용 최종 통과를 선언하지 않는다.
-- 실 SDK가 최종 이벤트를 누락하거나 16프레임 관찰 뒤에도 표시 projection이 안정되지 않으면 올바르지 않은 Canvas를 억지로 보이지 않고 숨김을 유지한다. 새 viewport 이벤트/명시적 명령으로 다시 관찰한다. 강제 reload·인스턴스 재생성·좌표 offset으로 감추지 않는다.
+- 이 항목의 이전 16프레임 감시/숨김 유지 정책은 아래 overlay 회귀 수정으로 대체했다. 종료 이벤트 누락·역순을 처리하고, 안정화 관찰 상한에 도달하면 기본 지형 fallback을 그린 뒤 공개한다.
 - 전국 지도는 긴 해안선이 대부분 보이므로 꼭짓점 생략 효과가 작다. 저사양 실장치·타일 네트워크·GPU 성능은 mock 결과로 보증할 수 없다.
 - 이동 중 분석 Canvas는 의도적으로 숨겨진다. native debug 원만 보이는 것은 localhost 진단의 동작이다. 단면 물결은 시간 재생이 꺼져 있을 때 정지한다.
 - 원자료의 항/갯바위 좌표 정확도와 수심 coverage의 기존 제한은 변경하지 않았다.
+
+
+## 이동 후 overlay 공개 회귀와 위성 타일 분리 진단 (2026-10-17~18)
+
+사용자는 최신 성능 최적화로 실제 pan/zoom 렉이 크게 줄었다고 확인했다. 그러나 이동 후 분석 Canvas가 사라지고 위성만 남는 회귀, 확대 시 위성의 큰 직사각형 블록을 보고했다. 아래 결과는 코드·mock 검증이며 최신 수정의 실 NAVER 결과는 사용자 localhost 재검증 대기다. 위성 블록의 실제 원인은 **미확인**이다. P3 완료/merge 가능 판정을 하지 않는다.
+
+### 재현한 코드 원인과 공개 순서
+
+직전 커밋 `16b9ee7`의 동일 browser/mock 재생 결과:
+
+| 이벤트 | 이전 상태 | 수정 후 상태 |
+|---|---|---|
+| dragstart → idle (dragend 누락) | gesture=true, moving=true, hidden=true | 모두 false |
+| dragstart → idle → dragend | waitingIdle=true, moving=true, hidden=true | 모두 false |
+
+idle에서 gesture를 해제하지 않았고, 늦은 dragend에서 waitingIdle을 다시 켜서 settle 감시 진입이 막혔다. 별도로 16프레임 감시 상한 도달 시 숨김을 유지하는 경로도 있었다. 이는 코드상 재현한 원인이다. 사용자의 실제 이벤트 순서는 새 trace로 확인해야 한다.
+
+실제 누른 포인터가 없으면 idle이 gesture 대기를 해제한다. dragend/zoomend/pinchend는 추가 idle이 없어도 마지막 표시 viewport의 안정성을 관찰한다. 실제 포인터가 눌려 있으면 조기 idle만으로 공개하지 않으며 마지막 pointerup/cancel도 관찰을 재개한다. 안정화 불능은 viewport 변화가 멈췄는데도 최대 120 RAF 동안 안정화되지 않으면 기본 지형 fallback으로 복구한다. 표시 viewport가 계속 변하는 정상 이동에서는 관찰 상한을 갱신해 조기 fallback을 막는다. resize도 분석 Canvas를 숨긴 상태에서 SDK 표시 viewport를 안정화한 뒤 공개한다. 대기 시간을 하드코딩해 성공으로 판정하거나 지도 인스턴스를 다시 만들지 않는다.
+
+`renderBase` 내부 공개를 제거했다. frame의 최종 렌더 경로는 `providerReadView → renderBase → drawUI → drawCurrentOverlay → 필요한 flow/section → providerRevealOverlay`다. no-change, 명령 성공/실패/취소, fallback도 최종 그리기 후 공개한다. 공개 후 UI를 다시 무효화하던 코드도 제거했다. 이동 중 무거운 렌더 차단·이벤트 기반 sync·입자 예산·throttle·path/mask cache·background RAF 중지는 유지한다.
+
+### 진단과 보안
+
+localhost에서만 `naksigwangTileDiagnostic(clientX?, clientY?)`와 `naksigwangPerfDiagnostic.providerOnly(true/false)`를 제공한다. 공개 호스트에는 노출하지 않는다.
+
+타일 진단은 provider mode/zoom/center/bounds/container rect, provider CSS와 마지막 SDK setSize 시점/횟수, 하위 IMG 개수·보이는 IMG 개수, 각 rect/naturalWidth/naturalHeight/complete, CSS 크기 분포, 네 이동 상태와 세 Canvas opacity/display/visibility, 최근 SDK 이벤트를 반환한다. IMG에는 attribution 등도 포함될 수 있어 IMG 개수 자체를 실패 타일 개수로 해석하지 않는다. viewport와 교차하고 조상 CSS까지 보이는 IMG를 세지만 다른 IMG가 위를 덮는지는 판정하지 않는다.
+
+URL query/fragment/userinfo는 반환하지 않는다. 임의 경로에 credential이 있을 수 있어 숫자 타일 좌표 외의 경로는 비공개로 표시한다. 호스트도 NAVER 계열 allowlist 외에는 가린다. 원본 URL을 로그하지 않는다. 진단은 DOM metadata만 읽으며 타일 요청·교체·캐시 저장을 하지 않는다.
+
+두 인수는 브라우저 client 좌표다. 해당 위치의 base/flow/ui 실제 RGBA를 읽는다. providerOnly=true에서도 Canvas backing 픽셀은 보존되므로 opacity/visibility와 함께 해석한다. providerOnly는 stage 직계 `#base/#flow/#ui`만 숨기고 providerMap/SDK pane/IMG/control/attribution에는 스타일을 바꾸지 않는다. 이동 CSS와 기존 Canvas 배치/하단 출처 clip CSS도 같은 직계 세 ID로 좁혀 SDK 내부 Canvas에 전파되지 않는다.
+
+`tilesloaded`는 실제 SDK 콜백에서 viewport 이벤트와 같은 trace에 기록하며 이벤트 시점의 providerMoving/revealAfterBase/commandPending/heavyHidden도 남긴다. idle과 타일 완료는 별개다. 타일 로딩을 기다리기 위해 올바른 분석 Canvas를 계속 숨기지 않는다.
+
+### 자동 검증 범위
+
+- 기존 90회 이동 성능 시나리오의 각 종료마다 세 Canvas computed opacity/display/visibility 및 숨김 class를 검사한다.
+- drag/zoom/pinch 각각 20회에서 종료→idle, idle→종료, 종료 누락을 섞어 검사한다. 누른 포인터 중 조기 idle, 포인터 종료 시 SDK end 누락, no-change/no idle도 검사한다.
+- 최종 read/base/UI/current/section/reveal 호출 순서를 직접 계측한다. 모드·resize·오늘→지도·취소·fit 성공/실패·안정화 timeout/fallback도 가시성을 검사한다.
+- mock IMG의 안전한 metadata, 미완료 상태, query/경로 비공개, providerOnly에서 SDK IMG 유지, 불투명 Canvas 픽셀과 provider layer의 분리, idle 뒤 tilesloaded 순서를 검사한다.
+- 3 화면 ×4 DPR, 기존 20 화면/DPR 정합·원거리 6회 연속 이동·native 3px 차단·DOM mismatch·수심/단면 baseline·전체 기존 회귀를 유지한다. 실 API/credential을 사용하지 않는다.
+
+### 사용자 localhost 재검증
+
+1. 이 브랜치를 최신으로 갱신하고 `python build.py`, `python -m http.server 8000`을 실행한다. 기존 로컬 NAVER 설정 방식으로 SDK를 활성화하고 `http://localhost:8000/index.html#map`을 강력 새로고침한다. credential을 콘솔 출력·보고서에 복사하지 않는다.
+2. `await naksigwangMapDiagnostic.fit(10000,38.20854,128.5947)` 뒤 `await naksigwangMapDiagnostic.fit(10000,36.05,129.38)`를 실행한다. 두 번째 command.status/errorPx/sdkViewportUnchanged를 기록한다.
+3. drag/wheel/pinch를 각각 반복하고 멈춘 뒤 `naksigwangTileDiagnostic()`을 실행한다. 정상 idle에서는 providerMoving/revealAfterBase/commandPending/heavyHidden 모두 false, 세 Canvas visible이어야 한다. 1~2분 반복해 렉·흩어짐·잔상·누적 drift도 확인한다.
+4. 블록이 보이는 위치·zoom에서 진단을 저장하고 `naksigwangPerfDiagnostic.providerOnly(true)`를 실행한다. 블록이 남는지 즉시/몇 초 뒤/tilesloaded 뒤를 비교한다. 필요하면 `naksigwangTileDiagnostic(clientX,clientY)`로 같은 블록 위치의 분석 Canvas RGBA를 확인한다.
+5. providerOnly 상태에서 위성(SATELLITE)·위성+지명(HYBRID)·일반(NORMAL)을 비교하고 각 진단의 zoom/center/rect/tiles/events를 저장한다. 이후 `naksigwangPerfDiagnostic.providerOnly(false)`로 복원한다.
+6. Canvas를 숨겨도 같은 블록이 유지되면 분석 Canvas 원인에서 제외할 수 있다. tilesloaded 뒤 사라지면 타일 lifecycle 가능성을 조사한다. 충분히 기다린 동일 좌표에서 SATELLITE/HYBRID에 동일 경계가 남고 NORMAL에는 없다면 제공 영상 모자이크 가능성을 분류한다. 이 조건과 실제 사용자 증거 없이 원인을 확정하지 않는다.
+
+실 NAVER fit 결과, 최신 overlay 복원, 1~2분 렉/잔상/drift, 위성 블록 원인 모두 **사용자 localhost 재검증 대기**다. 기존 정합 약 0.04px 성공은 이전 사용자 측정이며 최신 수정의 실측 결과를 대신하지 않는다. 수심 보호 경로와 운영 자료에는 변경이 없다.
+
+
+### 이번 공개 회귀 수정의 성능 비교
+
+직전 `16b9ee7`과 같은 60프레임 burst를 비교했다. Windows headless mock이며 실제 SDK·장치 성능과 구분한다.
+
+| 화면 | 이전 FPS | 수정 FPS | 이전/수정 p95 | 이동 중 base | 최종 idle base |
+|---|---:|---:|---:|---:|---:|
+| 390×844 | 50.72 | 62.57 | 17 / 17ms | 0 | 1 |
+| 1280×900 | 62.57 | 62.57 | 17 / 17ms | 0 | 1 |
+| 1920×1080 | 62.57 | 62.50 | 17 / 17ms | 0 | 1 |
+
+정지 중 SDK sync/check·base·mask 읽기·UI·단면의 불필요 호출은 0회였다. OS/브라우저 변동이 포함되므로 FPS 차이를 이번 수정만의 인과 효과로 주장하지 않는다. 구조상 heavy 렌더 회귀가 없고 공개 후 moving=false/hidden=false였다.
+
+최종 소스 집중 검사에서는 세 화면 각각 73개 종료 상태에서 permanent hidden 0회를 확인했다. 실제 DOM의 opacity=1/display=block/visibility=visible과 네 이동 상태가 모두 false인 것을 함께 기록했다. viewport가 130프레임 계속 변할 때 조기 fallback하지 않고, 변화가 멈춘 뒤 안정화 불능일 때 fallback하는 검사도 통과했다. `tests/P3_REVEAL_RESULTS.json`에 직전 버전 재현·성능 비교·확장 행렬·최종 종료 상태 요약을 기록한다.
+
+
+확장 12조합에서는 기존 이동 1,080회와 신규 drag/zoom/pinch 720회 종료의 가시성을 확인했고 permanent hidden/moving heavy 모두 0회였다. Marker 최대 0.447px, A/B 최대 0.901px, 해안 mask 변경 픽셀 0개, 일반 이동 100ms 이상 long task 0회였다. 병렬 회귀 중 idle 복구 최대는 **127ms**로 이전 기록 72ms보다 높았다. heavy 호출·60프레임 비교의 p95는 유지됐지만 idle 지연까지 무회귀로 단정하지 않는다. 실 장치의 복구 지연·체감은 사용자 확인 대기다. 전체 행렬 뒤 최종 CSS/resize/지속이동/버블 차단 보강은 세 화면의 최종 집중 검사에서 확인했고 최종 CI도 전체 행렬을 다시 실행한다.
+
+기존 12개 전체 CI 명령·20개 화면/DPR와 실패/설정/공개 호스트 검사·연속 viewport/명령 집중 회귀·301점 단면 baseline·수심 production 보호·최종 build consistency가 통과했다. 모바일/PC 다섯 탭과 active mock 이동/idle 캡처를 직접 확인했다. 실제 NAVER 영상 판정과 분리한다.

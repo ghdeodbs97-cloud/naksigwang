@@ -32,6 +32,7 @@ window.p3ViewportTest=async()=>{
   const sample=async(kind,i,action)=>{
     const result=await providerMarkerDiagnostic(38.20854,128.5947,action);
     check(result.timeline.length===9,'0~8프레임 기록');
+    check(providerCanvasVisibility().every(c=>c.visibility==='visible'&&c.display!=='none'&&Number(c.opacity)>0),kind+' 최종 Canvas 공개');
     check(result.passes&&result.errorPx<=2&&result.domMismatchPx<=2,kind+' 최종 정합 '+i);
     check(result.timeline.slice(-3).every(s=>s.valid&&s.errorPx<=2),'마지막 3프레임 정합');
     check(result.baseFrame?.viewport===PROVIDER_MAP.signature,'최종 base 재그리기');

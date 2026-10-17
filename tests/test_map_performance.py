@@ -13,7 +13,7 @@ ROOT=Path(__file__).resolve().parent.parent
 OUT=ROOT/'test-output/p3-performance'
 OUT.mkdir(parents=True,exist_ok=True)
 html=(ROOT/'index.html').read_text(encoding='utf-8')
-probe=PROBE+CHECK+''.join((ROOT/'tests'/n).read_text(encoding='utf-8') for n in ['p3_provider_checks.js','p3_viewport_checks.js','p3_path_checks.js','p3_perf_checks.js'])
+probe=PROBE+CHECK+''.join((ROOT/'tests'/n).read_text(encoding='utf-8') for n in ['p3_provider_checks.js','p3_viewport_checks.js','p3_path_checks.js','p3_reveal_checks.js','p3_perf_checks.js'])
 pos=html.rindex('\n})();');html=html[:pos]+probe+html[pos:]
 http.server.SimpleHTTPRequestHandler.log_message=lambda *a:None
 srv=http.server.ThreadingHTTPServer(('127.0.0.1',0),functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(ROOT)))

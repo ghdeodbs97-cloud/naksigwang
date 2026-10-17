@@ -286,6 +286,5 @@ function renderBase() {
   $('viewSize').textContent = '보이는 폭 ' + (gw >= 1000 ? (gw / 1000).toFixed(gw >= 10000 ? 0 : 1) + ' km' : Math.round(gw) + ' m');
   if (PROVIDER_MAP.active) { $('bandTitle').textContent = '온라인 지도'; $('bandLegend').textContent = '배경 영상은 수심 자료가 아닙니다.'; }
   $('warn').hidden = gw > 1500;
-  providerRevealOverlay();
   if(geometryChanged)flowStale = true;   // 흐름장·입자는 지도 움직임이 멈춘 뒤 stepParticles에서 다시 만든다
 }

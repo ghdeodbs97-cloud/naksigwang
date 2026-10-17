@@ -2,6 +2,7 @@
 /* ── 크기 ──────────────────────────────────────────────── */
 function resize() {
   if (!stage.clientWidth) return;                     // 지도 탭이 숨어 있으면 크기를 바꾸지 않음
+  const onlineResize=PROVIDER_MAP.active;if(onlineResize)providerBeginMove();
   const r = DPR(), old = cw ? toM(cw / 2, ch / 2) : null, oldGW = cw ? cw / pxPerGround() : 0;
   cw = stage.clientWidth;                               // 휴대폰: 화면 높이에 맞춰 길게, 넓은 화면: 가로 비율 0.72 (화면 높이 안에서)
   ch = Math.round(S.lock ? cw * (cw < 560 ? .85 : .5) : cw < 560 ? clamp(innerHeight - 290, 320, cw * 1.3) : Math.min(cw * .72, Math.max(380, innerHeight - 240)));   // 오늘 탭에서는 낮게
@@ -12,7 +13,7 @@ function resize() {
   sec.width = Math.round(sw * r); sec.height = Math.round(shh * r); sec.style.height = shh + 'px';
   if (old && !PROVIDER_MAP.active) { V.cx = old[0]; V.cy = old[1]; V.s = cw / (oldGW * kAt(latOf(V.cy))); clampView(); }
   RENDER.uiKey='';RENDER.sectionKey='';RENDER.chartKey='';
-  providerSync(); dirty = true;
+  providerSync();if(onlineResize)providerViewportChanged('resize');dirty = true;
 }
 
 /* ── 입력 ──────────────────────────────────────────────── */
@@ -68,6 +69,9 @@ stage.addEventListener('wheel',()=>{if(providerUseNativePan())providerCancelView
 stage.addEventListener('pointermove',e=>{if(providerUseNativePan())hoverAt=local(e);},true);
 stage.addEventListener('pointerup',e=>{if(!providerUseNativePan())return;const p=local(e);if(nativeTap&&Math.hypot(p[0]-nativeTap[0],p[1]-nativeTap[1])<6){const i=stationAt(...p);if(i!=null)selectPoint(i,cw/pxPerGround()>60000);}nativeTap=null;nativePointers.delete(e.pointerId);},true);
 stage.addEventListener('pointercancel',e=>{nativeTap=null;nativePointers.delete(e.pointerId);},true);
+// SDK 종료 이벤트가 빠지거나 idle보다 늦어도 마지막 포인터 해제에서 안정화를 재개한다.
+function providerPointerFinished(e){nativePointers.delete(e.pointerId);if(!nativePointers.size&&PROVIDER_MAP.providerMoving){PROVIDER_MAP.gesture=false;PROVIDER_MAP.waitingIdle=false;providerQueueSettle();}}
+addEventListener('pointerup',providerPointerFinished,true);addEventListener('pointercancel',providerPointerFinished,true);
 let hoverAt = null, hoverDone = null;
 function updateHover() {
   if (!hoverAt || (hoverDone && hoverDone[0] === hoverAt[0] && hoverDone[1] === hoverAt[1] && !dirtyHover)) return;

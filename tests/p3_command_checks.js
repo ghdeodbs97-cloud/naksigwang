@@ -27,6 +27,7 @@ window.p3CommandTest=async()=>{
     const o=command.trace.at(-1);check(o.reached&&o.inside&&command.trace.at(-2).key===o.key,name+' 목표/중심/배율·두 프레임 안정화');
     const c=f.unproject(cw/2,ch/2);check(Math.abs(V.cx-mxOf(c[0]))<.001&&Math.abs(V.cy-myOf(c[1]))<.001&&Math.abs(V.s*kAt(c[1])-f.getGroundScale())<1e-9,'settled V 호환');
     const r=await naksigwangMapDiagnostic(lat??command.target[1],lon??command.target[0]);
+    check(providerCanvasVisibility().every(c=>c.visibility==='visible'&&c.display!=='none'&&Number(c.opacity)>0),name+' fit 최종 공개');
     check(r.valid&&r.errorPx<=2&&r.domMismatchPx<=2,name+' native DOM/Canvas');
     check(JSON.stringify({A:S.A,B:S.B})===savedAB,'A/B 원좌표 보존');
     samples.push({name,id:command.id,target:command.target,center:command.center,zoom:r.providerZoom,errorPx:r.errorPx,domMismatchPx:r.domMismatchPx,requestedBounds:command.requestedBounds,fitBoundsType:command.fitBoundsType,before:command.before,after:command.after,sdkViewportUnchanged:command.sdkViewportUnchanged,trace:command.trace});
@@ -63,6 +64,8 @@ window.p3CommandTest=async()=>{
   check(!failed.valid&&failed.reason==='requested viewport not reached'&&failed.command.status==='failed'&&failed.errorPx===null,'미도착 원인 구분');
   check(failed.command.sdkViewportUnchanged&&failed.command.trace.every(s=>s.sdkViewportUnchanged),'SDK viewport 전체 미변경 명시');
   check(PROVIDER_MAP.active&&!PROVIDER_MAP.commandPending,'미도착은 projection fallback 아님');
+  for(let i=0;i<3;i++)await new Promise(requestAnimationFrame);
+  check(!PROVIDER_MAP.revealAfterBase&&!stage.classList.contains('provider-moving')&&providerCanvasVisibility().every(c=>c.visibility==='visible'&&c.display!=='none'&&Number(c.opacity)>0),'fit 실패 후 최종 Canvas 공개');
   f.noop=false;PROVIDER_MAP.commandTimeoutMs=timeout;
   const recovered=await naksigwangMapDiagnostic.fit(10000,36.05,129.38);check(recovered.valid&&recovered.errorPx<=2,'timeout 뒤 재검색');
   // 사용자 pan 명령은 미완료 fit을 취소한다.

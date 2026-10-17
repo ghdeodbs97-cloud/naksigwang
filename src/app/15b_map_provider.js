@@ -77,8 +77,8 @@ function providerFallback() {
   providerCancelViewCommand('provider unavailable');
   PROVIDER_MAP.failed = true; PROVIDER_MAP.active = false; clearTimeout(PROVIDER_MAP.timer);
   $('providerMap').style.visibility = 'hidden'; dirty = true;
-  cancelAnimationFrame(PROVIDER_MAP.syncRAF);PROVIDER_MAP.syncRAF=0;PROVIDER_MAP.providerMoving=false;PROVIDER_MAP.gesture=false;PROVIDER_MAP.waitingIdle=false;PROVIDER_MAP.revealAfterBase=false;
-  stage.classList.remove('provider-active','provider-moving'); providerUpdateInput();
+  cancelAnimationFrame(PROVIDER_MAP.syncRAF);PROVIDER_MAP.syncRAF=0;PROVIDER_MAP.providerMoving=false;PROVIDER_MAP.gesture=false;PROVIDER_MAP.waitingIdle=false;PROVIDER_MAP.revealAfterBase=true;
+  stage.classList.remove('provider-active'); providerUpdateInput();
   providerNotice('온라인 지도를 불러오지 못해 기본 지형지도로 표시합니다.');
 }
 function providerTransform() { return !!PROVIDER_MAP.adapter && !PROVIDER_MAP.failed && (PROVIDER_MAP.active || PROVIDER_MAP.checking); }
@@ -101,9 +101,11 @@ function providerBeginMove(){
   if(p.active)stage.classList.add('provider-moving');
   if(RENDER.depthQueued){RENDER.depthQueued=false;RENDER.depthKey='';p.depthDeferred=true;}clearTimeout(OFFICIAL_DEPTH.timer);if(!flowHidden){fctx.setTransform(1,0,0,1,0,0);fctx.clearRect(0,0,flow.width,flow.height);flowHidden=true;}flowStale=true;
 }
+function providerTilesLoaded(){const p=PROVIDER_MAP;if(p.failed)return;providerRecordEvent('tilesloaded');p.loaded=true;clearTimeout(p.timer);if(!p.active&&!p.providerMoving&&!p.commandPending)providerCheck();}
+function providerRecordEvent(name){const p=PROVIDER_MAP;p.events.push({name,time:performance.now(),providerMoving:p.providerMoving,revealAfterBase:p.revealAfterBase,commandPending:p.commandPending,heavyHidden:stage.classList.contains('provider-moving')});if(p.events.length>48)p.events.shift();}
 function providerRevealOverlay(){
   const p=PROVIDER_MAP;if(p.providerMoving||p.commandPending)return;
-  if(p.revealAfterBase){p.revealAfterBase=false;if(p.idleAt&&PERF.enabled){PERF.idleRecoveryMs.push(performance.now()-p.idleAt);if(PERF.idleRecoveryMs.length>100)PERF.idleRecoveryMs.shift();}RENDER.uiKey='';}
+  if(p.revealAfterBase){p.revealAfterBase=false;if(p.idleAt&&PERF.enabled){PERF.idleRecoveryMs.push(performance.now()-p.idleAt);if(PERF.idleRecoveryMs.length>100)PERF.idleRecoveryMs.shift();}}
   stage.classList.remove('provider-moving');
 }
 function providerQueueSettle(){
@@ -114,26 +116,26 @@ function providerQueueSettle(){
     try{
       const a=p.adapter,key=providerViewportKey(),reported=a.project(...a.getCenter()),scale=a.getViewportScale();
       const ready=Math.hypot(reported[0]-cw/2,reported[1]-ch/2)<=2&&!(p.stableZoom!==null&&a.getZoom()!==p.stableZoom&&Math.abs(Math.log2(scale/p.stableScale))<.001);
-      stable=ready&&key===previous?stable+1:ready?1:0;previous=key;
+      stable=ready&&key===previous?stable+1:ready?1:0;if(key!==previous)frames=0;previous=key;
       if(stable>=2){
         const changed=key!==p.signature; p.providerMoving=false;
         if(changed||!p.active){providerSync();providerCheck();dirty=true;dirtyHover=true;}
-        else {p.viewportDirty=false;p.revealAfterBase=false;stage.classList.remove('provider-moving');if(p.depthDeferred)scheduleDisplayDepthArea();}
+        else {p.viewportDirty=false;providerReadView();dirty=true;RENDER.uiKey='';}
         return;
       }
       // 이벤트 뒤 상한이 있는 감시만 실행한다. 정지 상태에서는 SDK를 읽지 않는다.
-      if(++frames<16)p.syncRAF=requestAnimationFrame(probe);
+      if(++frames<120)p.syncRAF=requestAnimationFrame(probe);else {p.settleFailure='표시 viewport 안정화 실패';providerFallback();}
     }catch(_){providerFallback();}
   };
   p.syncRAF=requestAnimationFrame(probe);
 }
 function providerViewportChanged(name){
   const p=PROVIDER_MAP;if(p.failed)return;
-  p.viewportDirty=true;p.events.push({name,time:performance.now()});if(p.events.length>48)p.events.shift();
-  if(['dragstart','pinchstart','zoomstart'].includes(name)){p.gesture=true;p.waitingIdle=true;providerBeginMove();return;}
-  if(['dragend','pinchend','zoomend'].includes(name)){p.gesture=false;p.waitingIdle=name!=='zoomend';}
-  if(name==='idle'){p.idleAt=performance.now();p.waitingIdle=false;}
-  providerBeginMove();providerQueueSettle();
+  p.viewportDirty=true;
+  if(['dragstart','pinchstart','zoomstart'].includes(name)){p.gesture=true;p.waitingIdle=true;providerBeginMove();providerRecordEvent(name);return;}
+  if(['dragend','pinchend','zoomend'].includes(name)){p.gesture=false;p.waitingIdle=false;}
+  if(name==='idle'){p.idleAt=performance.now();if(!nativePointers.size){p.gesture=false;p.waitingIdle=false;}}
+  providerBeginMove();providerRecordEvent(name);providerQueueSettle();
 }
 function providerUseNativePan() { return PROVIDER_MAP.active && !S.lock && S.mode==='pan'; }
 function providerUpdateInput() {
@@ -166,7 +168,7 @@ function providerFinishViewCommand(c,ok,reason=null) {
     providerReadView();p.lastSettledView={...V};p.signature=providerViewportKey();p.viewportDirty=false;
     const after={center:p.adapter.getCenter(),zoom:p.adapter.getZoom(),bounds:p.adapter.getBounds(),key:providerViewportKey()};
     const result={ok,id:c.id,status:ok?'settled':'failed',reason,target:c.target,requestedView:c.view,requestedBounds:c.requestedBounds,fitBoundsType:'LatLngBounds',before:c.before,after,sdkViewportUnchanged:after.key===c.before.key,settledView:{...V},center:after.center,renderCenter:p.adapter.unproject(cw/2,ch/2),bounds:after.bounds,trace:c.trace};
-    p.pendingCommand=null;p.lastCommand=result;p.providerMoving=false;p.revealAfterBase=true;p.idleAt=performance.now();dirty=true;dirtyHover=true;c.resolve(result);providerCheck();
+    p.pendingCommand=null;p.lastCommand=result;p.providerMoving=false;p.gesture=false;p.waitingIdle=false;p.revealAfterBase=true;p.idleAt=performance.now();dirty=true;dirtyHover=true;c.resolve(result);providerCheck();
   } catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}
 }
 function providerApplyView(view = {...V}) {
@@ -231,7 +233,7 @@ function providerSync() {
   const p=PROVIDER_MAP;if(!p.adapter||p.failed||p.syncing||!cw||!ch)return;
   p.syncing=true;if(p.loaded)clearTimeout(p.timer);
   try {
-    const sizeKey=[cw,ch].join(',');if(p.sizeKey!==sizeKey){p.sizeKey=sizeKey;p.adapter.resize();p.viewportDirty=true;}
+    const sizeKey=[cw,ch].join(',');if(p.sizeKey!==sizeKey){p.sizeKey=sizeKey;p.adapter.resize();p.lastResize={time:performance.now(),width:cw,height:ch};p.resizeCount=(p.resizeCount||0)+1;p.viewportDirty=true;}
     // 활성화·크기 변경·명시적 명령·최종 idle에서만 읽는다.
     const key=providerViewportKey();
     const v=p.compatibility;
@@ -300,7 +302,7 @@ async function providerStart() {
     p.adapter = new NaverMapAdapter(window.naver.maps); p.adapter.init($('providerMap'));
     p.adapter.onFailure = providerFallback;
     addEventListener('offline', providerFallback, { once: true });
-    p.adapter.onTilesLoaded(() => { if (p.failed) return; p.loaded = true; clearTimeout(p.timer); if(!p.active&&!p.providerMoving&&!p.commandPending)providerCheck(); });
+    p.adapter.onTilesLoaded(providerTilesLoaded);
     p.adapter.onViewportReady(providerViewportChanged);
     p.adapter.setMode(p.mode);providerApplyView({...V});providerSync();
 
