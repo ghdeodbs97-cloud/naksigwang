@@ -1,0 +1,844 @@
+{
+  "scope": "실 API 없는 Windows headless mock; 최종 실 NAVER 검증은 사용자 localhost 재검증 대기",
+  "previousCommit": "16b9ee7598e30bab391f6b7e1267ac6e171e94d2",
+  "rootCauseReplay": {
+    "before": [
+      {
+        "events": [
+          "dragstart",
+          "idle"
+        ],
+        "moving": true,
+        "gesture": true,
+        "waitingIdle": false,
+        "hidden": true
+      },
+      {
+        "events": [
+          "dragstart",
+          "idle",
+          "dragend"
+        ],
+        "moving": true,
+        "gesture": false,
+        "waitingIdle": true,
+        "hidden": true
+      }
+    ],
+    "after": [
+      {
+        "events": [
+          "dragstart",
+          "idle"
+        ],
+        "moving": false,
+        "gesture": false,
+        "waitingIdle": false,
+        "hidden": false
+      },
+      {
+        "events": [
+          "dragstart",
+          "idle",
+          "dragend"
+        ],
+        "moving": false,
+        "gesture": false,
+        "waitingIdle": false,
+        "hidden": false
+      }
+    ]
+  },
+  "fullMatrix": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.5590169943749475,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.25,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 0.44687800704855685,
+      "maxABErrorPx": 0.3535533905932738,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.5,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.3535533905932738,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.25,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.7071067811865476,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.25,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 0.2808883999276688,
+      "maxABErrorPx": 0.25,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.5,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.3535533905932738,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.5590169943749475,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.9013878188659974,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.25,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 0.27961908270946945,
+      "maxABErrorPx": 0.3535533905932738,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.5,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 0.33318465655668206,
+      "maxABErrorPx": 0.3535533905932738,
+      "pathChangedPixels": 0
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "endStateChecks": 73,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.5590169943749475,
+      "pathChangedPixels": 0
+    }
+  ],
+  "finalFocused": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "endStateChecks": 73,
+      "permanentHidden": 0,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "providerOnly": true,
+      "tileMetadata": true,
+      "credentialRedacted": true,
+      "canvasPixelSeparation": true,
+      "eventOrder": [
+        {
+          "name": "zoomstart",
+          "time": 14978,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "zoom_changed",
+          "time": 14978,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "zoomend",
+          "time": 14978,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "idle",
+          "time": 14978,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "tilesloaded",
+          "time": 14978,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        }
+      ],
+      "stableState": {
+        "label": "idle 이후 tilesloaded",
+        "providerMoving": false,
+        "revealAfterBase": false,
+        "commandPending": false,
+        "heavyHidden": false,
+        "canvases": [
+          {
+            "id": "base",
+            "opacity": "1",
+            "display": "block",
+            "visibility": "visible",
+            "rect": {
+              "left": 31,
+              "top": 382.953125,
+              "width": 328,
+              "height": 426
+            }
+          },
+          {
+            "id": "flow",
+            "opacity": "1",
+            "display": "block",
+            "visibility": "visible",
+            "rect": {
+              "left": 31,
+              "top": 382.953125,
+              "width": 328,
+              "height": 426
+            }
+          },
+          {
+            "id": "ui",
+            "opacity": "1",
+            "display": "block",
+            "visibility": "visible",
+            "rect": {
+              "left": 31,
+              "top": 382.953125,
+              "width": 328,
+              "height": 426
+            }
+          }
+        ]
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "endStateChecks": 73,
+      "permanentHidden": 0,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "providerOnly": true,
+      "tileMetadata": true,
+      "credentialRedacted": true,
+      "canvasPixelSeparation": true,
+      "eventOrder": [
+        {
+          "name": "zoomstart",
+          "time": 13748,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "zoom_changed",
+          "time": 13748,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "zoomend",
+          "time": 13748,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "idle",
+          "time": 13748,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "tilesloaded",
+          "time": 13748,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        }
+      ],
+      "stableState": {
+        "label": "idle 이후 tilesloaded",
+        "providerMoving": false,
+        "revealAfterBase": false,
+        "commandPending": false,
+        "heavyHidden": false,
+        "canvases": [
+          {
+            "id": "base",
+            "opacity": "1",
+            "display": "block",
+            "visibility": "visible",
+            "rect": {
+              "left": 121,
+              "top": 397.640625,
+              "width": 1038,
+              "height": 660
+            }
+          },
+          {
+            "id": "flow",
+            "opacity": "1",
+            "display": "block",
+            "visibility": "visible",
+            "rect": {
+              "left": 121,
+              "top": 397.640625,
+              "width": 1038,
+              "height": 660
+            }
+          },
+          {
+            "id": "ui",
+            "opacity": "1",
+            "display": "block",
+            "visibility": "visible",
+            "rect": {
+              "left": 121,
+              "top": 397.640625,
+              "width": 1038,
+              "height": 660
+            }
+          }
+        ]
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "endStateChecks": 73,
+      "permanentHidden": 0,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "providerOnly": true,
+      "tileMetadata": true,
+      "credentialRedacted": true,
+      "canvasPixelSeparation": true,
+      "eventOrder": [
+        {
+          "name": "zoomstart",
+          "time": 13777,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "zoom_changed",
+          "time": 13777,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "zoomend",
+          "time": 13777,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "idle",
+          "time": 13777,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        },
+        {
+          "name": "tilesloaded",
+          "time": 13777,
+          "providerMoving": true,
+          "revealAfterBase": true,
+          "commandPending": false,
+          "heavyHidden": true
+        }
+      ],
+      "stableState": {
+        "label": "idle 이후 tilesloaded",
+        "providerMoving": false,
+        "revealAfterBase": false,
+        "commandPending": false,
+        "heavyHidden": false,
+        "canvases": [
+          {
+            "id": "base",
+            "opacity": "1",
+            "display": "block",
+            "visibility": "visible",
+            "rect": {
+              "left": 441,
+              "top": 397.640625,
+              "width": 1038,
+              "height": 747
+            }
+          },
+          {
+            "id": "flow",
+            "opacity": "1",
+            "display": "block",
+            "visibility": "visible",
+            "rect": {
+              "left": 441,
+              "top": 397.640625,
+              "width": 1038,
+              "height": 747
+            }
+          },
+          {
+            "id": "ui",
+            "opacity": "1",
+            "display": "block",
+            "visibility": "visible",
+            "rect": {
+              "left": 441,
+              "top": 397.640625,
+              "width": 1038,
+              "height": 747
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "comparison": {
+    "before": [
+      {
+        "viewport": [
+          390,
+          844
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 961,
+          "fps": 62.43496357960458,
+          "averageFrameMs": 16.016666666666666,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 15
+          },
+          "perSecond": {
+            "stepParticles": 15.608740894901144
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 1183,
+          "fps": 50.718512256973796,
+          "averageFrameMs": 19.716666666666665,
+          "p95FrameMs": 17,
+          "longFrames": 1,
+          "counts": {
+            "stepParticles": 1
+          },
+          "perSecond": {
+            "stepParticles": 0.8453085376162299
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 3
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 180,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1280,
+          900
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 18,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 20
+          },
+          "perSecond": {
+            "stepParticles": 20.855057351407716
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 1
+          },
+          "perSecond": {
+            "stepParticles": 1.0427528675703859
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1920,
+          1080
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 955,
+          "fps": 62.82722513089005,
+          "averageFrameMs": 15.916666666666666,
+          "p95FrameMs": 18,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 21
+          },
+          "perSecond": {
+            "stepParticles": 21.98952879581152
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {},
+          "perSecond": {}
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      }
+    ],
+    "after": [
+      {
+        "viewport": [
+          390,
+          844
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 951,
+          "fps": 63.09148264984227,
+          "averageFrameMs": 15.85,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 15
+          },
+          "perSecond": {
+            "stepParticles": 15.772870662460567
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 1
+          },
+          "perSecond": {
+            "stepParticles": 1.0427528675703859
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 3,
+            "drawSection": 1
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 180,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1280,
+          900
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 953,
+          "fps": 62.95907660020986,
+          "averageFrameMs": 15.883333333333333,
+          "p95FrameMs": 20,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 21
+          },
+          "perSecond": {
+            "stepParticles": 22.03567681007345
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {},
+          "perSecond": {}
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4,
+            "drawSection": 1
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1920,
+          1080
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 951,
+          "fps": 63.09148264984227,
+          "averageFrameMs": 15.85,
+          "p95FrameMs": 19,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 20
+          },
+          "perSecond": {
+            "stepParticles": 21.03049421661409
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 960,
+          "fps": 62.5,
+          "averageFrameMs": 16,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {},
+          "perSecond": {}
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4,
+            "drawSection": 1
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      }
+    ]
+  },
+  "maxIdleRecoveryMs": 127,
+  "phaseTasksOver100ms": 0,
+  "knownLimitations": [
+    "실 위성 블록 원인 미확인",
+    "최신 실 NAVER fit/overlay/렉/잔상/drift 재검증 대기",
+    "병렬 회귀의 idle 최대 127ms는 이전 72ms보다 높음; 실 장치 수치와 분리",
+    "전체 행렬 뒤 최종 CSS/resize/지속이동/버블 차단 보강은 최종 집중 3화면과 최종 CI 행렬에서 재검증"
+  ]
+}

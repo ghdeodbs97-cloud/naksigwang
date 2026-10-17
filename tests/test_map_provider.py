@@ -108,7 +108,7 @@ try:
       if name=='index.html':route.fulfill(content_type='text/html',body=html)
       else:route.fulfill(path=str(ROOT/name),content_type=mimetypes.guess_type(name)[0] or 'application/octet-stream')
     page.route('http://production.example/**',production);page.goto('http://production.example/index.html',wait_until='domcontentloaded');page.wait_for_function('window.p3Ready?.()')
-    assert page.evaluate("typeof window.naksigwangMapDiagnostic==='undefined' && typeof window.naksigwangPerfDiagnostic==='undefined' && !document.querySelector('[data-naksigwang-native-probe]')")
+    assert page.evaluate("typeof window.naksigwangMapDiagnostic==='undefined' && typeof window.naksigwangPerfDiagnostic==='undefined' && typeof window.naksigwangTileDiagnostic==='undefined' && !document.querySelector('[data-naksigwang-native-probe]')")
     results.append({'productionDebugAbsent':True,'passed':True});page.close()
     browser.close()
 finally:

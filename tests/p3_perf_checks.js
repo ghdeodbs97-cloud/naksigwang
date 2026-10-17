@@ -5,7 +5,7 @@ window.p3PerfTest=async()=>{
   showTab('map');await new Promise(r=>setTimeout(r,350));
   const f=new DelayedMapAdapter();f.init($('providerMap'));const sdkSurface=document.createElement('canvas');sdkSurface.width=sdkSurface.height=1;f.container.append(sdkSurface);
   Object.assign(PROVIDER_MAP,{adapter:f,failed:false,loaded:true,active:false,signature:'',sizeKey:'',stableZoom:null});
-  f.onViewportReady(providerViewportChanged);f.onTilesLoaded(()=>{PROVIDER_MAP.loaded=true;});
+  f.onViewportReady(providerViewportChanged);f.onTilesLoaded(providerTilesLoaded);
   await fitGround(38.20854,128.5947,10000);await settle();S.playing=false;S.layers.flow=true;
   S.pin=[mxOf(128.5947),myOf(38.20854)];S.A=[mxOf(128.5937),myOf(38.20954)];S.B=[mxOf(128.5957),myOf(38.20754)];analyzeSection();
   const original=JSON.stringify([S.pin,S.A,S.B]),abMarkers=[S.A,S.B].map(p=>f.createDebugMarker(latOf(p[1]),lonOf(p[0])));
@@ -41,13 +41,14 @@ window.p3PerfTest=async()=>{
     window.naksigwangPerfDiagnostic.reset();
     for(let i=0;i<count;i++){
       const before=window.naksigwangPerfDiagnostic().counts;
-      f.viewportListener('dragstart');
+      nativePointers.add(-1);f.viewportListener('dragstart');
       if(kind==='zoom'||kind==='mixed'&&i%3===0)f.map.zoomBy(i%2?-1:1,new P3ProbeLL(38.20854,128.5947));
       else f.map.panBy(new P3ProbeXY(kind==='vertical'?0:(i%2?7:-7),kind==='horizontal'?0:(i%2?5:-5)));
-      for(let j=0;j<4;j++){await tick();check(getComputedStyle(base).visibility==='hidden'&&getComputedStyle(flow).visibility==='hidden'&&getComputedStyle(ui).visibility==='hidden','이동 중 Canvas 잔상 숨김');check(getComputedStyle(sdkSurface).visibility!=='hidden','SDK 자체 Canvas는 유지');}
+      for(let j=0;j<4;j++){await tick();check(getComputedStyle(base).visibility==='hidden'&&getComputedStyle(flow).visibility==='hidden'&&getComputedStyle(ui).visibility==='hidden','이동 중 Canvas 잔상 숨김');check(getComputedStyle(sdkSurface).visibility!=='hidden'&&getComputedStyle(sdkSurface).position==='static'&&getComputedStyle(sdkSurface).clipPath==='none','SDK 자체 Canvas의 가시성·배치·clip은 유지');}
       const during=window.naksigwangPerfDiagnostic().counts;
       for(const name of ['renderBase','maskRebuild','buildFlowField','providerCheck','providerAlignment','stepParticles','drawSection']){const delta=(during[name]||0)-(before[name]||0);movingHeavy+=delta;check(delta===0,'이동 중 금지된 '+name);}
-      f.viewportListener('dragend');if(i===0){for(let j=0;j<3;j++)await tick();check(getComputedStyle(base).visibility==='hidden','dragend 뒤 최종 idle까지 잔상 숨김');}f.viewportListener('idle');await settle();
+      nativePointers.delete(-1);f.viewportListener('dragend');f.viewportListener('idle');await settle();
+      for(const canvas of [base,flow,ui]){const css=getComputedStyle(canvas);check(css.visibility==='visible'&&css.display!=='none'&&Number(css.opacity)>0,kind+' idle Canvas 실제 공개');}check(!PROVIDER_MAP.revealAfterBase&&!stage.classList.contains('provider-moving'),'공개 완료 상태');
       const result=await providerMarkerDiagnostic(38.20854,128.5947);check(result.passes&&result.domMismatchPx===0,kind+' native/Canvas 정합');
       maxMarker=Math.max(maxMarker,result.errorPx);
       check(JSON.stringify([S.pin,S.A,S.B])===original,'반복 후 원좌표 drift');
@@ -66,8 +67,9 @@ window.p3PerfTest=async()=>{
   for(let i=0;i<5;i++){showTab('today');await tick();showTab('map');await settle();check(sctx.getImageData(0,0,1,1).data[3]>0,'탭 복귀 뒤 단면 Canvas 복구');}
   check(!PROVIDER_MAP.commandPending&&!PROVIDER_MAP.providerMoving,'오늘/지도 복귀 후 안정화');
   const sync=f.syncFromAppViewport;f.syncFromAppViewport=()=>{};const cancelled=providerApplyView({...V});providerCancelViewCommand('interrupted');check((await cancelled).status==='cancelled','이동 없는 명령 취소');f.syncFromAppViewport=sync;await settle();check(!stage.classList.contains('provider-moving'),'명령 취소 후 Canvas 복구');
+  const revealValidation=await p3RevealTest(f);
   showTab('tide');await tick();const frozenFlow=PERF.counts.stepParticles||0;for(let i=0;i<8;i++)await tick();check((PERF.counts.stepParticles||0)===frozenFlow,'비활성 탭 조류 정지');
   Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});dispatchEvent(new Event('visibilitychange'));const frozenFrames=PERF.counts.frame;await new Promise(r=>setTimeout(r,60));check(PERF.counts.frame===frozenFrames,'background RAF 정지');delete document.hidden;dispatchEvent(new Event('visibilitychange'));await tick();
   abMarkers.forEach(m=>m.marker.setMap(null));providerClearDiagnostic();
-  return {scope:'headless mock; 실제 NAVER·사용자 장치 성능은 별도 확인',stationary,phases,pathValidation,remote,movingHeavy,maxABErrorPx:maxAB,maxMarkerErrorPx:maxMarker,coordinateDrift:false,particles:PARTICLE_BUDGET};
+  return {scope:'headless mock; 실제 NAVER·사용자 장치 성능은 별도 확인',stationary,phases,pathValidation,revealValidation,remote,movingHeavy,maxABErrorPx:maxAB,maxMarkerErrorPx:maxMarker,coordinateDrift:false,particles:PARTICLE_BUDGET};
 };
