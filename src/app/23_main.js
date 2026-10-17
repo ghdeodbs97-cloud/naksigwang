@@ -70,22 +70,36 @@ fitLonLat([124.4, 32.9, 131.95, 38.7]);
 buildPoints();
 { const z = { lat: 37.9, lon: 128.83 }; let bi = 0, bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, z); if (d < bd) { bd = d; bi = i; } }); selectPoint(bi, false); }
 exampleSection(128.93, 37.80);
+providerStart();
 
-let last = performance.now();
-function frame(now) {
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
-  if (S.playing) S.t = (S.t + dt * .7) % 24;
-  for (const id of ['tIn', 'tIn2']) { const el = $(id); if (document.activeElement !== el && Math.abs(el.value - S.t) > .01) el.value = S.t; }
-  const tide = getTide();
-  if (Math.floor(S.t) !== biteHour || Math.floor(Date.now() / 60000) !== biteDataMinute) renderBite();
-  if (TAB === 'map' || TAB === 'today') {               // 보이는 탭만 그린다 (휴대폰 전지 절약). 오늘 탭에도 지도가 있다
-    if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
-    setText('clock2', fmtH(S.t));
-    updateHover(); drawUI(); drawCrnt(tide); stepParticles(tide, dt); drawSection(now, tide);
+let last=performance.now(),frameRequest=0;
+function frame(now){
+  frameRequest=0;if(document.hidden)return;
+  const workStart=performance.now();const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(S.playing)S.t=(S.t+dt*.7)%24;
+  for(const id of ['tIn','tIn2']){const el=$(id);if(document.activeElement!==el&&Math.abs(el.value-S.t)>.01)el.value=S.t;}
+  const tide=getTide(),tabChanged=RENDER.lastTab!==TAB;RENDER.lastTab=TAB;
+  if(Math.floor(S.t)!==biteHour||Math.floor(Date.now()/60000)!==biteDataMinute)renderBite();
+  const timeKey=JSON.stringify([S.playing?Math.floor(S.t*20):S.t,S.day,S.st,S.pt,TAB,CR.ready]);
+  if(timeKey!==RENDER.readKey||RENDER.readSection!==SEC){RENDER.readKey=timeKey;RENDER.readSection=SEC;updateReadouts(tide);}
+  if(TAB==='map'||TAB==='today'){
+    const moving=PROVIDER_MAP.providerMoving||PROVIDER_MAP.commandPending;
+    if(!moving){
+      if(dirty){renderBase();dirtyHover=true;apiAutoKick();RENDER.uiKey='';}
+      setText('clock2',fmtH(S.t));
+      if(hoverAt&&(dirtyHover||!hoverDone||hoverAt[0]!==hoverDone[0]||hoverAt[1]!==hoverDone[1]))updateHover();
+      // UI·조류·단면은 각자의 변경 원인만으로 무효화한다.
+      const uiKey=JSON.stringify([PROVIDER_MAP.signature,V,cw,ch,DPR(),S.A,S.B,S.drag,S.pin,S.secHover,S.layers.flow,timeKey,CR.ready,PROVIDER_DEBUG?.lat,PROVIDER_DEBUG?.lon]);
+      if(tabChanged||uiKey!==RENDER.uiKey||RENDER.arrowStations!==CR.st){RENDER.uiKey=uiKey;drawUI();drawCurrentOverlay(tide);}
+      const flowInterval=innerWidth<560?50:1000/30;
+      if(S.layers.flow&&now-RENDER.lastFlow>=flowInterval){const flowDt=Math.min(.1,(now-RENDER.lastFlow)/1000);RENDER.lastFlow=now;stepParticles(tide,flowDt);}
+      const sectionKey=JSON.stringify([timeKey,S.hs,S.secHover,sw,shh,DPR()]);
+      if(tabChanged||sectionKey!==RENDER.sectionKey||RENDER.section!==SEC){RENDER.sectionKey=sectionKey;RENDER.section=SEC;drawSection(S.playing?now:0,tide);}
+    }
   }
-  updateReadouts(tide);
-  if (TAB === 'tide') drawTideChart(tide);
-  if (TAB === 'bite') drawBiteChart();
-  requestAnimationFrame(frame);
+  const chartKey=JSON.stringify([TAB,timeKey,innerWidth,DPR(),biteDataMinute]);
+  if(chartKey!==RENDER.chartKey){RENDER.chartKey=chartKey;if(TAB==='tide')drawTideChart(tide);if(TAB==='bite')drawBiteChart();}
+  RENDER.workMs=performance.now()-workStart;frameRequest=requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
+addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frameRequest);frameRequest=0;}else if(!frameRequest){last=performance.now();RENDER.uiKey='';flowStale=true;frameRequest=requestAnimationFrame(frame);}});
+frameRequest=requestAnimationFrame(frame);

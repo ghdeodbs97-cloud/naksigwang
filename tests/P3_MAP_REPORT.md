@@ -1,0 +1,370 @@
+# P3 NAVER 지도 표시 투영·이동 동기화 수정 보고서
+
+2026-10-17 갱신. 기존 `feat/p3-map-foundation` / draft PR #6에서 계속 작업했다. 새 브랜치·PR과 merge는 없다. Codex는 실 credential을 사용하지 않았다. 사용자가 현재 서해안 viewport의 같은 좌표에서 **valid=true, errorPx≈0.0377 CSS px, domMismatchPx=0, satellite**를 보고했다. 추가로 이전 버전 속초 fit 약 0.04165px 성공이 보고됐다. **새 LatLngBounds 코드의 실 NAVER 포항 이동은 재검증 전까지 미확인**이다.
+
+## LatLngBounds 명시적 입력 수정
+
+최신 사용자 실측에서 이전 버전의 속초 fit은 settled, valid=true, 약 0.04165 CSS px로 성공했다. 직후 포항 fit은 60프레임 이상 center/renderCenter/zoom=11/viewportScale/bounds/key가 그대로이고 inside=false, centerErrorPx와 reportedErrorPx 약 4105px, occupancy 약 0.554로 유지됐다. 이 관측은 SDK viewport 미변경을 보여 주며 settle 조건을 완화할 근거가 아니다. 새 코드의 실 NAVER 포항 성공은 아직 미확인이다.
+
+기존 `[new LatLng(sw), new LatLng(ne)]` 인수 대신 `new LatLngBounds(sw,ne)`를 전달한다. providerRequestedBounds가 `{west,south,east,north}` 순수 값을 계산하고 NAVER 어댑터에서만 SDK 객체로 변환한다. 기존 pending/settle/commandId·축척·표시 투영은 유지했다. 추가 setCenter/setZoom 대안, 고정 지연, reload, 지도 재생성은 넣지 않았다. [공식 LatLngBounds 생성자](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.LatLngBounds.html)는 SW/NE LatLng를 받는다. [공식 fitBounds](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Map.html)는 Bounds 외에 좌표 배열도 기재하므로 기존 배열 형태가 모든 SDK에서 미지원이라고 단정하지 않는다.
+
+확인한 테스트 사각지대는 기존 FakeMapAdapter가 syncFromAppViewport를 재구현해 실제 NAVER 메서드와 fitBounds 인수 검사를 건너뛴 점이다. 이제 즉시/지연 mock 모두 실제 NaverMapAdapter.syncFromAppViewport를 호출하고, SDK 경계에서 LatLngBounds 객체·유효한 SW/NE를 엄격히 검사한 뒤 동일 geographic bounds로 표시 상태를 만든다. 객체 배열 거절 검사는 이번에 선택한 명시적 계약의 회귀이며 실제 NAVER의 두 번째 명령 무시 원인을 재현했다는 주장은 아니다. 실제 SDK causal root cause는 사용자 재검증 결과로 확정한다.
+
+홍원→속초→포항→주문진→홍원→포항→속초의 연속 여섯 이동을 각 DPR에서 검사한다. 매 명령 center/key/bounds 변경, target inside, 중심 오차 허용 범위, settled, 독립 native DOM/Canvas ≤2px를 확인한다. requestedBounds와 실제 mock 수신 bounds도 비교한다. command 결과에 fitBoundsType="LatLngBounds", before/after의 center/zoom/bounds/key, sdkViewportUnchanged를 추가했다. no-op 실패 fixture는 모든 SDK viewport 값을 그대로 유지하고 trace 전체와 실패 결과가 sdkViewportUnchanged=true인지 검사한다.
+
+## 명시적 viewport 이동 transaction 수정
+
+이전 커밋 `695a760`에서 fitGround는 V를 목표로 먼저 바꾸고 fitBounds 직후 providerSync가 옛 SDK projection을 읽어 V에 복사했다. diagnostic.fit은 이동 완료 여부를 확인하지 않고 frame 0~8을 측정했다. 이전 빌드에 20 RAF 지연 SDK를 주입하면 서해안 `[126.5,36.15]`에서 속초 `[128.5947,38.20854]`를 요청해도 서해안 center·V, valid=false/errorPx=null로 조기 반환했다. 이는 요청 완료와 표시 측정 사이의 race를 재현한 것이다. **옛 V 복사만으로 SDK 이동이 취소되었다거나 실 SDK fitBounds 미반영의 원인까지 확정한 것은 아니다.** 실 SDK의 요청/반영 순서는 새 command.trace로 확인해야 한다.
+
+fitGround/fitBox/fitLonLat와 탭 복원은 온라인 목표를 V와 분리해 순수 request로 만든다. providerApplyView는 Promise를 반환하고 commandId/requestedView/commandPending을 저장한 뒤 SDK fitBounds를 호출한다. providerSync는 pending 동안 현재 SDK 화면 재그리기는 허용하지만 V를 확정하지 않는다. 이벤트의 idle만 믿지 않고 매 RAF 실제 projection에서 목표가 viewport/bounds 안인지, 표시 중심과 보고 중심이 맞는지, 요청 범위의 배율이 적절한지, viewport key가 연속 두 프레임 안정적인지 검사한다. zoom 보고값이 먼저 바뀌는 경우에는 SDK 세계 좌표 1단위의 CSS pixel 크기도 확인해 옛 zoom projection을 완료 처리하지 않는다.
+
+도착 후 V compatibility·lastSettledView를 갱신하고 dirty를 설정해 기존 Canvas redraw와 수심 viewport 예약을 수행한다. 새 명령은 이전 명령을 superseded로 취소하며 오래된 idle은 새 목표를 확정할 수 없다. 사용자 pan/zoom은 미완료 fit을 interrupted로 취소한다. 기본 timeout은 8초이며 미도착 시 `reason="requested viewport not reached"`, 요청 목표와 관측 center/renderCenter/bounds/trace를 반환한다. 미도착만으로 projection 실패나 terrain fallback으로 분류하지 않는다. SDK 자체 오류는 기존 fallback으로 복귀한다. credential/SDK 객체는 반환하지 않는다.
+
+세계 좌표 배율·목표 포함 검사는 명령 완료를 판단하는 내부 상태 검사다. 실제 정합 판정은 계속 독립 native Marker DOM 중심과 실제 Canvas 픽셀로 수행한다.
+
+diagnostic.fit은 이 Promise가 성공한 뒤 native Marker 측정을 시작한다. 실패하면 이동 실패 이유와 command 기록을 반환하며 native 측정을 성공처럼 표시하지 않는다. 검색창 submit과 다섯 범위 버튼도 같은 transaction을 사용한다. fallback 지도는 기존 V 기반 이동·입력을 유지한다.
+
+추가 mock은 fitBounds를 2~5 RAF 늦추고 center/zoom/idle을 먼저 보고한다. 홍원→속초 10km, 속초→포항 10km, 포항→전국, 전국→주문진 2km, 같은 중심 zoom만 변경, 좌표 검색 10회, 빠른 검색 10회(이전 9개 취소), 홍원항 이름 검색, 전국/동해안/남해안/서해안/제주 버튼을 검사한다. 12 RAF 지연 진단 대기, no-op timeout/복구도 별도로 검사한다. 각 완료 후 목표 포함·중심·settled V·native DOM/실제 Canvas ≤2px·A/B 보존을 확인한다. 이 기록은 실 NAVER 이동 성공의 증거가 아니다.
+
+## 위성 기본값과 세 가지 모드
+
+첫 진입 기본은 순수 위성 `SATELLITE`다. Map 생성 옵션에서부터 지도 유형을 지정해 처음에 일반 타일을 요청하는 경로도 없앴다. UI와 실제 SDK 매핑은 다음과 같다.
+
+| 화면 | 저장값 | SDK MapTypeId |
+|---|---|---|
+| 위성 | satellite | SATELLITE |
+| 위성+지명 | hybrid | HYBRID |
+| 일반 | normal | NORMAL |
+
+예전 `naksigwang-map-mode`는 개발 중 생성된 설정으로 보고 제거한다. 새 `naksigwang-map-mode-v2`가 없으면 위성으로 시작한다. 이후 사용자가 선택한 v2 값은 새로고침 후에도 유지한다. credential 저장 항목은 변경하지 않는다.
+
+## 이번에 확인한 원인과 아직 확인하지 못한 원인
+
+이동 후 stale viewport 실패를 이전 커밋 `284389b`의 빌드로 재현했다. 1280×900에서 근거리 보기 후 mock SDK만 전국 zoom 7로 옮기면 providerSync가 V 서명만 감시하여 SDK 변경을 읽지 않았다. provider ground scale은 1264.089 m/px인데 앱 gpp는 1.234462 m/px에 머물렀고 606개 지점이 그려졌다. 즉, 표시 투영이 SDK 경로라도 축척·LOD·base 재그리기는 stale V에 묶여 있었다. 기존 즉시 setCenter/setZoom → providerReadView와 다음 frame의 V → SDK 재동기화도 지연 projection을 다시 덮어쓸 수 있는 경로였다. 실제 NAVER에서 어느 이벤트 순서가 발생했는지는 아직 계측 결과가 없으며, 코드의 실패 경로와 mock 재현을 구분한다.
+
+온라인 표시의 기준은 SDK의 현재 projection/center/zoom/bounds다. providerSync는 읽기만 하고, V는 현재 화면 중심 역변환과 SDK 100m 축척의 호환 복사본으로 둔다. 검색·범위 버튼·탭 복원 같은 명시적 이동만 providerApplyView → SDK fitBounds를 호출한다. V 변경만으로 SDK를 자동 덮어쓰지 않는다. 지도 이동 모드는 SDK native drag/pinch/wheel, 단면 모드는 Canvas pointer 입력을 사용한다. fallback 입력은 유지한다.
+
+SDK의 bounds_changed/center_changed/zoom_changed/projection_changed/idle에서 갱신을 예약한다. 매 표시 frame에서 SDK zoom/center/bounds 및 화면 모서리·중심 역변환을 감시하므로 이른 idle 뒤 projection이 늦게 바뀌어도 최종 base·UI를 다시 그린다. renderBase의 기존 수심 viewport 예약이 그 뒤 실행된다. pxPerGround는 화면 중심을 역변환하고 SDK getDestinationCoord로 동쪽 100m를 구해 실제 CSS pixel 거리/100으로 계산한다. gpp·LOD·라벨·축척막대가 이 값을 공유한다. A/B·선택 pin 지리좌표와 원자료는 이동시키지 않는다.
+
+수정 후 동일 zoom 7 조건은 gpp 1264.089270, 지점 **82개**(항구 81, 선택 갯바위 1), label 1개다. 기존 LOD 기준을 변경하지 않고 올바른 축척을 공급했다. 선택 지점은 기존 의도대로 항상 허용한다. 실제 화면 안의 수는 확대하면서 viewport가 좁아져 감소할 수 있다. 따라서 여섯 범위의 표시 개수와 함께 전체 목록에서 해당 LOD가 허용하는 eligible 개수를 기록하고 확대할수록 eligible이 줄지 않는지 검사한다.
+
+위성이 기본이 아니었던 원인은 mode의 초기값이 normal이고 satellite 버튼도 HYBRID에 연결되어 있던 코드다. 이를 SATELLITE 기본값과 세 가지 명시적인 매핑으로 고쳤다.
+
+이전 내부 정합 검사는 같은 SDK의 offset/세계 좌표 변환을 비교하므로 내부 일관성만 확인한다. 이 값이 거의 0이어도 실제 native Marker DOM, Canvas 원점·backing 크기, 지도 resize/center 반영 시점까지 맞았다는 증거가 되지 않는다. 사용자 실제 화면의 잔여 어긋남은 이 한계 때문에 아직 원인이 확정되지 않았다. 이번 작업은 독립적인 실제 렌더링 계측을 추가한 것이며, 실 NAVER 오차를 이미 해결했다고 주장하지 않는다. 하드코딩 offset이나 원자료 이동은 넣지 않았다.
+
+## native Marker와 실제 Canvas 픽셀 진단
+
+localhost에서 `await naksigwangMapDiagnostic(38.20854, 128.5947)`를 실행한다. 같은 lat/lon으로 SDK `new Marker({position:new LatLng(lat,lon),map:...})`의 청록색 HTML 원과 자료 mx/my → toS로 그린 자홍색 Canvas 십자선을 만든다.
+
+native 위치는 실제 HTML 원의 getBoundingClientRect 중심을 읽는다. Canvas 위치는 getImageData에서 실제 자홍색 픽셀을 찾아 alpha 가중 중심을 읽고 backing 크기로 나누어 CSS pixel로 환산한다. 양쪽 모두 ui Canvas 왼쪽 위를 기준으로 표현한다. SDK project 결과를 양쪽에 재사용하지 않는다. dx/dy는 Canvas minus native, errorPx는 두 값의 거리다. valid=true이고 errorPx≤2면 해당 좌표·뷰에서 두 렌더러의 정합이 확인된 것이다.
+
+반환 객체에는 providerMode/providerZoom, lat/lon, providerRect/baseRect/flowRect/canvasRect/stageRect, 각 사각형의 left/top/width/height 차이(rectDeltas), 실제 dpr와 canvasDpr(최대 2), nativeMarkerPixel/canvasPixel/dx/dy/errorPx, center/bounds가 있다. 경위도 배열은 [lon,lat], 화면 좌표는 [x,y] 순서다. CSS padding/border/transform/clipPath, backing/logical 크기와 함께 frame 0~8을 항상 기록한다. 각 frame은 SDK center/zoom/bounds, V, pxPerGround/gpp, provider/Canvas rect, 실제 native DOM/Canvas 위치와 dx/dy/errorPx, 마지막 base frame 및 station 개수와 최근 이벤트를 포함한다. maxObservedErrorPx와 마지막 세 프레임을 비교해 일시 지연과 지속 오차를 구분한다.
+
+provider·base·flow·ui·stage의 CSS 사각형도 2px guard에 포함했다. full viewport의 높이를 출처 때문에 줄이지 않는다. Canvas 하단 28px의 clip만 출처를 위해 유지한다. 완전한 십자선이 화면 밖/출처 영역에 있거나 마커가 준비되지 않았으면 valid=false, errorPx=null로 반환한다. 이 경우 0px 성공으로 취급하지 않는다. provider가 비활성이어도 DOM 사각형 차이는 반환한다.
+
+native Marker와 십자선은 로컬 호스트에서 사용자가 함수를 호출할 때만 만든다. 공개 호스트에는 window 진단 함수와 debug Marker가 없다. `naksigwangMapDiagnostic.clear()`로 지운다. 같은 좌표로 다시 호출하면 기존 Marker를 재사용해 pan/zoom 뒤 프레임 변화를 측정한다. 일반 pin·A/B·SEC는 진단 생성으로 변경하지 않는다. 반환값에 SDK 객체·credential·Client ID는 포함하지 않는다.
+
+인자 없는 `naksigwangMapDiagnostic()`는 이전 내부 비교값만 반환하며 nativeMarkerMeasured=false로 표시한다. **내부 maxError를 실제 marker-vs-Canvas errorPx로 해석하지 않는다.**
+
+## 원인과 수정
+
+사용자 첫 실검증에서 SDK 인증 오류 없이 2px 정합 실패 안내가 나왔다. 기존 구현은 Web Mercator의 연속 `V.s`를 그대로 둔 채 NAVER 정수 zoom만 반올림했다. 배율 양자화와 UTMK_NAVER 투영의 방향·곡률 차이를 화면 전체에서 맞출 수 없는 구조였다. 실제 실패 px 수치는 credential 없는 환경에서 측정하지 않았다.
+
+`rawToS/rawToM`은 기존 변환 그대로다. 정상 provider의 `toS`는 자료 mx/my → 경위도 → SDK `fromCoordToOffset`, `toM`은 SDK `fromOffsetToCoord` → 경위도 → 자료 mx/my를 쓴다. 초기화 전·정합 실패·SDK 실패는 raw 변환으로 돌아간다. 수심 값이나 원자료 좌표를 이동하지 않는다.
+
+지역/전국 이동 명령은 요청 V의 범위를 SDK fitBounds에 전달한다. SDK가 선택한 정수 줌의 실제 표시 중심과 100m 축척을 V에 복사한다. V.s는 중심의 국소 배율이며 전국을 affine로 맞추는 용도가 아니다. 실제 표시와 요청 범위는 SDK 투영·bounds를 쓴다.
+
+지도 이동 모드는 SDK native 입력을 사용한다. 단면 모드의 wheel/pinch와 확대 버튼은 배율을 누적한 뒤 SDK zoomBy의 경위도 기준점을 사용한다. SDK에 반복 setCenter로 기준점을 맞추는 루프는 제거했다. 앱 명령의 줌 애니메이션은 끈다. 캐시된 타일이 tilesloaded를 다시 발생시키지 않아도 viewport 이벤트와 매 프레임 감시가 최종 Canvas 재그리기를 보장한다. 실제 SDK native 애니메이션의 순간적인 어긋남 여부는 수동 프레임 검증이 필요하다.
+
+해안 경로·육지/구조물 마스크·항구·갯바위·수심 점·핀도 같은 SDK 변환을 쓴다. A→B는 원래 자료 좌표의 선을 100개 구간으로 투영하며 단면 hover 표식도 실제 자료 좌표를 투영한다. 18_section.js의 표본과 수심 계산은 그대로다. 활성 배경에서는 GEBCO 색상과 기존 바탕 그림을 건너뛰고 분석 마스크와 표시를 유지한다. 실패하면 기본 지형 그림을 다음 지도 프레임에 복구한다. SDK 하단 출처 28px 영역 위로 축척과 미니맵을 배치해 표시가 잘리지 않게 했다.
+
+## 정합 guard와 개발 진단
+
+2 CSS px 기준은 유지한다. 검사 중에만 후보 SDK 변환을 사용한 뒤 결과에 따라 active를 결정한다.
+
+- 중앙·네 모서리·네 변 중점: SDK 역변환 경위도를 자료 좌표로 바꿔 앱 화면 변환과 비교하고, 별도 SDK 세계 좌표 경로와 화면 원점을 함께 확인한다.
+- 속초·주문진·묵호·포항 고정 경위도: 앱 변환과 `fromCoordToPoint → fromPointToOffset` 기준을 비교한다. 기준 경로는 앱 toS/toM/project를 호출하지 않는다.
+- 고의 project 오차 3px를 넣으면 반드시 차단된다. 같은 함수를 양쪽에 호출해 항상 0으로 만드는 mock을 제거했다.
+
+localhost/127.0.0.1 개발자 콘솔에서 `naksigwangMapDiagnostic()`를 실행한다. SDK 객체나 credential은 반환하지 않는다. 결과는 V.cx/cy/s, SDK zoom, CSS viewport, 9곳의 경위도·오차, 고정 경위도의 실제/기준 화면 좌표와 오차, maxError, rawSamples/rawMaxError, x/y scale ratio, provider 중심, visible bounds다. raw 값은 현재 V를 기존 affine 방식으로 그렸을 때의 비교값이며 active 판정값이 아니다. 화면 사용자 UI에 개발 정보는 넣지 않았다.
+
+이 guard는 좌표 변환·화면 경로의 내부 일관성을 검사한다. SDK 영상 자체의 측량 정확도, 원본 OSM 해안/항구 위치의 정확도나 영상 촬영 시점까지 증명하지 않는다. 실영상 검증은 아래 절차로 별도 기록한다.
+
+## 이번 후속 수정 파일
+
+- `src/app/15b_map_provider.js`: SATELLITE 기본값·초기 생성 옵션, 세 가지 SDK 모드, v2 설정, native Marker 생성, DOM rect guard.
+- `src/app/15c_map_diagnostic.js`(신규): native DOM·실제 Canvas 픽셀·DPR·원점·프레임 진단, 로컬 전용 함수와 해제/폭 이동 보조 함수.
+- `src/app/19_overlay.js`: 로컬 debug 십자선 표시 연결. 기존 분석 좌표는 무변경.
+- `src/template.html`: 위성/위성+지명/일반 버튼과 초기 선택.
+- `src/README.md`, `index.html`(build.py 생성).
+- `tests/p3_provider_checks.js`, `tests/test_map_provider.py`: 세 모드·설정 이관·독립 native DOM mock·원점 오차·DPR 3·공개 호스트 진단 차단 검사.
+- `tests/smoke_degradation.py`: 최신 meta의 다른 원천 보존 상태가 합성 merged/kept/incomplete 시나리오를 덮지 않도록 fixture 상태를 분리한다. 기존 안내 문구 검증은 유지한다.
+- `tests/P3_MAP_REPORT.md`, `tests/p3_validation.json`: 절차와 결과.
+
+## mock 및 회귀 검증
+
+추가 delayed mock은 center/zoom 이벤트와 idle을 먼저 발생시키고 실제 projection/native DOM 반영은 3 RAF 뒤로 미룬다. 절반은 최종 이벤트까지 생략한다. DPR 1/1.25/1.5/2 각각 pan 20회·확대/축소 20회·혼합 20회·세 모드·실제 너비 변경/복원 후 0~8프레임을 기록한다. 각 단계 마지막 3프레임 native DOM/실제 Canvas ≤2px, DOM rect ≤2px, 최종 base viewport/gpp 최신화, A/B/pin 원좌표 유지, stale V를 SDK로 역전송하지 않음을 검사한다. 초기 stale frame은 숨기지 않고 timeline에 보관한다. 여섯 범위 station/label/eligible 개수는 `p3_validation.json`에 기록한다. 이 검사는 실제 NAVER 이벤트 순서의 관측이 아니다.
+
+mock은 앱 변환을 호출하지 않는 비선형 세계 좌표(방향 기울기·곡률)와 정수 줌을 쓴다. 390×844, 768×1024, 1280×900, 1365×768, 1920×1080 × DPR 1/1.25/1.5/2의 20개 조합을 검사한다. 각 조합은 네 항만 × 폭 1.5/9/60/600km를 검사한다. 기존 affine 방식이 2px를 넘는 경우도 검사하며 수정된 표시 변환의 오차는 1e-5 CSS px 미만이어야 한다. 최종 360개 화면 검사 최대 오차는 2.73e-09 CSS px, 기존 affine 비교 최대 오차는 35.508 CSS px였다. 정확한 실행 결과는 `p3_validation.json`에 기록한다. 실제 NAVER 측정값이 아니다.
+
+독립 native DOM mock은 20개 조합 × 전국/광역/10/5/2/1km 및 DPR 3 별도 검사를 합쳐 126개를 측정했다. 실제 Canvas 픽셀 기준 최대 errorPx는 0.247959 CSS px, 최대 DOM 사각형 차이는 0.000000px였다. 내부 비교가 통과해도 native DOM에 넣은 6px 이동과 provider DOM의 5px 원점 차이를 검출한다. SATELLITE 기본값·legacy 이관·세 모드 전환·공개 호스트 debug 부재도 통과했다. 이는 실제 NAVER 수치가 아니다.
+
+Canvas 이벤트 핸들러의 A→B·hover·pan·wheel·두 포인터 pinch, 작은 줌 누적, 줌 기준점, SDK 범위 안의 수심 요청, 3px 차단·복구, 실패 시 raw 복귀, 배경 투명·마스크·아이콘, 모드 전환 상태 보존을 검사한다. 합성 touch 이벤트는 물리 휴대폰 검증을 대신하지 않는다. 외부 HTTPS를 차단해 NAVER 요청과 실 credential을 CI에서 사용하지 않는다. SDK 404/429/offline/콜백 timeout/인증 실패도 mock으로 검사한다.
+
+기존 main baseline의 동해안 8곳 × 동쪽 0/500/1000m 수심·기준면·출처와 A→B 전체 301개 표본·특징 해시를 비교한다. baseline을 수정본으로 갱신하지 않는다. 기존 CI 12개 명령과 빌드 일치 검사도 실행한다. 390×844와 1280×900의 다섯 탭 및 활성 mock의 핀·아이콘·A→B·축척·미니맵을 PNG로 직접 확인했다. 원격 결과는 PR checks에 연결한다.
+
+## 수심 보호
+
+`static/depth/`, `04_depth.js`, `04b_depth_tiles.js`, `18_section.js`, `data/`는 변경하지 않는다. production 42타일·35,982점, verticalDatum·KHOA provenance, 12타일·60,000점·8MiB 제한, 육지/외삽 차단과 fallback은 동일하다. 바뀐 수심 부분은 화면 투영에 맞는 요청 bbox를 만드는 외부 표시 어댑터뿐이며 기존 depthPrepareAreas의 제한·공유·퇴거를 그대로 통과한다.
+
+## 사용자 localhost 실제 검증
+
+최신 LatLngBounds 변경은 홍원에서 시작해 다음 순서를 연속 실행한다. 각 행의 status=settled, unchanged=false, inside=true, valid=true, errorPx≤2를 확인하고 실제 지도 이동도 함께 확인한다. 실패 행의 command.before/after/requestedBounds/trace를 기록한다. 키와 SDK 객체는 포함하지 않는다.
+
+```js
+await naksigwangMapDiagnostic.fit(10000,36.15983,126.50376)
+var checks = []
+for (var [name,lat,lon] of [
+  ['홍원→속초',38.20854,128.5947], ['속초→포항',36.05,129.38],
+  ['포항→주문진',37.89192,128.8312883028771], ['주문진→홍원',36.15983,126.50376],
+  ['홍원→포항',36.05,129.38], ['포항→속초',38.20854,128.5947]
+]) {
+  var r = await naksigwangMapDiagnostic.fit(10000,lat,lon)
+  checks.push({name,status:r.command.status,type:r.command.fitBoundsType,
+    unchanged:r.command.sdkViewportUnchanged,inside:r.command.trace.at(-1)?.inside,
+    valid:r.valid,errorPx:r.errorPx,reason:r.reason})
+  if (!r.valid) console.log(name,r.command)
+}
+console.table(checks)
+```
+
+이번 수정의 우선 재검증은 아래 두 명령이다. 실제 화면이 해당 항만으로 바뀌는지 확인하고 command.status/target/center/renderCenter, trace의 reached/zoomPending/occupancy와 최종 errorPx를 기록한다. 실패하면 reason과 command.trace를 함께 전달한다. 이 객체에 credential은 없다. 검색창의 같은 좌표와 홍원항 이름, 다섯 범위 버튼도 반복한다.
+
+```js
+var sokcho = await naksigwangMapDiagnostic.fit(10000,38.20854,128.5947)
+console.log(sokcho.valid,sokcho.errorPx,sokcho.reason,sokcho.command)
+console.table(sokcho.command.trace)
+var pohang = await naksigwangMapDiagnostic.fit(10000,36.05,129.38)
+console.log(pohang.valid,pohang.errorPx,pohang.reason,pohang.command)
+console.table(pohang.command.trace)
+```
+
+1. 기존 브랜치의 최신 코드를 받아 `python build.py`를 실행한다. 저장소에서 `python -m http.server 8000`을 실행하고 `http://localhost:8000/index.html#map`을 강력 새로고침한다. 기존 localStorage `naksigwang-naver-key-id`는 그대로 둔다. 키를 채팅/보고서/캡처에 복사하지 않는다.
+2. 이전 P3 legacy 설정만 있던 브라우저와 신규 브라우저는 **위성**으로 열린다. 위성+지명/일반도 눌러 확인한다. 이후 직접 선택한 v2 값은 유지되는 것이 정상이다. 새 기본값만 다시 확인하려면 `localStorage.removeItem('naksigwang-map-mode-v2')` 후 새로고침한다. credential 항목은 지우지 않는다.
+3. 좌표 검색에 `38.20854, 128.5947`을 입력해 찾기를 누른다. 개발자 콘솔에서 다음을 실행한다.
+
+```js
+const r = await naksigwangMapDiagnostic(38.20854, 128.5947);
+r
+```
+
+청록색 원은 native Marker, 자홍색 십자는 Canvas다. r.valid=true, r.errorPx≤2인지 확인한다. providerRect/baseRect/flowRect/canvasRect/stageRect와 rectDeltas가 같은 원점·크기인지 확인한다. dpr와 canvasDpr는 3과 2처럼 달라도 정상이며 환산된 CSS px를 비교한다. 타일 영상 대신 이 동일 경위도 기준점으로 projection 정합을 판단한다.
+
+4. 다음을 한 줄씩 실행해 전국/광역/10km/5km/2km/1km에서 기록한다. 정수 줌 때문에 실제 표시 폭은 요청 폭과 다를 수 있다. 전국에서는 속초가 화면 가장자리에 걸릴 수 있어 화면 안의 별도 정확한 좌표 36,128을 쓴다.
+
+```js
+await naksigwangMapDiagnostic.fit(600000, 36, 128)
+await naksigwangMapDiagnostic.fit(60000, 38.20854, 128.5947)
+await naksigwangMapDiagnostic.fit(10000, 38.20854, 128.5947)
+await naksigwangMapDiagnostic.fit(5000, 38.20854, 128.5947)
+await naksigwangMapDiagnostic.fit(2000, 38.20854, 128.5947)
+await naksigwangMapDiagnostic.fit(1000, 38.20854, 128.5947)
+```
+
+5. 같은 검사를 주문진 37.89192/128.8312883028771, 묵호 37.55/129.12, 포항 36.05/129.38에서도 10/5/2/1km로 반복한다. 위성·위성+지명·일반, 390×844와 1280×900에서 시행한다. UI 검색 pin도 동일 좌표로 입력해 십자선과 중심이 같은지 확인한다. 분석 선을 그어 A/B·단면 hover와 수심 readout이 유지되는지도 확인한다.
+6. pan/wheel/pinch·창 크기/방향 변경 직후 같은 좌표의 진단을 다시 실행한다. r.timeline과 r.maxObservedErrorPx에서 frame 0과 이후 프레임의 차이를 확인한다. 지속되는 오차와 한 프레임 지연을 구분한다. CSS transform/padding/border는 styles, DPR 환산은 backingSize/logicalSize/canvasDpr, SDK 중심 반영은 각 프레임의 providerCenter/view를 비교한다. 필요하면 연속 화면 녹화로 확인한다.
+
+명령 시작부터 빠짐없이 기록하려면 같은 좌표가 화면 안에 있는 10km 보기에서 다음을 실행한다. 마지막 3프레임의 errorPx와 baseFrame.viewport/gpp, stationDrawStats도 비교한다. 이후 UI의 지도 이동 모드로 실제 drag/wheel/pinch를 반복한다. 단면 모드에서 A/B를 그린 뒤 전국 → 속초 → 이동 → 줌 → 전국을 반복하고 지리 위치가 유지되는지 확인한다.
+
+```js
+await naksigwangMapDiagnostic.fit(10000)
+const panResult = await naksigwangMapDiagnostic.pan(40, 20)
+console.table(panResult.timeline.map(({frame,providerCenter,providerZoom,gpp,errorPx}) => ({frame,providerCenter,providerZoom,gpp,errorPx})))
+const zoomResult = await naksigwangMapDiagnostic.zoom(2)
+zoomResult.timeline // center, bounds, V, rect, native/Canvas, baseFrame 포함
+await naksigwangMapDiagnostic.zoom(0.5)
+```
+
+7. projection이 ≤2px인 상태에서만 항구/갯바위 원자료와 위성의 구조물을 비교한다. 아이콘은 해안 밖으로 비켜 그리므로 연결선의 실제 위치 점을 사용한다. 데이터의 위치가 다르다고 전체 provider transform이나 항구 좌표에 offset을 넣지 않는다.
+8. 결과는 mode/zoom/viewport/DPR/lat/lon/dx/dy/errorPx/rectDeltas/timeline을 기록한다. 반환 객체에는 credential이 없다. Network/Storage 패널을 포함해 캡처하지 않는다. `naksigwangMapDiagnostic.clear()`로 debug를 지운다. offline 후 기본 지형 복귀, 오늘/지도 왕복과 나머지 세 탭도 확인한다.
+
+## 원자료 위치 오차와 projection 오차 구분
+
+| 대상 | 해석 |
+|---|---|
+| 같은 직접 입력 lat/lon의 native Marker와 Canvas 십자선이 >2px | 렌더링/DOM/DPR/SDK 갱신 시점 문제를 조사한다. 데이터 위치 이동으로 해결하지 않는다. |
+| 같은 lat/lon은 ≤2px인데 POINTS 항구/갯바위만 어긋남 | 포인트 생성·대표 좌표·간격에 따른 위치 정확도 문제일 수 있다. |
+| PORTS만 어긋남 | 원 항구 목록의 대표 위치와 방파제 끝점은 다를 수 있다. 원 출처 좌표를 확인한다. |
+| ROCKS만 어긋남 | 갯바위 위치·접근정보의 출처별 정확도를 확인한다. |
+| OSM 해안/구조물만 어긋남 | OSM 원자료·단순화 허용오차·위성 촬영/구조물 변경 시점 차이를 확인한다. |
+
+이 분류는 진단 순서이며 이번 작업에서 각 dataset의 실제 m 오차를 측정한 결과는 아니다. 임의 일괄 보정, 수심/해안의 영상 추론은 하지 않았다.
+
+## 남은 한계
+
+사용자는 현재 서해안 viewport의 동일 좌표 native-vs-Canvas 약 0.0377px 정합을 확인했다. 이전 버전 속초 fit 약 0.04165px 성공이 추가로 보고됐다. **새 LatLngBounds 코드의 포항 fit과 연속 이동은 재검증 전까지 미확인이다.** Codex는 사용자 credential을 사용하지 않았다. mock 수치로 실 SDK 이동 성공을 주장하지 않는다. native-vs-Canvas 정합은 두 렌더러가 같은 경위도를 찍는지 확인하며 영상/측량 또는 원자료의 위치 정확도를 보증하지 않는다. 화면 밖·출처 영역은 측정 불가로 반환한다. 합성 touch와 mock DOM은 실제 기기·SDK 프레임 검증을 대신하지 않는다. 공개 방문자의 NAVER 설정 주입 단계는 별도이며 설정이 없으면 기본 지형으로 동작한다.
+
+공식 근거: [MapSystemProjection 화면/세계 좌표 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.MapSystemProjection.html), [지도 유형](https://navermaps.github.io/maps.js.ncp/docs/tutorial-MapTypes.html), [Marker HTML 아이콘·anchor](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Marker.html), [지도 투영](https://navermaps.github.io/maps.js.ncp/docs/tutorial-Projection.html), [Map 줌·이벤트 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Map.html), [SDK 설정](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html), [허용 URL](https://guide.ncloud-docs.com/docs/en/maps-troubleshoot).
+
+## 이번 연속 이동 검사 결과
+
+4개 DPR 합계 264단계를 통과했다. 단계별 마지막 errorPx 최대는 0.304936 CSS px, DOM 차이는 0px였다. 초기 stale frame 수는 DPR 순서대로 [33, 33, 33, 33]개로 기록되었고 마지막 세 프레임은 모두 ≤2px였다.
+
+| 범위 | 화면 지점 | 라벨 | LOD 허용 목록 | m/px |
+|---|---:|---:|---:|---:|
+| 전국 | 71 | 47 | 81 | 632.045 |
+| 동해안 | 86 | 24 | 480 | 311.145 |
+| 60km | 12 | 9 | 606 | 76.735 |
+| 10km | 0 | 0 | 606 | 9.592 |
+| 2km | 0 | 0 | 606 | 2.398 |
+| 1km | 0 | 0 | 606 | 1.199 |
+
+1280×900 mock 기준이다. 근거리 기준점(38.20854,128.5947) 주위의 목록에 지점이 없으면 화면 개수는 0일 수 있으며 좌표나 가짜 지점을 추가하지 않았다. eligible은 화면 범위와 무관한 LOD 허용 개수로 확대 시 상세 단계가 늘어남을 검증한다.
+
+## 이번 명시적 이동 검사 결과
+
+DPR [1, 1.25, 1.5, 2]에서 명시적 이동/검색/범위 버튼 88개 측정이 통과했다. native DOM/실제 Canvas 최대 오차는 0.221596 CSS px였다. 빠른 검색의 이전 9개 취소, 같은 중심의 옛 zoom 차단, 미도착 이유 구분과 재검색 복구도 각 DPR에서 통과했다. 12 RAF 지연 fit은 측정 시작 전 각각 [13, 13, 13, 13]프레임을 관찰했다.
+
+| DPR | 속초 fit errorPx | 포항 fit errorPx | timeout reason |
+|---|---:|---:|---|
+| 1 | 0.000000 | 0.000000 | requested viewport not reached |
+| 1.25 | 0.046187 | 0.221596 | requested viewport not reached |
+| 1.5 | 0.000000 | 0.000000 | requested viewport not reached |
+| 2 | 0.000000 | 0.000000 | requested viewport not reached |
+
+기존 native DOM 검사 126건, 연속 이동 264단계와 20개 화면/DPR 검사도 통과했다. 이 결과는 mock이며 사용자 보고의 현재 viewport 0.0377px와 구분한다.
+
+## LatLngBounds 최종 mock 결과
+
+네 DPR에서 연속 6회 ×4 = 24회 원거리 이동이 모두 center/key/bounds 변경·목표 포함·settled·native 정합 기준을 통과했다. 전체 명시적 이동/검색 104건 최대 오차는 0.221596 CSS px다. 기존 native DOM 126건 최대 0.247959px, 연속 이동 264단계 최종 최대 0.304936px, DOM 차이 0px였다.
+
+| 이동 | 네 DPR 최대 errorPx |
+|---|---:|
+| 홍원→속초 | 0.046187 |
+| 속초→포항 | 0.221596 |
+| 포항→주문진 | 0.221596 |
+| 주문진→홍원 | 0.221596 |
+| 홍원→포항 | 0.221596 |
+| 포항→속초 | 0.046187 |
+
+객체 배열 거절과 SDK 전체 미변경 실패 검출은 네 DPR에서 모두 통과했다. 이는 선택한 입력 계약과 mock 결과이며 새 코드의 실 NAVER 포항 성공은 사용자 재검증이 필요하다.
+
+
+## P0 이동 성능·화면 안정화 (2026-10-17)
+
+최종 실사용 판정은 **사용자 localhost에서 렉·흩어짐이 사라졌는지 확인 대기**다. 아래 수치는 Windows Chromium headless의 비선형 SDK mock이며 실제 NAVER/휴대폰 하드웨어의 측정값이 아니다. 이전 사용자 보고의 실제 정합 약 0.04px는 보존해야 할 기준이고 이번 mock 수치로 대체하지 않는다. 실 NAVER 포항 연속 fit 성공도 여전히 미확인이다.
+
+### 확인한 병목과 수정
+
+기존 `frame()`은 정지 중에도 `providerSync`, `updateHover`, `drawUI`, `drawCrnt`, `stepParticles`, `drawSection`을 매 프레임 호출했다. 이동 중 `dirty → providerCheck → dirty → renderBase`가 내부 정합·해안 Path·station·육지 mask·getImageData를 반복했다. 보이는 구간보다 훨씬 긴 해안 ring까지 SDK로 투영하는 비용도 확인했다. 이것은 코드와 mock으로 확인한 앱 병목이며 사용자 장치의 실 SDK CPU profile을 직접 측정한 결과는 아니다.
+
+- SDK drag/pinch/zoom 시작부터 Canvas 3장을 함께 숨긴다(방법 A). 원본 좌표나 CSS origin에 offset을 더하지 않는다. 이전 포인트·핀·A/B·흐름 잔상을 표시하지 않는다.
+- native gesture 동안 SDK viewport polling·base/mask/흐름장·단면·수심 예약을 멈춘다. drag/pinch 종료 후 최종 idle, zoom 종료 또는 명시적 명령 뒤 표시 projection의 안정된 두 프레임을 확인한다. 이벤트 뒤 관찰은 최대 16프레임이고 정지 중에는 반복하지 않는다. 기존 명시적 fit의 pending/commandId/timeout 구조는 유지한다.
+- 마지막 SDK viewport를 한 번 읽어 호환 V·100m ground scale을 캐시한다. 최종 base와 UI를 같은 화면 갱신에서 그린 후 Canvas를 다시 보인다. 이동이 취소되어 SDK 이벤트가 없어도 bounded settle로 숨김을 해제한다.
+- base는 기존 `dirty`, UI·화살표·단면·계기판은 별도 상태 key, 흐름장은 `flowStale`로 무효화한다. viewport·LOD·구조물 변경이 없으면 Path/mask를 재사용한다. 수심 갱신만으로 mask readback을 반복하지 않는다. 이동 때문에 취소한 수심 예약은 최종 idle에 복구한다. 수심 로딩 완료 후 기존 단면 함수가 예약을 다시 만들어도 다음 base 갱신이 SDK 네 면 범위를 다시 예약한다. 고의 changed 응답을 이용한 회귀에서 동일한 전체 viewport 범위가 유지되는지 확인한다.
+- SDK 투영 전에 화면 밖의 같은 쪽에 머무는 긴 해안 구간을 생략한다. 보이는 꼭짓점의 SDK 투영은 그대로 사용한다. 기존 구현과 raster mask를 직접 비교했다. 속초 10km 예: 해안 project 36,545 → 451회, 포항 10km 36,503 → 177회. 전국 화면은 남는 꼭짓점이 많아 절감 폭이 작다.
+- 입자는 900개에서 PC 시작 360개/휴대폰 180개, 할당 상한 480개로 줄였다. 실제 이전 frame 작업 시간이 20ms를 넘는 상황이 반복되면 25%씩 줄이며 최저 120개다. 그리기 상한은 PC 30Hz/휴대폰 20Hz다. 이동·비활성 지도 탭·background에서 정지하고 idle 후 한 번 respawn한다.
+- 조류 화살표 bitmap은 viewport·시간·조류 자료·DPR·크기가 바뀔 때만 다시 만든다. 단면과 readout은 자료·A/B·시간·hover·크기 변경에만 다시 그린다. 재생 중에는 시간 key를 제한한다. 정지 중 단면 물결도 매 프레임 그리지 않는다. 보호된 `18_section.js`는 수정하지 않았다.
+- resize로 backing canvas가 초기화되면 별도 UI/단면 key도 무효화한다. 단면 모드에서 Canvas가 잠시 숨겨져도 stage가 연속 wheel 입력을 받는다. background에서는 앱 RAF 자체를 중단하고 복귀 시 다시 예약한다.
+
+이벤트 의미는 [NAVER 공식 Map 문서](https://navermaps.github.io/maps.js.en/docs/naver.maps.Map.html)의 dragstart/dragend, pinchstart/pinchend, zoomstart/zoomend, idle에 따른다. 실 SDK의 이벤트 순서와 렌더 지연은 localhost에서 다시 확인해야 한다.
+
+### 같은 60프레임 입력의 전후 비교
+
+`python tests/test_map_perf_comparison.py`로 `1ea95e6`의 index를 그대로 실행한 값과 현재 빌드를 같은 mock 입력으로 비교했다. 조류 켜짐·시간 재생 꺼짐, DPR 1이다. 입력 중 60회 viewport 변경을 보내고 마지막 idle 복구는 별도로 센다. 원시/요약 값은 `tests/P3_PERF_RESULTS.json`에 있다.
+
+| 호출 | 기존 정지 60프레임 | 수정 정지 60프레임 | 기존 이동 60프레임 | 수정 이동 / 마지막 복구 |
+|---|---:|---:|---:|---:|
+| providerSync | 60 | 0 | 60 | 0 / 1 |
+| providerCheck·alignment 각각 | 0 | 0 | 59 | 0 / 1 |
+| renderBase·stationRedraw 각각 | 0 | 0 | 59 | 0 / 1 |
+| mask·getImageData 각각 | 0 | 0 | 59 | 0 / 1 |
+| updateHover | 60 | 0 | 60 | 0 / 0 (hover 없음) |
+| drawUI·drawCrnt 각각 | 60 | 0 | 60 | 0 / 1 |
+| drawSection | 60 | 0 | 60 | 0 / 0 (A/B·시간 변경 없음) |
+
+입자는 정지 화면에서도 흐름을 표현하지만 제한된 주기로만 그린다. 명시적 진단은 실제 raster를 읽으므로 `getImageData` 계측에 별도로 포함된다. stress에서 반복한 Marker 진단의 9회 readback을 정상 이동의 mask readback으로 해석하면 안 된다.
+
+| 화면 | 이동 FPS 전 → 후 | p95 frame ms 전 → 후 | 50ms 이상 frame 전 → 후 |
+|---|---:|---:|---:|
+| 390×844 | 31.65 → 62.43 | 34 → 17 | 1 → 0 |
+| 1280×900 | 21.02 → 62.57 | 52 → 21 | 9 → 0 |
+| 1920×1080 | 20.80 → 62.57 | 54 → 18 | 13 → 0 |
+
+시간 값은 장치·동시 작업·Chromium 스케줄에 따라 달라진다. 실제 PC/휴대폰 FPS의 보증값이 아니다.
+
+### stress 결과
+
+3 화면 × DPR 1/1.25/1.5/2, 총 12조합에서 좌우 pan 20회·상하 pan 20회·zoom 20회·혼합 30회, 합계 **1,080회**를 검사했다. 각 gesture마다 이동 중 세 Canvas 숨김, 무거운 호출 0회, 최종 native Marker DOM 중심 대 실제 Canvas crosshair ≤2px, 원좌표 drift 없음이 통과했다. A/B는 각 phase 종료 후 별도 native DOM 기준과 Canvas의 주황 원 외곽 raster를 비교했다. 글자/연결선은 원 둘레 검출에서 배제한다.
+
+| 화면 | DPR | phase 평균 FPS 범위 | 최악 p95 frame ms | 최대 idle 복구 ms | 최대 Marker px | 최대 A/B px |
+|---|---:|---:|---:|---:|---:|---:|
+| 390×844 | 1 | 62.1~62.6 | 17 | 72 | 0.000 | 0.559 |
+| 390×844 | 1.25 | 62.3~62.6 | 20 | 71 | 0.447 | 0.354 |
+| 390×844 | 1.5 | 62.2~62.5 | 20 | 56 | 0.000 | 0.354 |
+| 390×844 | 2 | 62.3~62.6 | 17 | 58 | 0.000 | 0.250 |
+| 1280×900 | 1 | 61.9~62.5 | 18 | 63 | 0.000 | 0.707 |
+| 1280×900 | 1.25 | 59.2~61.2 | 22 | 71 | 0.281 | 0.250 |
+| 1280×900 | 1.5 | 57.6~62.5 | 35 | 72 | 0.000 | 0.354 |
+| 1280×900 | 2 | 57.9~60.9 | 25 | 67 | 0.000 | 0.559 |
+| 1920×1080 | 1 | 57.5~58.9 | 32 | 71 | 0.000 | 0.901 |
+| 1920×1080 | 1.25 | 57.8~59.3 | 32 | 70 | 0.280 | 0.354 |
+| 1920×1080 | 1.5 | 58.5~59.2 | 32 | 71 | 0.333 | 0.354 |
+| 1920×1080 | 2 | 57.2~61.5 | 26 | 66 | 0.000 | 0.559 |
+
+모든 조합에서 일반 이동 phase의 100ms 이상 long task는 0회였다. 이동 중 base/mask/흐름장/정합/단면 호출은 0회다. idle 복구는 최대 72ms이며 mock의 250ms 목표를 만족했다. 이는 최종 idle 이벤트부터 base 복구까지의 시간이다. 실제 SDK 자체의 명령 적용 대기시간과 네트워크 타일 로딩 시간은 포함하지 않는다.
+
+속초→포항→주문진→홍원 4회 ×12조합=48회는 settled와 실제 raster 정합을 통과했다. SATELLITE↔HYBRID↔NORMAL 3회 반복·오늘↔지도 5회 반복·비활성 탭의 입자 정지·background RAF 중지·숨겨진 Canvas 위 연속 wheel도 검사했다. 오늘 탭은 원래 기능대로 선택 포인트의 예시 단면을 새로 만든다. pan/zoom/모드 변경 중 원좌표 보존과 구분한다.
+
+해안 Path 최적화는 세 지역 × 네 축척 ×12조합=144 mask 비교에서 변경 픽셀 0개였다. 기존 20개 화면/DPR, DPR 3 backing cap, 늦은 projection·이른 idle, 원거리 6회 연속 이동, no-op SDK 실패·timeout·신규 명령 취소, DOM mismatch, native 3px/6px 오차 차단도 유지한다.
+
+390×844와 1280×900의 다섯 탭, active mock의 이동 중/idle 캡처를 직접 확인했다. 실제 위성 배경의 동영상/실장치 육안 판정은 사용자 확인 대기다.
+
+### 자료 보호·기존 기능
+
+SATELLITE 기본·HYBRID/NORMAL과 preference migration, 선택점·핀·A/B·hover, native pan/wheel/pinch, terrain fallback을 유지했다. 실제 정합 판정은 동일 lat/lon의 native DOM 중심과 Canvas 실제 픽셀의 거리이며 SDK project끼리의 비교만으로 실 정합 성공을 주장하지 않는다. Marker ≤2 CSS px인데 항/갯바위와 위성 구조물이 다르면 POINTS/PORTS/ROCKS/OSM 원자료 오차로 분류하며 전체 항 좌표를 이동하지 않는다.
+
+`static/depth/`, `04_depth.js`, `04b_depth_tiles.js`, `18_section.js`, `data/`의 diff는 없다. production 42타일/35,982점과 verticalDatum/source/provenance, 12타일/60,000점/8MiB, 육지·외삽 차단·fallback을 유지했다. 기존 8개 지점과 A→B 301점 baseline은 정확히 동일하다. CI 보호 검사에도 `18_section.js`를 추가했다.
+
+빌드 `missing ids: []`, 기본 smoke와 기존 CI 전체 명령, 전체 지도 회귀, 신규 성능 회귀, 빌드 플랫폼 일치가 통과했다. CI에 신규 12조합 성능 회귀를 추가하고 실행 제한을 25분으로 늘렸다. CI는 실제 NAVER API/credential을 사용하지 않는다.
+
+### 변경 파일
+
+- 실행 코드: `src/app/15_view.js`, `15b_map_provider.js`, `15c_map_diagnostic.js`, 신규 `15d_render_state.js`, `16_terrain.js`, `17_flow.js`, `21_input.js`, `23_main.js`
+- 화면·빌드 결과·코드 지도: `src/template.html`, `index.html`(build.py 생성), `src/README.md`
+- 검사: `tests/p3_provider_checks.js`, `p3_depth_guard.py`, `test_map_provider.py`, 신규 `p3_perf_baseline.js`, `p3_perf_checks.js`, `p3_path_checks.js`, `test_map_performance.py`, `test_map_perf_comparison.py`
+- 보고서·측정값·CI: `tests/P3_MAP_REPORT.md`, 신규 `tests/P3_PERF_RESULTS.json`, `.github/workflows/ci.yml`
+
+정지 성능 계측은 초기 자료 로딩·수심 예약·base/단면 변경이 실제로 멈춘 뒤 시작한다. 초기 로딩의 정상 렌더를 정지 중 중복 렌더로 오인하지 않는다. CI 시간 성능은 호스트 변동이 있어 기록하고, 호출 차단·가시성·정합·drift·mask 동일성은 assertion으로 검사한다.
+
+### localhost 재검증
+
+1. 이 branch의 최신 index를 로드한다. 필요하면 저장소에서 `python build.py`, 기존 localhost 서버를 계속 쓰거나 `python -m http.server 8000 --bind 127.0.0.1`로 실행한다. 기존 NAVER 로컬 설정은 유지한다. 코드 갱신 후 브라우저에서 새 빌드를 한 번 로드한다.
+2. 지도 탭에서 기본 위성, 위성+지명, 일반을 전환한다. 선택점·핀·A/B·hover가 유지되고 추가 depth 요청이 없는지 Network를 확인한다. native 정합 원을 지운 뒤 성능 계측을 시작한다.
+
+```js
+naksigwangMapDiagnostic.clear();
+naksigwangPerfDiagnostic.reset();
+```
+
+3. 먼저 5초 정지 후 `naksigwangPerfDiagnostic()`를 저장한다. counts의 providerSync/providerViewportKey/providerCheck/renderBase/maskRebuild/getImageData/drawSection이 0인지 본다(자료 로딩과 재생이 끝난 상태). callsPerSecond는 reset 이후 평균 초당 빈도, costs는 각 함수의 total/max ms다. FPS·p95FrameMs·p95WorkMs·longTasks도 함께 저장한다.
+4. reset 후 좌우 20회, 상하 20회, wheel 20회, 혼합 30회를 각각 실행한다. 이동 중 분석 overlay가 잠깐 숨고 손을 뗀 뒤 250ms 목표/500ms 이내에 한꺼번에 복구되는지, 이전 포인트 잔상·서로 다른 방향으로 튀는 표시·station 흩어짐이 없는지 눈으로 확인한다. `idleRecoveryMs`도 저장한다.
+5. 각 명령은 반드시 await하고 다음 원거리 명령을 순서대로 실행한다.
+
+```js
+await naksigwangMapDiagnostic.fit(10000,38.20854,128.5947); // 속초
+await naksigwangMapDiagnostic.fit(10000,36.05,129.38); // 포항
+await naksigwangMapDiagnostic.fit(10000,37.89192,128.8312883028771); // 주문진
+await naksigwangMapDiagnostic.fit(10000,36.15983,126.50376); // 홍원
+```
+
+6. `valid/passes`, `errorPx≤2`, `domMismatchPx=0`, command settled와 before/after center·zoom·bounds 변화를 저장한다. 포항 실패 시 requestedBounds·fitBoundsType·sdkViewportUnchanged·trace를 포함한 반환값을 보낸다. credential은 반환하지 않는다.
+7. 각 위치에서 A/B를 그려 endpoint·단면 hover를 확인하고 3개 모드/오늘↔지도를 반복한다. PC 1280×900·1920×1080과 휴대폰 390×844, DPR 1/1.25/1.5/2에서 반복한다. PC 45 FPS·휴대폰 30 FPS, 일반 이동 100ms 이상 task 없음도 실제 계측으로 확인한다.
+
+### 남은 한계
+
+- 사용자 localhost의 실제 NAVER pan/zoom 렉·시각 안정성·idle 지연과 연속 포항 fit 성공은 아직 미확인이다. mock 통과로 실사용 최종 통과를 선언하지 않는다.
+- 실 SDK가 최종 이벤트를 누락하거나 16프레임 관찰 뒤에도 표시 projection이 안정되지 않으면 올바르지 않은 Canvas를 억지로 보이지 않고 숨김을 유지한다. 새 viewport 이벤트/명시적 명령으로 다시 관찰한다. 강제 reload·인스턴스 재생성·좌표 offset으로 감추지 않는다.
+- 전국 지도는 긴 해안선이 대부분 보이므로 꼭짓점 생략 효과가 작다. 저사양 실장치·타일 네트워크·GPU 성능은 mock 결과로 보증할 수 없다.
+- 이동 중 분석 Canvas는 의도적으로 숨겨진다. native debug 원만 보이는 것은 localhost 진단의 동작이다. 단면 물결은 시간 재생이 꺼져 있을 때 정지한다.
+- 원자료의 항/갯바위 좌표 정확도와 수심 coverage의 기존 제한은 변경하지 않았다.

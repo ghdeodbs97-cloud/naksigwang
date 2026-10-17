@@ -40,7 +40,7 @@ function inStruct(mx, my) {
 }
 function structPath(margin) {
   const p = new Path2D(), lp = new Path2D();
-  const [vx1, vy1] = toM(-margin, ch + margin), [vx2, vy2] = toM(cw + margin, -margin);
+  const [vx1, vy1, vx2, vy2] = viewBounds(margin);
   const vis = r => r.maxx >= vx1 && r.minx <= vx2 && r.maxy >= vy1 && r.miny <= vy2;
   for (const r of STRUCT.polys) if (vis(r)) { for (let i = 0; i < r.n; i++) { const [x, y] = toS(r.xs[i], r.ys[i]); i ? p.lineTo(x, y) : p.moveTo(x, y); } p.closePath(); }
   for (const r of STRUCT.lines) if (vis(r)) { for (let i = 0; i < r.n; i++) { const [x, y] = toS(r.xs[i], r.ys[i]); i ? lp.lineTo(x, y) : lp.moveTo(x, y); } }
