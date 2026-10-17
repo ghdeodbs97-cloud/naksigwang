@@ -367,8 +367,9 @@ details.more[open] summary{margin-bottom:12px}
       </div>
       <div class="mapTime"><span class="t" id="clock2">—</span><input type="range" id="tIn2" min="0" max="23.99" step="0.05" value="6" aria-label="시각 (조류 흐름)"></div>
       <div class="seg" id="providerModes" role="group" aria-label="온라인 지도 종류">
-        <button type="button" data-provider-mode="normal" aria-pressed="true">일반</button>
-        <button type="button" data-provider-mode="satellite" aria-pressed="false">위성</button>
+        <button type="button" data-provider-mode="satellite" aria-pressed="true">위성</button>
+        <button type="button" data-provider-mode="hybrid" aria-pressed="false">위성+지명</button>
+        <button type="button" data-provider-mode="normal" aria-pressed="false">일반</button>
       </div>
       <p id="providerNotice" role="status">온라인 지도 설정 전 · 기본 지형지도로 표시합니다.</p>
       <div class="stage" id="stage">
@@ -2183,10 +2184,11 @@ class NaverMapAdapter {
     this.imageError = e => { if (e.target?.tagName === 'IMG') this.onFailure?.(); };
     container.addEventListener('error', this.imageError, true);
     this.map = new n.Map(container, { center: new n.LatLng(latOf(V.cy), lonOf(V.cx)), zoom: 10,
+      mapTypeId: n.MapTypeId[{satellite:'SATELLITE',hybrid:'HYBRID',normal:'NORMAL'}[PROVIDER_MAP.mode]],
       draggable: false, scrollWheel: false, pinchZoom: false, keyboardShortcuts: false,
       disableDoubleClickZoom: true, zoomControl: false, mapDataControl: true, logoControl: true });
   }
-  setMode(mode) { this.map.setMapTypeId(this.sdk.MapTypeId[mode === 'satellite' ? 'HYBRID' : 'NORMAL']); }
+  setMode(mode) { this.map.setMapTypeId(this.sdk.MapTypeId[{satellite:'SATELLITE',hybrid:'HYBRID',normal:'NORMAL'}[mode] || 'SATELLITE']); }
   syncFromAppViewport() {
     const n = this.sdk;
     this.map.setCenter(new n.LatLng(latOf(V.cy), lonOf(V.cx)));
@@ -2214,14 +2216,23 @@ class NaverMapAdapter {
   project(lon, lat) { const p = this.map.getProjection().fromCoordToOffset(new this.sdk.LatLng(lat, lon)); return [p.x, p.y]; }
   unproject(x, y) { const p = this.map.getProjection().fromOffsetToCoord(new this.sdk.Point(x, y)); return [p.lng(), p.lat()]; }
   resize() { this.map.setSize(new this.sdk.Size(cw, ch)); }
+  createDebugMarker(lat, lon) {
+    const n = this.sdk, element = document.createElement('div');
+    element.dataset.naksigwangNativeProbe = '';
+    element.style.cssText = 'width:20px;height:20px;box-sizing:border-box;border:2px solid #00ffff;border-radius:50%;pointer-events:none';
+    const marker = new n.Marker({position:new n.LatLng(lat,lon),map:this.map,clickable:false,zIndex:10000,
+      icon:{content:element,size:new n.Size(20,20),anchor:new n.Point(10,10)}});
+    return {marker,element};
+  }
   onViewportReady(fn) { this.listeners.push(this.sdk.Event.addListener(this.map, 'idle', fn)); }
   onTilesLoaded(fn) { this.listeners.push(this.sdk.Event.addListener(this.map, 'tilesloaded', fn)); }
   destroy() { for (const l of this.listeners) this.sdk.Event.removeListener(l); this.listeners = []; this.container?.removeEventListener('error', this.imageError, true); this.map?.destroy(); this.map = null; }
 }
 
-const PROVIDER_MAP = { adapter: null, active: false, failed: false, started: false, mode: 'normal',
+const PROVIDER_MAP = { adapter: null, active: false, failed: false, started: false, mode: 'satellite',
   signature: '', loaded: false, timer: null, alignment: null, checking: false, syncing: false, diagnostic: null };
-try { if (localStorage.getItem('naksigwang-map-mode') === 'satellite') PROVIDER_MAP.mode = 'satellite'; } catch (_) { /* 저장 제한 시 기본값 */ }
+// P3 개발 중 저장된 normal/HYBRID 값은 새 위성 기본값으로 한 번 전환한다.
+try { const saved = localStorage.getItem('naksigwang-map-mode-v2'); if (['satellite','hybrid','normal'].includes(saved)) PROVIDER_MAP.mode = saved; localStorage.removeItem('naksigwang-map-mode'); } catch (_) { /* 저장 제한 시 위성 기본값 */ }
 
 function providerNotice(text) { $('providerNotice').textContent = text; }
 function providerFallback() {
@@ -2259,17 +2270,22 @@ function providerAlignment(adapter) {
   PROVIDER_MAP.diagnostic = {view:{...V},zoom:adapter.getZoom(),viewport:{width:cw,height:ch},samples,references,maxError:max,rawSamples,rawMaxError:Math.max(...rawSamples.map(s=>s.error)),xScaleRatio:Math.hypot(ex[0]-o[0],ex[1]-o[1])/(100*V.s),yScaleRatio:Math.hypot(ey[0]-o[0],ey[1]-o[1])/(100*V.s),providerCenter:c,visibleBounds:adapter.getBounds()};
   return max;
 }
-// 로컬 개발에서만 공개. credential이나 SDK 객체는 반환하지 않는다.
-if (['localhost','127.0.0.1','[::1]'].includes(location.hostname)) window.naksigwangMapDiagnostic = () => structuredClone(PROVIDER_MAP.diagnostic);
+// 같은 SDK 내부 경로의 비교값은 실 Marker DOM 검증을 대신하지 않는다.
+function providerRect(el) { const r = el.getBoundingClientRect(); return {left:r.left,top:r.top,width:r.width,height:r.height}; }
+function providerRectError() {
+  const origin = providerRect(ui); let error = 0;
+  for (const el of [$('providerMap'),base,flow,stage]) { const rect = providerRect(el); for (const key of ['left','top','width','height']) error = Math.max(error,Math.abs(rect[key]-origin[key])); }
+  return error;
+}
 function providerCheck() {
   const p = PROVIDER_MAP;
   if (!p.adapter || p.failed || !p.loaded || p.syncing) return;
   try {
     clearTimeout(p.timer);
-    p.checking = true; p.alignment = providerAlignment(p.adapter); p.checking = false; p.active = p.alignment <= 2;
+    p.checking = true; p.alignment = Math.max(providerAlignment(p.adapter),providerRectError()); p.checking = false; p.active = p.alignment <= 2;
     $('providerMap').style.visibility = p.active ? 'visible' : 'hidden'; dirty = true;
     stage.classList.toggle('provider-active', p.active);
-    providerNotice(p.active ? (p.mode === 'satellite' ? 'NAVER 위성지도 · 수심은 별도 공공자료와 추정값입니다.' : 'NAVER 일반지도 · 수심은 별도 공공자료와 추정값입니다.')
+    providerNotice(p.active ? ('NAVER ' + {satellite:'위성지도',hybrid:'위성+지명',normal:'일반지도'}[p.mode] + ' · 수심은 별도 공공자료와 추정값입니다.')
       : '온라인 지도와 분석 표시의 위치를 맞추지 못해 기본 지형지도로 표시합니다.');
   } catch (_) { p.checking = false; providerFallback(); }
 }
@@ -2305,8 +2321,8 @@ function scheduleDisplayDepthArea() {
   },250);
 }
 function providerSetMode(mode) {
-  const p = PROVIDER_MAP; p.mode = mode === 'satellite' ? 'satellite' : 'normal';
-  try { localStorage.setItem('naksigwang-map-mode', p.mode); } catch (_) { /* 저장 제한 */ }
+  const p = PROVIDER_MAP; p.mode = ['satellite','hybrid','normal'].includes(mode) ? mode : 'satellite';
+  try { localStorage.setItem('naksigwang-map-mode-v2', p.mode); } catch (_) { /* 저장 제한 */ }
   for (const b of $('providerModes').children) b.setAttribute('aria-pressed', b.dataset.providerMode === p.mode);
   if (p.adapter && !p.failed) {
     // 같은 지도 인스턴스의 배경만 바꾼다. dirty/단면/수심 로더를 건드리지 않는다.
@@ -2343,6 +2359,115 @@ async function providerStart() {
     });
     p.adapter.setMode(p.mode); providerSync();
   } catch (_) { providerFallback(); }
+}
+// 15c_map_diagnostic.js — 로컬에서만 native Marker DOM과 실제 Canvas 픽셀 비교
+const PROVIDER_DEV_HOST = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+let PROVIDER_DEBUG = null;
+
+function providerClearDiagnostic() {
+  PROVIDER_DEBUG?.native.marker.setMap(null);
+  PROVIDER_DEBUG = null;
+}
+function drawProviderDebugCrosshair() {
+  const d = PROVIDER_DEBUG;
+  if (!PROVIDER_DEV_HOST || !d || !PROVIDER_MAP.active) return;
+  const p = toS(mxOf(d.lon), myOf(d.lat));
+  // native 아이콘의 중심은 청록색 원, Canvas 중심은 자홍색 십자다.
+  uctx.save(); uctx.fillStyle = '#ff00ff';
+  uctx.fillRect(p[0] - 9, p[1] - 1, 18, 2);
+  uctx.fillRect(p[0] - 1, p[1] - 9, 2, 18); uctx.restore();
+  d.lastDraw = {pixel:p, time:performance.now(), view:{...V}};
+}
+function providerCanvasProbePixel(d) {
+  if (!d.lastDraw) return null;
+  const r = DPR(), p = d.lastDraw.pixel;
+  const x0 = Math.max(0, Math.floor((p[0] - 11) * r)), y0 = Math.max(0, Math.floor((p[1] - 11) * r));
+  const x1 = Math.min(ui.width, Math.ceil((p[0] + 11) * r)), y1 = Math.min(ui.height, Math.ceil((p[1] + 11) * r));
+  if (x1 <= x0 || y1 <= y0) return null;
+  const data = uctx.getImageData(x0, y0, x1 - x0, y1 - y0).data;
+  let weight = 0, sx = 0, sy = 0;
+  for (let y = 0; y < y1 - y0; y++) for (let x = 0; x < x1 - x0; x++) {
+    const k = (y * (x1 - x0) + x) * 4;
+    if (data[k] > 245 && data[k + 1] < 10 && data[k + 2] > 245 && data[k + 3]) {
+      const a = data[k + 3] / 255; weight += a; sx += (x0 + x + .5) * a; sy += (y0 + y + .5) * a;
+    }
+  }
+  if (!weight) return null;
+  // 실제 그림의 backing pixel 중심을 viewport CSS pixel로 환산한다. 예상 toS 값 자체를 측정값으로 쓰지 않는다.
+  const rect = providerRect(ui);
+  return [sx / weight / ui.width * rect.width, sy / weight / ui.height * rect.height];
+}
+function providerProbeSample(d, frame) {
+  const canvasRect = providerRect(ui), element = d.native.element.isConnected ? d.native.element
+    : $('providerMap').querySelector('[data-naksigwang-native-probe]');
+  const nr = element?.getBoundingClientRect();
+  const nativeMarkerPixel = nr?.width && nr?.height ? [nr.left + nr.width / 2 - canvasRect.left, nr.top + nr.height / 2 - canvasRect.top] : null;
+  const canvasPixel = providerCanvasProbePixel(d);
+  const painted = d.lastDraw?.pixel;
+  const visible = !!painted && painted[0] >= 11 && painted[0] <= cw - 11 && painted[1] >= 11 && painted[1] <= ch - 28 - 11;
+  const valid = PROVIDER_MAP.active && !!nativeMarkerPixel && !!canvasPixel && visible;
+  const dx = valid ? canvasPixel[0] - nativeMarkerPixel[0] : null, dy = valid ? canvasPixel[1] - nativeMarkerPixel[1] : null;
+  return {frame, time:performance.now(), nativeMarkerPixel, canvasPixel, dx, dy, errorPx:valid ? Math.hypot(dx, dy) : null,
+    valid, visible, canvasDraw:d.lastDraw ? structuredClone(d.lastDraw) : null,
+    providerCenter:PROVIDER_MAP.adapter.getCenter(), providerZoom:PROVIDER_MAP.adapter.getZoom(), view:{...V}};
+}
+function providerDiagnosticRectDeltas() {
+  const origin = providerRect(ui), deltas = {};
+  for (const [name,el] of [['providerMap',$('providerMap')],['base',base],['flow',flow],['ui',ui],['stage',stage]]) {
+    const rect = providerRect(el); deltas[name] = {};
+    for (const key of ['left','top','width','height']) deltas[name][key] = rect[key] - origin[key];
+  }
+  return deltas;
+}
+function providerDiagnosticStyle(el) {
+  const s = getComputedStyle(el), out = {};
+  for (const k of ['position','boxSizing','transform','transformOrigin','paddingLeft','paddingTop','paddingRight','paddingBottom','borderLeftWidth','borderTopWidth','borderRightWidth','borderBottomWidth','clipPath']) out[k] = s[k];
+  return out;
+}
+async function providerMarkerDiagnostic(lat, lon) {
+  if (!PROVIDER_DEV_HOST) throw Error('로컬 개발 환경에서만 사용할 수 있습니다.');
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < 32.5 || lat > 39 || lon < 123.8 || lon > 132.2) throw Error('한국 연안의 숫자 경위도를 입력하세요.');
+  const a = PROVIDER_MAP.adapter;
+  if (!a || !PROVIDER_MAP.active) return {providerMode:PROVIDER_MAP.mode,providerZoom:null,lat,lon,
+    providerRect:providerRect($('providerMap')),canvasRect:providerRect(ui),baseRect:providerRect(base),flowRect:providerRect(flow),stageRect:providerRect(stage),
+    rectDeltas:providerDiagnosticRectDeltas(),domMismatchPx:providerRectError(),dpr:devicePixelRatio,canvasDpr:DPR(),
+    nativeMarkerPixel:null,canvasPixel:null,dx:null,dy:null,errorPx:null,center:null,bounds:null,valid:false,passes:false,
+    reason:'온라인 지도가 준비되지 않았거나 DOM 크기/원점 검사를 통과하지 못했습니다. 지도 탭과 rectDeltas를 확인하세요.',internal:structuredClone(PROVIDER_MAP.diagnostic)};
+  if (!PROVIDER_DEBUG || PROVIDER_DEBUG.lat !== lat || PROVIDER_DEBUG.lon !== lon) {
+    providerClearDiagnostic();
+    PROVIDER_DEBUG = {lat, lon, native:a.createDebugMarker(lat, lon)};
+    drawUI();
+  }
+  const d = PROVIDER_DEBUG, timeline = [providerProbeSample(d, 0)];
+  for (let frame = 1; frame <= 8; frame++) {
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    if (PROVIDER_DEBUG !== d) throw Error('다른 기준점 검사로 바뀌었습니다.');
+    timeline.push(providerProbeSample(d, frame));
+    if (frame >= 2 && timeline.at(-1).valid && timeline.at(-2).valid) break;
+  }
+  const sample = timeline.at(-1), canvasRect = providerRect(ui), providerRect_ = providerRect($('providerMap'));
+  return {providerMode:PROVIDER_MAP.mode, providerZoom:a.getZoom(), lat, lon,
+    providerRect:providerRect_, canvasRect, baseRect:providerRect(base), flowRect:providerRect(flow), stageRect:providerRect(stage),
+    rectDeltas:providerDiagnosticRectDeltas(), center:a.getCenter(), bounds:a.getBounds(),
+    ...sample, passes:sample.valid && sample.errorPx <= 2, domMismatchPx:providerRectError(),
+    dpr:devicePixelRatio, canvasDpr:DPR(), drawingDpr:DPR(), backingSize:[ui.width, ui.height], logicalSize:[cw, ch],
+    attribution:{reservedCssPx:28, fullViewportUnchanged:true},
+    styles:{stage:providerDiagnosticStyle(stage),provider:providerDiagnosticStyle($('providerMap')),canvas:providerDiagnosticStyle(ui),base:providerDiagnosticStyle(base),flow:providerDiagnosticStyle(flow)},
+    timeline, maxObservedErrorPx:Math.max(0,...timeline.filter(s => s.valid).map(s => s.errorPx)),
+    reason:sample.valid ? null : '기준점이 화면 밖·출처 영역에 있거나 native Marker/Canvas가 아직 표시되지 않았습니다.',
+    measurement:'native Marker DOM 중심 vs Canvas 자홍색 실제 픽셀 중심', internal:structuredClone(PROVIDER_MAP.diagnostic)};
+}
+if (PROVIDER_DEV_HOST) {
+  window.naksigwangMapDiagnostic = (lat, lon) => lat === undefined && lon === undefined
+    ? {...structuredClone(PROVIDER_MAP.diagnostic),measurement:'SDK 내부 일관성 검사',nativeMarkerMeasured:false} : providerMarkerDiagnostic(lat, lon);
+  window.naksigwangMapDiagnostic.clear = providerClearDiagnostic;
+  window.naksigwangMapDiagnostic.fit = async (width, lat = 38.20854, lon = 128.5947) => {
+    if (![1000,2000,5000,10000,60000,600000].includes(width)) throw Error('폭은 1000/2000/5000/10000/60000/600000 m 중에서 고르세요.');
+    if (TAB !== 'map' || S.lock) throw Error('지도 탭에서 실행하세요.');
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < 32.5 || lat > 39 || lon < 123.8 || lon > 132.2) throw Error('한국 연안의 숫자 경위도를 입력하세요.');
+    fitGround(lat, lon, width); providerSync();
+    return providerMarkerDiagnostic(lat, lon);
+  };
 }
 // 16_terrain.js — GEBCO 지형 격자와 바탕 지도 그리기
 // 남한 해안선 자료 밖의 북한·대마도 쪽 구역 (여기서 GEBCO가 육지면 남의 땅으로 본다)
@@ -3013,6 +3138,7 @@ function drawUI() {
     uctx.strokeStyle = '#ff7a6e'; uctx.lineWidth = 2; uctx.beginPath(); uctx.arc(x, y, 7, 0, 7); uctx.stroke();
     uctx.beginPath(); uctx.moveTo(x - 13, y); uctx.lineTo(x - 4, y); uctx.moveTo(x + 4, y); uctx.lineTo(x + 13, y); uctx.moveTo(x, y - 13); uctx.lineTo(x, y - 4); uctx.moveTo(x, y + 4); uctx.lineTo(x, y + 13); uctx.stroke();
   }
+  drawProviderDebugCrosshair();
 }
 // 20_readouts.js — 계기판 값 표시
 /* ── 계기판 ────────────────────────────────────────────── */

@@ -1,5 +1,5 @@
 {
-  "baseSha": "a6732f02272e9a2beacf40c04c0e9f78d1dc35e1",
+  "baseSha": "b25ee78c97ee72ac8e0830233fc1b784b754d8a9",
   "existingSuite": [
     {
       "command": "tests/boot_degradation.mjs",
@@ -166,11 +166,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.004642762426811945,
+            "dx": 0.003599264494198451,
+            "dy": 0.002932667395498356,
+            "rectMismatch": 0,
+            "zoom": 7,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 10,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 12,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 13,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1,
+            "drawingDpr": 1
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -287,11 +353,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.17411003784717238,
+            "dx": 0.007011554621755067,
+            "dy": -0.1739688000215267,
+            "rectMismatch": 0,
+            "zoom": 7,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 60000,
+            "errorPx": 0.1779712593269096,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.1779712593269096,
+            "rectMismatch": 0,
+            "zoom": 10,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 10000,
+            "errorPx": 0.1779712593269096,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.1779712593269096,
+            "rectMismatch": 0,
+            "zoom": 12,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 5000,
+            "errorPx": 0.1779712593269096,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.1779712593269096,
+            "rectMismatch": 0,
+            "zoom": 13,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 2000,
+            "errorPx": 0.1779712593269096,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.1779712593269096,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 1000,
+            "errorPx": 0.1779712593269096,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.1779712593269096,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          }
+        ],
+        "nativeFaultPx": 6.002638900445676,
+        "domFaultPx": 5.003166374321778
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 2
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -408,11 +540,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.005677446868789979,
+            "dx": 0.0017773560834939417,
+            "dy": 0.005392069018512302,
+            "rectMismatch": 0,
+            "zoom": 7,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 60000,
+            "errorPx": 1.6572562045795678e-13,
+            "dx": 1.4210854715202004e-13,
+            "dy": 8.526512829121202e-14,
+            "rectMismatch": 0,
+            "zoom": 10,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 10000,
+            "errorPx": 1.6572562045795678e-13,
+            "dx": 1.4210854715202004e-13,
+            "dy": 8.526512829121202e-14,
+            "rectMismatch": 0,
+            "zoom": 12,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 5000,
+            "errorPx": 1.6572562045795678e-13,
+            "dx": 1.4210854715202004e-13,
+            "dy": 8.526512829121202e-14,
+            "rectMismatch": 0,
+            "zoom": 13,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 2000,
+            "errorPx": 1.6572562045795678e-13,
+            "dx": 1.4210854715202004e-13,
+            "dy": 8.526512829121202e-14,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 1000,
+            "errorPx": 1.6572562045795678e-13,
+            "dx": 1.4210854715202004e-13,
+            "dy": 8.526512829121202e-14,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          }
+        ],
+        "nativeFaultPx": 5.999999999999858,
+        "domFaultPx": 4.999999999999858
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 1
     },
     {
       "viewport": [
@@ -529,11 +727,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.004062429145764715,
+            "dx": 0.0022850648182384248,
+            "dy": 0.0033588404756415002,
+            "rectMismatch": 0,
+            "zoom": 7,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 10,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 12,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 13,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 2,
+            "drawingDpr": 2
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 2
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -650,11 +914,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 13,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1,
+            "drawingDpr": 1
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -771,11 +1101,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.17821725241867625,
+            "dx": -0.17821725241867625,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 60000,
+            "errorPx": 0.17821725241867625,
+            "dx": -0.17821725241867625,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 10000,
+            "errorPx": 0.17821725241867625,
+            "dx": -0.17821725241867625,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 13,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 5000,
+            "errorPx": 0.17821725241867625,
+            "dx": -0.17821725241867625,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 2000,
+            "errorPx": 0.17821725241867625,
+            "dx": -0.17821725241867625,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 1000,
+            "errorPx": 0.17821725241867625,
+            "dx": -0.17821725241867625,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          }
+        ],
+        "nativeFaultPx": 6.178217252418676,
+        "domFaultPx": 5.178217252418676
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -892,11 +1288,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 4.582862941503293e-13,
+            "dx": 3.979039320256561e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 60000,
+            "errorPx": 4.582862941503293e-13,
+            "dx": 3.979039320256561e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 10000,
+            "errorPx": 4.582862941503293e-13,
+            "dx": 3.979039320256561e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 13,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 5000,
+            "errorPx": 4.582862941503293e-13,
+            "dx": 3.979039320256561e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 2000,
+            "errorPx": 4.582862941503293e-13,
+            "dx": 3.979039320256561e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 1000,
+            "errorPx": 4.582862941503293e-13,
+            "dx": 3.979039320256561e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          }
+        ],
+        "nativeFaultPx": 5.999999999999602,
+        "domFaultPx": 4.999999999999602
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -1013,11 +1475,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 13,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 2,
+            "drawingDpr": 2
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -1134,11 +1662,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1,
+            "drawingDpr": 1
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -1255,11 +1849,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.22159638103687485,
+            "dx": -0.22159638103687485,
+            "dy": 2.8421709430404007e-13,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 60000,
+            "errorPx": 0.22159638103687485,
+            "dx": -0.22159638103687485,
+            "dy": 2.8421709430404007e-13,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 10000,
+            "errorPx": 0.22159638103687485,
+            "dx": -0.22159638103687485,
+            "dy": 2.8421709430404007e-13,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 5000,
+            "errorPx": 0.22159638103687485,
+            "dx": -0.22159638103687485,
+            "dy": 2.8421709430404007e-13,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 2000,
+            "errorPx": 0.22159638103687485,
+            "dx": -0.22159638103687485,
+            "dy": 2.8421709430404007e-13,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 1000,
+            "errorPx": 0.22159638103687485,
+            "dx": -0.22159638103687485,
+            "dy": 2.8421709430404007e-13,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          }
+        ],
+        "nativeFaultPx": 6.221596381036875,
+        "domFaultPx": 5.221596381036875
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -1376,11 +2036,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 2.8421709430404007e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 1.7053025658242404e-13,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 60000,
+            "errorPx": 2.8421709430404007e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 1.7053025658242404e-13,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 10000,
+            "errorPx": 2.8421709430404007e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 1.7053025658242404e-13,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 5000,
+            "errorPx": 2.8421709430404007e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 1.7053025658242404e-13,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 2000,
+            "errorPx": 2.8421709430404007e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 1.7053025658242404e-13,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 1000,
+            "errorPx": 2.8421709430404007e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 1.7053025658242404e-13,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          }
+        ],
+        "nativeFaultPx": 5.999999999999773,
+        "domFaultPx": 4.999999999999773
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -1497,11 +2223,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 2,
+            "drawingDpr": 2
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -1618,11 +2410,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1,
+            "drawingDpr": 1
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -1739,11 +2597,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.2217761686306403,
+            "dx": -0.2217761686306403,
+            "dy": 1.1368683772161603e-13,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 60000,
+            "errorPx": 0.2217761686306403,
+            "dx": -0.2217761686306403,
+            "dy": 1.1368683772161603e-13,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 10000,
+            "errorPx": 0.2217761686306403,
+            "dx": -0.2217761686306403,
+            "dy": 1.1368683772161603e-13,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 5000,
+            "errorPx": 0.2217761686306403,
+            "dx": -0.2217761686306403,
+            "dy": 1.1368683772161603e-13,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 2000,
+            "errorPx": 0.2217761686306403,
+            "dx": -0.2217761686306403,
+            "dy": 1.1368683772161603e-13,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 1000,
+            "errorPx": 0.2217761686306403,
+            "dx": -0.2217761686306403,
+            "dy": 1.1368683772161603e-13,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          }
+        ],
+        "nativeFaultPx": 6.22177616863064,
+        "domFaultPx": 5.22177616863064
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -1860,11 +2784,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 4.099037227506403e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 3.410605131648481e-13,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 60000,
+            "errorPx": 4.099037227506403e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 3.410605131648481e-13,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 10000,
+            "errorPx": 4.099037227506403e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 3.410605131648481e-13,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 5000,
+            "errorPx": 4.099037227506403e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 3.410605131648481e-13,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 2000,
+            "errorPx": 4.099037227506403e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 3.410605131648481e-13,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 1000,
+            "errorPx": 4.099037227506403e-13,
+            "dx": 2.2737367544323206e-13,
+            "dy": 3.410605131648481e-13,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          }
+        ],
+        "nativeFaultPx": 5.999999999999773,
+        "domFaultPx": 4.999999999999773
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -1981,11 +2971,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 2,
+            "drawingDpr": 2
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -2102,11 +3158,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 6.122223575328581e-13,
+            "dx": 5.684341886080801e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 60000,
+            "errorPx": 6.122223575328581e-13,
+            "dx": 5.684341886080801e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 10000,
+            "errorPx": 6.122223575328581e-13,
+            "dx": 5.684341886080801e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 5000,
+            "errorPx": 6.122223575328581e-13,
+            "dx": 5.684341886080801e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 2000,
+            "errorPx": 6.122223575328581e-13,
+            "dx": 5.684341886080801e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1,
+            "drawingDpr": 1
+          },
+          {
+            "width": 1000,
+            "errorPx": 6.122223575328581e-13,
+            "dx": 5.684341886080801e-13,
+            "dy": 2.2737367544323206e-13,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1,
+            "drawingDpr": 1
+          }
+        ],
+        "nativeFaultPx": 5.999999999999432,
+        "domFaultPx": 4.999999999999432
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -2223,11 +3345,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.24795912593269998,
+            "dx": -0.2217761686308677,
+            "dy": -0.1109011233519368,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 60000,
+            "errorPx": 0.24795912593269998,
+            "dx": -0.2217761686308677,
+            "dy": -0.1109011233519368,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 10000,
+            "errorPx": 0.24795912593269998,
+            "dx": -0.2217761686308677,
+            "dy": -0.1109011233519368,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 5000,
+            "errorPx": 0.24795912593269998,
+            "dx": -0.2217761686308677,
+            "dy": -0.1109011233519368,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 2000,
+            "errorPx": 0.24795912593269998,
+            "dx": -0.2217761686308677,
+            "dy": -0.1109011233519368,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          },
+          {
+            "width": 1000,
+            "errorPx": 0.24795912593269998,
+            "dx": -0.2217761686308677,
+            "dy": -0.1109011233519368,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1.25,
+            "drawingDpr": 1.25
+          }
+        ],
+        "nativeFaultPx": 6.222764478244675,
+        "domFaultPx": 5.222953705944749
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -2344,11 +3532,77 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.16605468590910277,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.16605468590910277,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 60000,
+            "errorPx": 0.16605468590910277,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.16605468590910277,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 10000,
+            "errorPx": 0.16605468590910277,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.16605468590910277,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 5000,
+            "errorPx": 0.16605468590910277,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.16605468590910277,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 2000,
+            "errorPx": 0.16605468590910277,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.16605468590910277,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          },
+          {
+            "width": 1000,
+            "errorPx": 0.16605468590910277,
+            "dx": 2.2737367544323206e-13,
+            "dy": -0.16605468590910277,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 1.5,
+            "drawingDpr": 1.5
+          }
+        ],
+        "nativeFaultPx": 6.002297406719334,
+        "domFaultPx": 5.002756655955803
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
     },
     {
       "viewport": [
@@ -2465,11 +3719,145 @@
         }
       ],
       "checks": 29,
+      "nativeDiagnostic": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 8,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 11,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 14,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 2,
+            "drawingDpr": 2
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 17,
+            "dpr": 2,
+            "drawingDpr": 2
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      },
       "errors": [],
       "failedRequests": [
         "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       ],
-      "depthToggleFetches": 0
+      "depthToggleFetches": 7
+    },
+    {
+      "highDprNative": {
+        "samples": [
+          {
+            "width": 600000,
+            "errorPx": 0.004062429145764715,
+            "dx": 0.0022850648182384248,
+            "dy": 0.0033588404756415002,
+            "rectMismatch": 0,
+            "zoom": 7,
+            "dpr": 3,
+            "drawingDpr": 2
+          },
+          {
+            "width": 60000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 10,
+            "dpr": 3,
+            "drawingDpr": 2
+          },
+          {
+            "width": 10000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 12,
+            "dpr": 3,
+            "drawingDpr": 2
+          },
+          {
+            "width": 5000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 13,
+            "dpr": 3,
+            "drawingDpr": 2
+          },
+          {
+            "width": 2000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 15,
+            "dpr": 3,
+            "drawingDpr": 2
+          },
+          {
+            "width": 1000,
+            "errorPx": 0,
+            "dx": 0,
+            "dy": 0,
+            "rectMismatch": 0,
+            "zoom": 16,
+            "dpr": 3,
+            "drawingDpr": 2
+          }
+        ],
+        "nativeFaultPx": 6,
+        "domFaultPx": 5
+      }
     },
     {
       "failure": "404",
@@ -2490,6 +3878,30 @@
     {
       "failure": "auth",
       "passed": true
+    },
+    {
+      "preference": "satellite",
+      "legacy": "normal",
+      "passed": true
+    },
+    {
+      "preference": "satellite",
+      "legacy": "satellite",
+      "passed": true
+    },
+    {
+      "preference": "normal",
+      "legacy": null,
+      "passed": true
+    },
+    {
+      "preference": "hybrid",
+      "legacy": null,
+      "passed": true
+    },
+    {
+      "productionDebugAbsent": true,
+      "passed": true
     }
   ],
   "protectedPathsChanged": [],
@@ -2504,22 +3916,63 @@
   "buildConsistency": true,
   "realNaverConnection": false,
   "realImageAlignmentMeasured": false,
-  "mockMaxCssPx": 2.729723057927088e-09,
-  "rawAffineMaxCssPx": 35.50742678537364,
-  "alignmentViewCount": 360,
-  "projectionArchitecture": "SDK project/unproject + independent world-coordinate reference",
-  "activeVisualQa": {
-    "viewports": [
-      [
-        390,
-        844
-      ],
-      [
-        1280,
-        900
-      ]
+  "nativeMarkerMock": {
+    "sampleCount": 126,
+    "maxErrorPx": 0.24795912593269998,
+    "maxRectMismatchPx": 0,
+    "nativeFaultPx": [
+      6,
+      6.002638900445676,
+      5.999999999999858,
+      6,
+      6,
+      6.178217252418676,
+      5.999999999999602,
+      6,
+      6,
+      6.221596381036875,
+      5.999999999999773,
+      6,
+      6,
+      6.22177616863064,
+      5.999999999999773,
+      6,
+      5.999999999999432,
+      6.222764478244675,
+      6.002297406719334,
+      6
     ],
-    "credentialFreeMock": true,
-    "scaleAndMinimapAboveAttribution": true
-  }
+    "domFaultPx": [
+      5,
+      5.003166374321778,
+      4.999999999999858,
+      5,
+      5,
+      5.178217252418676,
+      4.999999999999602,
+      5,
+      5,
+      5.221596381036875,
+      4.999999999999773,
+      5,
+      5,
+      5.22177616863064,
+      4.999999999999773,
+      5,
+      4.999999999999432,
+      5.222953705944749,
+      5.002756655955803,
+      5
+    ]
+  },
+  "defaultMode": "SATELLITE",
+  "modeMapping": {
+    "satellite": "SATELLITE",
+    "hybrid": "HYBRID",
+    "normal": "NORMAL"
+  },
+  "nativeRealNaverAlignment": "미확인",
+  "validationDate": "2026-10-17",
+  "diagnosticFieldContractPassed": true,
+  "fixtureIsolationRerunPassed": true
 }

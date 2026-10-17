@@ -4,23 +4,34 @@ window.p3SizeCheck = () => ch===Math.round(cw<560?clamp(innerHeight-290,320,cw*1
 // 앱 변환을 호출하지 않는 비선형 세계 좌표. 정수 줌과 회전·곡률을 함께 재현한다.
 const fakeWorld = (lon,lat) => { const y=myOf(lat), d=y-myOf(36); return [mxOf(lon)+.03*d+1e-7*d*d,y]; };
 const fakeCoord = (x,y) => { const d=y-myOf(36); return [lonOf(x-.03*d-1e-7*d*d),latOf(y)]; };
+class P3ProbeLL { constructor(lat,lon) {this.latitude=lat;this.longitude=lon;} lat(){return this.latitude;} lng(){return this.longitude;} }
+class P3ProbeXY { constructor(x,y) {this.x=x;this.y=y;} }
+// native DOM 기준은 adapter.project/referenceProject/toS를 호출하지 않고 SDK 렌더러를 모사한다.
+class P3NativeMarker {
+  constructor(options) {this.options=options;this.setMap(options.map);}
+  setMap(map) {this.map?.owner.markers.delete(this);this.element?.remove();this.map=map;if(!map)return;this.element=this.options.icon.content;map.owner.markers.add(this);map.owner.container.append(this.element);this.render();}
+  render() {if(!this.map)return;const f=this.map.owner,p=this.options.position,c=fakeWorld(...f.center),w=fakeWorld(p.lng(),p.lat()),anchor=this.options.icon.anchor;
+    this.element.style.position='absolute';this.element.style.left=((w[0]-c[0])*2**f.z/200000+cw/2-anchor.x+(f.nativeOffset||0))+'px';this.element.style.top=((c[1]-w[1])*2**f.z/200000+ch/2-anchor.y)+'px';}
+}
 class FakeMapAdapter {
-  init(container) { this.container=container; this.instances=1; this.modes=[]; this.error=0; this.center=[128,36]; this.z=10; this.map={setZoom:z=>{this.z=z;}}; }
+  init(container) { this.container=container; this.instances=1; this.modes=[]; this.error=0; this.center=[128,36]; this.z=10; this.markers=new Set();this.sdk={LatLng:P3ProbeLL,Size:P3ProbeXY,Point:P3ProbeXY,Marker:P3NativeMarker};this.map={owner:this,setZoom:z=>{this.z=z;this.renderMarkers();}}; }
   setMode(mode) { this.modes.push(mode); this.loaded?.(); }
+  createDebugMarker(lat,lon) {return NaverMapAdapter.prototype.createDebugMarker.call(this,lat,lon);}
+  renderMarkers() {for(const m of this.markers)m.render();}
   scale() { return 2**this.z/200000; }
-  syncFromAppViewport() { this.center=[lonOf(V.cx),latOf(V.cy)]; this.z=Math.max(6,Math.min(21,Math.round(Math.log2(V.s*200000)))); this.zoomTarget=this.z; this.viewport={...V,s:this.scale()}; this.loaded?.(); }
-  resize() { this.size=[cw,ch]; }
+  syncFromAppViewport() { this.center=[lonOf(V.cx),latOf(V.cy)]; this.z=Math.max(6,Math.min(21,Math.round(Math.log2(V.s*200000)))); this.zoomTarget=this.z; this.viewport={...V,s:this.scale()}; this.renderMarkers();this.loaded?.(); }
+  resize() { this.size=[cw,ch];this.renderMarkers(); }
   project(lon,lat) { const w=fakeWorld(lon,lat), c=fakeWorld(...this.center), s=this.scale(); return [(w[0]-c[0])*s+cw/2+this.error,(c[1]-w[1])*s+ch/2]; }
   referenceProject(lon,lat) { const w=fakeWorld(lon,lat), c=fakeWorld(...this.center); return [(w[0]-c[0])*2**this.z/200000+cw/2,(c[1]-w[1])*2**this.z/200000+ch/2]; }
   unproject(x,y) { const c=fakeWorld(...this.center), s=this.scale(); return fakeCoord(c[0]+(x-cw/2)/s,c[1]-(y-ch/2)/s); }
   getBounds() { const pts=[this.unproject(0,0),this.unproject(cw,0),this.unproject(0,ch),this.unproject(cw,ch)]; return [[Math.min(...pts.map(p=>p[0])),Math.min(...pts.map(p=>p[1]))],[Math.max(...pts.map(p=>p[0])),Math.max(...pts.map(p=>p[1]))]]; }
   getCenter() { return this.center; }
   getZoom() { return this.z; }
-  setCenter(lon,lat) { this.center=[lon,lat]; }
+  setCenter(lon,lat) { this.center=[lon,lat];this.renderMarkers(); }
   moveAnchor(ll,x,y) { NaverMapAdapter.prototype.moveAnchor.call(this,ll,x,y); }
   zoomAt(x,y,f) { NaverMapAdapter.prototype.zoomAt.call(this,x,y,f); }
   onTilesLoaded(fn) { this.loaded=fn; }
-  destroy() { this.destroyed=true; }
+  destroy() { for(const m of [...this.markers])m.setMap(null);this.destroyed=true; }
 }
 window.p3Test = async () => {
   const check = (ok, msg) => { if (!ok) throw Error(msg); };
@@ -40,12 +51,13 @@ window.p3Test = async () => {
   hoverAt=toS(...S.pin);dirtyHover=true;updateHover();
   check($('depthRead').textContent.length>0,'전환 전 실제 수심 readout');
   const state = () => JSON.stringify({V,Spt:S.pt,pin:S.pin,A:S.A,B:S.B,SEC,depths:window.p3DepthSnapshot(),read:$('depthRead').textContent});
+  await pause();await OFFICIAL_DEPTH.init;await Promise.all([...OFFICIAL_DEPTH.pending.values()]);await pause();
   const before = state();
   const originalFetch=window.fetch;let depthFetches=0;
   window.fetch=(url,...args)=>{if(String(url).includes('static/depth/'))depthFetches++;return originalFetch(url,...args);};
-  providerSetMode('satellite');providerSetMode('normal');await pause();
+  providerSetMode('satellite');providerSetMode('hybrid');providerSetMode('normal');await pause();
   window.fetch=originalFetch;check(depthFetches===0,'활성 배경 전환 시 수심 요청 없음');
-  check(fake.instances===1 && fake.modes.join(',')==='satellite,normal','인스턴스와 모드 전환');
+  check(fake.instances===1 && fake.modes.join(',')==='satellite,hybrid,normal','인스턴스와 모드 전환');
   check(before===state(),'선택·단면·수심·화면 상태 보존');
   const point=fake.project(128.8,37.9), ll=fake.unproject(...point);
   check(Math.abs(ll[0]-128.8)<1e-8 && Math.abs(ll[1]-37.9)<1e-8,'좌표 왕복');
@@ -106,7 +118,7 @@ window.p3AdapterUnit = () => {
   const calls=[];let instances=0;
   class LL {constructor(lat,lon){this.latitude=lat;this.longitude=lon;}lat(){return this.latitude;}lng(){return this.longitude;}}
   class XY {constructor(x,y){this.x=x;this.y=y;}}
-  const sdk={LatLng:LL,Point:XY,Size:XY,MapTypeId:{NORMAL:'N',HYBRID:'H'},Event:{addListener:()=>1,removeListener:l=>calls.push(['remove',l])},Map:class {
+  const sdk={LatLng:LL,Point:XY,Size:XY,MapTypeId:{SATELLITE:'S',NORMAL:'N',HYBRID:'H'},Event:{addListener:()=>1,removeListener:l=>calls.push(['remove',l])},Map:class {
     constructor(c,o){instances++;this.z=o.zoom;this.c=o.center;}
     setMapTypeId(m){calls.push(m);}setCenter(c){this.c=c;calls.push('center');}getCenter(){return this.c;}
     setZoom(z){this.z=z;}getZoom(){return this.z;}setSize(s){calls.push('size');}
@@ -118,12 +130,45 @@ window.p3AdapterUnit = () => {
       fromOffsetToCoord:p=>{const ll=fakeCoord(center[0]+(p.x-cw/2)/scale,center[1]-(p.y-ch/2)/scale);return new LL(ll[1],ll[0]);}
     };}
   }};
-  const a=new NaverMapAdapter(sdk);a.init($('providerMap'));a.setMode('normal');a.setMode('satellite');
+  const a=new NaverMapAdapter(sdk);a.init($('providerMap'));a.setMode('satellite');a.setMode('hybrid');a.setMode('normal');
   a.resize();a.syncFromAppViewport();a.onTilesLoaded(()=>{});
   const p=a.project(129,37),ll=a.unproject(...p);
-  if(instances!==1 || calls[0]!=='N' || calls[1]!=='H' || Math.abs(ll[0]-129)>1e-8 || Math.abs(ll[1]-37)>1e-8 || a.getBounds()[0][0]!==124)throw Error('NAVER 어댑터 계약');
+  if(instances!==1 || calls[0]!=='S' || calls[1]!=='H' || calls[2]!=='N' || Math.abs(ll[0]-129)>1e-8 || Math.abs(ll[1]-37)>1e-8 || a.getBounds()[0][0]!==124)throw Error('NAVER 어댑터 계약');
   const ref=a.referenceProject(129,37);if(Math.hypot(ref[0]-p[0],ref[1]-p[1])>1e-6)throw Error('독립 세계 좌표 경로');
   a.destroy();if(a.map!==null || !calls.includes('destroy'))throw Error('NAVER 해제');
   return true;
 };
-window.p3SwitchOnly = () => {providerSetMode('satellite');providerSetMode('normal');};
+window.p3SwitchOnly = () => {providerSetMode('satellite');providerSetMode('hybrid');providerSetMode('normal');};
+window.p3Preference = () => ({mode:PROVIDER_MAP.mode,legacy:localStorage.getItem('naksigwang-map-mode'),saved:localStorage.getItem('naksigwang-map-mode-v2'),pressed:$('providerModes').querySelector('[aria-pressed="true"]').dataset.providerMode});
+window.p3NativeTest = async () => {
+  const check=(ok,msg)=>{if(!ok)throw Error(msg);};
+  showTab('map');await new Promise(r=>setTimeout(r,350));
+  const fake=new FakeMapAdapter();fake.init($('providerMap'));Object.assign(PROVIDER_MAP,{adapter:fake,failed:false,loaded:true,signature:'',active:false});
+  fake.onTilesLoaded(()=>{PROVIDER_MAP.loaded=true;providerCheck();});
+  providerSetMode('satellite');providerSync();
+  const samples=[], required=['providerMode','providerZoom','providerRect','canvasRect','baseRect','flowRect','stageRect','rectDeltas','dpr','canvasDpr','lat','lon','nativeMarkerPixel','canvasPixel','dx','dy','errorPx','center','bounds'];
+  for(const width of [600000,60000,10000,5000,2000,1000]) {
+    const result=await window.naksigwangMapDiagnostic.fit(width,width===600000?36:38.20854,width===600000?128:128.5947);
+    check(required.every(k=>k in result),'진단 반환 필드 계약');
+    check(result.valid && result.passes && result.errorPx<=2,'native DOM vs 실제 Canvas 정합 '+width);
+    check(result.domMismatchPx<.01 && result.attribution.fullViewportUnchanged,'DOM 크기/원점·출처 영역');
+    check(result.canvasPixel && result.nativeMarkerPixel && result.timeline.length>=3,'독립 렌더링과 프레임 기록');
+    samples.push({width,errorPx:result.errorPx,dx:result.dx,dy:result.dy,rectMismatch:result.domMismatchPx,zoom:result.providerZoom,dpr:result.dpr,drawingDpr:result.drawingDpr});
+  }
+  clearTimeout(OFFICIAL_DEPTH.timer);await Promise.all([...OFFICIAL_DEPTH.pending.values()]);clearTimeout(OFFICIAL_DEPTH.timer);
+  const saved=JSON.stringify({pin:S.pin,A:S.A,B:S.B,SEC});
+  fake.nativeOffset=6;fake.renderMarkers();const shifted=await window.naksigwangMapDiagnostic(38.20854,128.5947);
+  check(!shifted.passes && shifted.errorPx>5,'독립 native DOM 오차 검출');
+  check(PROVIDER_MAP.diagnostic.maxError<1e-5,'내부 project 비교가 통과해도 native DOM 검사는 실패');
+  fake.nativeOffset=0;fake.renderMarkers();
+  $('providerMap').style.transform='translateX(5px)';const domShift=await window.naksigwangMapDiagnostic(38.20854,128.5947);
+  check(domShift.domMismatchPx>=5 && !domShift.passes,'DOM 원점 오차 검출');
+  providerCheck();check(!PROVIDER_MAP.active,'DOM 오차 guard');
+  $('providerMap').style.transform='';providerCheck();
+  const ok=await window.naksigwangMapDiagnostic(38.20854,128.5947);check(ok.passes,'DOM 원점 복구');
+  check(saved===JSON.stringify({pin:S.pin,A:S.A,B:S.B,SEC}),'debug 생성 시 분석·핀 상태 유지');
+  window.naksigwangMapDiagnostic.clear();drawUI();check(!$('providerMap').querySelector('[data-naksigwang-native-probe]')&&!PROVIDER_DEBUG,'debug 해제');
+  fake.destroy();PROVIDER_MAP.adapter=null;PROVIDER_MAP.active=false;$('providerMap').style.visibility='hidden';stage.classList.remove('provider-active');dirty=true;
+  const unavailable=await window.naksigwangMapDiagnostic(38.20854,128.5947);check(required.every(k=>k in unavailable)&&!unavailable.valid&&unavailable.errorPx===null,'미준비 진단 필드와 null 오차');
+  return {samples,nativeFaultPx:shifted.errorPx,domFaultPx:domShift.errorPx};
+};

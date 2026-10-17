@@ -360,8 +360,9 @@ details.more[open] summary{margin-bottom:12px}
       </div>
       <div class="mapTime"><span class="t" id="clock2">—</span><input type="range" id="tIn2" min="0" max="23.99" step="0.05" value="6" aria-label="시각 (조류 흐름)"></div>
       <div class="seg" id="providerModes" role="group" aria-label="온라인 지도 종류">
-        <button type="button" data-provider-mode="normal" aria-pressed="true">일반</button>
-        <button type="button" data-provider-mode="satellite" aria-pressed="false">위성</button>
+        <button type="button" data-provider-mode="satellite" aria-pressed="true">위성</button>
+        <button type="button" data-provider-mode="hybrid" aria-pressed="false">위성+지명</button>
+        <button type="button" data-provider-mode="normal" aria-pressed="false">일반</button>
       </div>
       <p id="providerNotice" role="status">온라인 지도 설정 전 · 기본 지형지도로 표시합니다.</p>
       <div class="stage" id="stage">
