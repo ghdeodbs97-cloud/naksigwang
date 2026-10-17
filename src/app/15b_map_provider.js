@@ -7,21 +7,26 @@ class NaverMapAdapter {
     this.container = container;
     this.imageError = e => { if (e.target?.tagName === 'IMG') this.onFailure?.(); };
     container.addEventListener('error', this.imageError, true);
-    this.map = new n.Map(container, { center: new n.LatLng(latOf(V.cy), lonOf(V.cx)), zoom: 10,
+    this.map = new n.Map(container, { center: new n.LatLng(latOf(V.cy), lonOf(V.cx)), zoom: 10, minZoom:6, maxZoom:21,
       mapTypeId: n.MapTypeId[{satellite:'SATELLITE',hybrid:'HYBRID',normal:'NORMAL'}[PROVIDER_MAP.mode]],
       draggable: false, scrollWheel: false, pinchZoom: false, keyboardShortcuts: false,
       disableDoubleClickZoom: true, zoomControl: false, mapDataControl: true, logoControl: true });
   }
   setMode(mode) { this.map.setMapTypeId(this.sdk.MapTypeId[{satellite:'SATELLITE',hybrid:'HYBRID',normal:'NORMAL'}[mode] || 'SATELLITE']); }
-  syncFromAppViewport() {
-    const n = this.sdk;
-    this.map.setCenter(new n.LatLng(latOf(V.cy), lonOf(V.cx)));
-    // SDK 자체 투영으로 현재 배율을 측정한다. Mercator zoom 공식은 적용하지 않는다.
-    const a = this.project(lonOf(V.cx), latOf(V.cy)), b = this.project(lonOf(V.cx + 1000), latOf(V.cy));
-    const scale = Math.hypot(b[0] - a[0], b[1] - a[1]) / 1000;
-    if (!(scale > 0)) throw Error('지도 좌표 변환 실패');
-    const z = Math.max(6, Math.min(21, Math.round(this.map.getZoom() + Math.log2(V.s / scale))));
-    this.map.setZoom(z, false); this.zoomTarget = z;
+  syncFromAppViewport(view = V) {
+    // 이동 명령만 SDK에 보낸다. 미반영 projection으로 정수 zoom을 역산하지 않는다.
+    const n=this.sdk, hx=cw/(2*view.s), hy=ch/(2*view.s);
+    this.map.fitBounds([new n.LatLng(latOf(view.cy-hy),lonOf(view.cx-hx)),new n.LatLng(latOf(view.cy+hy),lonOf(view.cx+hx))],{top:0,right:0,bottom:0,left:0,maxZoom:21});
+    this.zoomRemainder=0;
+  }
+  getGroundScale() {
+    const n=this.sdk, c=this.unproject(cw/2,ch/2), projection=this.map.getProjection();
+    const end=projection.getDestinationCoord(new n.LatLng(c[1],c[0]),90,100), a=this.project(...c), b=this.project(end.lng(),end.lat());
+    return Math.hypot(b[0]-a[0],b[1]-a[1])/100;
+  }
+  setInteraction(enabled) {
+    if (this.interactive===enabled) return; this.interactive=enabled;
+    this.map.setOptions({draggable:enabled,scrollWheel:enabled,pinchZoom:enabled,keyboardShortcuts:enabled});
   }
   getBounds() { const b = this.map.getBounds(), sw = b.getSW(), ne = b.getNE(); return [[sw.lng(), sw.lat()], [ne.lng(), ne.lat()]]; }
   getCenter() { const c = this.map.getCenter(); return [c.lng(), c.lat()]; }
@@ -29,13 +34,12 @@ class NaverMapAdapter {
   // 정합 기준은 별도 세계 좌표 경로. 앱 toS/toM이나 project를 호출하지 않는다.
   referenceProject(lon, lat) { const p = this.map.getProjection(), w = p.fromCoordToPoint(new this.sdk.LatLng(lat, lon)), o = p.fromPointToOffset(w); return [o.x, o.y]; }
   setCenter(lon, lat) { this.map.setCenter(new this.sdk.LatLng(lat, lon)); }
-  moveAnchor(ll, x, y) {
-    for (let i = 0; i < 3; i++) { const p = this.project(...ll), c = this.unproject(cw / 2 + p[0] - x, ch / 2 + p[1] - y); this.setCenter(...c); }
-  }
-  zoomAt(x, y, factor) {
-    const ll = this.unproject(x, y);
-    this.zoomTarget = Math.max(6, Math.min(21, (this.zoomTarget ?? this.getZoom()) + Math.log2(factor)));
-    this.map.setZoom(Math.round(this.zoomTarget), false); this.moveAnchor(ll, x, y);
+  moveAnchor(ll,x,y) { const p=this.project(...ll); this.map.panBy(new this.sdk.Point(p[0]-x,p[1]-y)); }
+  panPixels(dx,dy) { this.map.panBy(new this.sdk.Point(-dx,-dy)); }
+  zoomAt(x,y,factor) {
+    const ll=this.unproject(x,y); this.zoomRemainder=(this.zoomRemainder||0)+Math.log2(factor);
+    const delta=Math.round(this.zoomRemainder); this.zoomRemainder-=delta;
+    if (delta) this.map.zoomBy(delta,new this.sdk.LatLng(ll[1],ll[0]),false);
   }
   project(lon, lat) { const p = this.map.getProjection().fromCoordToOffset(new this.sdk.LatLng(lat, lon)); return [p.x, p.y]; }
   unproject(x, y) { const p = this.map.getProjection().fromOffsetToCoord(new this.sdk.Point(x, y)); return [p.lng(), p.lat()]; }
@@ -48,13 +52,13 @@ class NaverMapAdapter {
       icon:{content:element,size:new n.Size(20,20),anchor:new n.Point(10,10)}});
     return {marker,element};
   }
-  onViewportReady(fn) { this.listeners.push(this.sdk.Event.addListener(this.map, 'idle', fn)); }
+  onViewportReady(fn) { for (const name of ['bounds_changed','center_changed','zoom_changed','projection_changed','idle']) this.listeners.push(this.sdk.Event.addListener(this.map,name,()=>fn(name))); }
   onTilesLoaded(fn) { this.listeners.push(this.sdk.Event.addListener(this.map, 'tilesloaded', fn)); }
   destroy() { for (const l of this.listeners) this.sdk.Event.removeListener(l); this.listeners = []; this.container?.removeEventListener('error', this.imageError, true); this.map?.destroy(); this.map = null; }
 }
 
 const PROVIDER_MAP = { adapter: null, active: false, failed: false, started: false, mode: 'satellite',
-  signature: '', loaded: false, timer: null, alignment: null, checking: false, syncing: false, diagnostic: null };
+  signature: '', loaded: false, timer: null, alignment: null, checking: false, syncing: false, diagnostic: null, viewportDirty:true, sizeKey:'', events:[], reads:0, commands:0, lastBaseFrame:null };
 // P3 개발 중 저장된 normal/HYBRID 값은 새 위성 기본값으로 한 번 전환한다.
 try { const saved = localStorage.getItem('naksigwang-map-mode-v2'); if (['satellite','hybrid','normal'].includes(saved)) PROVIDER_MAP.mode = saved; localStorage.removeItem('naksigwang-map-mode'); } catch (_) { /* 저장 제한 시 위성 기본값 */ }
 
@@ -62,17 +66,37 @@ function providerNotice(text) { $('providerNotice').textContent = text; }
 function providerFallback() {
   PROVIDER_MAP.failed = true; PROVIDER_MAP.active = false; clearTimeout(PROVIDER_MAP.timer);
   $('providerMap').style.visibility = 'hidden'; dirty = true;
-  stage.classList.remove('provider-active');
+  stage.classList.remove('provider-active'); providerUpdateInput();
   providerNotice('온라인 지도를 불러오지 못해 기본 지형지도로 표시합니다.');
 }
 function providerTransform() { return !!PROVIDER_MAP.adapter && !PROVIDER_MAP.failed && (PROVIDER_MAP.active || PROVIDER_MAP.checking); }
 function providerReadView() {
-  const a = PROVIDER_MAP.adapter, c = a.getCenter(), p = a.project(...c), q = a.project(lonOf(mxOf(c[0]) + 100), c[1]);
-  const scale = Math.hypot(q[0] - p[0], q[1] - p[1]) / 100;
-  if (!(scale > 0) || !Number.isFinite(scale)) throw Error('지도 배율 변환 실패');
-  V.cx = mxOf(c[0]); V.cy = myOf(c[1]); V.s = scale;
-  PROVIDER_MAP.signature = [V.cx, V.cy, V.s, cw, ch].join(',');
-  dirty = true; dirtyHover = true; VIEW_T = performance.now();
+  const p=PROVIDER_MAP,a=p.adapter,c=a.unproject(cw/2,ch/2),scale=a.getGroundScale();
+  if (!(scale>0) || !Number.isFinite(scale)) throw Error('지도 배율 변환 실패');
+  // SDK의 현재 표시 projection 중심·100m 축척을 호환 상태에 복사한다. SDK에 다시 보내지 않는다.
+  V.cx=mxOf(c[0]); V.cy=myOf(c[1]); V.s=scale/kAt(c[1]); p.reads++;
+  p.compatibility={...V};
+  dirty=true;dirtyHover=true;VIEW_T=performance.now();
+}
+function providerViewportKey() {
+  const a=PROVIDER_MAP.adapter;
+  return JSON.stringify([a.getZoom(),a.getCenter(),a.getBounds(),a.unproject(0,0),a.unproject(cw/2,ch/2),a.unproject(cw,ch),cw,ch]);
+}
+function providerViewportChanged(name) {
+  const p=PROVIDER_MAP;if(p.failed)return;
+  p.viewportDirty=true;p.events.push({name,time:performance.now()});if(p.events.length>48)p.events.shift();
+  // 최종 idle도 재그리기를 예약한다. 이벤트에서 app V를 SDK로 역전송하지 않는다.
+  dirty=true;dirtyHover=true;
+}
+function providerUseNativePan() { return PROVIDER_MAP.active && !S.lock && S.mode==='pan'; }
+function providerUpdateInput() {
+  const native=providerUseNativePan();stage.classList.toggle('provider-native',native);
+  PROVIDER_MAP.adapter?.setInteraction?.(native);
+}
+function providerApplyView(view = {...V}) {
+  const p=PROVIDER_MAP;if(!p.adapter||p.failed)return;
+  try { p.commands++;p.adapter.syncFromAppViewport(view);p.viewportDirty=true;providerSync(); }
+  catch (_) {providerFallback();}
 }
 function providerAlignment(adapter) {
   // 9곳의 독립 SDK 화면 역변환을 확인하고, 고정 경위도는 별도 세계 좌표 경로와 비교한다.
@@ -108,31 +132,36 @@ function providerCheck() {
     clearTimeout(p.timer);
     p.checking = true; p.alignment = Math.max(providerAlignment(p.adapter),providerRectError()); p.checking = false; p.active = p.alignment <= 2;
     $('providerMap').style.visibility = p.active ? 'visible' : 'hidden'; dirty = true;
-    stage.classList.toggle('provider-active', p.active);
+    stage.classList.toggle('provider-active', p.active); providerUpdateInput();
     providerNotice(p.active ? ('NAVER ' + {satellite:'위성지도',hybrid:'위성+지명',normal:'일반지도'}[p.mode] + ' · 수심은 별도 공공자료와 추정값입니다.')
       : '온라인 지도와 분석 표시의 위치를 맞추지 못해 기본 지형지도로 표시합니다.');
   } catch (_) { p.checking = false; providerFallback(); }
 }
 function providerSync() {
-  const p = PROVIDER_MAP;
-  if (!p.adapter || p.failed || p.syncing) return;
-  const key = [V.cx, V.cy, V.s, cw, ch].join(',');
-  if (key === p.signature) return;
-  p.active = false; p.syncing = true; $('providerMap').style.visibility = 'hidden'; stage.classList.remove('provider-active'); dirty = true;
-  clearTimeout(p.timer); p.timer = setTimeout(providerFallback, 12000);
-  try { p.adapter.resize(); p.adapter.syncFromAppViewport(); providerReadView(); }
-  catch (_) { providerFallback(); }
-  finally { p.syncing = false; }
-  // 캐시된 타일은 tilesloaded가 다시 오지 않을 수 있다. 이미 준비된 지도는 즉시 재검사한다.
-  providerCheck();
+  const p=PROVIDER_MAP;if(!p.adapter||p.failed||p.syncing||!cw||!ch)return;
+  p.syncing=true;
+  try {
+    const sizeKey=[cw,ch].join(',');if(p.sizeKey!==sizeKey){p.sizeKey=sizeKey;p.adapter.resize();p.viewportDirty=true;}
+    // 매 frame의 읽기 전용 감시로 이벤트보다 늦은 projection 갱신도 놓치지 않는다.
+    const key=providerViewportKey();
+    const v=p.compatibility;
+    if(key!==p.signature||p.viewportDirty||!v||v.cx!==V.cx||v.cy!==V.cy||v.s!==V.s){p.signature=key;p.viewportDirty=false;providerReadView();}
+  } catch (_) {providerFallback();}
+  finally {p.syncing=false;}
+  if(dirty&&p.loaded)providerCheck();
+  providerUpdateInput();
 }
-function providerZoomAt(x, y, factor) {
-  try { PROVIDER_MAP.adapter.zoomAt(x,y,factor); providerReadView(); providerCheck(); }
-  catch (_) { providerFallback(); }
+function providerZoomAt(x,y,factor) {
+  try {PROVIDER_MAP.commands++;PROVIDER_MAP.adapter.zoomAt(x,y,factor);providerViewportChanged('app_zoom');providerSync();}
+  catch (_) {providerFallback();}
 }
-function providerPanAnchor(ll, x, y) {
-  try { PROVIDER_MAP.adapter.moveAnchor(ll,x,y); providerReadView(); providerCheck(); }
-  catch (_) { providerFallback(); }
+function providerPanAnchor(ll,x,y) {
+  try {PROVIDER_MAP.commands++;PROVIDER_MAP.adapter.moveAnchor(ll,x,y);providerViewportChanged('app_anchor');providerSync();}
+  catch (_) {providerFallback();}
+}
+function providerPanBy(dx,dy) {
+  try {PROVIDER_MAP.commands++;PROVIDER_MAP.adapter.panPixels(dx,dy);providerViewportChanged('app_pan');providerSync();}
+  catch (_) {providerFallback();}
 }
 function scheduleDisplayDepthArea() {
   if (!PROVIDER_MAP.active) { scheduleDepthArea(); return; }
@@ -176,11 +205,8 @@ async function providerStart() {
     p.adapter.onFailure = providerFallback;
     addEventListener('offline', providerFallback, { once: true });
     p.adapter.onTilesLoaded(() => { if (p.failed) return; p.loaded = true; clearTimeout(p.timer); providerCheck(); });
-    p.adapter.onViewportReady(() => {
-      if (p.failed || p.syncing) return;
-      if ([V.cx,V.cy,V.s,cw,ch].join(',') !== p.signature) { providerSync(); return; }
-      try { providerReadView(); providerCheck(); } catch (_) { providerFallback(); }
-    });
-    p.adapter.setMode(p.mode); providerSync();
+    p.adapter.onViewportReady(providerViewportChanged);
+    p.adapter.setMode(p.mode);providerApplyView({...V});providerSync();
+
   } catch (_) { providerFallback(); }
 }

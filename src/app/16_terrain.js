@@ -237,6 +237,7 @@ function renderBase() {
   bctx.restore();
   drawPortsAndSoundings(gpp);
   drawStations();
+  if(PROVIDER_MAP.active)PROVIDER_MAP.lastBaseFrame={time:performance.now(),viewport:PROVIDER_MAP.signature,view:{...V},gpp,stations:{...stationDrawStats}};
   // SDK 출처 영역 위에 축척과 미니맵을 둔다.
   const mapBottom = ch - (PROVIDER_MAP.active ? 28 : 0);
   const bm = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000].find(m => m * ppg >= 70) || 100000;

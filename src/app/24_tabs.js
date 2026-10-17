@@ -11,7 +11,7 @@ function placeMap(today) {
   else { STAGE_HOME[0].insertBefore(stage, STAGE_HOME[1]); SEC_HOME[0].insertBefore(secPanel, SEC_HOME[1]); S.lock = false; if (matchMedia('(pointer: coarse)').matches) setMode('pan'); }
   resize();
   if (today) { const p = POINTS[S.pt]; if (p) { fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); } }
-  else if (mapView) { V.cx = mapView.cx; V.cy = mapView.cy; V.s = mapView.s; clampView(); }
+  else if (mapView) { V.cx = mapView.cx; V.cy = mapView.cy; V.s = mapView.s; clampView(); providerApplyView({...V}); }
   dirty = true;
 }
 function showTab(k, keepHash, focusPt) {

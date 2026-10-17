@@ -31,9 +31,9 @@
 | `12_fish.js` | 대상어 정보와 물고기 그림 | 71 | `fishSVG` |
 | `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 119 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
 | `14_bite.js` | 포인트별 입질 조건점수·자료 신뢰도·이유, 실제 시계의 분 단위 갱신 | 107 | `lightF`, `targetF`, `biteTemperature`, `biteDataQuality`, `myF`, `biteEvalAt`, `biteAt`, `biteReasons`, `spark`, `renderBite` |
-| `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 가변 | `rawToS`, `rawToM`, `toS`, `toM`, `viewBounds`, `drawStations`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
-| `15b_map_provider.js` | NAVER SDK 표시 투영·정수 줌/입력 동기화, 내부 정합/DOM 검사·3가지 지도 모드·기본 지형 복구 | 가변 | `NaverMapAdapter`, `providerStart`, `providerSync`, `providerAlignment`, `providerReadView`, `providerZoomAt`, `providerPanAnchor`, `scheduleDisplayDepthArea`, `providerSetMode`, `providerFallback`, `providerRect`, `providerRectError` |
-| `15c_map_diagnostic.js` | localhost 전용 native Marker DOM 중심과 Canvas 실제 픽셀·DPR·원점·프레임 진단 | 가변 | `providerMarkerDiagnostic`, `providerCanvasProbePixel`, `providerProbeSample`, `providerDiagnosticRectDeltas`, `drawProviderDebugCrosshair`, `providerClearDiagnostic` |
+| `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 가변 | `rawToS`, `rawToM`, `toS`, `toM`, `viewBounds`, `drawStations`, `stationDetailAllowed`, `stationAt`, `tmToLL`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
+| `15b_map_provider.js` | NAVER SDK viewport 단방향 동기화·100m 축척·native 이동, 내부 정합/DOM 검사·3가지 지도 모드·기본 지형 복구 | 가변 | `NaverMapAdapter`, `providerStart`, `providerSync`, `providerAlignment`, `providerReadView`, `providerViewportKey`, `providerViewportChanged`, `providerApplyView`, `providerUseNativePan`, `providerUpdateInput`, `providerZoomAt`, `providerPanBy`, `providerPanAnchor`, `scheduleDisplayDepthArea`, `providerSetMode`, `providerFallback`, `providerRect`, `providerRectError` |
+| `15c_map_diagnostic.js` | localhost 전용 native Marker DOM 중심과 Canvas 실제 픽셀·DPR·원점·이동 후 8프레임 진단 | 가변 | `providerMarkerDiagnostic`, `providerCanvasProbePixel`, `providerProbeSample`, `providerDiagnosticRectDeltas`, `drawProviderDebugCrosshair`, `providerClearDiagnostic` |
 | `16_terrain.js` | GEBCO 배경·SDK 화면 수심 범위 요청, 비선형 해안 마스크 | 가변 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
 | `17_flow.js` | 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표 | 102 | `buildFlowField`, `realField`, `spawn`, `stepParticles`, `drawCrnt` |
 | `18_section.js` | KHOA 출처를 보존하는 A→B 단면, 기준면 경계의 특징분석 중단 | 가변 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
@@ -41,7 +41,7 @@
 | `19_overlay.js` | 평면도 위 표시(자료 좌표에서 투영한 단면선·단면 표식·핀) | 가변 | `drawUI` |
 | `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |
 | `20b_today.js` | 「오늘」 탭: 선택한 포인트의 오늘·지금 요약, 연속된 좋은 시간 구간 | 70 | `goodHourRanges`, `renderToday`, `drawToday` |
-| `21_input.js` | 화면·터치·검색 입력, 온라인 배경 버튼과 크기 동기화, 수심/출처 상세 | 가변 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
+| `21_input.js` | 화면·터치·검색 입력, 온라인 native 이동/Canvas 단면 전환과 크기 동기화, 수심/출처 상세 | 가변 | `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
 | `22_catchlog.js` | 내 조과 기록 | 45 | `localCatches`, `renderLog` |
 | `23_main.js` | 예시 단면, SDK 비동기 시작, 보이는 지도 화면 동기화와 매 프레임 갱신 | 가변 | `exampleSection`, `drawBiteChart`, `apiAutoKick`, `frame` |
 | `24_tabs.js` | 다섯 탭 전환과 지도 stage 이동, 창 높이 변경 시 지도 크기 갱신 | 가변 | `showTab`, `placeMap` |
