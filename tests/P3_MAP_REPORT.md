@@ -1,6 +1,16 @@
 # P3 NAVER 지도 표시 투영·이동 동기화 수정 보고서
 
-2026-10-17 갱신. 기존 `feat/p3-map-foundation` / draft PR #6에서 계속 작업했다. 새 브랜치·PR과 merge는 없다. Codex는 실 credential을 사용하지 않았다. 사용자가 현재 서해안 viewport의 같은 좌표에서 **valid=true, errorPx≈0.0377 CSS px, domMismatchPx=0, satellite**를 보고했다. 이 성공 결과와 별개로 **실 NAVER 속초/포항 명시적 이동은 재검증 전까지 미확인**이다.
+2026-10-17 갱신. 기존 `feat/p3-map-foundation` / draft PR #6에서 계속 작업했다. 새 브랜치·PR과 merge는 없다. Codex는 실 credential을 사용하지 않았다. 사용자가 현재 서해안 viewport의 같은 좌표에서 **valid=true, errorPx≈0.0377 CSS px, domMismatchPx=0, satellite**를 보고했다. 추가로 이전 버전 속초 fit 약 0.04165px 성공이 보고됐다. **새 LatLngBounds 코드의 실 NAVER 포항 이동은 재검증 전까지 미확인**이다.
+
+## LatLngBounds 명시적 입력 수정
+
+최신 사용자 실측에서 이전 버전의 속초 fit은 settled, valid=true, 약 0.04165 CSS px로 성공했다. 직후 포항 fit은 60프레임 이상 center/renderCenter/zoom=11/viewportScale/bounds/key가 그대로이고 inside=false, centerErrorPx와 reportedErrorPx 약 4105px, occupancy 약 0.554로 유지됐다. 이 관측은 SDK viewport 미변경을 보여 주며 settle 조건을 완화할 근거가 아니다. 새 코드의 실 NAVER 포항 성공은 아직 미확인이다.
+
+기존 `[new LatLng(sw), new LatLng(ne)]` 인수 대신 `new LatLngBounds(sw,ne)`를 전달한다. providerRequestedBounds가 `{west,south,east,north}` 순수 값을 계산하고 NAVER 어댑터에서만 SDK 객체로 변환한다. 기존 pending/settle/commandId·축척·표시 투영은 유지했다. 추가 setCenter/setZoom 대안, 고정 지연, reload, 지도 재생성은 넣지 않았다. [공식 LatLngBounds 생성자](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.LatLngBounds.html)는 SW/NE LatLng를 받는다. [공식 fitBounds](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Map.html)는 Bounds 외에 좌표 배열도 기재하므로 기존 배열 형태가 모든 SDK에서 미지원이라고 단정하지 않는다.
+
+확인한 테스트 사각지대는 기존 FakeMapAdapter가 syncFromAppViewport를 재구현해 실제 NAVER 메서드와 fitBounds 인수 검사를 건너뛴 점이다. 이제 즉시/지연 mock 모두 실제 NaverMapAdapter.syncFromAppViewport를 호출하고, SDK 경계에서 LatLngBounds 객체·유효한 SW/NE를 엄격히 검사한 뒤 동일 geographic bounds로 표시 상태를 만든다. 객체 배열 거절 검사는 이번에 선택한 명시적 계약의 회귀이며 실제 NAVER의 두 번째 명령 무시 원인을 재현했다는 주장은 아니다. 실제 SDK causal root cause는 사용자 재검증 결과로 확정한다.
+
+홍원→속초→포항→주문진→홍원→포항→속초의 연속 여섯 이동을 각 DPR에서 검사한다. 매 명령 center/key/bounds 변경, target inside, 중심 오차 허용 범위, settled, 독립 native DOM/Canvas ≤2px를 확인한다. requestedBounds와 실제 mock 수신 bounds도 비교한다. command 결과에 fitBoundsType="LatLngBounds", before/after의 center/zoom/bounds/key, sdkViewportUnchanged를 추가했다. no-op 실패 fixture는 모든 SDK viewport 값을 그대로 유지하고 trace 전체와 실패 결과가 sdkViewportUnchanged=true인지 검사한다.
 
 ## 명시적 viewport 이동 transaction 수정
 
@@ -109,6 +119,25 @@ Canvas 이벤트 핸들러의 A→B·hover·pan·wheel·두 포인터 pinch, 작
 
 ## 사용자 localhost 실제 검증
 
+최신 LatLngBounds 변경은 홍원에서 시작해 다음 순서를 연속 실행한다. 각 행의 status=settled, unchanged=false, inside=true, valid=true, errorPx≤2를 확인하고 실제 지도 이동도 함께 확인한다. 실패 행의 command.before/after/requestedBounds/trace를 기록한다. 키와 SDK 객체는 포함하지 않는다.
+
+```js
+await naksigwangMapDiagnostic.fit(10000,36.15983,126.50376)
+var checks = []
+for (var [name,lat,lon] of [
+  ['홍원→속초',38.20854,128.5947], ['속초→포항',36.05,129.38],
+  ['포항→주문진',37.89192,128.8312883028771], ['주문진→홍원',36.15983,126.50376],
+  ['홍원→포항',36.05,129.38], ['포항→속초',38.20854,128.5947]
+]) {
+  var r = await naksigwangMapDiagnostic.fit(10000,lat,lon)
+  checks.push({name,status:r.command.status,type:r.command.fitBoundsType,
+    unchanged:r.command.sdkViewportUnchanged,inside:r.command.trace.at(-1)?.inside,
+    valid:r.valid,errorPx:r.errorPx,reason:r.reason})
+  if (!r.valid) console.log(name,r.command)
+}
+console.table(checks)
+```
+
 이번 수정의 우선 재검증은 아래 두 명령이다. 실제 화면이 해당 항만으로 바뀌는지 확인하고 command.status/target/center/renderCenter, trace의 reached/zoomPending/occupancy와 최종 errorPx를 기록한다. 실패하면 reason과 command.trace를 함께 전달한다. 이 객체에 credential은 없다. 검색창의 같은 좌표와 홍원항 이름, 다섯 범위 버튼도 반복한다.
 
 ```js
@@ -173,7 +202,7 @@ await naksigwangMapDiagnostic.zoom(0.5)
 
 ## 남은 한계
 
-사용자는 현재 서해안 viewport의 동일 좌표 native-vs-Canvas 약 0.0377px 정합을 확인했다. **실 NAVER 속초/포항 fit과 연속 이동은 재검증 전까지 미확인이다.** Codex는 사용자 credential을 사용하지 않았다. mock 수치로 실 SDK 이동 성공을 주장하지 않는다. native-vs-Canvas 정합은 두 렌더러가 같은 경위도를 찍는지 확인하며 영상/측량 또는 원자료의 위치 정확도를 보증하지 않는다. 화면 밖·출처 영역은 측정 불가로 반환한다. 합성 touch와 mock DOM은 실제 기기·SDK 프레임 검증을 대신하지 않는다. 공개 방문자의 NAVER 설정 주입 단계는 별도이며 설정이 없으면 기본 지형으로 동작한다.
+사용자는 현재 서해안 viewport의 동일 좌표 native-vs-Canvas 약 0.0377px 정합을 확인했다. 이전 버전 속초 fit 약 0.04165px 성공이 추가로 보고됐다. **새 LatLngBounds 코드의 포항 fit과 연속 이동은 재검증 전까지 미확인이다.** Codex는 사용자 credential을 사용하지 않았다. mock 수치로 실 SDK 이동 성공을 주장하지 않는다. native-vs-Canvas 정합은 두 렌더러가 같은 경위도를 찍는지 확인하며 영상/측량 또는 원자료의 위치 정확도를 보증하지 않는다. 화면 밖·출처 영역은 측정 불가로 반환한다. 합성 touch와 mock DOM은 실제 기기·SDK 프레임 검증을 대신하지 않는다. 공개 방문자의 NAVER 설정 주입 단계는 별도이며 설정이 없으면 기본 지형으로 동작한다.
 
 공식 근거: [MapSystemProjection 화면/세계 좌표 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.MapSystemProjection.html), [지도 유형](https://navermaps.github.io/maps.js.ncp/docs/tutorial-MapTypes.html), [Marker HTML 아이콘·anchor](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Marker.html), [지도 투영](https://navermaps.github.io/maps.js.ncp/docs/tutorial-Projection.html), [Map 줌·이벤트 API](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Map.html), [SDK 설정](https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html), [허용 URL](https://guide.ncloud-docs.com/docs/en/maps-troubleshoot).
 
@@ -204,3 +233,18 @@ DPR [1, 1.25, 1.5, 2]에서 명시적 이동/검색/범위 버튼 88개 측정�
 | 2 | 0.000000 | 0.000000 | requested viewport not reached |
 
 기존 native DOM 검사 126건, 연속 이동 264단계와 20개 화면/DPR 검사도 통과했다. 이 결과는 mock이며 사용자 보고의 현재 viewport 0.0377px와 구분한다.
+
+## LatLngBounds 최종 mock 결과
+
+네 DPR에서 연속 6회 ×4 = 24회 원거리 이동이 모두 center/key/bounds 변경·목표 포함·settled·native 정합 기준을 통과했다. 전체 명시적 이동/검색 104건 최대 오차는 0.221596 CSS px다. 기존 native DOM 126건 최대 0.247959px, 연속 이동 264단계 최종 최대 0.304936px, DOM 차이 0px였다.
+
+| 이동 | 네 DPR 최대 errorPx |
+|---|---:|
+| 홍원→속초 | 0.046187 |
+| 속초→포항 | 0.221596 |
+| 포항→주문진 | 0.221596 |
+| 주문진→홍원 | 0.221596 |
+| 홍원→포항 | 0.221596 |
+| 포항→속초 | 0.046187 |
+
+객체 배열 거절과 SDK 전체 미변경 실패 검출은 네 DPR에서 모두 통과했다. 이는 선택한 입력 계약과 mock 결과이며 새 코드의 실 NAVER 포항 성공은 사용자 재검증이 필요하다.

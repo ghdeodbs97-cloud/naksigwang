@@ -2183,6 +2183,10 @@ const BANDS = [[10, '#64e6d4'], [30, '#43ccc3'], [50, '#2fb0b4'], [100, '#2194a5
 const FAR = '#06141f';
 // 15b_map_provider.js — 공식 온라인 지도 어댑터와 좌표 정합 확인, 실패 시 기본 지형 유지
 // 수심 계산·자료 요청·단면 상태는 이 파일에서 변경하지 않는다.
+function providerRequestedBounds(view) {
+  const hx=cw/(2*view.s),hy=ch/(2*view.s);
+  return {west:lonOf(view.cx-hx),south:latOf(view.cy-hy),east:lonOf(view.cx+hx),north:latOf(view.cy+hy)};
+}
 class NaverMapAdapter {
   constructor(maps) { this.sdk = maps; this.map = null; this.listeners = []; }
   init(container) {
@@ -2198,8 +2202,9 @@ class NaverMapAdapter {
   setMode(mode) { this.map.setMapTypeId(this.sdk.MapTypeId[{satellite:'SATELLITE',hybrid:'HYBRID',normal:'NORMAL'}[mode] || 'SATELLITE']); }
   syncFromAppViewport(view = V) {
     // 이동 명령만 SDK에 보낸다. 미반영 projection으로 정수 zoom을 역산하지 않는다.
-    const n=this.sdk, hx=cw/(2*view.s), hy=ch/(2*view.s);
-    this.map.fitBounds([new n.LatLng(latOf(view.cy-hy),lonOf(view.cx-hx)),new n.LatLng(latOf(view.cy+hy),lonOf(view.cx+hx))],{top:0,right:0,bottom:0,left:0,maxZoom:21});
+    const n=this.sdk,b=providerRequestedBounds(view);
+    const bounds=new n.LatLngBounds(new n.LatLng(b.south,b.west),new n.LatLng(b.north,b.east));
+    this.map.fitBounds(bounds,{top:0,right:0,bottom:0,left:0,maxZoom:21});
     this.zoomRemainder=0;
   }
   getGroundScale() {
@@ -2286,7 +2291,7 @@ function providerUpdateInput() {
 function providerCancelViewCommand(reason='superseded') {
   const p=PROVIDER_MAP,c=p.pendingCommand;if(!c)return;
   clearTimeout(c.timer);cancelAnimationFrame(c.raf);p.pendingCommand=null;p.commandPending=false;
-  c.resolve({ok:false,id:c.id,status:'cancelled',reason,target:c.target,requestedView:c.view,trace:c.trace});
+  c.resolve({ok:false,id:c.id,status:'cancelled',reason,target:c.target,requestedView:c.view,requestedBounds:c.requestedBounds,fitBoundsType:'LatLngBounds',before:c.before,trace:c.trace});
 }
 function providerCommandObservation(c) {
   const a=PROVIDER_MAP.adapter,center=a.getCenter(),renderCenter=a.unproject(cw/2,ch/2),point=a.project(...c.target),reported=a.project(...center);
@@ -2297,7 +2302,8 @@ function providerCommandObservation(c) {
   // 중심·zoom 보고값만 먼저 바뀌어도 실제 표시 projection이 도착하기 전에는 확정하지 않는다.
   const centerErrorPx=Math.hypot(point[0]-cw/2,point[1]-ch/2),reportedErrorPx=Math.hypot(reported[0]-cw/2,reported[1]-ch/2);
   const viewportScale=a.getViewportScale(),zoomPending=a.getZoom()!==c.beforeZoom&&Math.abs(Math.log2(viewportScale/c.beforeScale))<.001;
-  return {time:performance.now(),center,renderCenter,zoom:a.getZoom(),viewportScale,zoomPending,bounds,key:providerViewportKey(),inside,centerErrorPx,reportedErrorPx,occupancy,
+  const key=providerViewportKey();
+  return {time:performance.now(),center,renderCenter,zoom:a.getZoom(),viewportScale,zoomPending,bounds,key,inside,centerErrorPx,reportedErrorPx,occupancy,sdkViewportUnchanged:key===c.before?.key,
     reached:!zoomPending&&inside&&centerErrorPx<=Math.max(2,Math.min(cw,ch)*.1)&&reportedErrorPx<=2&&occupancy>=.35&&occupancy<=1.6};
 }
 function providerFinishViewCommand(c,ok,reason=null) {
@@ -2305,14 +2311,15 @@ function providerFinishViewCommand(c,ok,reason=null) {
   clearTimeout(c.timer);cancelAnimationFrame(c.raf);p.commandPending=false;
   try {
     providerReadView();p.lastSettledView={...V};p.signature=providerViewportKey();p.viewportDirty=false;
-    const result={ok,id:c.id,status:ok?'settled':'failed',reason,target:c.target,requestedView:c.view,settledView:{...V},center:p.adapter.getCenter(),renderCenter:p.adapter.unproject(cw/2,ch/2),bounds:p.adapter.getBounds(),trace:c.trace};
+    const after={center:p.adapter.getCenter(),zoom:p.adapter.getZoom(),bounds:p.adapter.getBounds(),key:providerViewportKey()};
+    const result={ok,id:c.id,status:ok?'settled':'failed',reason,target:c.target,requestedView:c.view,requestedBounds:c.requestedBounds,fitBoundsType:'LatLngBounds',before:c.before,after,sdkViewportUnchanged:after.key===c.before.key,settledView:{...V},center:after.center,renderCenter:p.adapter.unproject(cw/2,ch/2),bounds:after.bounds,trace:c.trace};
     p.pendingCommand=null;p.lastCommand=result;dirty=true;dirtyHover=true;c.resolve(result);providerCheck();
   } catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}
 }
 function providerApplyView(view = {...V}) {
   const p=PROVIDER_MAP;if(!p.adapter||p.failed)return Promise.resolve({ok:true,status:'fallback',settledView:{...V}});
   providerCancelViewCommand();
-  const c={id:++p.commandId,view:{...view},target:[lonOf(view.cx),latOf(view.cy)],trace:[],frame:0,stable:0,lastKey:null};
+  const c={id:++p.commandId,view:{...view},target:[lonOf(view.cx),latOf(view.cy)],requestedBounds:providerRequestedBounds(view),trace:[],frame:0,stable:0,lastKey:null};
   c.promise=new Promise(resolve=>{c.resolve=resolve;});p.pendingCommand=c;p.commandPending=true;p.requestedView={...view};
   const step=()=>{
     if(p.pendingCommand!==c||c.id!==p.commandId)return;
@@ -2324,7 +2331,7 @@ function providerApplyView(view = {...V}) {
     } catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}
   };
   c.timer=setTimeout(()=>{try{providerFinishViewCommand(c,false,'requested viewport not reached');}catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}},p.commandTimeoutMs);
-  try {c.beforeZoom=p.adapter.getZoom();c.beforeScale=p.adapter.getViewportScale();p.commands++;p.adapter.syncFromAppViewport(c.view);p.viewportDirty=true;c.raf=requestAnimationFrame(step);}
+  try {c.before={center:p.adapter.getCenter(),zoom:p.adapter.getZoom(),bounds:p.adapter.getBounds(),key:providerViewportKey()};c.beforeZoom=c.before.zoom;c.beforeScale=p.adapter.getViewportScale();p.commands++;p.adapter.syncFromAppViewport(c.view);p.viewportDirty=true;c.raf=requestAnimationFrame(step);}
   catch(_){providerCancelViewCommand('viewport command failed');providerFallback();}
   return c.promise;
 }
