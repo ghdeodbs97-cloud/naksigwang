@@ -43,10 +43,10 @@ function providerProbeSample(d, frame) {
   const canvasPixel = providerCanvasProbePixel(d);
   const painted = d.lastDraw?.pixel;
   const visible = !!painted && painted[0] >= 11 && painted[0] <= cw - 11 && painted[1] >= 11 && painted[1] <= ch - 28 - 11;
-  const valid = PROVIDER_MAP.active && !!nativeMarkerPixel && !!canvasPixel && visible;
+  const valid = PROVIDER_MAP.active && !PROVIDER_MAP.providerMoving && !PROVIDER_MAP.revealAfterBase && !stage.classList.contains('provider-moving') && !!nativeMarkerPixel && !!canvasPixel && visible;
   const dx = valid ? canvasPixel[0] - nativeMarkerPixel[0] : null, dy = valid ? canvasPixel[1] - nativeMarkerPixel[1] : null;
   return {frame, time:performance.now(), nativeMarkerPixel, canvasPixel, dx, dy, errorPx:valid ? Math.hypot(dx, dy) : null,
-    valid, visible, canvasDraw:d.lastDraw ? structuredClone(d.lastDraw) : null,
+    valid, visible, providerMoving:!!PROVIDER_MAP.providerMoving,heavyHidden:stage.classList.contains('provider-moving'),canvasDraw:d.lastDraw ? structuredClone(d.lastDraw) : null,
     providerCenter:PROVIDER_MAP.adapter.getCenter(), providerZoom:PROVIDER_MAP.adapter.getZoom(), providerBounds:PROVIDER_MAP.adapter.getBounds(), pxPerGround:pxPerGround(), gpp:1/pxPerGround(), providerRect:providerRect($('providerMap')), canvasRect, baseFrame:structuredClone(PROVIDER_MAP.lastBaseFrame), stationDrawStats:{...stationDrawStats}, events:structuredClone(PROVIDER_MAP.events), view:{...V}};
 }
 function providerDiagnosticRectDeltas() {

@@ -11,6 +11,7 @@ function resize() {
   sw = $('secWrap').clientWidth; shh = sw < 560 ? 240 : 300;
   sec.width = Math.round(sw * r); sec.height = Math.round(shh * r); sec.style.height = shh + 'px';
   if (old && !PROVIDER_MAP.active) { V.cx = old[0]; V.cy = old[1]; V.s = cw / (oldGW * kAt(latOf(V.cy))); clampView(); }
+  RENDER.uiKey='';RENDER.sectionKey='';RENDER.chartKey='';
   providerSync(); dirty = true;
 }
 
@@ -58,6 +59,8 @@ function endPtr(e) {
 ui.addEventListener('pointerup', endPtr); ui.addEventListener('pointercancel', endPtr);
 ui.addEventListener('pointerleave', () => { hoverAt = null; setText('cursorRead', '커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다'); });
 ui.addEventListener('wheel', e => { if (providerUseNativePan() || S.lock) return; e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
+// 단면 모드에서 Canvas를 숨긴 짧은 이동 중에도 연속 wheel 입력을 받는다.
+stage.addEventListener('wheel',e=>{if(e.target===ui||!providerTransform()||providerUseNativePan()||S.lock)return;e.preventDefault();const [x,y]=local(e);zoomAt(x,y,Math.exp(-e.deltaY*.0016));},{passive:false});
 // 이동 모드에서는 SDK가 입력을 소유한다. 캡처 관찰은 hover와 짧은 탭 선택만 한다.
 let nativeTap=null;const nativePointers=new Set();
 stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;providerCancelViewCommand('interrupted');nativePointers.add(e.pointerId);nativeTap=nativePointers.size===1?local(e):null;},true);

@@ -57,6 +57,7 @@ body{font-family:var(--font-ui);font-size:14px;line-height:1.55}
 .stage canvas{position:absolute;inset:0;display:block}
 #base,#flow{pointer-events:none}
 .provider-native #ui{pointer-events:none}
+.provider-moving > canvas{visibility:hidden} /* 이전 viewport 잔상을 보이지 않는다 */
 #providerMap{position:absolute;inset:0;visibility:hidden}
 .provider-active canvas{clip-path:inset(0 0 28px 0)} /* SDK 하단 출처·로고를 가리지 않는다 */
 #providerNotice{font-size:12px;color:var(--muted);margin:6px 0}
@@ -2119,7 +2120,7 @@ function drawStations() {
     bctx.fillStyle = st.kind === 'rock' ? (sel ? '#f0a35e' : '#f6d2b0') : sel ? '#4fe3d3' : '#c9f6f0'; bctx.fillText(st.name, tx, y);
   }
 }
-function stationAt(x, y) { let best = null, bd = 14; for (const [sx, sy, i] of stHits) { const d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = i; } } return best; }
+function stationAt(x, y) { if(PROVIDER_MAP.providerMoving||PROVIDER_MAP.commandPending)return null;let best = null, bd = 14; for (const [sx, sy, i] of stHits) { const d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = i; } } return best; }
 
 /* ── 평면직각좌표(TM) → 경위도 (EPSG:5179, 5186 지원) ─── */
 function tmToLL(x, y) {
@@ -2154,7 +2155,7 @@ function viewBounds(margin = 0) {
   pts.push([mxOf(b[0][0]), myOf(b[0][1])], [mxOf(b[1][0]), myOf(b[1][1])]);
   return [Math.min(...pts.map(p => p[0])), Math.min(...pts.map(p => p[1])), Math.max(...pts.map(p => p[0])), Math.max(...pts.map(p => p[1]))];
 }
-const pxPerGround = () => providerTransform() ? PROVIDER_MAP.adapter.getGroundScale() : V.s * kAt(latOf(V.cy));
+const pxPerGround = () => providerTransform() ? (PROVIDER_MAP.groundScale || PROVIDER_MAP.adapter.getGroundScale()) : V.s * kAt(latOf(V.cy));
 // 지도 범위 = 지형 자료(GEBCO) 범위. 이보다 넓게 축소하거나 밖으로 밀면 자료 없는 검은 곳이 보이므로 막는다
 const KB = { x1: mxOf(124.4), x2: mxOf(131.95), y1: myOf(32.9), y2: myOf(38.7) };
 let VIEW_T = 0;      // 마지막으로 지도를 옮기거나 확대·축소한 시각 (조류 입자를 잠깐 숨기는 데 씀)
@@ -2244,14 +2245,14 @@ class NaverMapAdapter {
       icon:{content:element,size:new n.Size(20,20),anchor:new n.Point(10,10)}});
     return {marker,element};
   }
-  onViewportReady(fn) { for (const name of ['bounds_changed','center_changed','zoom_changed','projection_changed','idle']) this.listeners.push(this.sdk.Event.addListener(this.map,name,()=>fn(name))); }
+  onViewportReady(fn) { for (const name of ['bounds_changed','center_changed','zoom_changed','projection_changed','idle','dragstart','dragend','pinchstart','pinchend','zoomstart','zoomend']) this.listeners.push(this.sdk.Event.addListener(this.map,name,()=>fn(name))); }
   onTilesLoaded(fn) { this.listeners.push(this.sdk.Event.addListener(this.map, 'tilesloaded', fn)); }
   destroy() { for (const l of this.listeners) this.sdk.Event.removeListener(l); this.listeners = []; this.container?.removeEventListener('error', this.imageError, true); this.map?.destroy(); this.map = null; }
 }
 
 const PROVIDER_MAP = { adapter: null, active: false, failed: false, started: false, mode: 'satellite',
   signature: '', loaded: false, timer: null, alignment: null, checking: false, syncing: false, diagnostic: null, viewportDirty:true, sizeKey:'', events:[], reads:0, commands:0, lastBaseFrame:null,
-  commandPending:false,commandId:0,pendingCommand:null,requestedView:null,lastSettledView:null,lastCommand:null,commandTimeoutMs:8000 };
+  commandPending:false,commandId:0,pendingCommand:null,requestedView:null,lastSettledView:null,lastCommand:null,commandTimeoutMs:8000,providerMoving:false,gesture:false,waitingIdle:false,syncRAF:0,revealAfterBase:false,idleAt:0,groundScale:0,stableZoom:null,stableScale:0 };
 // P3 개발 중 저장된 normal/HYBRID 값은 새 위성 기본값으로 한 번 전환한다.
 try { const saved = localStorage.getItem('naksigwang-map-mode-v2'); if (['satellite','hybrid','normal'].includes(saved)) PROVIDER_MAP.mode = saved; localStorage.removeItem('naksigwang-map-mode'); } catch (_) { /* 저장 제한 시 위성 기본값 */ }
 
@@ -2260,7 +2261,8 @@ function providerFallback() {
   providerCancelViewCommand('provider unavailable');
   PROVIDER_MAP.failed = true; PROVIDER_MAP.active = false; clearTimeout(PROVIDER_MAP.timer);
   $('providerMap').style.visibility = 'hidden'; dirty = true;
-  stage.classList.remove('provider-active'); providerUpdateInput();
+  cancelAnimationFrame(PROVIDER_MAP.syncRAF);PROVIDER_MAP.syncRAF=0;PROVIDER_MAP.providerMoving=false;PROVIDER_MAP.gesture=false;PROVIDER_MAP.waitingIdle=false;PROVIDER_MAP.revealAfterBase=false;
+  stage.classList.remove('provider-active','provider-moving'); providerUpdateInput();
   providerNotice('온라인 지도를 불러오지 못해 기본 지형지도로 표시합니다.');
 }
 function providerTransform() { return !!PROVIDER_MAP.adapter && !PROVIDER_MAP.failed && (PROVIDER_MAP.active || PROVIDER_MAP.checking); }
@@ -2270,18 +2272,52 @@ function providerReadView() {
   if (!(scale>0) || !Number.isFinite(scale)) throw Error('지도 배율 변환 실패');
   // SDK의 현재 표시 projection 중심·100m 축척을 호환 상태에 복사한다. SDK에 다시 보내지 않는다.
   V.cx=mxOf(c[0]); V.cy=myOf(c[1]); V.s=scale/kAt(c[1]); p.reads++;
-  p.compatibility={...V};
+  p.compatibility={...V};p.groundScale=scale;p.stableZoom=a.getZoom();p.stableScale=a.getViewportScale();
   dirty=true;dirtyHover=true;VIEW_T=performance.now();
 }
 function providerViewportKey() {
   const a=PROVIDER_MAP.adapter;
   return JSON.stringify([a.getZoom(),a.getCenter(),a.getBounds(),a.unproject(0,0),a.unproject(cw/2,ch/2),a.unproject(cw,ch),cw,ch]);
 }
-function providerViewportChanged(name) {
+// 이동 중에는 이전 Canvas를 숨기고 SDK의 마지막 표시 좌표가 안정된 뒤 한 번 갱신한다.
+function providerBeginMove(){
+  const p=PROVIDER_MAP;p.providerMoving=true;p.revealAfterBase=true;
+  if(p.active)stage.classList.add('provider-moving');
+  if(RENDER.depthQueued){RENDER.depthQueued=false;RENDER.depthKey='';p.depthDeferred=true;}clearTimeout(OFFICIAL_DEPTH.timer);if(!flowHidden){fctx.setTransform(1,0,0,1,0,0);fctx.clearRect(0,0,flow.width,flow.height);flowHidden=true;}flowStale=true;
+}
+function providerRevealOverlay(){
+  const p=PROVIDER_MAP;if(p.providerMoving||p.commandPending)return;
+  if(p.revealAfterBase){p.revealAfterBase=false;if(p.idleAt&&PERF.enabled){PERF.idleRecoveryMs.push(performance.now()-p.idleAt);if(PERF.idleRecoveryMs.length>100)PERF.idleRecoveryMs.shift();}RENDER.uiKey='';}
+  stage.classList.remove('provider-moving');
+}
+function providerQueueSettle(){
+  const p=PROVIDER_MAP;if(p.syncRAF||p.commandPending||p.gesture||p.waitingIdle||p.failed)return;
+  let previous='',stable=0,frames=0;
+  const probe=()=>{
+    p.syncRAF=0;if(p.failed||p.commandPending||p.gesture||p.waitingIdle)return;
+    try{
+      const a=p.adapter,key=providerViewportKey(),reported=a.project(...a.getCenter()),scale=a.getViewportScale();
+      const ready=Math.hypot(reported[0]-cw/2,reported[1]-ch/2)<=2&&!(p.stableZoom!==null&&a.getZoom()!==p.stableZoom&&Math.abs(Math.log2(scale/p.stableScale))<.001);
+      stable=ready&&key===previous?stable+1:ready?1:0;previous=key;
+      if(stable>=2){
+        const changed=key!==p.signature; p.providerMoving=false;
+        if(changed||!p.active){providerSync();providerCheck();dirty=true;dirtyHover=true;}
+        else {p.viewportDirty=false;p.revealAfterBase=false;stage.classList.remove('provider-moving');if(p.depthDeferred)scheduleDisplayDepthArea();}
+        return;
+      }
+      // 이벤트 뒤 상한이 있는 감시만 실행한다. 정지 상태에서는 SDK를 읽지 않는다.
+      if(++frames<16)p.syncRAF=requestAnimationFrame(probe);
+    }catch(_){providerFallback();}
+  };
+  p.syncRAF=requestAnimationFrame(probe);
+}
+function providerViewportChanged(name){
   const p=PROVIDER_MAP;if(p.failed)return;
   p.viewportDirty=true;p.events.push({name,time:performance.now()});if(p.events.length>48)p.events.shift();
-  // 최종 idle도 재그리기를 예약한다. 이벤트에서 app V를 SDK로 역전송하지 않는다.
-  dirty=true;dirtyHover=true;
+  if(['dragstart','pinchstart','zoomstart'].includes(name)){p.gesture=true;p.waitingIdle=true;providerBeginMove();return;}
+  if(['dragend','pinchend','zoomend'].includes(name)){p.gesture=false;p.waitingIdle=name!=='zoomend';}
+  if(name==='idle'){p.idleAt=performance.now();p.waitingIdle=false;}
+  providerBeginMove();providerQueueSettle();
 }
 function providerUseNativePan() { return PROVIDER_MAP.active && !S.lock && S.mode==='pan'; }
 function providerUpdateInput() {
@@ -2292,6 +2328,7 @@ function providerCancelViewCommand(reason='superseded') {
   const p=PROVIDER_MAP,c=p.pendingCommand;if(!c)return;
   clearTimeout(c.timer);cancelAnimationFrame(c.raf);p.pendingCommand=null;p.commandPending=false;
   c.resolve({ok:false,id:c.id,status:'cancelled',reason,target:c.target,requestedView:c.view,requestedBounds:c.requestedBounds,fitBoundsType:'LatLngBounds',before:c.before,trace:c.trace});
+  providerQueueSettle();
 }
 function providerCommandObservation(c) {
   const a=PROVIDER_MAP.adapter,center=a.getCenter(),renderCenter=a.unproject(cw/2,ch/2),point=a.project(...c.target),reported=a.project(...center);
@@ -2313,12 +2350,12 @@ function providerFinishViewCommand(c,ok,reason=null) {
     providerReadView();p.lastSettledView={...V};p.signature=providerViewportKey();p.viewportDirty=false;
     const after={center:p.adapter.getCenter(),zoom:p.adapter.getZoom(),bounds:p.adapter.getBounds(),key:providerViewportKey()};
     const result={ok,id:c.id,status:ok?'settled':'failed',reason,target:c.target,requestedView:c.view,requestedBounds:c.requestedBounds,fitBoundsType:'LatLngBounds',before:c.before,after,sdkViewportUnchanged:after.key===c.before.key,settledView:{...V},center:after.center,renderCenter:p.adapter.unproject(cw/2,ch/2),bounds:after.bounds,trace:c.trace};
-    p.pendingCommand=null;p.lastCommand=result;dirty=true;dirtyHover=true;c.resolve(result);providerCheck();
+    p.pendingCommand=null;p.lastCommand=result;p.providerMoving=false;p.revealAfterBase=true;p.idleAt=performance.now();dirty=true;dirtyHover=true;c.resolve(result);providerCheck();
   } catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}
 }
 function providerApplyView(view = {...V}) {
   const p=PROVIDER_MAP;if(!p.adapter||p.failed)return Promise.resolve({ok:true,status:'fallback',settledView:{...V}});
-  providerCancelViewCommand();
+  providerCancelViewCommand();p.waitingIdle=false;cancelAnimationFrame(p.syncRAF);p.syncRAF=0;providerBeginMove();
   const c={id:++p.commandId,view:{...view},target:[lonOf(view.cx),latOf(view.cy)],requestedBounds:providerRequestedBounds(view),trace:[],frame:0,stable:0,lastKey:null};
   c.promise=new Promise(resolve=>{c.resolve=resolve;});p.pendingCommand=c;p.commandPending=true;p.requestedView={...view};
   const step=()=>{
@@ -2331,7 +2368,7 @@ function providerApplyView(view = {...V}) {
     } catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}
   };
   c.timer=setTimeout(()=>{try{providerFinishViewCommand(c,false,'requested viewport not reached');}catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}},p.commandTimeoutMs);
-  try {c.before={center:p.adapter.getCenter(),zoom:p.adapter.getZoom(),bounds:p.adapter.getBounds(),key:providerViewportKey()};c.beforeZoom=c.before.zoom;c.beforeScale=p.adapter.getViewportScale();p.commands++;p.adapter.syncFromAppViewport(c.view);p.viewportDirty=true;c.raf=requestAnimationFrame(step);}
+  try {c.before={center:p.adapter.getCenter(),zoom:p.adapter.getZoom(),bounds:p.adapter.getBounds(),key:providerViewportKey()};c.beforeZoom=p.stableZoom??c.before.zoom;c.beforeScale=p.stableScale||p.adapter.getViewportScale();p.commands++;p.adapter.syncFromAppViewport(c.view);p.viewportDirty=true;c.raf=requestAnimationFrame(step);}
   catch(_){providerCancelViewCommand('viewport command failed');providerFallback();}
   return c.promise;
 }
@@ -2376,17 +2413,17 @@ function providerCheck() {
 }
 function providerSync() {
   const p=PROVIDER_MAP;if(!p.adapter||p.failed||p.syncing||!cw||!ch)return;
-  p.syncing=true;
+  p.syncing=true;if(p.loaded)clearTimeout(p.timer);
   try {
     const sizeKey=[cw,ch].join(',');if(p.sizeKey!==sizeKey){p.sizeKey=sizeKey;p.adapter.resize();p.viewportDirty=true;}
-    // 매 frame의 읽기 전용 감시로 이벤트보다 늦은 projection 갱신도 놓치지 않는다.
+    // 활성화·크기 변경·명시적 명령·최종 idle에서만 읽는다.
     const key=providerViewportKey();
     const v=p.compatibility;
     const repair=!p.commandPending&&(!v||v.cx!==V.cx||v.cy!==V.cy||v.s!==V.s);
     if(key!==p.signature||p.viewportDirty||repair){p.signature=key;p.viewportDirty=false;if(!p.commandPending)providerReadView();else{dirty=true;dirtyHover=true;}}
   } catch (_) {providerFallback();}
   finally {p.syncing=false;}
-  if(dirty&&p.loaded)providerCheck();
+  if(!p.active&&p.loaded&&!p.commandPending)providerCheck();
   providerUpdateInput();
 }
 function providerZoomAt(x,y,factor) {
@@ -2405,10 +2442,11 @@ function providerPanBy(dx,dy) {
   catch (_) {providerFallback();}
 }
 function scheduleDisplayDepthArea() {
-  if(PROVIDER_MAP.commandPending){clearTimeout(OFFICIAL_DEPTH.timer);return;}
+  if(PROVIDER_MAP.commandPending||PROVIDER_MAP.providerMoving){clearTimeout(OFFICIAL_DEPTH.timer);return;}
   if (!PROVIDER_MAP.active) { scheduleDepthArea(); return; }
-  clearTimeout(OFFICIAL_DEPTH.timer);
+  clearTimeout(OFFICIAL_DEPTH.timer);RENDER.depthQueued=true;PROVIDER_MAP.depthDeferred=false;
   OFFICIAL_DEPTH.timer = setTimeout(async () => {
+    RENDER.depthQueued=false;if(PROVIDER_MAP.providerMoving||PROVIDER_MAP.commandPending){RENDER.depthKey='';PROVIDER_MAP.depthDeferred=true;return;}
     // SDK bounds와 화면 네 변을 함께 포함한다. 두 대각점만으로 비선형 투영을 자르지 않는다.
     const b = viewBounds(), areas = [[lonOf(b[0]),latOf(b[1]),lonOf(b[2]),latOf(b[3])]];
     if (S.A && S.B) areas.push([Math.min(lonOf(S.A[0]),lonOf(S.B[0])),Math.min(latOf(S.A[1]),latOf(S.B[1])),Math.max(lonOf(S.A[0]),lonOf(S.B[0])),Math.max(latOf(S.A[1]),latOf(S.B[1]))]);
@@ -2422,7 +2460,7 @@ function providerSetMode(mode) {
   if (p.adapter && !p.failed) {
     // 같은 지도 인스턴스의 배경만 바꾼다. dirty/단면/수심 로더를 건드리지 않는다.
     p.loaded = false; clearTimeout(p.timer); p.timer = setTimeout(providerFallback, 12000);
-    try { p.adapter.setMode(p.mode); } catch (_) { providerFallback(); }
+    try { p.adapter.setMode(p.mode);if(p.active)providerNotice('NAVER '+{satellite:'위성지도',hybrid:'위성+지명',normal:'일반지도'}[p.mode]+' · 수심은 별도 공공자료와 추정값입니다.'); } catch (_) { providerFallback(); }
   }
 }
 async function providerStart() {
@@ -2446,7 +2484,7 @@ async function providerStart() {
     p.adapter = new NaverMapAdapter(window.naver.maps); p.adapter.init($('providerMap'));
     p.adapter.onFailure = providerFallback;
     addEventListener('offline', providerFallback, { once: true });
-    p.adapter.onTilesLoaded(() => { if (p.failed) return; p.loaded = true; clearTimeout(p.timer); providerCheck(); });
+    p.adapter.onTilesLoaded(() => { if (p.failed) return; p.loaded = true; clearTimeout(p.timer); if(!p.active&&!p.providerMoving&&!p.commandPending)providerCheck(); });
     p.adapter.onViewportReady(providerViewportChanged);
     p.adapter.setMode(p.mode);providerApplyView({...V});providerSync();
 
@@ -2497,10 +2535,10 @@ function providerProbeSample(d, frame) {
   const canvasPixel = providerCanvasProbePixel(d);
   const painted = d.lastDraw?.pixel;
   const visible = !!painted && painted[0] >= 11 && painted[0] <= cw - 11 && painted[1] >= 11 && painted[1] <= ch - 28 - 11;
-  const valid = PROVIDER_MAP.active && !!nativeMarkerPixel && !!canvasPixel && visible;
+  const valid = PROVIDER_MAP.active && !PROVIDER_MAP.providerMoving && !PROVIDER_MAP.revealAfterBase && !stage.classList.contains('provider-moving') && !!nativeMarkerPixel && !!canvasPixel && visible;
   const dx = valid ? canvasPixel[0] - nativeMarkerPixel[0] : null, dy = valid ? canvasPixel[1] - nativeMarkerPixel[1] : null;
   return {frame, time:performance.now(), nativeMarkerPixel, canvasPixel, dx, dy, errorPx:valid ? Math.hypot(dx, dy) : null,
-    valid, visible, canvasDraw:d.lastDraw ? structuredClone(d.lastDraw) : null,
+    valid, visible, providerMoving:!!PROVIDER_MAP.providerMoving,heavyHidden:stage.classList.contains('provider-moving'),canvasDraw:d.lastDraw ? structuredClone(d.lastDraw) : null,
     providerCenter:PROVIDER_MAP.adapter.getCenter(), providerZoom:PROVIDER_MAP.adapter.getZoom(), providerBounds:PROVIDER_MAP.adapter.getBounds(), pxPerGround:pxPerGround(), gpp:1/pxPerGround(), providerRect:providerRect($('providerMap')), canvasRect, baseFrame:structuredClone(PROVIDER_MAP.lastBaseFrame), stationDrawStats:{...stationDrawStats}, events:structuredClone(PROVIDER_MAP.events), view:{...V}};
 }
 function providerDiagnosticRectDeltas() {
@@ -2576,6 +2614,34 @@ if (PROVIDER_DEV_HOST) {
       center:PROVIDER_MAP.adapter?.getCenter()??null,bounds:PROVIDER_MAP.adapter?.getBounds()??null,reason:command.reason,command};
     return {...await providerMarkerDiagnostic(lat,lon),command};
   };
+}
+// 15d_render_state.js — 용도별 렌더 무효화와 localhost 성능 계측
+const RENDER={uiKey:'',sectionKey:'',section:null,readKey:'',readSection:null,lastTab:'',lastSection:0,lastFlow:0,arrowKey:'',arrowStations:null,arrowCanvas:document.createElement('canvas')};
+const PERF_NAMES=['frame','providerSync','providerViewportKey','providerCheck','providerAlignment','renderBase','coastPath','structPath','updateHover','drawUI','drawCrnt','stepParticles','drawSection','stationRedraw','maskRebuild','getImageData','buildFlowField','particleRespawn'];
+const PERF={enabled:PROVIDER_DEV_HOST,start:performance.now(),counts:{},costs:{},frames:[],work:[],last:0,idleRecoveryMs:[],particleReductions:0,longTasks:[]};
+function perfCount(name){if(PERF.enabled)PERF.counts[name]=(PERF.counts[name]||0)+1;}
+function perfWrap(name,fn){if(!PERF.enabled)return fn;return function(...args){const start=performance.now();perfCount(name);try{return fn.apply(this,args);}finally{const ms=performance.now()-start,c=PERF.costs[name]||={totalMs:0,maxMs:0};c.totalMs+=ms;c.maxMs=Math.max(c.maxMs,ms);if(name==='frame'){if(PERF.last)PERF.frames.push(start-PERF.last);PERF.last=start;PERF.work.push(ms);if(PERF.frames.length>1800)PERF.frames.shift();if(PERF.work.length>1800)PERF.work.shift();}}};}
+providerSync=perfWrap('providerSync',providerSync);providerViewportKey=perfWrap('providerViewportKey',providerViewportKey);
+providerCheck=perfWrap('providerCheck',providerCheck);providerAlignment=perfWrap('providerAlignment',providerAlignment);
+buildPath=perfWrap('coastPath',buildPath);structPath=perfWrap('structPath',structPath);renderBase=perfWrap('renderBase',renderBase);drawUI=perfWrap('drawUI',drawUI);drawCrnt=perfWrap('drawCrnt',drawCrnt);
+stepParticles=perfWrap('stepParticles',stepParticles);drawSection=perfWrap('drawSection',drawSection);updateHover=perfWrap('updateHover',updateHover);
+drawStations=perfWrap('stationRedraw',drawStations);buildFlowField=perfWrap('buildFlowField',buildFlowField);frame=perfWrap('frame',frame);
+if(PROVIDER_DEV_HOST){
+  if(typeof PerformanceObserver!=='undefined'&&PerformanceObserver.supportedEntryTypes.includes('longtask'))new PerformanceObserver(list=>{for(const e of list.getEntries())if(e.startTime>=PERF.start)PERF.longTasks.push({startTime:e.startTime,duration:e.duration});if(PERF.longTasks.length>300)PERF.longTasks.splice(0,PERF.longTasks.length-300);}).observe({type:'longtask',buffered:false});
+  const readPixels=CanvasRenderingContext2D.prototype.getImageData;
+  CanvasRenderingContext2D.prototype.getImageData=function(...args){perfCount('getImageData');return readPixels.apply(this,args);};
+  window.naksigwangPerfDiagnostic=()=>{
+    const elapsedMs=performance.now()-PERF.start,percentile=a=>{const v=[...a].sort((a,b)=>a-b);return v.length?v[Math.min(v.length-1,Math.floor(v.length*.95))]:0;},average=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0;
+    const counts=Object.fromEntries(PERF_NAMES.map(name=>[name,PERF.counts[name]||0]));
+    return {scope:'이 브라우저의 계측; 실 NAVER 성공 판정과 별도',elapsedMs,fps:(PERF.counts.frame||0)*1000/elapsedMs,averageFrameMs:average(PERF.frames),p95FrameMs:percentile(PERF.frames),averageWorkMs:average(PERF.work),p95WorkMs:percentile(PERF.work),longFrames:PERF.frames.filter(x=>x>=50).length,longWorkFrames:PERF.work.filter(x=>x>=50).length,longTasks:[...PERF.longTasks],counts,callsPerSecond:Object.fromEntries(Object.entries(counts).map(([k,v])=>[k,v*1000/elapsedMs])),costs:structuredClone(PERF.costs),idleRecoveryMs:[...PERF.idleRecoveryMs],providerMoving:!!PROVIDER_MAP.providerMoving,heavyHidden:stage.classList.contains('provider-moving'),particles:PARTICLE_BUDGET,particleReductions:PERF.particleReductions,background:document.hidden};
+  };
+  window.naksigwangPerfDiagnostic.reset=()=>{PERF.start=performance.now();PERF.counts={};PERF.costs={};PERF.frames=[];PERF.work=[];PERF.last=0;PERF.idleRecoveryMs=[];PERF.particleReductions=0;PERF.longTasks=[];};
+}
+function drawCurrentOverlay(tide){
+  const key=JSON.stringify([PROVIDER_MAP.signature,V.cx,V.cy,V.s,cw,ch,DPR(),S.layers.flow,tide.tA,CR.ready]);
+  const c=RENDER.arrowCanvas;
+  if(key!==RENDER.arrowKey||RENDER.arrowStations!==CR.st){RENDER.arrowKey=key;RENDER.arrowStations=CR.st;c.width=ui.width;c.height=ui.height;drawCrnt(tide,c.getContext('2d'));}
+  uctx.setTransform(1,0,0,1,0,0);uctx.drawImage(c,0,0);
 }
 // 16_terrain.js — GEBCO 지형 격자와 바탕 지도 그리기
 // 남한 해안선 자료 밖의 북한·대마도 쪽 구역 (여기서 GEBCO가 육지면 남의 땅으로 본다)
@@ -2737,10 +2803,18 @@ const CITIES = [['서울', 37.566, 126.978], ['인천', 37.456, 126.705], ['태�
 function buildPath(rings, margin) {
   const p = new Path2D(), x0 = -margin, x1 = cw + margin, y0 = -margin, y1 = ch + margin;
   const oc = (x, y) => (x < x0 ? 1 : 0) | (x > x1 ? 2 : 0) | (y < y0 ? 4 : 0) | (y > y1 ? 8 : 0);
-  const sx = new Float64Array(0);
+  // 화면 밖의 같은 쪽에 머무는 긴 해안 구간은 비싼 SDK 투영 전에 생략한다.
+  // 화면을 포함하는 세계 좌표 bbox를 써서 보이는 꼭짓점의 실제 투영은 그대로 보존한다.
+  const [wx0,wy0,wx1,wy1]=viewBounds(margin),worldCode=(x,y)=>(x<wx0?1:0)|(x>wx1?2:0)|(y<wy0?4:0)|(y>wy1?8:0);
   for (const r of rings) {
-    const n = r.n, X = new Float64Array(n), Y = new Float64Array(n), C = new Uint8Array(n);
-    for (let i = 0; i < n; i++) { [X[i], Y[i]] = toS(r.xs[i], r.ys[i]); C[i] = oc(X[i], Y[i]); }
+    const codes=new Uint8Array(r.n),X=[],Y=[],C=[];
+    for(let i=0;i<r.n;i++)codes[i]=worldCode(r.xs[i],r.ys[i]);
+    let previous=codes[0];
+    for(let i=0;i<r.n;i++){
+      if(i>0&&i<r.n-1&&(previous&codes[i]&codes[i+1]))continue;
+      const [x,y]=toS(r.xs[i],r.ys[i]);X.push(x);Y.push(y);C.push(oc(x,y));previous=codes[i];
+    }
+    const n=X.length;
     let lx = X[0], ly = Y[0], lc = C[0];
     p.moveTo(lx, ly);
     for (let i = 1; i < n; i++) {
@@ -2756,7 +2830,9 @@ function buildPath(rings, margin) {
 }
 
 function renderBase() {
-  scheduleDisplayDepthArea();
+  if(PROVIDER_MAP.providerMoving||PROVIDER_MAP.commandPending)return;
+  const depthKey=JSON.stringify([PROVIDER_MAP.active,PROVIDER_MAP.signature,V,cw,ch,S.A,S.B]);
+  if(depthKey!==RENDER.depthKey){RENDER.depthKey=depthKey;scheduleDisplayDepthArea();}
   dirty = false;
   const r = DPR(), ppg = pxPerGround(), gpp = 1 / ppg, diag = Math.hypot(cw, ch);
   const lod = gpp > 2000 ? LOD.low : gpp > 35 ? LOD.mid : LOD.full;
@@ -2768,13 +2844,15 @@ function renderBase() {
   let bg = FAR; for (const [d, c] of BANDS_) if (d * ppg > 3 * diag && dC < d) { bg = c; break; }
   const [vx1, vy1, vx2, vy2] = viewBounds(margin);
   const vis = lod.filter(q => q.maxx >= vx1 && q.minx <= vx2 && q.maxy >= vy1 && q.miny <= vy2);
-  const path = buildPath(vis, margin);
+  const geometryKey=JSON.stringify([PROVIDER_MAP.active,PROVIDER_MAP.signature,V,cw,ch,margin,STRUCT.n,mask.width,mask.height]);
+  const geometryChanged=geometryKey!==RENDER.geometryKey||RENDER.geometryLod!==lod||RENDER.geometryStruct!==STRUCT.seg;
+  if(geometryChanged){RENDER.geometryKey=geometryKey;RENDER.geometryLod=lod;RENDER.geometryStruct=STRUCT.seg;RENDER.path=buildPath(vis,margin);RENDER.structPaths=STRUCT.n?structPath(margin):[null,null];}
+  const path=RENDER.path;
   bctx.setTransform(r, 0, 0, r, 0, 0);
   bctx.clearRect(0, 0, cw, ch);
   bctx.save();
   // 온라인 배경에서도 육지·구조물 마스크는 같은 SDK 투영으로 만든다.
-  let sPoly = null, sLine = null;
-  if (STRUCT.n) [sPoly, sLine] = structPath(margin);
+  const [sPoly,sLine]=RENDER.structPaths;
   if (!PROVIDER_MAP.active) {
   bctx.fillStyle = bg; bctx.fillRect(0, 0, cw, ch);
   bctx.lineJoin = 'round'; bctx.lineCap = 'round';
@@ -2839,11 +2917,13 @@ function renderBase() {
     const rx = ox + (a1 - bx1) * ms, ry = oy + (by2 - a2) * ms, rw = Math.max(4, (b1 - a1) * ms), rh = Math.max(4, (a2 - b2) * ms);
     bctx.strokeStyle = '#ffb84d'; bctx.lineWidth = 1.5; bctx.strokeRect(rx, ry, rw, rh);
   }
-  // 육지 마스크 (조류 입자용)
+  // 육지 마스크는 표시 좌표/해안선/구조물이 바뀔 때만 읽는다.
+  if(geometryChanged||!maskData){
   mctx.setTransform(1, 0, 0, 1, 0, 0); mctx.clearRect(0, 0, mask.width, mask.height);
   mctx.setTransform(.5, 0, 0, .5, 0, 0); mctx.fillStyle = '#fff'; mctx.fill(path, 'evenodd');
   if (sPoly) { mctx.fill(sPoly); mctx.strokeStyle = '#fff'; mctx.lineWidth = Math.max(2, 8 * ppg); mctx.stroke(sLine); }
-  maskData = mctx.getImageData(0, 0, mask.width, mask.height).data;
+  perfCount('maskRebuild');maskData = mctx.getImageData(0, 0, mask.width, mask.height).data;
+  }
   // 범례, 안내
   $('bandTitle').textContent = TER ? '수심 구간' : '해안선에서 거리';
   $('bandLegend').innerHTML = TER ? DEPTH_STEPS.slice(0, -1).map((d, k) => { const v = Math.round(d * .35 + DEPTH_STEPS[k + 1] * .65), c = `rgb(${SEA_LUT[v * 3]},${SEA_LUT[v * 3 + 1]},${SEA_LUT[v * 3 + 2]})`; return `<span class="b"><i style="background:${c}"></i>${d >= 1000 ? d / 1000 + 'k' : d}~</span>`; }).join('') + '<span class="b">m</span>' + '<span class="b"><i style="background:#728c56"></i>육지 200m</span><span class="b"><i style="background:#a08c72"></i>1000m</span>'
@@ -2851,7 +2931,8 @@ function renderBase() {
   $('viewSize').textContent = '보이는 폭 ' + (gw >= 1000 ? (gw / 1000).toFixed(gw >= 10000 ? 0 : 1) + ' km' : Math.round(gw) + ' m');
   if (PROVIDER_MAP.active) { $('bandTitle').textContent = '온라인 지도'; $('bandLegend').textContent = '배경 영상은 수심 자료가 아닙니다.'; }
   $('warn').hidden = gw > 1500;
-  flowStale = true;   // 흐름장·입자는 지도 움직임이 멈춘 뒤 stepParticles에서 다시 만든다
+  providerRevealOverlay();
+  if(geometryChanged)flowStale = true;   // 흐름장·입자는 지도 움직임이 멈춘 뒤 stepParticles에서 다시 만든다
 }
 // 17_flow.js — 조류: 해안을 따르는 방향장, 예보 지점 흐름장, 흐름 입자, 예보 화살표
 // 해안선과 나란한 방향장 (모식): 육지 마스크를 넓게 평균한 값의 기울기에 수직인 방향.
@@ -2901,15 +2982,17 @@ function realField(tA) {
 }
 
 /* ── 조류 입자 ─────────────────────────────────────────── */
-const NP = 900; const P = { x: new Float32Array(NP), y: new Float32Array(NP), age: new Float32Array(NP), max: new Float32Array(NP) };
+const NP = 480; let PARTICLE_BUDGET = innerWidth<560 ? 180 : 360, flowSlowFrames=0; const P = { x: new Float32Array(NP), y: new Float32Array(NP), age: new Float32Array(NP), max: new Float32Array(NP) };
 function spawn(k) { for (let t = 0; t < 25; t++) { const x = Math.random() * cw, y = Math.random() * ch; if (isSea(x | 0, y | 0)) { P.x[k] = x; P.y[k] = y; P.age[k] = 0; P.max[k] = 50 + Math.random() * 110; return; } } P.age[k] = 1e9; }
-// 지도를 끌거나 확대·축소하는 동안에는 입자를 숨겼다가, 손을 떼고 0.3초 뒤 새 화면에 맞춰 다시 뿌린다.
+// 지도를 끌거나 확대·축소하는 동안 입자를 숨기고 최종 viewport 복구 뒤 한 번 다시 뿌린다.
 // (예전에는 움직이는 동안 매 프레임 입자를 새로 뿌려서, 휴대폰에서 누르면 조류가 아주 빨리 흐르는 것처럼 보였다)
 let flowStale = true, flowHidden = false;
 function stepParticles(tide, dt) {
-  const moving = ptrs.size > 0 || performance.now() - VIEW_T < 300;
+  const moving = PROVIDER_MAP.providerMoving || document.hidden || ptrs.size > 0 || (!PROVIDER_MAP.active && performance.now()-VIEW_T<300);
   if (moving) { if (!flowHidden) { fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowHidden = true; } return; }
-  if (flowStale) { buildFlowField(); for (let k = 0; k < NP; k++) spawn(k); fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowStale = false; }
+  if(!S.layers.flow)return;
+  if(RENDER.workMs>20){if(++flowSlowFrames>=4&&PARTICLE_BUDGET>120){PARTICLE_BUDGET=Math.max(120,Math.floor(PARTICLE_BUDGET*.75));PERF.particleReductions++;flowSlowFrames=0;}}else flowSlowFrames=Math.max(0,flowSlowFrames-1);
+  if (flowStale) { buildFlowField();perfCount('particleRespawn'); for (let k = 0; k < PARTICLE_BUDGET; k++) spawn(k); fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowStale = false; }
   flowHidden = false;
   fctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
   fctx.globalCompositeOperation = 'destination-out'; fctx.fillStyle = 'rgba(0,0,0,.09)'; fctx.fillRect(0, 0, cw, ch);
@@ -2917,7 +3000,7 @@ function stepParticles(tide, dt) {
   if (!S.layers.flow || !FF) return;
   const sc = 1.4 * dt * 60, rf = realField(tide.tA);
   fctx.strokeStyle = 'rgba(205,255,250,.55)'; fctx.lineWidth = 1; fctx.beginPath();
-  for (let k = 0; k < NP; k++) {
+  for (let k = 0; k < PARTICLE_BUDGET; k++) {
     if (P.age[k] > P.max[k]) { spawn(k); continue; }
     const fi = (Math.min(FFh - 1, (P.y[k] >> 1) / FC | 0) * FFw + Math.min(FFw - 1, (P.x[k] >> 1) / FC | 0)) * 2;
     let vx = FF[fi] * tide.u, vy = FF[fi + 1] * tide.u;
@@ -2939,28 +3022,28 @@ function stepParticles(tide, dt) {
 
 // 조류 예보 지점 화살표: 그 시각 유향·유속 (길이 ∝ 유속)
 const crColor = kn => kn < .5 ? '#9ec9cf' : kn < 1.5 ? '#5ff0a8' : kn < 3 ? '#ffb84d' : '#ff7a6e';
-function drawCrnt(tide) {
+function drawCrnt(tide, context=uctx) {
   if (!S.layers.flow || !CR.ready) return;
-  const r = DPR(); uctx.setTransform(r, 0, 0, r, 0, 0);
+  const r = DPR(); context.setTransform(r, 0, 0, r, 0, 0);
   const gw = cw / pxPerGround(), showName = gw < 60000, big = gw < 400000;
-  uctx.font = '600 10.5px JetBrains Mono, monospace'; uctx.textBaseline = 'middle';
+  context.font = '600 10.5px JetBrains Mono, monospace'; context.textBaseline = 'middle';
   for (const c of CR.st) {
     const [x, y] = toS(c.mx, c.my); if (x < -30 || y < -30 || x > cw + 30 || y > ch + 30) continue;
     const q = crntAt(c, tide.tA); if (!q) continue;
     const kn = q.sp * KN, col = crColor(kn);
-    uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.fillStyle = col;
-    if (kn < .2) { uctx.strokeStyle = col; uctx.lineWidth = 1.5; uctx.beginPath(); uctx.arc(x, y, big ? 4 : 3, 0, 7); uctx.stroke(); }   // 물돌이: 속 빈 고리 (항 아이콘과 구분)
+    context.lineWidth = 1.5; context.strokeStyle = 'rgba(6,15,19,.9)'; context.fillStyle = col;
+    if (kn < .2) { context.strokeStyle = col; context.lineWidth = 1.5; context.beginPath(); context.arc(x, y, big ? 4 : 3, 0, 7); context.stroke(); }   // 물돌이: 속 빈 고리 (항 아이콘과 구분)
     else {
       const L = (big ? 10 : 6) + Math.min(big ? 30 : 14, kn * (big ? 8 : 4)), a = q.dir * D2R, dx = Math.sin(a), dy = -Math.cos(a);
       const x0 = x - dx * L / 2, y0 = y - dy * L / 2, x1 = x + dx * L / 2, y1 = y + dy * L / 2, hw = big ? 5 : 3.5, hl = big ? 8 : 5;
-      uctx.beginPath(); uctx.moveTo(x0, y0); uctx.lineTo(x1 - dx * hl * .6, y1 - dy * hl * .6);
-      uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.lineWidth = 5; uctx.stroke(); uctx.strokeStyle = col; uctx.lineWidth = 2.5; uctx.stroke();
-      uctx.beginPath(); uctx.moveTo(x1, y1); uctx.lineTo(x1 - dx * hl - dy * hw, y1 - dy * hl + dx * hw); uctx.lineTo(x1 - dx * hl + dy * hw, y1 - dy * hl - dx * hw); uctx.closePath();
-      uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.stroke(); uctx.fill();
+      context.beginPath(); context.moveTo(x0, y0); context.lineTo(x1 - dx * hl * .6, y1 - dy * hl * .6);
+      context.strokeStyle = 'rgba(6,15,19,.9)'; context.lineWidth = 5; context.stroke(); context.strokeStyle = col; context.lineWidth = 2.5; context.stroke();
+      context.beginPath(); context.moveTo(x1, y1); context.lineTo(x1 - dx * hl - dy * hw, y1 - dy * hl + dx * hw); context.lineTo(x1 - dx * hl + dy * hw, y1 - dy * hl - dx * hw); context.closePath();
+      context.lineWidth = 1.5; context.strokeStyle = 'rgba(6,15,19,.9)'; context.stroke(); context.fill();
     }
     if (gw < 150000 && (kn >= .2 || gw < 40000)) {   // 글자는 150 km 폭 안에서만, 「물돌이」 글자는 40 km 안에서만 (넓게 볼 때 어지럽지 않게)
       const t = (kn < .2 ? '물돌이' : kn.toFixed(1) + 'kn') + (showName ? ' ' + c.name : '');
-      uctx.lineWidth = 3; uctx.strokeStyle = 'rgba(6,15,19,.85)'; uctx.strokeText(t, x + 9, y + 9); uctx.fillStyle = col; uctx.fillText(t, x + 9, y + 9);
+      context.lineWidth = 3; context.strokeStyle = 'rgba(6,15,19,.85)'; context.strokeText(t, x + 9, y + 9); context.fillStyle = col; context.fillText(t, x + 9, y + 9);
     }
   }
 }
@@ -3377,6 +3460,7 @@ function resize() {
   sw = $('secWrap').clientWidth; shh = sw < 560 ? 240 : 300;
   sec.width = Math.round(sw * r); sec.height = Math.round(shh * r); sec.style.height = shh + 'px';
   if (old && !PROVIDER_MAP.active) { V.cx = old[0]; V.cy = old[1]; V.s = cw / (oldGW * kAt(latOf(V.cy))); clampView(); }
+  RENDER.uiKey='';RENDER.sectionKey='';RENDER.chartKey='';
   providerSync(); dirty = true;
 }
 
@@ -3424,6 +3508,8 @@ function endPtr(e) {
 ui.addEventListener('pointerup', endPtr); ui.addEventListener('pointercancel', endPtr);
 ui.addEventListener('pointerleave', () => { hoverAt = null; setText('cursorRead', '커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다'); });
 ui.addEventListener('wheel', e => { if (providerUseNativePan() || S.lock) return; e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
+// 단면 모드에서 Canvas를 숨긴 짧은 이동 중에도 연속 wheel 입력을 받는다.
+stage.addEventListener('wheel',e=>{if(e.target===ui||!providerTransform()||providerUseNativePan()||S.lock)return;e.preventDefault();const [x,y]=local(e);zoomAt(x,y,Math.exp(-e.deltaY*.0016));},{passive:false});
 // 이동 모드에서는 SDK가 입력을 소유한다. 캡처 관찰은 hover와 짧은 탭 선택만 한다.
 let nativeTap=null;const nativePointers=new Set();
 stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;providerCancelViewCommand('interrupted');nativePointers.add(e.pointerId);nativeTap=nativePointers.size===1?local(e):null;},true);
@@ -3655,25 +3741,37 @@ buildPoints();
 exampleSection(128.93, 37.80);
 providerStart();
 
-let last = performance.now();
-function frame(now) {
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
-  if (S.playing) S.t = (S.t + dt * .7) % 24;
-  for (const id of ['tIn', 'tIn2']) { const el = $(id); if (document.activeElement !== el && Math.abs(el.value - S.t) > .01) el.value = S.t; }
-  const tide = getTide();
-  if (Math.floor(S.t) !== biteHour || Math.floor(Date.now() / 60000) !== biteDataMinute) renderBite();
-  if (TAB === 'map' || TAB === 'today') {               // 보이는 탭만 그린다 (휴대폰 전지 절약). 오늘 탭에도 지도가 있다
-    providerSync();
-    if (dirty) { renderBase(); dirtyHover = true; apiAutoKick(); }
-    setText('clock2', fmtH(S.t));
-    updateHover(); drawUI(); drawCrnt(tide); stepParticles(tide, dt); drawSection(now, tide);
+let last=performance.now(),frameRequest=0;
+function frame(now){
+  frameRequest=0;if(document.hidden)return;
+  const workStart=performance.now();const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(S.playing)S.t=(S.t+dt*.7)%24;
+  for(const id of ['tIn','tIn2']){const el=$(id);if(document.activeElement!==el&&Math.abs(el.value-S.t)>.01)el.value=S.t;}
+  const tide=getTide(),tabChanged=RENDER.lastTab!==TAB;RENDER.lastTab=TAB;
+  if(Math.floor(S.t)!==biteHour||Math.floor(Date.now()/60000)!==biteDataMinute)renderBite();
+  const timeKey=JSON.stringify([S.playing?Math.floor(S.t*20):S.t,S.day,S.st,S.pt,TAB,CR.ready]);
+  if(timeKey!==RENDER.readKey||RENDER.readSection!==SEC){RENDER.readKey=timeKey;RENDER.readSection=SEC;updateReadouts(tide);}
+  if(TAB==='map'||TAB==='today'){
+    const moving=PROVIDER_MAP.providerMoving||PROVIDER_MAP.commandPending;
+    if(!moving){
+      if(dirty){renderBase();dirtyHover=true;apiAutoKick();RENDER.uiKey='';}
+      setText('clock2',fmtH(S.t));
+      if(hoverAt&&(dirtyHover||!hoverDone||hoverAt[0]!==hoverDone[0]||hoverAt[1]!==hoverDone[1]))updateHover();
+      // UI·조류·단면은 각자의 변경 원인만으로 무효화한다.
+      const uiKey=JSON.stringify([PROVIDER_MAP.signature,V,cw,ch,DPR(),S.A,S.B,S.drag,S.pin,S.secHover,S.layers.flow,timeKey,CR.ready,PROVIDER_DEBUG?.lat,PROVIDER_DEBUG?.lon]);
+      if(tabChanged||uiKey!==RENDER.uiKey||RENDER.arrowStations!==CR.st){RENDER.uiKey=uiKey;drawUI();drawCurrentOverlay(tide);}
+      const flowInterval=innerWidth<560?50:1000/30;
+      if(S.layers.flow&&now-RENDER.lastFlow>=flowInterval){const flowDt=Math.min(.1,(now-RENDER.lastFlow)/1000);RENDER.lastFlow=now;stepParticles(tide,flowDt);}
+      const sectionKey=JSON.stringify([timeKey,S.hs,S.secHover,sw,shh,DPR()]);
+      if(tabChanged||sectionKey!==RENDER.sectionKey||RENDER.section!==SEC){RENDER.sectionKey=sectionKey;RENDER.section=SEC;drawSection(S.playing?now:0,tide);}
+    }
   }
-  updateReadouts(tide);
-  if (TAB === 'tide') drawTideChart(tide);
-  if (TAB === 'bite') drawBiteChart();
-  requestAnimationFrame(frame);
+  const chartKey=JSON.stringify([TAB,timeKey,innerWidth,DPR(),biteDataMinute]);
+  if(chartKey!==RENDER.chartKey){RENDER.chartKey=chartKey;if(TAB==='tide')drawTideChart(tide);if(TAB==='bite')drawBiteChart();}
+  RENDER.workMs=performance.now()-workStart;frameRequest=requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
+addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frameRequest);frameRequest=0;}else if(!frameRequest){last=performance.now();RENDER.uiKey='';flowStale=true;frameRequest=requestAnimationFrame(frame);}});
+frameRequest=requestAnimationFrame(frame);
 // 24_tabs.js — 아래(휴대폰)·위(넓은 화면) 탭 전환. 주소 끝 #today · #map · #tide · #bite · #log 로 바로 열 수 있다
 const TABS = ['today', 'map', 'tide', 'bite', 'log'];
 let TAB = 'today';

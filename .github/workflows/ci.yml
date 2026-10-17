@@ -6,7 +6,7 @@ permissions:
 jobs:
   p0:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v6
         with:
@@ -37,6 +37,8 @@ jobs:
         run: python tests/smoke.py
       - name: P3 지도 어댑터·모바일·DPR 회귀 (실 API 없음)
         run: python tests/test_map_provider.py
+      - name: P3 이동 중 렌더 차단·성능 회귀 (실 API 없음)
+        run: python tests/test_map_performance.py
       - name: 빌드 결과 일치
         run: |
           python tests/test_build_consistency.py
