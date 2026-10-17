@@ -158,10 +158,18 @@ const CITIES = [['서울', 37.566, 126.978], ['인천', 37.456, 126.705], ['태�
 function buildPath(rings, margin) {
   const p = new Path2D(), x0 = -margin, x1 = cw + margin, y0 = -margin, y1 = ch + margin;
   const oc = (x, y) => (x < x0 ? 1 : 0) | (x > x1 ? 2 : 0) | (y < y0 ? 4 : 0) | (y > y1 ? 8 : 0);
-  const sx = new Float64Array(0);
+  // 화면 밖의 같은 쪽에 머무는 긴 해안 구간은 비싼 SDK 투영 전에 생략한다.
+  // 화면을 포함하는 세계 좌표 bbox를 써서 보이는 꼭짓점의 실제 투영은 그대로 보존한다.
+  const [wx0,wy0,wx1,wy1]=viewBounds(margin),worldCode=(x,y)=>(x<wx0?1:0)|(x>wx1?2:0)|(y<wy0?4:0)|(y>wy1?8:0);
   for (const r of rings) {
-    const n = r.n, X = new Float64Array(n), Y = new Float64Array(n), C = new Uint8Array(n);
-    for (let i = 0; i < n; i++) { [X[i], Y[i]] = toS(r.xs[i], r.ys[i]); C[i] = oc(X[i], Y[i]); }
+    const codes=new Uint8Array(r.n),X=[],Y=[],C=[];
+    for(let i=0;i<r.n;i++)codes[i]=worldCode(r.xs[i],r.ys[i]);
+    let previous=codes[0];
+    for(let i=0;i<r.n;i++){
+      if(i>0&&i<r.n-1&&(previous&codes[i]&codes[i+1]))continue;
+      const [x,y]=toS(r.xs[i],r.ys[i]);X.push(x);Y.push(y);C.push(oc(x,y));previous=codes[i];
+    }
+    const n=X.length;
     let lx = X[0], ly = Y[0], lc = C[0];
     p.moveTo(lx, ly);
     for (let i = 1; i < n; i++) {
@@ -177,7 +185,9 @@ function buildPath(rings, margin) {
 }
 
 function renderBase() {
-  scheduleDisplayDepthArea();
+  if(PROVIDER_MAP.providerMoving||PROVIDER_MAP.commandPending)return;
+  const depthKey=JSON.stringify([PROVIDER_MAP.active,PROVIDER_MAP.signature,V,cw,ch,S.A,S.B]);
+  if(depthKey!==RENDER.depthKey){RENDER.depthKey=depthKey;scheduleDisplayDepthArea();}
   dirty = false;
   const r = DPR(), ppg = pxPerGround(), gpp = 1 / ppg, diag = Math.hypot(cw, ch);
   const lod = gpp > 2000 ? LOD.low : gpp > 35 ? LOD.mid : LOD.full;
@@ -189,13 +199,15 @@ function renderBase() {
   let bg = FAR; for (const [d, c] of BANDS_) if (d * ppg > 3 * diag && dC < d) { bg = c; break; }
   const [vx1, vy1, vx2, vy2] = viewBounds(margin);
   const vis = lod.filter(q => q.maxx >= vx1 && q.minx <= vx2 && q.maxy >= vy1 && q.miny <= vy2);
-  const path = buildPath(vis, margin);
+  const geometryKey=JSON.stringify([PROVIDER_MAP.active,PROVIDER_MAP.signature,V,cw,ch,margin,STRUCT.n,mask.width,mask.height]);
+  const geometryChanged=geometryKey!==RENDER.geometryKey||RENDER.geometryLod!==lod||RENDER.geometryStruct!==STRUCT.seg;
+  if(geometryChanged){RENDER.geometryKey=geometryKey;RENDER.geometryLod=lod;RENDER.geometryStruct=STRUCT.seg;RENDER.path=buildPath(vis,margin);RENDER.structPaths=STRUCT.n?structPath(margin):[null,null];}
+  const path=RENDER.path;
   bctx.setTransform(r, 0, 0, r, 0, 0);
   bctx.clearRect(0, 0, cw, ch);
   bctx.save();
   // 온라인 배경에서도 육지·구조물 마스크는 같은 SDK 투영으로 만든다.
-  let sPoly = null, sLine = null;
-  if (STRUCT.n) [sPoly, sLine] = structPath(margin);
+  const [sPoly,sLine]=RENDER.structPaths;
   if (!PROVIDER_MAP.active) {
   bctx.fillStyle = bg; bctx.fillRect(0, 0, cw, ch);
   bctx.lineJoin = 'round'; bctx.lineCap = 'round';
@@ -260,11 +272,13 @@ function renderBase() {
     const rx = ox + (a1 - bx1) * ms, ry = oy + (by2 - a2) * ms, rw = Math.max(4, (b1 - a1) * ms), rh = Math.max(4, (a2 - b2) * ms);
     bctx.strokeStyle = '#ffb84d'; bctx.lineWidth = 1.5; bctx.strokeRect(rx, ry, rw, rh);
   }
-  // 육지 마스크 (조류 입자용)
+  // 육지 마스크는 표시 좌표/해안선/구조물이 바뀔 때만 읽는다.
+  if(geometryChanged||!maskData){
   mctx.setTransform(1, 0, 0, 1, 0, 0); mctx.clearRect(0, 0, mask.width, mask.height);
   mctx.setTransform(.5, 0, 0, .5, 0, 0); mctx.fillStyle = '#fff'; mctx.fill(path, 'evenodd');
   if (sPoly) { mctx.fill(sPoly); mctx.strokeStyle = '#fff'; mctx.lineWidth = Math.max(2, 8 * ppg); mctx.stroke(sLine); }
-  maskData = mctx.getImageData(0, 0, mask.width, mask.height).data;
+  perfCount('maskRebuild');maskData = mctx.getImageData(0, 0, mask.width, mask.height).data;
+  }
   // 범례, 안내
   $('bandTitle').textContent = TER ? '수심 구간' : '해안선에서 거리';
   $('bandLegend').innerHTML = TER ? DEPTH_STEPS.slice(0, -1).map((d, k) => { const v = Math.round(d * .35 + DEPTH_STEPS[k + 1] * .65), c = `rgb(${SEA_LUT[v * 3]},${SEA_LUT[v * 3 + 1]},${SEA_LUT[v * 3 + 2]})`; return `<span class="b"><i style="background:${c}"></i>${d >= 1000 ? d / 1000 + 'k' : d}~</span>`; }).join('') + '<span class="b">m</span>' + '<span class="b"><i style="background:#728c56"></i>육지 200m</span><span class="b"><i style="background:#a08c72"></i>1000m</span>'
@@ -272,5 +286,6 @@ function renderBase() {
   $('viewSize').textContent = '보이는 폭 ' + (gw >= 1000 ? (gw / 1000).toFixed(gw >= 10000 ? 0 : 1) + ' km' : Math.round(gw) + ' m');
   if (PROVIDER_MAP.active) { $('bandTitle').textContent = '온라인 지도'; $('bandLegend').textContent = '배경 영상은 수심 자료가 아닙니다.'; }
   $('warn').hidden = gw > 1500;
-  flowStale = true;   // 흐름장·입자는 지도 움직임이 멈춘 뒤 stepParticles에서 다시 만든다
+  providerRevealOverlay();
+  if(geometryChanged)flowStale = true;   // 흐름장·입자는 지도 움직임이 멈춘 뒤 stepParticles에서 다시 만든다
 }

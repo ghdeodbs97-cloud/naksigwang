@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 base=sys.argv[1]
-paths=subprocess.check_output(['git','diff','--name-only',base,'HEAD','--','static/depth/','src/app/04_depth.js','src/app/04b_depth_tiles.js'],text=True).splitlines()
+paths=subprocess.check_output(['git','diff','--name-only',base,'HEAD','--','static/depth/','src/app/04_depth.js','src/app/04b_depth_tiles.js','src/app/18_section.js'],text=True).splitlines()
 if paths:
     print('P3 수심 변경 금지:',*paths,sep='\n')
     sys.exit(1)

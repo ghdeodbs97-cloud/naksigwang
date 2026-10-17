@@ -92,7 +92,7 @@ function drawStations() {
     bctx.fillStyle = st.kind === 'rock' ? (sel ? '#f0a35e' : '#f6d2b0') : sel ? '#4fe3d3' : '#c9f6f0'; bctx.fillText(st.name, tx, y);
   }
 }
-function stationAt(x, y) { let best = null, bd = 14; for (const [sx, sy, i] of stHits) { const d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = i; } } return best; }
+function stationAt(x, y) { if(PROVIDER_MAP.providerMoving||PROVIDER_MAP.commandPending)return null;let best = null, bd = 14; for (const [sx, sy, i] of stHits) { const d = Math.hypot(sx - x, sy - y); if (d < bd) { bd = d; best = i; } } return best; }
 
 /* ── 평면직각좌표(TM) → 경위도 (EPSG:5179, 5186 지원) ─── */
 function tmToLL(x, y) {
@@ -127,7 +127,7 @@ function viewBounds(margin = 0) {
   pts.push([mxOf(b[0][0]), myOf(b[0][1])], [mxOf(b[1][0]), myOf(b[1][1])]);
   return [Math.min(...pts.map(p => p[0])), Math.min(...pts.map(p => p[1])), Math.max(...pts.map(p => p[0])), Math.max(...pts.map(p => p[1]))];
 }
-const pxPerGround = () => providerTransform() ? PROVIDER_MAP.adapter.getGroundScale() : V.s * kAt(latOf(V.cy));
+const pxPerGround = () => providerTransform() ? (PROVIDER_MAP.groundScale || PROVIDER_MAP.adapter.getGroundScale()) : V.s * kAt(latOf(V.cy));
 // 지도 범위 = 지형 자료(GEBCO) 범위. 이보다 넓게 축소하거나 밖으로 밀면 자료 없는 검은 곳이 보이므로 막는다
 const KB = { x1: mxOf(124.4), x2: mxOf(131.95), y1: myOf(32.9), y2: myOf(38.7) };
 let VIEW_T = 0;      // 마지막으로 지도를 옮기거나 확대·축소한 시각 (조류 입자를 잠깐 숨기는 데 씀)

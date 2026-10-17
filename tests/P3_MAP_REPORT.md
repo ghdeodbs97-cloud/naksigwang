@@ -248,3 +248,123 @@ DPR [1, 1.25, 1.5, 2]에서 명시적 이동/검색/범위 버튼 88개 측정�
 | 포항→속초 | 0.046187 |
 
 객체 배열 거절과 SDK 전체 미변경 실패 검출은 네 DPR에서 모두 통과했다. 이는 선택한 입력 계약과 mock 결과이며 새 코드의 실 NAVER 포항 성공은 사용자 재검증이 필요하다.
+
+
+## P0 이동 성능·화면 안정화 (2026-10-17)
+
+최종 실사용 판정은 **사용자 localhost에서 렉·흩어짐이 사라졌는지 확인 대기**다. 아래 수치는 Windows Chromium headless의 비선형 SDK mock이며 실제 NAVER/휴대폰 하드웨어의 측정값이 아니다. 이전 사용자 보고의 실제 정합 약 0.04px는 보존해야 할 기준이고 이번 mock 수치로 대체하지 않는다. 실 NAVER 포항 연속 fit 성공도 여전히 미확인이다.
+
+### 확인한 병목과 수정
+
+기존 `frame()`은 정지 중에도 `providerSync`, `updateHover`, `drawUI`, `drawCrnt`, `stepParticles`, `drawSection`을 매 프레임 호출했다. 이동 중 `dirty → providerCheck → dirty → renderBase`가 내부 정합·해안 Path·station·육지 mask·getImageData를 반복했다. 보이는 구간보다 훨씬 긴 해안 ring까지 SDK로 투영하는 비용도 확인했다. 이것은 코드와 mock으로 확인한 앱 병목이며 사용자 장치의 실 SDK CPU profile을 직접 측정한 결과는 아니다.
+
+- SDK drag/pinch/zoom 시작부터 Canvas 3장을 함께 숨긴다(방법 A). 원본 좌표나 CSS origin에 offset을 더하지 않는다. 이전 포인트·핀·A/B·흐름 잔상을 표시하지 않는다.
+- native gesture 동안 SDK viewport polling·base/mask/흐름장·단면·수심 예약을 멈춘다. drag/pinch 종료 후 최종 idle, zoom 종료 또는 명시적 명령 뒤 표시 projection의 안정된 두 프레임을 확인한다. 이벤트 뒤 관찰은 최대 16프레임이고 정지 중에는 반복하지 않는다. 기존 명시적 fit의 pending/commandId/timeout 구조는 유지한다.
+- 마지막 SDK viewport를 한 번 읽어 호환 V·100m ground scale을 캐시한다. 최종 base와 UI를 같은 화면 갱신에서 그린 후 Canvas를 다시 보인다. 이동이 취소되어 SDK 이벤트가 없어도 bounded settle로 숨김을 해제한다.
+- base는 기존 `dirty`, UI·화살표·단면·계기판은 별도 상태 key, 흐름장은 `flowStale`로 무효화한다. viewport·LOD·구조물 변경이 없으면 Path/mask를 재사용한다. 수심 갱신만으로 mask readback을 반복하지 않는다. 이동 때문에 취소한 수심 예약은 최종 idle에 복구한다.
+- SDK 투영 전에 화면 밖의 같은 쪽에 머무는 긴 해안 구간을 생략한다. 보이는 꼭짓점의 SDK 투영은 그대로 사용한다. 기존 구현과 raster mask를 직접 비교했다. 속초 10km 예: 해안 project 36,545 → 451회, 포항 10km 36,503 → 177회. 전국 화면은 남는 꼭짓점이 많아 절감 폭이 작다.
+- 입자는 900개에서 PC 시작 360개/휴대폰 180개, 할당 상한 480개로 줄였다. 실제 이전 frame 작업 시간이 20ms를 넘는 상황이 반복되면 25%씩 줄이며 최저 120개다. 그리기 상한은 PC 30Hz/휴대폰 20Hz다. 이동·비활성 지도 탭·background에서 정지하고 idle 후 한 번 respawn한다.
+- 조류 화살표 bitmap은 viewport·시간·조류 자료·DPR·크기가 바뀔 때만 다시 만든다. 단면과 readout은 자료·A/B·시간·hover·크기 변경에만 다시 그린다. 재생 중에는 시간 key를 제한한다. 정지 중 단면 물결도 매 프레임 그리지 않는다. 보호된 `18_section.js`는 수정하지 않았다.
+- resize로 backing canvas가 초기화되면 별도 UI/단면 key도 무효화한다. 단면 모드에서 Canvas가 잠시 숨겨져도 stage가 연속 wheel 입력을 받는다. background에서는 앱 RAF 자체를 중단하고 복귀 시 다시 예약한다.
+
+이벤트 의미는 [NAVER 공식 Map 문서](https://navermaps.github.io/maps.js.en/docs/naver.maps.Map.html)의 dragstart/dragend, pinchstart/pinchend, zoomstart/zoomend, idle에 따른다. 실 SDK의 이벤트 순서와 렌더 지연은 localhost에서 다시 확인해야 한다.
+
+### 같은 60프레임 입력의 전후 비교
+
+`python tests/test_map_perf_comparison.py`로 `1ea95e6`의 index를 그대로 실행한 값과 현재 빌드를 같은 mock 입력으로 비교했다. 조류 켜짐·시간 재생 꺼짐, DPR 1이다. 입력 중 60회 viewport 변경을 보내고 마지막 idle 복구는 별도로 센다. 원시/요약 값은 `tests/P3_PERF_RESULTS.json`에 있다.
+
+| 호출 | 기존 정지 60프레임 | 수정 정지 60프레임 | 기존 이동 60프레임 | 수정 이동 / 마지막 복구 |
+|---|---:|---:|---:|---:|
+| providerSync | 60 | 0 | 60 | 0 / 1 |
+| providerCheck·alignment 각각 | 0 | 0 | 59 | 0 / 1 |
+| renderBase·stationRedraw 각각 | 0 | 0 | 59 | 0 / 1 |
+| mask·getImageData 각각 | 0 | 0 | 59 | 0 / 1 |
+| updateHover | 60 | 0 | 60 | 0 / 0 (hover 없음) |
+| drawUI·drawCrnt 각각 | 60 | 0 | 60 | 0 / 1 |
+| drawSection | 60 | 0 | 60 | 0 / 0 (A/B·시간 변경 없음) |
+
+입자는 정지 화면에서도 흐름을 표현하지만 제한된 주기로만 그린다. 명시적 진단은 실제 raster를 읽으므로 `getImageData` 계측에 별도로 포함된다. stress에서 반복한 Marker 진단의 9회 readback을 정상 이동의 mask readback으로 해석하면 안 된다.
+
+| 화면 | 이동 FPS 전 → 후 | p95 frame ms 전 → 후 | 50ms 이상 frame 전 → 후 |
+|---|---:|---:|---:|
+| 390×844 | 31.65 → 62.43 | 34 → 17 | 1 → 0 |
+| 1280×900 | 21.02 → 62.57 | 52 → 21 | 9 → 0 |
+| 1920×1080 | 20.80 → 62.57 | 54 → 18 | 13 → 0 |
+
+시간 값은 장치·동시 작업·Chromium 스케줄에 따라 달라진다. 실제 PC/휴대폰 FPS의 보증값이 아니다.
+
+### stress 결과
+
+3 화면 × DPR 1/1.25/1.5/2, 총 12조합에서 좌우 pan 20회·상하 pan 20회·zoom 20회·혼합 30회, 합계 **1,080회**를 검사했다. 각 gesture마다 이동 중 세 Canvas 숨김, 무거운 호출 0회, 최종 native Marker DOM 중심 대 실제 Canvas crosshair ≤2px, 원좌표 drift 없음이 통과했다. A/B는 각 phase 종료 후 별도 native DOM 기준과 Canvas의 주황 원 외곽 raster를 비교했다. 글자/연결선은 원 둘레 검출에서 배제한다.
+
+| 화면 | DPR | phase 평균 FPS 범위 | 최악 p95 frame ms | 최대 idle 복구 ms | 최대 Marker px | 최대 A/B px |
+|---|---:|---:|---:|---:|---:|---:|
+| 390×844 | 1 | 62.1~62.6 | 17 | 72 | 0.000 | 0.559 |
+| 390×844 | 1.25 | 62.3~62.6 | 20 | 71 | 0.447 | 0.354 |
+| 390×844 | 1.5 | 62.2~62.5 | 20 | 56 | 0.000 | 0.354 |
+| 390×844 | 2 | 62.3~62.6 | 17 | 58 | 0.000 | 0.250 |
+| 1280×900 | 1 | 61.9~62.5 | 18 | 63 | 0.000 | 0.707 |
+| 1280×900 | 1.25 | 59.2~61.2 | 22 | 71 | 0.281 | 0.250 |
+| 1280×900 | 1.5 | 57.6~62.5 | 35 | 72 | 0.000 | 0.354 |
+| 1280×900 | 2 | 57.9~60.9 | 25 | 67 | 0.000 | 0.559 |
+| 1920×1080 | 1 | 57.5~58.9 | 32 | 71 | 0.000 | 0.901 |
+| 1920×1080 | 1.25 | 57.8~59.3 | 32 | 70 | 0.280 | 0.354 |
+| 1920×1080 | 1.5 | 58.5~59.2 | 32 | 71 | 0.333 | 0.354 |
+| 1920×1080 | 2 | 57.2~61.5 | 26 | 66 | 0.000 | 0.559 |
+
+모든 조합에서 일반 이동 phase의 100ms 이상 long task는 0회였다. 이동 중 base/mask/흐름장/정합/단면 호출은 0회다. idle 복구는 최대 72ms이며 mock의 250ms 목표를 만족했다. 이는 최종 idle 이벤트부터 base 복구까지의 시간이다. 실제 SDK 자체의 명령 적용 대기시간과 네트워크 타일 로딩 시간은 포함하지 않는다.
+
+속초→포항→주문진→홍원 4회 ×12조합=48회는 settled와 실제 raster 정합을 통과했다. SATELLITE↔HYBRID↔NORMAL 3회 반복·오늘↔지도 5회 반복·비활성 탭의 입자 정지·background RAF 중지·숨겨진 Canvas 위 연속 wheel도 검사했다. 오늘 탭은 원래 기능대로 선택 포인트의 예시 단면을 새로 만든다. pan/zoom/모드 변경 중 원좌표 보존과 구분한다.
+
+해안 Path 최적화는 세 지역 × 네 축척 ×12조합=144 mask 비교에서 변경 픽셀 0개였다. 기존 20개 화면/DPR, DPR 3 backing cap, 늦은 projection·이른 idle, 원거리 6회 연속 이동, no-op SDK 실패·timeout·신규 명령 취소, DOM mismatch, native 3px/6px 오차 차단도 유지한다.
+
+390×844와 1280×900의 다섯 탭, active mock의 이동 중/idle 캡처를 직접 확인했다. 실제 위성 배경의 동영상/실장치 육안 판정은 사용자 확인 대기다.
+
+### 자료 보호·기존 기능
+
+SATELLITE 기본·HYBRID/NORMAL과 preference migration, 선택점·핀·A/B·hover, native pan/wheel/pinch, terrain fallback을 유지했다. 실제 정합 판정은 동일 lat/lon의 native DOM 중심과 Canvas 실제 픽셀의 거리이며 SDK project끼리의 비교만으로 실 정합 성공을 주장하지 않는다. Marker ≤2 CSS px인데 항/갯바위와 위성 구조물이 다르면 POINTS/PORTS/ROCKS/OSM 원자료 오차로 분류하며 전체 항 좌표를 이동하지 않는다.
+
+`static/depth/`, `04_depth.js`, `04b_depth_tiles.js`, `18_section.js`, `data/`의 diff는 없다. production 42타일/35,982점과 verticalDatum/source/provenance, 12타일/60,000점/8MiB, 육지·외삽 차단·fallback을 유지했다. 기존 8개 지점과 A→B 301점 baseline은 정확히 동일하다. CI 보호 검사에도 `18_section.js`를 추가했다.
+
+빌드 `missing ids: []`, 기본 smoke와 기존 CI 전체 명령, 전체 지도 회귀, 신규 성능 회귀, 빌드 플랫폼 일치가 통과했다. CI에 신규 12조합 성능 회귀를 추가하고 실행 제한을 25분으로 늘렸다. CI는 실제 NAVER API/credential을 사용하지 않는다.
+
+### 변경 파일
+
+- 실행 코드: `src/app/15_view.js`, `15b_map_provider.js`, `15c_map_diagnostic.js`, 신규 `15d_render_state.js`, `16_terrain.js`, `17_flow.js`, `21_input.js`, `23_main.js`
+- 화면·빌드 결과·코드 지도: `src/template.html`, `index.html`(build.py 생성), `src/README.md`
+- 검사: `tests/p3_provider_checks.js`, `p3_depth_guard.py`, `test_map_provider.py`, 신규 `p3_perf_baseline.js`, `p3_perf_checks.js`, `p3_path_checks.js`, `test_map_performance.py`, `test_map_perf_comparison.py`
+- 보고서·측정값·CI: `tests/P3_MAP_REPORT.md`, 신규 `tests/P3_PERF_RESULTS.json`, `.github/workflows/ci.yml`
+
+정지 성능 계측은 초기 자료 로딩·수심 예약·base/단면 변경이 실제로 멈춘 뒤 시작한다. 초기 로딩의 정상 렌더를 정지 중 중복 렌더로 오인하지 않는다. CI 시간 성능은 호스트 변동이 있어 기록하고, 호출 차단·가시성·정합·drift·mask 동일성은 assertion으로 검사한다.
+
+### localhost 재검증
+
+1. 이 branch의 최신 index를 로드한다. 필요하면 저장소에서 `python build.py`, 기존 localhost 서버를 계속 쓰거나 `python -m http.server 8000 --bind 127.0.0.1`로 실행한다. 기존 NAVER 로컬 설정은 유지한다. 코드 갱신 후 브라우저에서 새 빌드를 한 번 로드한다.
+2. 지도 탭에서 기본 위성, 위성+지명, 일반을 전환한다. 선택점·핀·A/B·hover가 유지되고 추가 depth 요청이 없는지 Network를 확인한다. native 정합 원을 지운 뒤 성능 계측을 시작한다.
+
+```js
+naksigwangMapDiagnostic.clear();
+naksigwangPerfDiagnostic.reset();
+```
+
+3. 먼저 5초 정지 후 `naksigwangPerfDiagnostic()`를 저장한다. counts의 providerSync/providerViewportKey/providerCheck/renderBase/maskRebuild/getImageData/drawSection이 0인지 본다(자료 로딩과 재생이 끝난 상태). callsPerSecond는 reset 이후 평균 초당 빈도, costs는 각 함수의 total/max ms다. FPS·p95FrameMs·p95WorkMs·longTasks도 함께 저장한다.
+4. reset 후 좌우 20회, 상하 20회, wheel 20회, 혼합 30회를 각각 실행한다. 이동 중 분석 overlay가 잠깐 숨고 손을 뗀 뒤 250ms 목표/500ms 이내에 한꺼번에 복구되는지, 이전 포인트 잔상·서로 다른 방향으로 튀는 표시·station 흩어짐이 없는지 눈으로 확인한다. `idleRecoveryMs`도 저장한다.
+5. 각 명령은 반드시 await하고 다음 원거리 명령을 순서대로 실행한다.
+
+```js
+await naksigwangMapDiagnostic.fit(10000,38.20854,128.5947); // 속초
+await naksigwangMapDiagnostic.fit(10000,36.05,129.38); // 포항
+await naksigwangMapDiagnostic.fit(10000,37.89192,128.8312883028771); // 주문진
+await naksigwangMapDiagnostic.fit(10000,36.15983,126.50376); // 홍원
+```
+
+6. `valid/passes`, `errorPx≤2`, `domMismatchPx=0`, command settled와 before/after center·zoom·bounds 변화를 저장한다. 포항 실패 시 requestedBounds·fitBoundsType·sdkViewportUnchanged·trace를 포함한 반환값을 보낸다. credential은 반환하지 않는다.
+7. 각 위치에서 A/B를 그려 endpoint·단면 hover를 확인하고 3개 모드/오늘↔지도를 반복한다. PC 1280×900·1920×1080과 휴대폰 390×844, DPR 1/1.25/1.5/2에서 반복한다. PC 45 FPS·휴대폰 30 FPS, 일반 이동 100ms 이상 task 없음도 실제 계측으로 확인한다.
+
+### 남은 한계
+
+- 사용자 localhost의 실제 NAVER pan/zoom 렉·시각 안정성·idle 지연과 연속 포항 fit 성공은 아직 미확인이다. mock 통과로 실사용 최종 통과를 선언하지 않는다.
+- 실 SDK가 최종 이벤트를 누락하거나 16프레임 관찰 뒤에도 표시 projection이 안정되지 않으면 올바르지 않은 Canvas를 억지로 보이지 않고 숨김을 유지한다. 새 viewport 이벤트/명시적 명령으로 다시 관찰한다. 강제 reload·인스턴스 재생성·좌표 offset으로 감추지 않는다.
+- 전국 지도는 긴 해안선이 대부분 보이므로 꼭짓점 생략 효과가 작다. 저사양 실장치·타일 네트워크·GPU 성능은 mock 결과로 보증할 수 없다.
+- 이동 중 분석 Canvas는 의도적으로 숨겨진다. native debug 원만 보이는 것은 localhost 진단의 동작이다. 단면 물결은 시간 재생이 꺼져 있을 때 정지한다.
+- 원자료의 항/갯바위 좌표 정확도와 수심 coverage의 기존 제한은 변경하지 않았다.

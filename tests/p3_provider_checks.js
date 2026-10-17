@@ -119,7 +119,7 @@ window.p3Test = async () => {
     pointer('pointermove',51,cw*.2,ch*.5,'touch');pointer('pointermove',52,cw*.8,ch*.5,'touch');
     pointer('pointerup',51,cw*.2,ch*.5,'touch');pointer('pointerup',52,cw*.8,ch*.5,'touch');
     screen=toS(mxOf(pinchAnchor[0]),myOf(pinchAnchor[1]));check(Math.hypot(screen[0]-cw*.5,screen[1]-ch*.5)<1e-5,'pinch 중심점');
-    fitGround(POINTS[S.pt].lat,POINTS[S.pt].lon,9000);providerSync();drawUI();renderBase();check(stHits.length>0,'항구·갯바위 표시 유지');
+    await fitGround(POINTS[S.pt].lat,POINTS[S.pt].lon,9000);providerSync();drawUI();renderBase();check(stHits.length>0,'항구·갯바위 표시 유지');
   } finally { ui.setPointerCapture=capture;ptrs.clear();pinch=null;panStart=null;S.drag=null; }
   fake.error=3;providerCheck();check(!PROVIDER_MAP.active,'2px 초과 차단');
   fake.error=0;providerCheck();check(PROVIDER_MAP.active,'정합 복구');
@@ -180,6 +180,7 @@ window.p3NativeTest = async () => {
   fake.nativeOffset=6;fake.renderMarkers();const shifted=await window.naksigwangMapDiagnostic(38.20854,128.5947);
   check(!shifted.passes && shifted.errorPx>5,'독립 native DOM 오차 검출');
   check(PROVIDER_MAP.diagnostic.maxError<1e-5,'내부 project 비교가 통과해도 native DOM 검사는 실패');
+  fake.nativeOffset=3;fake.renderMarkers();const shifted3=await window.naksigwangMapDiagnostic(38.20854,128.5947);check(!shifted3.passes&&shifted3.errorPx>2,'native 3px 오차 차단');
   fake.nativeOffset=0;fake.renderMarkers();
   $('providerMap').style.transform='translateX(5px)';const domShift=await window.naksigwangMapDiagnostic(38.20854,128.5947);
   check(domShift.domMismatchPx>=5 && !domShift.passes,'DOM 원점 오차 검출');
@@ -190,5 +191,5 @@ window.p3NativeTest = async () => {
   window.naksigwangMapDiagnostic.clear();drawUI();check(!$('providerMap').querySelector('[data-naksigwang-native-probe]')&&!PROVIDER_DEBUG,'debug 해제');
   fake.destroy();PROVIDER_MAP.adapter=null;PROVIDER_MAP.active=false;$('providerMap').style.visibility='hidden';stage.classList.remove('provider-active');dirty=true;
   const unavailable=await window.naksigwangMapDiagnostic(38.20854,128.5947);check(required.every(k=>k in unavailable)&&!unavailable.valid&&unavailable.errorPx===null,'미준비 진단 필드와 null 오차');
-  return {samples,nativeFaultPx:shifted.errorPx,domFaultPx:domShift.errorPx};
+  return {samples,nativeFaultPx:shifted.errorPx,native3pxFaultPx:shifted3.errorPx,domFaultPx:domShift.errorPx};
 };

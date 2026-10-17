@@ -53,6 +53,8 @@ try:
           page.locator(f'#tabbar [data-tab="{tab}"]').click()
           page.wait_for_timeout(150)
           assert page.locator('#v-'+tab).is_visible()
+          if tab in ('today','map'):
+            assert page.evaluate("document.getElementById('sec').getContext('2d').getImageData(0,0,1,1).data[3]>0"),'탭/크기 변경 후 단면 Canvas 복구'
           assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+1')
           if dpr==1 and width in (390,1280):page.screenshot(path=str(OUT/f'{width}-{tab}.png'),full_page=True)
         page.set_viewport_size({'width':height,'height':width})
@@ -106,7 +108,7 @@ try:
       if name=='index.html':route.fulfill(content_type='text/html',body=html)
       else:route.fulfill(path=str(ROOT/name),content_type=mimetypes.guess_type(name)[0] or 'application/octet-stream')
     page.route('http://production.example/**',production);page.goto('http://production.example/index.html',wait_until='domcontentloaded');page.wait_for_function('window.p3Ready?.()')
-    assert page.evaluate("typeof window.naksigwangMapDiagnostic==='undefined' && !document.querySelector('[data-naksigwang-native-probe]')")
+    assert page.evaluate("typeof window.naksigwangMapDiagnostic==='undefined' && typeof window.naksigwangPerfDiagnostic==='undefined' && !document.querySelector('[data-naksigwang-native-probe]')")
     results.append({'productionDebugAbsent':True,'passed':True});page.close()
     browser.close()
 finally:
