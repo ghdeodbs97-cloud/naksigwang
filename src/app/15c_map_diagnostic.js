@@ -114,7 +114,12 @@ if (PROVIDER_DEV_HOST) {
     if (![1000,2000,5000,10000,60000,600000].includes(width)) throw Error('폭은 1000/2000/5000/10000/60000/600000 m 중에서 고르세요.');
     if (TAB !== 'map' || S.lock) throw Error('지도 탭에서 실행하세요.');
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < 32.5 || lat > 39 || lon < 123.8 || lon > 132.2) throw Error('한국 연안의 숫자 경위도를 입력하세요.');
-    fitGround(lat, lon, width); providerSync();
-    return providerMarkerDiagnostic(lat, lon);
+    const command=await fitGround(lat,lon,width);
+    if(!command.ok)return {providerMode:PROVIDER_MAP.mode,providerZoom:PROVIDER_MAP.adapter?.getZoom()??null,lat,lon,
+      providerRect:providerRect($('providerMap')),canvasRect:providerRect(ui),baseRect:providerRect(base),flowRect:providerRect(flow),stageRect:providerRect(stage),
+      rectDeltas:providerDiagnosticRectDeltas(),domMismatchPx:providerRectError(),dpr:devicePixelRatio,canvasDpr:DPR(),
+      nativeMarkerPixel:null,canvasPixel:null,dx:null,dy:null,errorPx:null,valid:false,passes:false,
+      center:PROVIDER_MAP.adapter?.getCenter()??null,bounds:PROVIDER_MAP.adapter?.getBounds()??null,reason:command.reason,command};
+    return {...await providerMarkerDiagnostic(lat,lon),command};
   };
 }

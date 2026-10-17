@@ -131,20 +131,24 @@ const pxPerGround = () => providerTransform() ? PROVIDER_MAP.adapter.getGroundSc
 // 지도 범위 = 지형 자료(GEBCO) 범위. 이보다 넓게 축소하거나 밖으로 밀면 자료 없는 검은 곳이 보이므로 막는다
 const KB = { x1: mxOf(124.4), x2: mxOf(131.95), y1: myOf(32.9), y2: myOf(38.7) };
 let VIEW_T = 0;      // 마지막으로 지도를 옮기거나 확대·축소한 시각 (조류 입자를 잠깐 숨기는 데 씀)
-function clampView() {
-  if (!cw || !ch) return;
-  VIEW_T = performance.now();
+function clampRequestedView(request) {
+  const view={...request};if(!cw||!ch)return view;
   const sMin = Math.max(cw / (KB.x2 - KB.x1), ch / (KB.y2 - KB.y1));   // 화면이 자료 범위 안에 들어가는 가장 작은 배율
-  if (V.s < sMin) V.s = sMin;
-  const gw = cw / (V.s*kAt(latOf(V.cy)));
-  if (gw < 150) V.s *= gw / 150;
-  const hx = cw / 2 / V.s, hy = ch / 2 / V.s;                          // 화면 가장자리가 범위 밖으로 나가지 않게
-  V.cx = clamp(V.cx, KB.x1 + hx, KB.x2 - hx); V.cy = clamp(V.cy, KB.y1 + hy, KB.y2 - hy);
-  dirty = true;
+  if(view.s<sMin)view.s=sMin;
+  const gw=cw/(view.s*kAt(latOf(view.cy)));if(gw<150)view.s*=gw/150;
+  const hx=cw/2/view.s,hy=ch/2/view.s;
+  view.cx=clamp(view.cx,KB.x1+hx,KB.x2-hx);view.cy=clamp(view.cy,KB.y1+hy,KB.y2-hy);return view;
 }
-function fitBox(x1, y1, x2, y2, pad = .9) { V.cx = (x1 + x2) / 2; V.cy = (y1 + y2) / 2; V.s = Math.min(cw / Math.max(1, x2 - x1), ch / Math.max(1, y2 - y1)) * pad; clampView(); providerApplyView({...V}); }
-function fitLonLat(bb) { fitBox(mxOf(bb[0]), myOf(bb[1]), mxOf(bb[2]), myOf(bb[3])); }
-function fitGround(lat, lon, widthG) { if (S.lock) widthG = TD_MAP_W; /* 오늘 탭 지도는 늘 같은 폭 */ V.cx = mxOf(lon); V.cy = myOf(lat); V.s = cw / (widthG * kAt(lat)); clampView(); providerApplyView({...V}); }
+function clampView() {Object.assign(V,clampRequestedView(V));VIEW_T=performance.now();dirty=true;}
+function applyMapView(request) {
+  const view=clampRequestedView(request);
+  // 온라인 목표는 별도로 보관하고, 완료되기 전 V를 목표 또는 옛 SDK 값으로 바꾸지 않는다.
+  if(!providerTransform())Object.assign(V,view);
+  VIEW_T=performance.now();dirty=true;return providerApplyView(view);
+}
+function fitBox(x1, y1, x2, y2, pad = .9) {return applyMapView({cx:(x1+x2)/2,cy:(y1+y2)/2,s:Math.min(cw/Math.max(1,x2-x1),ch/Math.max(1,y2-y1))*pad});}
+function fitLonLat(bb) {return fitBox(mxOf(bb[0]),myOf(bb[1]),mxOf(bb[2]),myOf(bb[3]));}
+function fitGround(lat, lon, widthG) {if(S.lock)widthG=TD_MAP_W;return applyMapView({cx:mxOf(lon),cy:myOf(lat),s:cw/(widthG*kAt(lat))});}
 function zoomAt(px, py, f) { if (providerTransform()) { providerZoomAt(px, py, f); return; } const [mx, my] = toM(px, py); V.s *= f; clampView(); const [nx, ny] = toM(px, py); V.cx += mx - nx; V.cy += my - ny; clampView(); }
 
 /* ── 바탕 그리기 ───────────────────────────────────────── */
