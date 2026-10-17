@@ -6,6 +6,13 @@ const fakeWorld = (lon,lat) => { const y=myOf(lat), d=y-myOf(36); return [mxOf(l
 const fakeDestination=(lon,lat,meter)=>{const a=meter/R,phi=lat*D2R,phi2=Math.asin(Math.sin(phi)*Math.cos(a));return [lon+Math.atan2(Math.sin(a)*Math.cos(phi),Math.cos(a)-Math.sin(phi)*Math.sin(phi2))/D2R,phi2/D2R];};
 const fakeCoord = (x,y) => { const d=y-myOf(36); return [lonOf(x-.03*d-1e-7*d*d),latOf(y)]; };
 class P3ProbeLL { constructor(lat,lon) {this.latitude=lat;this.longitude=lon;} lat(){return this.latitude;} lng(){return this.longitude;} }
+class P3ProbeBounds {constructor(sw,ne){this.sw=sw;this.ne=ne;}getSW(){return this.sw;}getNE(){return this.ne;}}
+function p3StrictBounds(b) {
+  if(!(b instanceof P3ProbeBounds))throw Error('LatLngBounds 입력 계약');
+  const sw=b.getSW(),ne=b.getNE(),out={west:sw.lng(),south:sw.lat(),east:ne.lng(),north:ne.lat()};
+  if(!Object.values(out).every(Number.isFinite)||out.west>=out.east||out.south>=out.north)throw Error('유효한 경위도 bounds 계약');return out;
+}
+function p3BoundsView(b){return {cx:(mxOf(b.west)+mxOf(b.east))/2,cy:(myOf(b.south)+myOf(b.north))/2,s:Math.min(cw/(mxOf(b.east)-mxOf(b.west)),ch/(myOf(b.north)-myOf(b.south)))};}
 class P3ProbeXY { constructor(x,y) {this.x=x;this.y=y;} }
 // native DOM 기준은 adapter.project/referenceProject/toS를 호출하지 않고 SDK 렌더러를 모사한다.
 class P3NativeMarker {
@@ -15,7 +22,7 @@ class P3NativeMarker {
     this.element.style.position='absolute';this.element.style.left=((w[0]-c[0])*2**f.z/200000+cw/2-anchor.x+(f.nativeOffset||0))+'px';this.element.style.top=((c[1]-w[1])*2**f.z/200000+ch/2-anchor.y)+'px';}
 }
 class FakeMapAdapter {
-  init(container) { this.container=container; this.instances=1; this.modes=[]; this.error=0; this.center=[128,36]; this.z=10; this.markers=new Set();this.sdk={LatLng:P3ProbeLL,Size:P3ProbeXY,Point:P3ProbeXY,Marker:P3NativeMarker};this.map={owner:this,setZoom:z=>{this.z=z;this.renderMarkers();},
+  init(container) { this.container=container; this.instances=1; this.modes=[]; this.error=0; this.center=[128,36]; this.z=10; this.markers=new Set();this.sdk={LatLng:P3ProbeLL,LatLngBounds:P3ProbeBounds,Size:P3ProbeXY,Point:P3ProbeXY,Marker:P3NativeMarker};this.map={owner:this,fitBounds:b=>{this.lastRequestedBounds=p3StrictBounds(b);this.applyGeographicBounds(this.lastRequestedBounds);},setZoom:z=>{this.z=z;this.renderMarkers();},
       panBy:p=>{const c=fakeWorld(...this.center),ll=fakeCoord(c[0]+p.x/this.scale(),c[1]-p.y/this.scale());this.setCenter(...ll);},
       zoomBy:(delta,ll)=>{const p=this.referenceProject(ll.lng(),ll.lat()),w=fakeWorld(ll.lng(),ll.lat());this.z=Math.max(6,Math.min(21,this.z+delta));this.center=fakeCoord(w[0]-(p[0]-cw/2)/this.scale(),w[1]+(p[1]-ch/2)/this.scale());this.renderMarkers();this.viewportListener?.('zoom_changed');this.viewportListener?.('idle');}}; }
   setMode(mode) { this.modes.push(mode); this.loaded?.(); }
@@ -27,7 +34,8 @@ class FakeMapAdapter {
   onViewportReady(fn){this.viewportListener=fn;}
   panPixels(dx,dy){NaverMapAdapter.prototype.panPixels.call(this,dx,dy);}
   scale() { return 2**this.z/200000; }
-  syncFromAppViewport(view=V) { this.syncCalls=(this.syncCalls||0)+1;this.center=[lonOf(view.cx),latOf(view.cy)]; this.z=Math.max(6,Math.min(21,Math.round(Math.log2(view.s*200000)))); this.zoomTarget=this.z; this.viewport={...view,s:this.scale()}; this.renderMarkers();this.loaded?.(); }
+  syncFromAppViewport(view=V) {this.syncCalls=(this.syncCalls||0)+1;NaverMapAdapter.prototype.syncFromAppViewport.call(this,view);}
+  applyGeographicBounds(bounds) {const view=p3BoundsView(bounds);this.center=[lonOf(view.cx),latOf(view.cy)];this.z=Math.max(6,Math.min(21,Math.round(Math.log2(view.s*200000))));this.zoomTarget=this.z;this.viewport={...view,s:this.scale()};this.renderMarkers();this.loaded?.();}
   resize() { this.size=[cw,ch];this.renderMarkers(); }
   project(lon,lat) { const w=fakeWorld(lon,lat), c=fakeWorld(...this.center), s=this.scale(); return [(w[0]-c[0])*s+cw/2+this.error,(c[1]-w[1])*s+ch/2]; }
   referenceProject(lon,lat) { const w=fakeWorld(lon,lat), c=fakeWorld(...this.center); return [(w[0]-c[0])*2**this.z/200000+cw/2,(c[1]-w[1])*2**this.z/200000+ch/2]; }
@@ -127,11 +135,11 @@ window.p3AdapterUnit = () => {
   const calls=[];let instances=0;
   class LL {constructor(lat,lon){this.latitude=lat;this.longitude=lon;}lat(){return this.latitude;}lng(){return this.longitude;}}
   class XY {constructor(x,y){this.x=x;this.y=y;}}
-  const sdk={LatLng:LL,Point:XY,Size:XY,MapTypeId:{SATELLITE:'S',NORMAL:'N',HYBRID:'H'},Event:{addListener:()=>1,removeListener:l=>calls.push(['remove',l])},Map:class {
+  const sdk={LatLng:LL,LatLngBounds:P3ProbeBounds,Point:XY,Size:XY,MapTypeId:{SATELLITE:'S',NORMAL:'N',HYBRID:'H'},Event:{addListener:()=>1,removeListener:l=>calls.push(['remove',l])},Map:class {
     constructor(c,o){instances++;this.z=o.zoom;this.c=o.center;}
     setMapTypeId(m){calls.push(m);}setCenter(c){this.c=c;calls.push('center');}getCenter(){return this.c;}
     setZoom(z){this.z=z;}getZoom(){return this.z;}setSize(s){calls.push('size');}setOptions(o){calls.push('options');}
-    fitBounds(b){this.c=new LL((b[0].lat()+b[1].lat())/2,(b[0].lng()+b[1].lng())/2);calls.push('fitBounds');}
+    fitBounds(b){const g=p3StrictBounds(b);this.c=new LL((g.south+g.north)/2,(g.west+g.east)/2);calls.push('fitBounds');}
     getBounds(){return {getSW:()=>new LL(33,124),getNE:()=>new LL(39,132)};}destroy(){calls.push('destroy');}
     getProjection(){const scale=2**this.z/200000, center=fakeWorld(this.c.lng(),this.c.lat()); return {
       getDestinationCoord:(c,a,m)=>{const ll=fakeDestination(c.lng(),c.lat(),m);return new LL(ll[1],ll[0]);},

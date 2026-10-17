@@ -1,9 +1,8 @@
 // p3_command_checks.js — 지연 fitBounds·검색·범위 버튼의 목표 도착 검사
 class CommandMapAdapter extends DelayedMapAdapter {
   enqueue(center,z) {
-    const ticket=++this.ticket;this.reportedCenter=center;this.reportedZoom=z;
+    const ticket=++this.ticket;if(this.noop)return;this.reportedCenter=center;this.reportedZoom=z;
     this.viewportListener?.('center_changed');this.viewportListener?.('zoom_changed');this.viewportListener?.('idle');
-    if(this.noop)return;
     let frames=0;const delay=this.fitDelay||2+ticket%4;
     const commit=()=>{if(++frames<delay){requestAnimationFrame(commit);return;}
       if(ticket===this.ticket){this.center=center;this.z=z;this.renderMarkers();this.viewportListener?.('bounds_changed');}
@@ -19,21 +18,27 @@ window.p3CommandTest=async()=>{
   f.onViewportReady(providerViewportChanged);f.onTilesLoaded(()=>{PROVIDER_MAP.loaded=true;providerCheck();});
   f.center=[126.502,36.151];f.reportedCenter=f.center;f.z=13;f.reportedZoom=f.z;providerSync();providerCheck();
   const savedAB=JSON.stringify({A:S.A,B:S.B}),samples=[];
+  const legacyBefore=providerViewportKey();let legacyArrayRejected=false;
+  try{f.map.fitBounds([new P3ProbeLL(36,129),new P3ProbeLL(37,130)]);}catch(_){legacyArrayRejected=true;}
+  check(legacyArrayRejected&&providerViewportKey()===legacyBefore,'객체 배열은 선택한 LatLngBounds 계약에서 거절');
   const verify=async(name,command,lat,lon)=>{
     check(command?.ok&&command.status==='settled',name+' 명령 완료 '+command?.reason);
+    check(command.fitBoundsType==='LatLngBounds'&&JSON.stringify(command.requestedBounds)===JSON.stringify(f.lastRequestedBounds),'실 adapter와 mock 동일 bounds');
     const o=command.trace.at(-1);check(o.reached&&o.inside&&command.trace.at(-2).key===o.key,name+' 목표/중심/배율·두 프레임 안정화');
     const c=f.unproject(cw/2,ch/2);check(Math.abs(V.cx-mxOf(c[0]))<.001&&Math.abs(V.cy-myOf(c[1]))<.001&&Math.abs(V.s*kAt(c[1])-f.getGroundScale())<1e-9,'settled V 호환');
     const r=await naksigwangMapDiagnostic(lat??command.target[1],lon??command.target[0]);
     check(r.valid&&r.errorPx<=2&&r.domMismatchPx<=2,name+' native DOM/Canvas');
     check(JSON.stringify({A:S.A,B:S.B})===savedAB,'A/B 원좌표 보존');
-    samples.push({name,id:command.id,target:command.target,center:command.center,zoom:r.providerZoom,errorPx:r.errorPx,domMismatchPx:r.domMismatchPx,trace:command.trace});
+    samples.push({name,id:command.id,target:command.target,center:command.center,zoom:r.providerZoom,errorPx:r.errorPx,domMismatchPx:r.domMismatchPx,requestedBounds:command.requestedBounds,fitBoundsType:command.fitBoundsType,before:command.before,after:command.after,sdkViewportUnchanged:command.sdkViewportUnchanged,trace:command.trace});
   };
-  for(const [name,lat,lon,width] of [['홍원→속초',38.20854,128.5947,10000],['속초→포항',36.05,129.38,10000]]){
+  for(const [name,lat,lon,width] of [['홍원→속초',38.20854,128.5947,10000],['속초→포항',36.05,129.38,10000],['포항→주문진',37.89192,128.8312883028771,10000],['주문진→홍원',36.15983,126.50376,10000],['홍원→포항',36.05,129.38,10000],['포항→속초',38.20854,128.5947,10000]]){
     const before=JSON.stringify(V),reads=PROVIDER_MAP.reads,promise=fitGround(lat,lon,width);
     providerSync();providerReadView();check(PROVIDER_MAP.commandPending&&JSON.stringify(V)===before&&PROVIDER_MAP.reads===reads,'fit 직후 옛 viewport 읽기 차단');
-    await verify(name,await promise,lat,lon);
+    const command=await promise;
+    check(JSON.stringify(command.before.center)!==JSON.stringify(command.after.center)&&command.before.key!==command.after.key&&JSON.stringify(command.before.bounds)!==JSON.stringify(command.after.bounds)&&!command.sdkViewportUnchanged,name+' 실제 SDK center/key/bounds 변경');
+    await verify(name,command,lat,lon);
   }
-  await verify('포항→전국',await fitLonLat([124.4,32.9,131.95,38.7]));
+  await verify('전국 범위 이동',await fitLonLat([124.4,32.9,131.95,38.7]));
   await verify('전국→주문진 2km',await fitGround(37.89192,128.8312883028771,2000),37.89192,128.8312883028771);
   const zoomOnly=await fitGround(37.89192,128.8312883028771,1000);
   check(zoomOnly.trace.some(o=>o.zoomPending&&!o.reached),'같은 중심의 옛 zoom projection도 확정하지 않음');
@@ -56,6 +61,7 @@ window.p3CommandTest=async()=>{
   const timeout=PROVIDER_MAP.commandTimeoutMs;PROVIDER_MAP.commandTimeoutMs=180;f.noop=true;
   const failed=await naksigwangMapDiagnostic.fit(10000,36.05,129.38);
   check(!failed.valid&&failed.reason==='requested viewport not reached'&&failed.command.status==='failed'&&failed.errorPx===null,'미도착 원인 구분');
+  check(failed.command.sdkViewportUnchanged&&failed.command.trace.every(s=>s.sdkViewportUnchanged),'SDK viewport 전체 미변경 명시');
   check(PROVIDER_MAP.active&&!PROVIDER_MAP.commandPending,'미도착은 projection fallback 아님');
   f.noop=false;PROVIDER_MAP.commandTimeoutMs=timeout;
   const recovered=await naksigwangMapDiagnostic.fit(10000,36.05,129.38);check(recovered.valid&&recovered.errorPx<=2,'timeout 뒤 재검색');
@@ -63,5 +69,5 @@ window.p3CommandTest=async()=>{
   const interrupted=fitGround(38.20854,128.5947,10000);providerPanBy(5,3);check((await interrupted).reason==='interrupted','사용자 이동 우선');
   await new Promise(r=>setTimeout(r,200));
   providerClearDiagnostic();f.destroy();PROVIDER_MAP.adapter=null;providerFallback();
-  return {samples,slow:{errorPx:slow.errorPx,frames:slow.command.trace.length},timeout:{reason:failed.reason,center:failed.center,target:failed.command.target},superseded:results.length-1,maxErrorPx:Math.max(...samples.map(s=>s.errorPx),slow.errorPx,recovered.errorPx)};
+  return {samples,legacyArrayRejected,slow:{errorPx:slow.errorPx,frames:slow.command.trace.length},timeout:{reason:failed.reason,sdkViewportUnchanged:failed.command.sdkViewportUnchanged,before:failed.command.before,after:failed.command.after,center:failed.center,target:failed.command.target},superseded:results.length-1,maxErrorPx:Math.max(...samples.map(s=>s.errorPx),slow.errorPx,recovered.errorPx)};
 };

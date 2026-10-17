@@ -18,7 +18,7 @@ class DelayedMapAdapter extends FakeMapAdapter {
   getCenter(){return this.reportedCenter;}
   getZoom(){return this.reportedZoom;}
   setCenter(lon,lat){this.enqueue([lon,lat],this.z);}
-  syncFromAppViewport(view=V){this.syncCalls=(this.syncCalls||0)+1;this.enqueue([lonOf(view.cx),latOf(view.cy)],Math.max(6,Math.min(21,Math.round(Math.log2(view.s*200000)))));this.loaded?.();}
+  applyGeographicBounds(bounds){const view=p3BoundsView(bounds);this.enqueue([lonOf(view.cx),latOf(view.cy)],Math.max(6,Math.min(21,Math.round(Math.log2(view.s*200000)))));this.loaded?.();}
 }
 window.p3ViewportTest=async()=>{
   const check=(ok,msg)=>{if(!ok)throw Error(msg);},wait=async()=>{for(let i=0;i<8;i++)await new Promise(requestAnimationFrame);};
