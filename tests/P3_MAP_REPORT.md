@@ -517,3 +517,21 @@ await naksigwangMapDiagnostic.fit(10000,36.05,129.38)
 ```
 
 마지막 fit의 command.status/errorPx/sdkViewportUnchanged, 1~2분 반복 pan/zoom의 렉, overlay 잔상·누적 drift, 위성 유지와 블록 providerOnly 비교는 모두 **사용자 localhost 재검증 대기**다.
+
+## 실제 settle-failure 확인 후 정책 수정 (2026-10-18)
+
+사용자의 실제 localhost 진단은 active=false, failed=true, lastFallbackReason=settle-failure, fallbackCount=1이었다. 이번 실제 provider 소실의 직접 경로는 개별 IMG가 아니라 providerQueueSettle의 watchdog→providerFallback으로 확인됐다. 위의 이전 원인 미확인 기록은 이 새 증거로 갱신한다. 위성 영상 블록 자체의 원인은 여전히 미확인이다.
+
+이전 판정은 reported center가 화면 중심에서 2 CSS px 이내, zoom 변화와 scale 변화의 조합, 완전히 같은 viewport JSON key 2프레임을 요구했다. key가 바뀌면 frames도 0으로 되돌렸으므로 기존 watchdog은 총 120프레임 상한이 아니라 같은 key가 지속된 120프레임이었다. 같은 key에서 ready=true라면 2프레임 뒤 성공하므로 실제 발동 직전에는 center 조건 또는 zoom/scale 대기가 계속 실패했을 가능성이 있다(코드에서 도출한 추론). 이전 진단에는 이 두 조건 수치가 없어 어느 쪽인지는 확정할 수 없다.
+
+[NAVER 공식 Map 문서](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Map.html)는 idle을 지도 움직임 종료, tilesloaded를 모든 타일 로드로 구분한다. 문서의 이벤트 의미는 앱의 2px·정확한 key 일치 조건을 보장하지 않는다. 타일 로드는 이 settle ready 식의 직접 입력이 아니다. fractional transform이나 애니메이션 도중 보고 중심과 표시 중심이 달라질 수 있다는 가능성과 실제 사용자 원인은 구분한다. 보통 단일 CSS/DPR 반올림만으로 2px 초과가 설명되지는 않으며, 누적 transform/SDK projection 상태는 새 계측으로 확인해야 한다. 소수 key 변동은 완전 일치를 깨뜨리는 것을 mock으로 재현했다. 실제 SDK의 수치 오차라고 단정하지 않는다.
+
+정합 안전 기준은 완화하지 않는다. 감시를 총 120 RAF로 제한하고 timeout에서는 한 번 API health를 확인한다. 정상 map/projection/center/bounds이면 현재 표시 중심을 안전하게 read하고 provider와 native 입력을 유지한다. failed=false, healthState=settle-timeout이며 이전 Canvas는 숨김/보류한다. 스스로 감시를 재시작하지 않고 다음 idle/interaction에서 새 settle을 시도한다. 성공하면 기존 최종 viewport→DRAW→REVEAL로 돌아간다. 다음 이벤트에서도 기준을 못 맞추면 지도는 유지되고 overlay만 계속 보류될 수 있다.
+
+settle-failure는 fallback allowed/recoverable 목록과 호출 경로에서 제거했다. map 객체 소실이나 지속 API/projection 실패는 기존 fatal 경로를 유지하며 3회 상태 재확인 실패 시 fallback한다. timeout 진단은 settleTimedOut, settleTimeoutCount, lastSettleObservation(frames/stableFrames/keyChanges/centerErrorPx/zoom/scale/stableZoom/stableScale/zoomScalePending/ready), settleFailure의 마지막 timeout snapshot, settleRecoveredAt을 반환한다. credential/URL은 포함하지 않는다. 마지막 timeout 기록은 성공 후에도 보존하고 settleTimedOut은 성공 시 false로 바꾼다.
+
+새 p3_settle_checks는 center 3px, zoom/scale 대기, 소수 bounds key 변동을 각각 재현한다. 동일 RAF 함수 호출을 결정적으로 120회 진행해 watchdog 경계를 확인하고 healthy timeout 뒤 active=true/failed=false/fallback 0, native 입력 유지, heavy 0, 다음 실제 idle 후 base 1회를 검사한다. 100회 pan/zoom 모두에 timeout을 강제한 뒤에도 provider 유지와 마지막 Marker/Canvas 정합을 검사한다. 이 결정적 RAF 검사는 실제 100회 NAVER 렌더링 시간 계측과 구분한다. 기존 health 6개 화면/DPR에 포함해 지속 API 3회 실패와 SDK/auth/offline fatal 검사도 함께 유지한다.
+
+localhost에서 최신 빌드 후 1~2분 pan/zoom하고 `naksigwangTileDiagnostic()`을 확인한다. timeout이 발생해도 active=true, failed=false, providerDOMVisible=true, healthState=settle-timeout이어야 하며 fallbackCount가 증가하면 안 된다(API/offline 등 다른 fatal 사유는 별도). lastSettleObservation과 settleFailure.observation을 기록하고 한 번 더 이동한 뒤 idle에서 settleTimedOut=false와 overlay 복원을 확인한다. `await naksigwangMapDiagnostic.fit(10000,36.05,129.38)`도 확인한다. 최신 실제 위성 유지·성능·overlay와 포항 fit은 **사용자 localhost 재검증 대기**이며 P3 완료/merge 가능 판정은 하지 않는다.
+
+최종 로컬 결과는 `tests/P3_SETTLE_RESULTS.json`에 기록했다. health 6개 조합에서 각 100회, 총 600회 강제 pan/zoom timeout의 fallback 0·moving heavy 0을 확인했다. 다음 idle 후 base 1회와 Marker 정합을 통과했다. 기존 provider 20 화면/DPR 및 SDK 실패 6종 등 32개 결과, performance 12개 조합, legacy 전체 12개 명령이 모두 통과했다. 기존 reveal 테스트의 과거 fatal 기대값을 새 정책으로 바꾼 후 전체 성능 행렬을 재실행했다. performance의 이동 중 heavy 0, 영구 숨김 0, Marker 최대 0.4469px, A/B 최대 0.9014px, idle 최대 98ms였다. 이 로컬 mock 시간값은 실제 사용자 PC 성능을 보장하지 않는다. 빌드 missing ids: [], 플랫폼 빌드 일치, 수심 production 무변경도 통과했다.
