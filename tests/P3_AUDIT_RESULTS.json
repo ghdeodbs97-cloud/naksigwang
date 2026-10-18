@@ -2479,6 +2479,7 @@
         "imgError": 100,
         "missingTilesloaded": 100
       },
+      "wheelZoomChanges": 150,
       "lateEvents": 1600,
       "movingHeavy": 0,
       "movingDepthPrepare": 0,
@@ -2486,592 +2487,16 @@
       "fallbacks": 0,
       "instances": 1,
       "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 270.2000000476837,
-      "missingEndRecordedMs": 270.09999990463257,
-      "maxRecoveryMs": 60.89999985694885,
+      "missingEndRecoveryMs": 274.40000009536743,
+      "missingEndRecordedMs": 274.19999980926514,
+      "maxRecoveryMs": 117.60000014305115,
       "maxMarkerErrorPx": 0,
       "activity": {
-        "fps": 50.75364927635186,
-        "averageFrameMs": 20.804777777724794,
-        "p95FrameMs": 19.59999990463257,
-        "averageWorkMs": 1.5392222252157,
-        "p95WorkMs": 10.300000190734863,
-        "longFrames": 32,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2453,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 320,
-          "structPath": 320,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 320,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 320,
-          "getImageData": 590,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 180,
-        "maxIdleRecoveryMs": 270.09999990463257
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.11421700370764,
-        "averageFrameMs": 16.6728813567404,
-        "p95FrameMs": 18.09999990463257,
-        "averageWorkMs": 0.11166667143503825,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 180,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        390,
-        844
-      ],
-      "dpr": 1.25,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 276.10000014305115,
-      "missingEndRecordedMs": 275.89999985694885,
-      "maxRecoveryMs": 69.29999995231628,
-      "maxMarkerErrorPx": 0.1779712593269096,
-      "activity": {
-        "fps": 50.81960078021863,
-        "averageFrameMs": 20.767277777724797,
-        "p95FrameMs": 21.59999990463257,
-        "averageWorkMs": 1.5178888893127442,
-        "p95WorkMs": 9.799999952316284,
-        "longFrames": 33,
-        "longWorkFrames": 1,
-        "counts": {
-          "frame": 2452,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 320,
-          "structPath": 320,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 320,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 320,
-          "getImageData": 590,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 180,
-        "maxIdleRecoveryMs": 275.89999985694885
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0.1779712593269096,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0.1779712593269096,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0.1779712593269096,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 0.1779712593269096,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 0.1779712593269096,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0.1779712593269096,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0.1779712593269096,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0.1779712593269096,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.37432079178796,
-        "averageFrameMs": 16.652542372881356,
-        "p95FrameMs": 17.90000009536743,
-        "averageWorkMs": 0.12166666587193807,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 180,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        390,
-        844
-      ],
-      "dpr": 1.5,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 280.7000000476837,
-      "missingEndRecordedMs": 280.5,
-      "maxRecoveryMs": 60.69999980926514,
-      "maxMarkerErrorPx": 1.6572562045795678e-13,
-      "activity": {
-        "fps": 50.544595869791095,
-        "averageFrameMs": 20.89711111108462,
-        "p95FrameMs": 24.09999990463257,
-        "averageWorkMs": 1.6873333337571885,
-        "p95WorkMs": 11.299999952316284,
-        "longFrames": 33,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2453,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 320,
-          "structPath": 320,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 320,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 320,
-          "getImageData": 590,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 180,
-        "maxIdleRecoveryMs": 280.5
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 1.6572562045795678e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 1.6572562045795678e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 1.6572562045795678e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 1.6572562045795678e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 1.6572562045795678e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 1.6572562045795678e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 1.6572562045795678e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 1.6572562045795678e-13,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.18657840165489,
-        "averageFrameMs": 16.655932204198027,
-        "p95FrameMs": 18.09999990463257,
-        "averageWorkMs": 0.05499999523162842,
-        "p95WorkMs": 0.10000014305114746,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 180,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        390,
-        844
-      ],
-      "dpr": 2,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 280.39999985694885,
-      "missingEndRecordedMs": 280.2999999523163,
-      "maxRecoveryMs": 61.5,
-      "maxMarkerErrorPx": 0,
-      "activity": {
-        "fps": 49.97850496432978,
-        "averageFrameMs": 21.12855555560854,
-        "p95FrameMs": 23.600000143051147,
-        "averageWorkMs": 1.487555558151669,
-        "p95WorkMs": 8.799999952316284,
-        "longFrames": 33,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2453,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 320,
-          "structPath": 320,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 320,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 320,
-          "getImageData": 590,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 180,
-        "maxIdleRecoveryMs": 280.2999999523163
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.33182503770739,
-        "averageFrameMs": 16.664406780469214,
-        "p95FrameMs": 18.09999990463257,
-        "averageWorkMs": 0.11666667064030965,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 180,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        768,
-        1024
-      ],
-      "dpr": 1,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 282.80000019073486,
-      "missingEndRecordedMs": 282.59999990463257,
-      "maxRecoveryMs": 59.60000014305115,
-      "maxMarkerErrorPx": 0,
-      "activity": {
-        "fps": 49.39374909415184,
-        "averageFrameMs": 21.38861111111111,
-        "p95FrameMs": 28,
-        "averageWorkMs": 1.9649444462193384,
-        "p95WorkMs": 12.600000143051147,
+        "fps": 50.03323315827459,
+        "averageFrameMs": 21.063944444391463,
+        "p95FrameMs": 23.59999990463257,
+        "averageWorkMs": 1.8152777755260467,
+        "p95WorkMs": 12.200000047683716,
         "longFrames": 33,
         "longWorkFrames": 0,
         "counts": {
@@ -3080,22 +2505,22 @@
           "providerViewportKey": 2845,
           "providerCheck": 60,
           "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
+          "renderBase": 494,
+          "coastPath": 461,
+          "structPath": 461,
           "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
+          "drawUI": 524,
+          "drawCrnt": 461,
           "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 461,
+          "getImageData": 731,
           "buildFlowField": 0,
           "particleRespawn": 0
         },
-        "particles": 360,
-        "maxIdleRecoveryMs": 282.59999990463257
+        "particles": 180,
+        "maxIdleRecoveryMs": 274.19999980926514
       },
       "firstFitSequence": [
         {
@@ -3148,10 +2573,10 @@
         }
       ],
       "stationary": {
-        "fps": 60.38039649503959,
-        "averageFrameMs": 16.649152545605677,
-        "p95FrameMs": 17.600000143051147,
-        "averageWorkMs": 0.12999999523162842,
+        "fps": 60.18054162487462,
+        "averageFrameMs": 16.638983051655657,
+        "p95FrameMs": 18,
+        "averageWorkMs": 0.09166666269302368,
         "p95WorkMs": 0.20000004768371582,
         "longFrames": 0,
         "longWorkFrames": 0,
@@ -3175,14 +2600,14 @@
           "buildFlowField": 0,
           "particleRespawn": 0
         },
-        "particles": 360,
+        "particles": 180,
         "maxIdleRecoveryMs": 0
       }
     },
     {
       "viewport": [
-        768,
-        1024
+        390,
+        844
       ],
       "dpr": 1.25,
       "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
@@ -3199,6 +2624,7 @@
         "imgError": 100,
         "missingTilesloaded": 100
       },
+      "wheelZoomChanges": 150,
       "lateEvents": 1600,
       "movingHeavy": 0,
       "movingDepthPrepare": 0,
@@ -3206,17 +2632,17 @@
       "fallbacks": 0,
       "instances": 1,
       "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 284.7000000476837,
-      "missingEndRecordedMs": 284.5,
-      "maxRecoveryMs": 63.299999952316284,
-      "maxMarkerErrorPx": 0.17821725241867625,
+      "missingEndRecoveryMs": 269.5,
+      "missingEndRecordedMs": 269.2999999523163,
+      "maxRecoveryMs": 62.299999952316284,
+      "maxMarkerErrorPx": 0.1779712593269096,
       "activity": {
-        "fps": 49.70829559100305,
-        "averageFrameMs": 21.147722222275203,
-        "p95FrameMs": 26.399999856948853,
-        "averageWorkMs": 1.6989444400204552,
-        "p95WorkMs": 10.299999952316284,
-        "longFrames": 33,
+        "fps": 50.56157773569099,
+        "averageFrameMs": 20.83277777777778,
+        "p95FrameMs": 23.5,
+        "averageWorkMs": 1.64966666592492,
+        "p95WorkMs": 10.399999856948853,
+        "longFrames": 31,
         "longWorkFrames": 0,
         "counts": {
           "frame": 2453,
@@ -3224,79 +2650,79 @@
           "providerViewportKey": 2845,
           "providerCheck": 60,
           "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
+          "renderBase": 494,
+          "coastPath": 461,
+          "structPath": 461,
           "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
+          "drawUI": 524,
+          "drawCrnt": 461,
           "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 461,
+          "getImageData": 731,
           "buildFlowField": 0,
           "particleRespawn": 0
         },
-        "particles": 360,
-        "maxIdleRecoveryMs": 284.5
+        "particles": 180,
+        "maxIdleRecoveryMs": 269.2999999523163
       },
       "firstFitSequence": [
         {
           "name": "홍원",
           "status": "settled",
-          "errorPx": 0.17821725241867625,
+          "errorPx": 0.1779712593269096,
           "centerErrorPx": 0
         },
         {
           "name": "속초",
           "status": "settled",
-          "errorPx": 0.17821725241867625,
+          "errorPx": 0.1779712593269096,
           "centerErrorPx": 0
         },
         {
           "name": "포항",
           "status": "settled",
-          "errorPx": 0.17821725241867625,
+          "errorPx": 0.1779712593269096,
           "centerErrorPx": 0
         },
         {
           "name": "주문진",
           "status": "settled",
-          "errorPx": 0.17821725241867625,
+          "errorPx": 0.1779712593269096,
           "centerErrorPx": 0
         },
         {
           "name": "묵호",
           "status": "settled",
-          "errorPx": 0.17821725241867625,
+          "errorPx": 0.1779712593269096,
           "centerErrorPx": 0
         },
         {
           "name": "홍원",
           "status": "settled",
-          "errorPx": 0.17821725241867625,
+          "errorPx": 0.1779712593269096,
           "centerErrorPx": 0
         },
         {
           "name": "포항",
           "status": "settled",
-          "errorPx": 0.17821725241867625,
+          "errorPx": 0.1779712593269096,
           "centerErrorPx": 0
         },
         {
           "name": "속초",
           "status": "settled",
-          "errorPx": 0.17821725241867625,
+          "errorPx": 0.1779712593269096,
           "centerErrorPx": 0
         }
       ],
       "stationary": {
-        "fps": 60.42296072507553,
-        "averageFrameMs": 16.655932204198027,
-        "p95FrameMs": 18,
-        "averageWorkMs": 0.08499999443689982,
-        "p95WorkMs": 0.20000004768371582,
+        "fps": 60.350030186593095,
+        "averageFrameMs": 16.66271186279038,
+        "p95FrameMs": 18.09999990463257,
+        "averageWorkMs": 0.0766666571299235,
+        "p95WorkMs": 0.19999980926513672,
         "longFrames": 0,
         "longWorkFrames": 0,
         "counts": {
@@ -3319,14 +2745,14 @@
           "buildFlowField": 0,
           "particleRespawn": 0
         },
-        "particles": 360,
+        "particles": 180,
         "maxIdleRecoveryMs": 0
       }
     },
     {
       "viewport": [
-        768,
-        1024
+        390,
+        844
       ],
       "dpr": 1.5,
       "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
@@ -3343,6 +2769,7 @@
         "imgError": 100,
         "missingTilesloaded": 100
       },
+      "wheelZoomChanges": 150,
       "lateEvents": 1600,
       "movingHeavy": 0,
       "movingDepthPrepare": 0,
@@ -3350,304 +2777,16 @@
       "fallbacks": 0,
       "instances": 1,
       "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 282.59999990463257,
-      "missingEndRecordedMs": 282.2000000476837,
-      "maxRecoveryMs": 73,
-      "maxMarkerErrorPx": 4.582862941503293e-13,
+      "missingEndRecoveryMs": 274.7000000476837,
+      "missingEndRecordedMs": 274.40000009536743,
+      "maxRecoveryMs": 65.79999995231628,
+      "maxMarkerErrorPx": 1.6572562045795678e-13,
       "activity": {
-        "fps": 49.20641609938892,
-        "averageFrameMs": 21.339888888862397,
-        "p95FrameMs": 29,
-        "averageWorkMs": 1.7736666676733228,
-        "p95WorkMs": 10,
-        "longFrames": 37,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2452,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 282.2000000476837
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 4.582862941503293e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 4.582862941503293e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 4.582862941503293e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 4.582862941503293e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 4.582862941503293e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 4.582862941503293e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 4.582862941503293e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 4.582862941503293e-13,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.102173698152754,
-        "averageFrameMs": 16.652542372881356,
-        "p95FrameMs": 18,
-        "averageWorkMs": 0.09833333094914755,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        768,
-        1024
-      ],
-      "dpr": 2,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 270.60000014305115,
-      "missingEndRecordedMs": 270.60000014305115,
-      "maxRecoveryMs": 62.69999980926514,
-      "maxMarkerErrorPx": 0,
-      "activity": {
-        "fps": 48.301185073166906,
-        "averageFrameMs": 21.73900000002649,
-        "p95FrameMs": 32.59999990463257,
-        "averageWorkMs": 1.7701111141840618,
-        "p95WorkMs": 11.099999904632568,
-        "longFrames": 40,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2452,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 270.60000014305115
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.325759104919676,
-        "averageFrameMs": 16.684745760287267,
-        "p95FrameMs": 18,
-        "averageWorkMs": 0.1233333428700765,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        1280,
-        900
-      ],
-      "dpr": 1,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 284.7000000476837,
-      "missingEndRecordedMs": 284.60000014305115,
-      "maxRecoveryMs": 58.09999990463257,
-      "maxMarkerErrorPx": 0,
-      "activity": {
-        "fps": 50.57857101623982,
-        "averageFrameMs": 20.688944444523916,
-        "p95FrameMs": 27.600000143051147,
-        "averageWorkMs": 1.7917777772744496,
-        "p95WorkMs": 10.599999904632568,
+        "fps": 50.59734987876464,
+        "averageFrameMs": 20.841277777751287,
+        "p95FrameMs": 21.200000047683716,
+        "averageWorkMs": 1.591000002755059,
+        "p95WorkMs": 9.800000190734863,
         "longFrames": 32,
         "longWorkFrames": 0,
         "counts": {
@@ -3656,78 +2795,78 @@
           "providerViewportKey": 2845,
           "providerCheck": 60,
           "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
+          "renderBase": 494,
+          "coastPath": 461,
+          "structPath": 461,
           "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
+          "drawUI": 524,
+          "drawCrnt": 461,
           "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 461,
+          "getImageData": 731,
           "buildFlowField": 0,
           "particleRespawn": 0
         },
-        "particles": 360,
-        "maxIdleRecoveryMs": 284.60000014305115
+        "particles": 180,
+        "maxIdleRecoveryMs": 274.40000009536743
       },
       "firstFitSequence": [
         {
           "name": "홍원",
           "status": "settled",
-          "errorPx": 0,
+          "errorPx": 1.6572562045795678e-13,
           "centerErrorPx": 0
         },
         {
           "name": "속초",
           "status": "settled",
-          "errorPx": 0,
+          "errorPx": 1.6572562045795678e-13,
           "centerErrorPx": 0
         },
         {
           "name": "포항",
           "status": "settled",
-          "errorPx": 0,
+          "errorPx": 1.6572562045795678e-13,
           "centerErrorPx": 0
         },
         {
           "name": "주문진",
           "status": "settled",
-          "errorPx": 0,
+          "errorPx": 1.6572562045795678e-13,
           "centerErrorPx": 0
         },
         {
           "name": "묵호",
           "status": "settled",
-          "errorPx": 0,
+          "errorPx": 1.6572562045795678e-13,
           "centerErrorPx": 0
         },
         {
           "name": "홍원",
           "status": "settled",
-          "errorPx": 0,
+          "errorPx": 1.6572562045795678e-13,
           "centerErrorPx": 0
         },
         {
           "name": "포항",
           "status": "settled",
-          "errorPx": 0,
+          "errorPx": 1.6572562045795678e-13,
           "centerErrorPx": 0
         },
         {
           "name": "속초",
           "status": "settled",
-          "errorPx": 0,
+          "errorPx": 1.6572562045795678e-13,
           "centerErrorPx": 0
         }
       ],
       "stationary": {
-        "fps": 60.350030186593095,
-        "averageFrameMs": 16.664406780469214,
+        "fps": 60.07810152912311,
+        "averageFrameMs": 16.681355933011588,
         "p95FrameMs": 18,
-        "averageWorkMs": 0.0783333420753479,
+        "averageWorkMs": 0.10999999443689983,
         "p95WorkMs": 0.20000004768371582,
         "longFrames": 0,
         "longWorkFrames": 0,
@@ -3751,302 +2890,14 @@
           "buildFlowField": 0,
           "particleRespawn": 0
         },
-        "particles": 360,
+        "particles": 180,
         "maxIdleRecoveryMs": 0
       }
     },
     {
       "viewport": [
-        1280,
-        900
-      ],
-      "dpr": 1.25,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 285.10000014305115,
-      "missingEndRecordedMs": 284.7999999523163,
-      "maxRecoveryMs": 65.59999990463257,
-      "maxMarkerErrorPx": 0.22159638103687485,
-      "activity": {
-        "fps": 50.43607042948823,
-        "averageFrameMs": 20.931166666613684,
-        "p95FrameMs": 29.90000009536743,
-        "averageWorkMs": 1.7792222230964236,
-        "p95WorkMs": 9.900000095367432,
-        "longFrames": 36,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2452,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 284.7999999523163
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0.22159638103687485,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0.22159638103687485,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0.22159638103687485,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 0.22159638103687485,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 0.22159638103687485,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0.22159638103687485,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0.22159638103687485,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0.22159638103687485,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.19261637527107,
-        "averageFrameMs": 16.659322035514702,
-        "p95FrameMs": 17.200000047683716,
-        "averageWorkMs": 0.08499997854232788,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        1280,
-        900
-      ],
-      "dpr": 1.5,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 284.5,
-      "missingEndRecordedMs": 284.2999999523163,
-      "maxRecoveryMs": 63.799999952316284,
-      "maxMarkerErrorPx": 2.8421709430404007e-13,
-      "activity": {
-        "fps": 50.073240541599766,
-        "averageFrameMs": 20.73072222219573,
-        "p95FrameMs": 27,
-        "averageWorkMs": 1.6916666656070285,
-        "p95WorkMs": 11.5,
-        "longFrames": 34,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2451,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 284.2999999523163
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 2.8421709430404007e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 2.8421709430404007e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 2.8421709430404007e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 2.8421709430404007e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 2.8421709430404007e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 2.8421709430404007e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 2.8421709430404007e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 2.8421709430404007e-13,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.35003017212058,
-        "averageFrameMs": 16.659322035514702,
-        "p95FrameMs": 17.700000047683716,
-        "averageWorkMs": 0.08666664361953735,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        1280,
-        900
+        390,
+        844
       ],
       "dpr": 2,
       "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
@@ -4063,6 +2914,7 @@
         "imgError": 100,
         "missingTilesloaded": 100
       },
+      "wheelZoomChanges": 150,
       "lateEvents": 1600,
       "movingHeavy": 0,
       "movingDepthPrepare": 0,
@@ -4070,40 +2922,40 @@
       "fallbacks": 0,
       "instances": 1,
       "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 281.89999985694885,
-      "missingEndRecordedMs": 281.59999990463257,
-      "maxRecoveryMs": 64.59999990463257,
+      "missingEndRecoveryMs": 280.90000009536743,
+      "missingEndRecordedMs": 280.7000000476837,
+      "maxRecoveryMs": 60,
       "maxMarkerErrorPx": 0,
       "activity": {
-        "fps": 48.376113923675874,
-        "averageFrameMs": 21.369722222222222,
-        "p95FrameMs": 37.299999952316284,
-        "averageWorkMs": 1.9527777757909563,
-        "p95WorkMs": 15.399999856948853,
-        "longFrames": 46,
+        "fps": 50.318079211984404,
+        "averageFrameMs": 20.823166666693158,
+        "p95FrameMs": 27.09999990463257,
+        "averageWorkMs": 1.700833332935969,
+        "p95WorkMs": 10.299999952316284,
+        "longFrames": 31,
         "longWorkFrames": 0,
         "counts": {
-          "frame": 2451,
+          "frame": 2452,
           "providerSync": 391,
           "providerViewportKey": 2845,
           "providerCheck": 60,
           "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
+          "renderBase": 494,
+          "coastPath": 461,
+          "structPath": 461,
           "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
+          "drawUI": 524,
+          "drawCrnt": 461,
           "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 461,
+          "getImageData": 731,
           "buildFlowField": 0,
           "particleRespawn": 0
         },
-        "particles": 360,
-        "maxIdleRecoveryMs": 281.59999990463257
+        "particles": 180,
+        "maxIdleRecoveryMs": 280.7000000476837
       },
       "firstFitSequence": [
         {
@@ -4156,10 +3008,10 @@
         }
       ],
       "stationary": {
-        "fps": 60.34396057817301,
-        "averageFrameMs": 16.671186443102563,
-        "p95FrameMs": 17.90000009536743,
-        "averageWorkMs": 0.08333333333333333,
+        "fps": 60.08411777060892,
+        "averageFrameMs": 16.662711866831376,
+        "p95FrameMs": 17.5,
+        "averageWorkMs": 0.09333329598108928,
         "p95WorkMs": 0.20000004768371582,
         "longFrames": 0,
         "longWorkFrames": 0,
@@ -4183,14 +3035,14 @@
           "buildFlowField": 0,
           "particleRespawn": 0
         },
-        "particles": 360,
+        "particles": 180,
         "maxIdleRecoveryMs": 0
       }
     },
     {
       "viewport": [
-        1920,
-        1080
+        768,
+        1024
       ],
       "dpr": 1,
       "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
@@ -4207,6 +3059,7 @@
         "imgError": 100,
         "missingTilesloaded": 100
       },
+      "wheelZoomChanges": 150,
       "lateEvents": 1600,
       "movingHeavy": 0,
       "movingDepthPrepare": 0,
@@ -4214,467 +3067,35 @@
       "fallbacks": 0,
       "instances": 1,
       "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 271.09999990463257,
-      "missingEndRecordedMs": 271.09999990463257,
-      "maxRecoveryMs": 90.79999995231628,
-      "maxMarkerErrorPx": 6.122223575328581e-13,
-      "activity": {
-        "fps": 50.73653816724689,
-        "averageFrameMs": 20.517444444497425,
-        "p95FrameMs": 29,
-        "averageWorkMs": 1.9131111103958554,
-        "p95WorkMs": 10.299999952316284,
-        "longFrames": 34,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2453,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 271.09999990463257
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 6.122223575328581e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 6.122223575328581e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 6.122223575328581e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 6.122223575328581e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 6.122223575328581e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 6.122223575328581e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 6.122223575328581e-13,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 6.122223575328581e-13,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.35003017212058,
-        "averageFrameMs": 16.65932203147371,
-        "p95FrameMs": 17.299999952316284,
-        "averageWorkMs": 0.08166666825612386,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        1920,
-        1080
-      ],
-      "dpr": 1.25,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 282.60000014305115,
-      "missingEndRecordedMs": 282.2999999523163,
-      "maxRecoveryMs": 66.80000019073486,
-      "maxMarkerErrorPx": 0.24795912593269998,
-      "activity": {
-        "fps": 49.72542564589857,
-        "averageFrameMs": 20.96172222216924,
-        "p95FrameMs": 31.699999809265137,
-        "averageWorkMs": 1.7738888888888888,
-        "p95WorkMs": 10.299999952316284,
-        "longFrames": 34,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2453,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 282.2999999523163
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0.24795912593269998,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0.24795912593269998,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0.24795912593269998,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 0.24795912593269998,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 0.24795912593269998,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0.24795912593269998,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0.24795912593269998,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0.24795912593269998,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.356100987190416,
-        "averageFrameMs": 16.655932204198027,
-        "p95FrameMs": 17.299999952316284,
-        "averageWorkMs": 0.09666665395100911,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        1920,
-        1080
-      ],
-      "dpr": 1.5,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 282.90000009536743,
-      "missingEndRecordedMs": 282.80000019073486,
-      "maxRecoveryMs": 94.39999985694885,
-      "maxMarkerErrorPx": 0.16605468590910277,
-      "activity": {
-        "fps": 49.59142167461791,
-        "averageFrameMs": 21.017666666640174,
-        "p95FrameMs": 33.09999990463257,
-        "averageWorkMs": 1.8500555558999379,
-        "p95WorkMs": 12.199999809265137,
-        "longFrames": 40,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 2453,
-          "providerSync": 391,
-          "providerViewportKey": 2845,
-          "providerCheck": 60,
-          "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
-          "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
-          "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 282.80000019073486
-      },
-      "firstFitSequence": [
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0.16605468590910277,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0.16605468590910277,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0.16605468590910277,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "주문진",
-          "status": "settled",
-          "errorPx": 0.16605468590910277,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "묵호",
-          "status": "settled",
-          "errorPx": 0.16605468590910277,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "홍원",
-          "status": "settled",
-          "errorPx": 0.16605468590910277,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "포항",
-          "status": "settled",
-          "errorPx": 0.16605468590910277,
-          "centerErrorPx": 0
-        },
-        {
-          "name": "속초",
-          "status": "settled",
-          "errorPx": 0.16605468590910277,
-          "centerErrorPx": 0
-        }
-      ],
-      "stationary": {
-        "fps": 60.07810152912311,
-        "averageFrameMs": 16.677966101694917,
-        "p95FrameMs": 18.200000047683716,
-        "averageWorkMs": 0.06666667064030965,
-        "p95WorkMs": 0.20000004768371582,
-        "longFrames": 0,
-        "longWorkFrames": 0,
-        "counts": {
-          "frame": 60,
-          "providerSync": 0,
-          "providerViewportKey": 0,
-          "providerCheck": 0,
-          "providerAlignment": 0,
-          "renderBase": 0,
-          "coastPath": 0,
-          "structPath": 0,
-          "updateHover": 0,
-          "drawUI": 0,
-          "drawCrnt": 0,
-          "stepParticles": 0,
-          "drawSection": 0,
-          "stationRedraw": 0,
-          "maskRebuild": 0,
-          "getImageData": 0,
-          "buildFlowField": 0,
-          "particleRespawn": 0
-        },
-        "particles": 360,
-        "maxIdleRecoveryMs": 0
-      }
-    },
-    {
-      "viewport": [
-        1920,
-        1080
-      ],
-      "dpr": 2,
-      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
-      "counts": {
-        "drag": 100,
-        "wheel": 100,
-        "mixed": 100,
-        "mode": 30,
-        "tabs": 30,
-        "resize": 30,
-        "fit": 30,
-        "providerOnly": 30,
-        "forcedTimeout": 100,
-        "imgError": 100,
-        "missingTilesloaded": 100
-      },
-      "lateEvents": 1600,
-      "movingHeavy": 0,
-      "movingDepthPrepare": 0,
-      "permanentHidden": 0,
-      "fallbacks": 0,
-      "instances": 1,
-      "modeDepthFetches": 0,
-      "missingEndRecoveryMs": 281.7000000476837,
+      "missingEndRecoveryMs": 281.60000014305115,
       "missingEndRecordedMs": 281.5,
-      "maxRecoveryMs": 67.59999990463257,
+      "maxRecoveryMs": 66.39999985694885,
       "maxMarkerErrorPx": 0,
       "activity": {
-        "fps": 48.016762785050574,
-        "averageFrameMs": 21.593333333333334,
-        "p95FrameMs": 37,
-        "averageWorkMs": 1.9863888918028938,
-        "p95WorkMs": 16.100000143051147,
-        "longFrames": 49,
+        "fps": 49.623625134131494,
+        "averageFrameMs": 21.10127777788374,
+        "p95FrameMs": 30.299999952316284,
+        "averageWorkMs": 2.2718333350287545,
+        "p95WorkMs": 14.699999809265137,
+        "longFrames": 32,
         "longWorkFrames": 0,
         "counts": {
-          "frame": 2452,
+          "frame": 2453,
           "providerSync": 391,
           "providerViewportKey": 2845,
           "providerCheck": 60,
           "providerAlignment": 60,
-          "renderBase": 495,
-          "coastPath": 319,
-          "structPath": 319,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
           "updateHover": 0,
-          "drawUI": 525,
-          "drawCrnt": 319,
+          "drawUI": 524,
+          "drawCrnt": 460,
           "stepParticles": 0,
-          "drawSection": 495,
-          "stationRedraw": 495,
-          "maskRebuild": 319,
-          "getImageData": 589,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
           "buildFlowField": 0,
           "particleRespawn": 0
         },
@@ -4732,10 +3153,1605 @@
         }
       ],
       "stationary": {
-        "fps": 60.13229104316229,
-        "averageFrameMs": 16.65423729056019,
+        "fps": 60.34396057817301,
+        "averageFrameMs": 16.661016949152543,
         "p95FrameMs": 18.09999990463257,
-        "averageWorkMs": 0.08333333730697631,
+        "averageWorkMs": 0.09333331187566121,
+        "p95WorkMs": 0.20000004768371582,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1.25,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 270.39999985694885,
+      "missingEndRecordedMs": 270.2999999523163,
+      "maxRecoveryMs": 66,
+      "maxMarkerErrorPx": 0.17821725241867625,
+      "activity": {
+        "fps": 48.816503281770196,
+        "averageFrameMs": 21.471611111164094,
+        "p95FrameMs": 32.60000014305115,
+        "averageWorkMs": 2.305833333995607,
+        "p95WorkMs": 15.200000047683716,
+        "longFrames": 33,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2453,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 270.2999999523163
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0.17821725241867625,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0.17821725241867625,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0.17821725241867625,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 0.17821725241867625,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 0.17821725241867625,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0.17821725241867625,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0.17821725241867625,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0.17821725241867625,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.404711570402014,
+        "averageFrameMs": 16.65762711783587,
+        "p95FrameMs": 18.09999990463257,
+        "averageWorkMs": 0.07833331823348999,
+        "p95WorkMs": 0.20000004768371582,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1.5,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 283,
+      "missingEndRecordedMs": 282.7000000476837,
+      "maxRecoveryMs": 65.29999995231628,
+      "maxMarkerErrorPx": 4.582862941503293e-13,
+      "activity": {
+        "fps": 49.00863447393668,
+        "averageFrameMs": 21.368833333386316,
+        "p95FrameMs": 33.799999952316284,
+        "averageWorkMs": 2.166388886769613,
+        "p95WorkMs": 12.399999856948853,
+        "longFrames": 33,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2452,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 282.7000000476837
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 4.582862941503293e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 4.582862941503293e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 4.582862941503293e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 4.582862941503293e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 4.582862941503293e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 4.582862941503293e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 4.582862941503293e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 4.582862941503293e-13,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.356100987190416,
+        "averageFrameMs": 16.664406780469214,
+        "p95FrameMs": 18,
+        "averageWorkMs": 0.09500000874201457,
+        "p95WorkMs": 0.20000004768371582,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 2,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 262.2999999523163,
+      "missingEndRecordedMs": 262,
+      "maxRecoveryMs": 69.09999990463257,
+      "maxMarkerErrorPx": 0,
+      "activity": {
+        "fps": 48.60086613044469,
+        "averageFrameMs": 21.841666666666665,
+        "p95FrameMs": 33.5,
+        "averageWorkMs": 2.132722224526935,
+        "p95WorkMs": 12.900000095367432,
+        "longFrames": 39,
+        "longWorkFrames": 1,
+        "counts": {
+          "frame": 2451,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 262
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.289389079078866,
+        "averageFrameMs": 16.66779661178589,
+        "p95FrameMs": 18.100000143051147,
+        "averageWorkMs": 0.10166664918263753,
+        "p95WorkMs": 0.20000004768371582,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 273.2999999523163,
+      "missingEndRecordedMs": 273.2999999523163,
+      "maxRecoveryMs": 68.20000004768372,
+      "maxMarkerErrorPx": 0,
+      "activity": {
+        "fps": 49.99500661359204,
+        "averageFrameMs": 20.80450000007947,
+        "p95FrameMs": 31.09999990463257,
+        "averageWorkMs": 2.1502777757909564,
+        "p95WorkMs": 12.799999952316284,
+        "longFrames": 32,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2453,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 273.2999999523163
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.38039649503959,
+        "averageFrameMs": 16.652542372881356,
+        "p95FrameMs": 17.699999809265137,
+        "averageWorkMs": 0.0950000007947286,
+        "p95WorkMs": 0.20000004768371582,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.25,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 283.40000009536743,
+      "missingEndRecordedMs": 283.2000000476837,
+      "maxRecoveryMs": 62.60000014305115,
+      "maxMarkerErrorPx": 0.22159638103687485,
+      "activity": {
+        "fps": 49.64669788662381,
+        "averageFrameMs": 20.93466666671965,
+        "p95FrameMs": 32.60000014305115,
+        "averageWorkMs": 2.043888887564341,
+        "p95WorkMs": 11.200000047683716,
+        "longFrames": 38,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2450,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 283.2000000476837
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0.22159638103687485,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0.22159638103687485,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0.22159638103687485,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 0.22159638103687485,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 0.22159638103687485,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0.22159638103687485,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0.22159638103687485,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0.22159638103687485,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.36217303822938,
+        "averageFrameMs": 16.6728813567404,
+        "p95FrameMs": 17.299999952316284,
+        "averageWorkMs": 0.0799999992052714,
+        "p95WorkMs": 0.20000004768371582,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.5,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 272.59999990463257,
+      "missingEndRecordedMs": 272.5,
+      "maxRecoveryMs": 60.89999985694885,
+      "maxMarkerErrorPx": 2.8421709430404007e-13,
+      "activity": {
+        "fps": 49.85253737414828,
+        "averageFrameMs": 20.860166666640175,
+        "p95FrameMs": 30.40000009536743,
+        "averageWorkMs": 2.0748333330949147,
+        "p95WorkMs": 12.399999856948853,
+        "longFrames": 38,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2451,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 272.5
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 2.8421709430404007e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 2.8421709430404007e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 2.8421709430404007e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 2.8421709430404007e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 2.8421709430404007e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 2.8421709430404007e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 2.8421709430404007e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 2.8421709430404007e-13,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.10819476203639,
+        "averageFrameMs": 16.661016949152543,
+        "p95FrameMs": 17.59999990463257,
+        "averageWorkMs": 0.05333335399627685,
+        "p95WorkMs": 0.10000014305114746,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 271.2000000476837,
+      "missingEndRecordedMs": 271,
+      "maxRecoveryMs": 59,
+      "maxMarkerErrorPx": 0,
+      "activity": {
+        "fps": 48.24974113274098,
+        "averageFrameMs": 21.452277777724795,
+        "p95FrameMs": 35.299999952316284,
+        "averageWorkMs": 2.1373888925711313,
+        "p95WorkMs": 16.799999952316284,
+        "longFrames": 50,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2451,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 271
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.277275475811464,
+        "averageFrameMs": 16.677966101694917,
+        "p95FrameMs": 17.199999809265137,
+        "averageWorkMs": 0.06333330472310385,
+        "p95WorkMs": 0.10000014305114746,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 282.2999999523163,
+      "missingEndRecordedMs": 282.2000000476837,
+      "maxRecoveryMs": 91.39999985694885,
+      "maxMarkerErrorPx": 6.122223575328581e-13,
+      "activity": {
+        "fps": 49.48706615569777,
+        "averageFrameMs": 21.188833333386317,
+        "p95FrameMs": 32.90000009536743,
+        "averageWorkMs": 2.3106666632493336,
+        "p95WorkMs": 15.399999856948853,
+        "longFrames": 32,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2452,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 282.2000000476837
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 6.122223575328581e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 6.122223575328581e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 6.122223575328581e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 6.122223575328581e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 6.122223575328581e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 6.122223575328581e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 6.122223575328581e-13,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 6.122223575328581e-13,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.34396056370341,
+        "averageFrameMs": 16.65762712187686,
+        "p95FrameMs": 17.299999952316284,
+        "averageWorkMs": 0.07666667302449544,
+        "p95WorkMs": 0.10000014305114746,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.25,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 284.40000009536743,
+      "missingEndRecordedMs": 284.19999980926514,
+      "maxRecoveryMs": 63.40000009536743,
+      "maxMarkerErrorPx": 0.24795912593269998,
+      "activity": {
+        "fps": 49.258313972004316,
+        "averageFrameMs": 21.37949999994702,
+        "p95FrameMs": 28.5,
+        "averageWorkMs": 2.074444441927804,
+        "p95WorkMs": 11.799999952316284,
+        "longFrames": 41,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2453,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 284.19999980926514
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0.24795912593269998,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0.24795912593269998,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0.24795912593269998,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 0.24795912593269998,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 0.24795912593269998,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0.24795912593269998,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0.24795912593269998,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0.24795912593269998,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.138318128828686,
+        "averageFrameMs": 16.661016949152543,
+        "p95FrameMs": 17.600000143051147,
+        "averageWorkMs": 0.07666667302449544,
+        "p95WorkMs": 0.20000004768371582,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.5,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 282.5,
+      "missingEndRecordedMs": 282.2999999523163,
+      "maxRecoveryMs": 70.90000009536743,
+      "maxMarkerErrorPx": 0.16605468590910277,
+      "activity": {
+        "fps": 49.02107846386645,
+        "averageFrameMs": 21.46288888891538,
+        "p95FrameMs": 30.200000047683716,
+        "averageWorkMs": 2.0179999997880724,
+        "p95WorkMs": 12.899999856948853,
+        "longFrames": 37,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2451,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 282.2999999523163
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0.16605468590910277,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0.16605468590910277,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0.16605468590910277,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 0.16605468590910277,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 0.16605468590910277,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0.16605468590910277,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0.16605468590910277,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0.16605468590910277,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.16847171794118,
+        "averageFrameMs": 16.681355933011588,
+        "p95FrameMs": 18.299999952316284,
+        "averageWorkMs": 0.10499998728434244,
+        "p95WorkMs": 0.20000004768371582,
+        "longFrames": 0,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 0,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "scope": "실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증",
+      "counts": {
+        "drag": 100,
+        "wheel": 100,
+        "mixed": 100,
+        "mode": 30,
+        "tabs": 30,
+        "resize": 30,
+        "fit": 30,
+        "providerOnly": 30,
+        "forcedTimeout": 100,
+        "imgError": 100,
+        "missingTilesloaded": 100
+      },
+      "wheelZoomChanges": 150,
+      "lateEvents": 1600,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "instances": 1,
+      "modeDepthFetches": 0,
+      "missingEndRecoveryMs": 282.7000000476837,
+      "missingEndRecordedMs": 282.2999999523163,
+      "maxRecoveryMs": 63.799999952316284,
+      "maxMarkerErrorPx": 0,
+      "activity": {
+        "fps": 47.151934652834086,
+        "averageFrameMs": 21.980833333333333,
+        "p95FrameMs": 34.30000019073486,
+        "averageWorkMs": 2.1347222212950387,
+        "p95WorkMs": 13.400000095367432,
+        "longFrames": 44,
+        "longWorkFrames": 0,
+        "counts": {
+          "frame": 2451,
+          "providerSync": 391,
+          "providerViewportKey": 2845,
+          "providerCheck": 60,
+          "providerAlignment": 60,
+          "renderBase": 494,
+          "coastPath": 460,
+          "structPath": 460,
+          "updateHover": 0,
+          "drawUI": 524,
+          "drawCrnt": 460,
+          "stepParticles": 0,
+          "drawSection": 494,
+          "stationRedraw": 494,
+          "maskRebuild": 460,
+          "getImageData": 730,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        },
+        "particles": 360,
+        "maxIdleRecoveryMs": 282.2999999523163
+      },
+      "firstFitSequence": [
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "주문진",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "묵호",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "홍원",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "포항",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        },
+        {
+          "name": "속초",
+          "status": "settled",
+          "errorPx": 0,
+          "centerErrorPx": 0
+        }
+      ],
+      "stationary": {
+        "fps": 60.31363088347002,
+        "averageFrameMs": 16.664406780469214,
+        "p95FrameMs": 17.300000190734863,
+        "averageWorkMs": 0.09166665474573771,
         "p95WorkMs": 0.20000004768371582,
         "longFrames": 0,
         "longWorkFrames": 0,
