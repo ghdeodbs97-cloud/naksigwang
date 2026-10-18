@@ -25,6 +25,7 @@
       "settle": {
         "healthyTimeoutRetained": true,
         "nextIdleRecovered": true,
+        "fitRecovered": true,
         "reasonCases": [
           "centerErrorPx",
           "zoomScalePending",
@@ -75,6 +76,7 @@
       "settle": {
         "healthyTimeoutRetained": true,
         "nextIdleRecovered": true,
+        "fitRecovered": true,
         "reasonCases": [
           "centerErrorPx",
           "zoomScalePending",
@@ -125,6 +127,7 @@
       "settle": {
         "healthyTimeoutRetained": true,
         "nextIdleRecovered": true,
+        "fitRecovered": true,
         "reasonCases": [
           "centerErrorPx",
           "zoomScalePending",
@@ -175,6 +178,7 @@
       "settle": {
         "healthyTimeoutRetained": true,
         "nextIdleRecovered": true,
+        "fitRecovered": true,
         "reasonCases": [
           "centerErrorPx",
           "zoomScalePending",
@@ -225,6 +229,7 @@
       "settle": {
         "healthyTimeoutRetained": true,
         "nextIdleRecovered": true,
+        "fitRecovered": true,
         "reasonCases": [
           "centerErrorPx",
           "zoomScalePending",
@@ -275,6 +280,7 @@
       "settle": {
         "healthyTimeoutRetained": true,
         "nextIdleRecovered": true,
+        "fitRecovered": true,
         "reasonCases": [
           "centerErrorPx",
           "zoomScalePending",
