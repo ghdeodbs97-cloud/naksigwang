@@ -39,6 +39,8 @@ jobs:
         run: python tests/test_map_provider.py
       - name: P3 이동 중 렌더 차단·성능 회귀 (실 API 없음)
         run: python tests/test_map_performance.py
+      - name: P3 타일 오류 허용·SDK 상태·복구 회귀 (실 API 없음)
+        run: python tests/test_map_health.py
       - name: 빌드 결과 일치
         run: |
           python tests/test_build_consistency.py

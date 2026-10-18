@@ -395,7 +395,7 @@ localhost에서만 `naksigwangTileDiagnostic(clientX?, clientY?)`와 `naksigwang
 
 타일 진단은 provider mode/zoom/center/bounds/container rect, provider CSS와 마지막 SDK setSize 시점/횟수, 하위 IMG 개수·보이는 IMG 개수, 각 rect/naturalWidth/naturalHeight/complete, CSS 크기 분포, 네 이동 상태와 세 Canvas opacity/display/visibility, 최근 SDK 이벤트를 반환한다. IMG에는 attribution 등도 포함될 수 있어 IMG 개수 자체를 실패 타일 개수로 해석하지 않는다. viewport와 교차하고 조상 CSS까지 보이는 IMG를 세지만 다른 IMG가 위를 덮는지는 판정하지 않는다.
 
-URL query/fragment/userinfo는 반환하지 않는다. 임의 경로에 credential이 있을 수 있어 숫자 값까지 모든 경로 segment를 비공개로 표시하고 이미지 확장자만 남긴다. 하위 호스트도 가리고 NAVER 계열의 공개 기본 도메인만 남긴다. 원본 URL을 로그하지 않는다. 진단은 DOM metadata만 읽으며 타일 요청·교체·캐시 저장을 하지 않는다.
+이번 provider health 수정부터 타일 진단은 IMG currentSrc/src를 읽거나 반환하지 않는다. 이전의 가린 hostname/path 정보도 제거했다. URL/query/key/credential과 SDK 예외 메시지는 기록·반환하지 않는다. 진단은 DOM metadata만 읽으며 타일 요청·교체·캐시 저장을 하지 않는다.
 
 두 인수는 브라우저 client 좌표다. 해당 위치의 base/flow/ui 실제 RGBA를 읽는다. providerOnly=true에서도 Canvas backing 픽셀은 보존되므로 opacity/visibility와 함께 해석한다. providerOnly는 stage 직계 `#base/#flow/#ui`만 숨기고 providerMap/SDK pane/IMG/control/attribution에는 스타일을 바꾸지 않는다. 이동 CSS와 기존 Canvas 배치/하단 출처 clip CSS도 같은 직계 세 ID로 좁혀 SDK 내부 Canvas에 전파되지 않는다.
 
@@ -439,3 +439,81 @@ URL query/fragment/userinfo는 반환하지 않는다. 임의 경로에 credenti
 확장 12조합에서는 기존 이동 1,080회와 신규 drag/zoom/pinch 720회 종료의 가시성을 확인했고 permanent hidden/moving heavy 모두 0회였다. Marker 최대 0.447px, A/B 최대 0.901px, 해안 mask 변경 픽셀 0개, 일반 이동 100ms 이상 long task 0회였다. 병렬 회귀 중 idle 복구 최대는 **127ms**로 이전 기록 72ms보다 높았다. heavy 호출·60프레임 비교의 p95는 유지됐지만 idle 지연까지 무회귀로 단정하지 않는다. 실 장치의 복구 지연·체감은 사용자 확인 대기다. 전체 행렬 뒤 최종 CSS/resize/지속이동/버블 차단 보강은 세 화면의 최종 집중 검사에서 확인했고 최종 CI도 전체 행렬을 다시 실행한다.
 
 기존 12개 전체 CI 명령·20개 화면/DPR와 실패/설정/공개 호스트 검사·연속 viewport/명령 집중 회귀·301점 단면 baseline·수심 production 보호·최종 build consistency가 통과했다. 모바일/PC 다섯 탭과 active mock 이동/idle 캡처를 직접 확인했다. 실제 NAVER 영상 판정과 분리한다.
+
+
+## 개별 타일 오류와 provider 실패 분리 (2026-10-18)
+
+사용자 실제 확인: 이전 심한 렉과 이동 후 overlay 영구 소실은 개선됐다. 그러나 NAVER 위성 대신 GEBCO 지형과 「온라인 지도를 불러오지 못해 기본 지형지도로 표시합니다」 안내가 나타났다. 이전에는 fallback 사유가 없어 실제 사용자 세션의 발화 경로는 확정할 수 없다. 아래 두 직접 경로를 직전 커밋 `30af641`과 수정본에서 동일 mock으로 재현했다.
+
+| 입력 | 이전 | 수정 |
+|---|---|---|
+| provider 안 IMG 1개 error | failed=true, active=false | failed=false, active=true, tileErrorCount=1 |
+| 정상 API + tilesloaded 12초 누락 | failed=true, active=false | failed=false, active=true, modeHealthChecks=1 |
+
+기존 imageError 캡처 리스너는 모든 IMG 오류를 onFailure→providerFallback으로 연결했다. 타일 교체 중 단일 오류나 로고 IMG 오류도 전체 지도를 내릴 수 있었다. 수정 후 같은 실제 adapter 리스너는 providerRecordTileError만 호출한다. time/zoom/mode와 누적 수·최근 10초 수만 기록하고 SDK 자체 처리·재요청에 맡긴다. 오류 수가 많아도 그 수만으로 fallback하지 않는다. 최근 metadata 32개와 밀리초별 10초 창을 유지한다.
+
+모드 전환은 기존 loaded 상태를 보존한다. 12초 타이머는 providerModeTimeout으로 바꾸어 map 객체, center/zoom/bounds, project/unproject, ground/viewport scale, provider DOM visibility와 SDK IMG/Canvas 존재를 확인한다. API가 정상인 경우 지도를 유지하고 tilesloaded가 없다는 이유로 실패시키지 않는다. DOM/타일이 아직 없으면 대기 상태로 관찰한다. 이 health check는 위성 영상의 도착·화질이나 native Marker 정합 성공을 증명하지 않는다.
+
+### 실패 사유와 복구
+
+production fallback 경로는 고정된 코드만 기록한다:
+
+- sdk-script-load-failed / sdk-script-timeout: SDK 파일 실패 또는 초기 callback 시간 초과.
+- auth-failed: 인증 실패.
+- map-init-failed: 지도 생성 실패 또는 객체 소실.
+- projection-failure: 필수 지도 좌표 API가 제한된 3회 재확인에서도 사용 불가.
+- map-api-failure: 입력 설정 API가 반복 실패.
+- browser-offline: 브라우저 offline.
+- settle-failure: 기존 최종 표시 viewport 안정화 감시 실패.
+
+manual-fallback은 테스트 정리에 사용한다. 허용하지 않은 인수·예외 객체는 unknown-provider-failure로 치환한다. 원본 예외 메시지를 저장하지 않는다. lastFallbackReason/lastFallbackAt/fallbackCount는 복구 뒤에도 원인 추적을 위해 남긴다.
+
+단일 projection 예외는 즉시 전체 실패로 만들지 않고 분석 Canvas를 숨긴 채 최대 3 RAF에서 API를 재확인한다. 정상으로 돌아오면 기존 FINAL VIEWPORT→DRAW→REVEAL 경로로 복구한다. 지속 예외만 fallback한다. 반복 입력 API 예외도 재확인 상한으로 끝나게 하며, 실패한 setOptions를 성공으로 캐시하지 않는다.
+
+offline·projection/map API·settle 실패는 기존 SDK 객체가 살아 있으면 online, idle, tilesloaded 또는 localhost의 `await naksigwangTileDiagnostic.retry()`에서 제한된 상태 재확인을 지원한다. offline→online 두 번을 검사했으며 같은 map 객체·인스턴스 1개를 유지했다. offline 중 바뀐 화면 크기와 선택 모드는 최종 settle 전에 같은 SDK에 동기화한다. 재확인 실패 시 무한 재시도하지 않는다. SDK 파일/인증/생성 실패처럼 재사용할 지도가 없는 경우 자동으로 인스턴스를 반복 생성하지 않는다. 초기 offline 상태에서 SDK 자체가 없었던 경우도 기존 지도 재사용 복구 대상이 아니다.
+
+### 진단 필드와 검증
+
+naksigwangTileDiagnostic은 tileErrorCount, tileErrorsLast10s, lastTileErrorAt, tilesLoadedCount, lastTilesLoadedAt, active/failed, lastFallbackReason, mode/zoom/center, mapProjectionHealthy, providerDOMVisible, image/complete/incomplete/decoded count를 포함한다. complete=true인 실패 IMG도 있을 수 있어 natural size가 양수인 decodedTileCount를 별도로 둔다. IMG에는 로고 등도 포함될 수 있다. mapProjectionHealthy는 유한한 API 응답과 양수 배율의 상태 확인이며 실제 영상 전달이나 DOM Marker 정합 판정과 구분한다.
+
+새 tests/test_map_health.py는 3 화면 ×2 DPR에서 실제 NaverMapAdapter.init의 IMG 캡처 리스너, 단일 +10개 오류, 정상 load 뒤 overlay, 가상 시계 12초 누락, 10초 오류 창 만료, offline→online 두 번, 단일/지속 projection API 예외, 반복 입력 API 예외, 같은 SDK 객체 복구·offline 중 resize/모드 선택·gesture 중 health 회복의 heavy 차단, 원래 A/B와 복구 후 native Marker/Canvas를 검사한다. 기존 SDK 404/429/연결 실패/timeout/auth 검사에는 사유 assertion과 map-init 실패를 추가했다. 실 API/credential은 사용하지 않는다.
+
+23_main의 FINAL VIEWPORT→DRAW→REVEAL, 이동 중 heavy 차단, 최종 idle base 1회, 이벤트 기반 sync, 입자/throttle, Path/mask cache, SATELLITE 기본·HYBRID/NORMAL은 되돌리지 않았다. 보호된 수심 코드·static/depth·data는 변경하지 않는다. 42타일/35,982점·datum/provenance/cache/육지·외삽 guard와 A→B 301점 baseline을 유지한다.
+
+### 사용자 localhost 확인
+
+최신 브랜치를 받고 기존 NAVER 설정을 유지한 채 `python build.py`, `python -m http.server 8000` 후 localhost 지도 탭을 강력 새로고침한다. 이동 모드에서 1~2분 pan/wheel/pinch하고 세 지도 모드를 바꾼다. 위성이 유지되는지, overlay가 잠깐 숨었다가 돌아오는지, 렉 개선이 유지되는지 확인한다.
+
+블록이나 fallback이 보이면 `naksigwangTileDiagnostic()`의 active/failed, lastFallbackReason, tileErrorCount/tileErrorsLast10s, tilesLoadedCount, mapProjectionHealthy, DOM visibility를 기록한다. 블록 위치에서 `naksigwangPerfDiagnostic.providerOnly(true)`로 SDK 영상만 비교하고 `false`로 복원한다. recoverable=true이고 online/SDK 객체가 살아 있으면 `await naksigwangTileDiagnostic.retry()` 후 최종 idle의 진단을 다시 확인한다. 정상 타일 상태에서 retry는 불필요하며 타일을 직접 요청하지 않는다.
+
+이번 실제 fallback의 발화 경로와 최신 위성 유지·렉/overlay 복원은 **사용자 localhost 재검증 대기**다. 위성 블록의 원인은 providerOnly 실제 결과 전까지 **미확인**이다. 자동 검증으로 P3 완료/merge 가능을 판정하지 않는다.
+
+### 최종 로컬 회귀 기록
+
+계측 원자료 요약은 `tests/P3_HEALTH_RESULTS.json`에 있다. health 6개 조합, 기존 provider 20개 화면/DPR와 DPR 상한·SDK 실패 6종·설정 4종·production 진단 제거(총 32개 결과), performance 12개 조합이 통과했다. legacy 12개 검사 중 smoke_degradation의 첫 실행은 partial_station 시작 시간 초과였고, 소스를 고정한 후 해당 전체 검사를 재실행하여 통과했다. 첫 시간 초과 원인은 확정하지 않았다. provider 높이 변경 검사의 고정 350ms 대기는 실제 크기 조건을 기다리도록 바꾸었으며 동일 assertion으로 전체 행렬을 통과했다. 휴대폰 390×844와 PC 1280×900 다섯 탭도 확인했다.
+
+performance 12개 조합에서 이동 중 heavy rebuild 0, 영구 숨김 0, Marker 최대 0.4469 CSS px, A/B 최대 0.9014 CSS px였다. 병렬 실행 idle 최대는 569ms였다. 별도 단독 실행의 idle 최대는 아래와 같으며 실행 부하에 따른 시간 차이를 숨기지 않는다. 실제 사용자 장치의 체감 성능을 이 수치로 보장하지 않는다.
+
+| 단독 화면 / DPR 1 | idle 최대 | 이동 중 heavy | 영구 숨김 |
+|---|---:|---:|---:|
+| 390×844 | 67ms | 0 | 0 |
+| 1280×900 | 84ms | 0 | 0 |
+| 1920×1080 | 92ms | 0 | 0 |
+
+직전 30af641과 60프레임 비교에서도 정지 중 SDK/base/mask/UI/section 재계산 0, 이동 중 base 0, idle 후 base 1회를 유지했다. pan FPS는 화면별 이전 62.50/62.57/62.57 → 수정 62.43/62.57/62.50, p95는 17/17/17 → 18/17/17ms였다. 이 headless mock 범위에서는 작업 횟수 회귀가 없으며 실 NAVER 성능 판정은 대기한다.
+
+브라우저 콘솔의 정확한 확인 명령:
+
+```js
+naksigwangTileDiagnostic()
+naksigwangPerfDiagnostic.providerOnly(true)
+naksigwangTileDiagnostic()
+naksigwangPerfDiagnostic.providerOnly(false)
+// online이며 recoverable=true인 경우에만 기존 SDK 복구 시작:
+await naksigwangTileDiagnostic.retry()
+// 최종 idle 뒤 다시 상태 확인:
+naksigwangTileDiagnostic()
+await naksigwangMapDiagnostic.fit(10000,36.05,129.38)
+```
+
+마지막 fit의 command.status/errorPx/sdkViewportUnchanged, 1~2분 반복 pan/zoom의 렉, overlay 잔상·누적 drift, 위성 유지와 블록 providerOnly 비교는 모두 **사용자 localhost 재검증 대기**다.

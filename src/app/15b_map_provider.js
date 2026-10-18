@@ -9,13 +9,14 @@ class NaverMapAdapter {
   init(container) {
     const n = this.sdk;
     this.container = container;
-    this.imageError = e => { if (e.target?.tagName === 'IMG') this.onFailure?.(); };
+    this.imageError = e => this.handleImageError(e);
     container.addEventListener('error', this.imageError, true);
     this.map = new n.Map(container, { center: new n.LatLng(latOf(V.cy), lonOf(V.cx)), zoom: 10, minZoom:6, maxZoom:21,
       mapTypeId: n.MapTypeId[{satellite:'SATELLITE',hybrid:'HYBRID',normal:'NORMAL'}[PROVIDER_MAP.mode]],
       draggable: false, scrollWheel: false, pinchZoom: false, keyboardShortcuts: false,
       disableDoubleClickZoom: true, zoomControl: false, mapDataControl: true, logoControl: true });
   }
+  handleImageError(e) { if(e.target?.tagName==='IMG')providerRecordTileError(); }
   setMode(mode) { this.map.setMapTypeId(this.sdk.MapTypeId[{satellite:'SATELLITE',hybrid:'HYBRID',normal:'NORMAL'}[mode] || 'SATELLITE']); }
   syncFromAppViewport(view = V) {
     // 이동 명령만 SDK에 보낸다. 미반영 projection으로 정수 zoom을 역산하지 않는다.
@@ -34,8 +35,8 @@ class NaverMapAdapter {
     return Math.hypot(b.x-a.x,b.y-a.y);
   }
   setInteraction(enabled) {
-    if (this.interactive===enabled) return; this.interactive=enabled;
-    this.map.setOptions({draggable:enabled,scrollWheel:enabled,pinchZoom:enabled,keyboardShortcuts:enabled});
+    if (this.interactive===enabled) return;
+    this.map.setOptions({draggable:enabled,scrollWheel:enabled,pinchZoom:enabled,keyboardShortcuts:enabled});this.interactive=enabled;
   }
   getBounds() { const b = this.map.getBounds(), sw = b.getSW(), ne = b.getNE(); return [[sw.lng(), sw.lat()], [ne.lng(), ne.lat()]]; }
   getCenter() { const c = this.map.getCenter(); return [c.lng(), c.lat()]; }
@@ -66,14 +67,16 @@ class NaverMapAdapter {
   destroy() { for (const l of this.listeners) this.sdk.Event.removeListener(l); this.listeners = []; this.container?.removeEventListener('error', this.imageError, true); this.map?.destroy(); this.map = null; }
 }
 
-const PROVIDER_MAP = { adapter: null, active: false, failed: false, started: false, mode: 'satellite',
+const PROVIDER_MAP = { adapter: null, offline:navigator.onLine===false, active: false, failed: false, started: false, mode: 'satellite',
   signature: '', loaded: false, timer: null, alignment: null, checking: false, syncing: false, diagnostic: null, viewportDirty:true, sizeKey:'', events:[], reads:0, commands:0, lastBaseFrame:null,
   commandPending:false,commandId:0,pendingCommand:null,requestedView:null,lastSettledView:null,lastCommand:null,commandTimeoutMs:8000,providerMoving:false,gesture:false,waitingIdle:false,syncRAF:0,revealAfterBase:false,idleAt:0,groundScale:0,stableZoom:null,stableScale:0 };
 // P3 개발 중 저장된 normal/HYBRID 값은 새 위성 기본값으로 한 번 전환한다.
 try { const saved = localStorage.getItem('naksigwang-map-mode-v2'); if (['satellite','hybrid','normal'].includes(saved)) PROVIDER_MAP.mode = saved; localStorage.removeItem('naksigwang-map-mode'); } catch (_) { /* 저장 제한 시 위성 기본값 */ }
 
 function providerNotice(text) { $('providerNotice').textContent = text; }
-function providerFallback() {
+function providerFallback(reason='manual-fallback') {
+  const p=PROVIDER_MAP;const allowed=['sdk-script-load-failed','sdk-script-timeout','auth-failed','browser-offline','map-init-failed','map-api-failure','projection-failure','settle-failure','manual-fallback'];
+  p.fallbackCount=(p.fallbackCount||0)+1;p.lastFallbackReason=allowed.includes(reason)?reason:'unknown-provider-failure';p.lastFallbackAt=performance.now();p.recoverable=['browser-offline','map-api-failure','projection-failure','settle-failure'].includes(p.lastFallbackReason);p.healthState='failed';providerCancelHealthCheck(p.lastFallbackReason);
   providerCancelViewCommand('provider unavailable');
   PROVIDER_MAP.failed = true; PROVIDER_MAP.active = false; clearTimeout(PROVIDER_MAP.timer);
   $('providerMap').style.visibility = 'hidden'; dirty = true;
@@ -101,7 +104,7 @@ function providerBeginMove(){
   if(p.active)stage.classList.add('provider-moving');
   if(RENDER.depthQueued){RENDER.depthQueued=false;RENDER.depthKey='';p.depthDeferred=true;}clearTimeout(OFFICIAL_DEPTH.timer);if(!flowHidden){fctx.setTransform(1,0,0,1,0,0);fctx.clearRect(0,0,flow.width,flow.height);flowHidden=true;}flowStale=true;
 }
-function providerTilesLoaded(){const p=PROVIDER_MAP;if(p.failed)return;providerRecordEvent('tilesloaded');p.loaded=true;clearTimeout(p.timer);if(!p.active&&!p.providerMoving&&!p.commandPending)providerCheck();}
+function providerTilesLoaded(){const p=PROVIDER_MAP;p.tilesLoadedCount=(p.tilesLoadedCount||0)+1;p.lastTilesLoadedAt=performance.now();providerRecordEvent('tilesloaded');if(p.failed){if(p.recoverable)providerTryRecover('tilesloaded');return;}p.loaded=true;clearTimeout(p.timer);if(!p.active&&!p.providerMoving&&!p.commandPending)providerCheck();}
 function providerRecordEvent(name){const p=PROVIDER_MAP;p.events.push({name,time:performance.now(),providerMoving:p.providerMoving,revealAfterBase:p.revealAfterBase,commandPending:p.commandPending,heavyHidden:stage.classList.contains('provider-moving')});if(p.events.length>48)p.events.shift();}
 function providerRevealOverlay(){
   const p=PROVIDER_MAP;if(p.providerMoving||p.commandPending)return;
@@ -109,10 +112,10 @@ function providerRevealOverlay(){
   stage.classList.remove('provider-moving');
 }
 function providerQueueSettle(){
-  const p=PROVIDER_MAP;if(p.syncRAF||p.commandPending||p.gesture||p.waitingIdle||p.failed)return;
+  const p=PROVIDER_MAP;if(p.syncRAF||p.healthPromise||p.commandPending||p.gesture||p.waitingIdle||p.failed)return;
   let previous='',stable=0,frames=0;
   const probe=()=>{
-    p.syncRAF=0;if(p.failed||p.commandPending||p.gesture||p.waitingIdle)return;
+    p.syncRAF=0;if(p.failed||p.healthPromise||p.commandPending||p.gesture||p.waitingIdle)return;
     try{
       const a=p.adapter,key=providerViewportKey(),reported=a.project(...a.getCenter()),scale=a.getViewportScale();
       const ready=Math.hypot(reported[0]-cw/2,reported[1]-ch/2)<=2&&!(p.stableZoom!==null&&a.getZoom()!==p.stableZoom&&Math.abs(Math.log2(scale/p.stableScale))<.001);
@@ -124,13 +127,13 @@ function providerQueueSettle(){
         return;
       }
       // 이벤트 뒤 상한이 있는 감시만 실행한다. 정지 상태에서는 SDK를 읽지 않는다.
-      if(++frames<120)p.syncRAF=requestAnimationFrame(probe);else {p.settleFailure='표시 viewport 안정화 실패';providerFallback();}
-    }catch(_){providerFallback();}
+      if(++frames<120)p.syncRAF=requestAnimationFrame(probe);else {p.settleFailure='표시 viewport 안정화 실패';providerFallback('settle-failure');}
+    }catch(_){providerHandleProjectionFailure();}
   };
   p.syncRAF=requestAnimationFrame(probe);
 }
 function providerViewportChanged(name){
-  const p=PROVIDER_MAP;if(p.failed)return;
+  const p=PROVIDER_MAP;if(p.failed){providerRecordEvent(name);if(p.recoverable&&name==='idle')providerTryRecover('idle');return;}
   p.viewportDirty=true;
   if(['dragstart','pinchstart','zoomstart'].includes(name)){p.gesture=true;p.waitingIdle=true;providerBeginMove();providerRecordEvent(name);return;}
   if(['dragend','pinchend','zoomend'].includes(name)){p.gesture=false;p.waitingIdle=false;}
@@ -140,7 +143,7 @@ function providerViewportChanged(name){
 function providerUseNativePan() { return PROVIDER_MAP.active && !S.lock && S.mode==='pan'; }
 function providerUpdateInput() {
   const native=providerUseNativePan();stage.classList.toggle('provider-native',native);
-  PROVIDER_MAP.adapter?.setInteraction?.(native);
+  try{PROVIDER_MAP.adapter?.setInteraction?.(native);PROVIDER_MAP.interactionFailures=0;}catch(_){const p=PROVIDER_MAP;if(!p.failed){p.interactionFailures=(p.interactionFailures||0)+1;if(p.interactionFailures>=3)providerFallback('map-api-failure');else providerHandleProjectionFailure();}}
 }
 function providerCancelViewCommand(reason='superseded') {
   const p=PROVIDER_MAP,c=p.pendingCommand;if(!c)return;
@@ -169,7 +172,7 @@ function providerFinishViewCommand(c,ok,reason=null) {
     const after={center:p.adapter.getCenter(),zoom:p.adapter.getZoom(),bounds:p.adapter.getBounds(),key:providerViewportKey()};
     const result={ok,id:c.id,status:ok?'settled':'failed',reason,target:c.target,requestedView:c.view,requestedBounds:c.requestedBounds,fitBoundsType:'LatLngBounds',before:c.before,after,sdkViewportUnchanged:after.key===c.before.key,settledView:{...V},center:after.center,renderCenter:p.adapter.unproject(cw/2,ch/2),bounds:after.bounds,trace:c.trace};
     p.pendingCommand=null;p.lastCommand=result;p.providerMoving=false;p.gesture=false;p.waitingIdle=false;p.revealAfterBase=true;p.idleAt=performance.now();dirty=true;dirtyHover=true;c.resolve(result);providerCheck();
-  } catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}
+  } catch(_){providerCancelViewCommand('provider unavailable');providerHandleProjectionFailure();}
 }
 function providerApplyView(view = {...V}) {
   const p=PROVIDER_MAP;if(!p.adapter||p.failed)return Promise.resolve({ok:true,status:'fallback',settledView:{...V}});
@@ -183,11 +186,11 @@ function providerApplyView(view = {...V}) {
       c.stable=o.reached?(o.key===c.lastKey?c.stable+1:1):0;c.lastKey=o.key;
       if(c.stable>=2){providerFinishViewCommand(c,true);return;}
       c.raf=requestAnimationFrame(step);
-    } catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}
+    } catch(_){providerCancelViewCommand('provider unavailable');providerHandleProjectionFailure();}
   };
-  c.timer=setTimeout(()=>{try{providerFinishViewCommand(c,false,'requested viewport not reached');}catch(_){providerCancelViewCommand('provider unavailable');providerFallback();}},p.commandTimeoutMs);
+  c.timer=setTimeout(()=>{try{providerFinishViewCommand(c,false,'requested viewport not reached');}catch(_){providerCancelViewCommand('provider unavailable');providerHandleProjectionFailure();}},p.commandTimeoutMs);
   try {c.before={center:p.adapter.getCenter(),zoom:p.adapter.getZoom(),bounds:p.adapter.getBounds(),key:providerViewportKey()};c.beforeZoom=p.stableZoom??c.before.zoom;c.beforeScale=p.stableScale||p.adapter.getViewportScale();p.commands++;p.adapter.syncFromAppViewport(c.view);p.viewportDirty=true;c.raf=requestAnimationFrame(step);}
-  catch(_){providerCancelViewCommand('viewport command failed');providerFallback();}
+  catch(_){providerCancelViewCommand('viewport command failed');providerHandleProjectionFailure();}
   return c.promise;
 }
 function providerAlignment(adapter) {
@@ -219,7 +222,7 @@ function providerRectError() {
 }
 function providerCheck() {
   const p = PROVIDER_MAP;
-  if (!p.adapter || p.failed || !p.loaded || p.syncing) return;
+  if (!p.adapter || p.failed || !p.loaded || p.syncing || p.healthPromise) return;
   try {
     clearTimeout(p.timer);
     p.checking = true; p.alignment = Math.max(providerAlignment(p.adapter),providerRectError()); p.checking = false; p.active = p.alignment <= 2;
@@ -227,10 +230,10 @@ function providerCheck() {
     stage.classList.toggle('provider-active', p.active); providerUpdateInput();
     providerNotice(p.active ? (p.lastCommand?.id===p.commandId&&p.lastCommand?.reason==='requested viewport not reached'?'요청한 위치로 이동하지 못했습니다. 다시 찾거나 지도 상태를 확인하세요.':'NAVER ' + {satellite:'위성지도',hybrid:'위성+지명',normal:'일반지도'}[p.mode] + ' · 수심은 별도 공공자료와 추정값입니다.')
       : '온라인 지도와 분석 표시의 위치를 맞추지 못해 기본 지형지도로 표시합니다.');
-  } catch (_) { p.checking = false; providerFallback(); }
+  } catch (_) { p.checking = false; providerHandleProjectionFailure(); }
 }
 function providerSync() {
-  const p=PROVIDER_MAP;if(!p.adapter||p.failed||p.syncing||!cw||!ch)return;
+  const p=PROVIDER_MAP;if(!p.adapter||p.failed||p.healthPromise||p.syncing||!cw||!ch)return;
   p.syncing=true;if(p.loaded)clearTimeout(p.timer);
   try {
     const sizeKey=[cw,ch].join(',');if(p.sizeKey!==sizeKey){p.sizeKey=sizeKey;p.adapter.resize();p.lastResize={time:performance.now(),width:cw,height:ch};p.resizeCount=(p.resizeCount||0)+1;p.viewportDirty=true;}
@@ -239,7 +242,7 @@ function providerSync() {
     const v=p.compatibility;
     const repair=!p.commandPending&&(!v||v.cx!==V.cx||v.cy!==V.cy||v.s!==V.s);
     if(key!==p.signature||p.viewportDirty||repair){p.signature=key;p.viewportDirty=false;if(!p.commandPending)providerReadView();else{dirty=true;dirtyHover=true;}}
-  } catch (_) {providerFallback();}
+  } catch (_) {providerHandleProjectionFailure();}
   finally {p.syncing=false;}
   if(!p.active&&p.loaded&&!p.commandPending)providerCheck();
   providerUpdateInput();
@@ -247,17 +250,17 @@ function providerSync() {
 function providerZoomAt(x,y,factor) {
   providerCancelViewCommand('interrupted');
   try {PROVIDER_MAP.commands++;PROVIDER_MAP.adapter.zoomAt(x,y,factor);providerViewportChanged('app_zoom');providerSync();}
-  catch (_) {providerFallback();}
+  catch (_) {providerHandleProjectionFailure();}
 }
 function providerPanAnchor(ll,x,y) {
   providerCancelViewCommand('interrupted');
   try {PROVIDER_MAP.commands++;PROVIDER_MAP.adapter.moveAnchor(ll,x,y);providerViewportChanged('app_anchor');providerSync();}
-  catch (_) {providerFallback();}
+  catch (_) {providerHandleProjectionFailure();}
 }
 function providerPanBy(dx,dy) {
   providerCancelViewCommand('interrupted');
   try {PROVIDER_MAP.commands++;PROVIDER_MAP.adapter.panPixels(dx,dy);providerViewportChanged('app_pan');providerSync();}
-  catch (_) {providerFallback();}
+  catch (_) {providerHandleProjectionFailure();}
 }
 function scheduleDisplayDepthArea() {
   if(PROVIDER_MAP.commandPending||PROVIDER_MAP.providerMoving){clearTimeout(OFFICIAL_DEPTH.timer);return;}
@@ -277,8 +280,8 @@ function providerSetMode(mode) {
   for (const b of $('providerModes').children) b.setAttribute('aria-pressed', b.dataset.providerMode === p.mode);
   if (p.adapter && !p.failed) {
     // 같은 지도 인스턴스의 배경만 바꾼다. dirty/단면/수심 로더를 건드리지 않는다.
-    p.loaded = false; clearTimeout(p.timer); p.timer = setTimeout(providerFallback, 12000);
-    try { p.adapter.setMode(p.mode);if(p.active)providerNotice('NAVER '+{satellite:'위성지도',hybrid:'위성+지명',normal:'일반지도'}[p.mode]+' · 수심은 별도 공공자료와 추정값입니다.'); } catch (_) { providerFallback(); }
+    clearTimeout(p.timer); p.timer = setTimeout(providerModeTimeout, 12000);
+    try { p.adapter.setMode(p.mode);if(p.active)providerNotice('NAVER '+{satellite:'위성지도',hybrid:'위성+지명',normal:'일반지도'}[p.mode]+' · 수심은 별도 공공자료와 추정값입니다.'); } catch (_) { providerHandleProjectionFailure(); }
   }
 }
 async function providerStart() {
@@ -288,23 +291,24 @@ async function providerStart() {
   let key = document.querySelector('meta[name="naver-map-key-id"]')?.content.trim();
   try { key ||= localStorage.getItem('naksigwang-naver-key-id')?.trim(); } catch (_) { /* 로컬 설정 제한 */ }
   if (!key) { providerNotice('온라인 지도 설정 전 · 기본 지형지도로 표시합니다.'); return; }
+  if(p.offline){providerFallback('browser-offline');return;}
+  let startupReason='sdk-script-load-failed';
   try {
     await new Promise((resolve, reject) => {
-      const script = document.createElement('script'); const timer = setTimeout(() => { script.remove(); reject(Error('SDK timeout')); }, 12000);
+      const script = document.createElement('script'); const timer = setTimeout(() => { script.remove();startupReason='sdk-script-timeout';reject(Error('SDK timeout')); }, 12000);
       const finish = fn => { clearTimeout(timer); script.onload = script.onerror = null; fn(); };
-      window.navermap_authFailure = () => { finish(() => reject(Error('SDK 인증 실패'))); providerFallback(); };
+      window.navermap_authFailure = () => {startupReason='auth-failed';finish(() => reject(Error('SDK 인증 실패')));providerFallback('auth-failed');};
       window.naksigwangProviderReady = () => finish(resolve);
       script.onerror = () => finish(() => reject(Error('SDK 로드 실패')));
       script.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + encodeURIComponent(key) + '&callback=naksigwangProviderReady';
       document.head.append(script);
     });
     if (p.failed) return;
+    startupReason='map-init-failed';
     p.adapter = new NaverMapAdapter(window.naver.maps); p.adapter.init($('providerMap'));
-    p.adapter.onFailure = providerFallback;
-    addEventListener('offline', providerFallback, { once: true });
     p.adapter.onTilesLoaded(providerTilesLoaded);
     p.adapter.onViewportReady(providerViewportChanged);
-    p.adapter.setMode(p.mode);providerApplyView({...V});providerSync();
+    providerSetMode(p.mode);providerApplyView({...V});providerSync();
 
-  } catch (_) { providerFallback(); }
+  } catch (_) {if(!p.failed)providerFallback(startupReason);}
 }

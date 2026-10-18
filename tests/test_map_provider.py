@@ -42,9 +42,9 @@ try:
         if width==1280:
           result['continuousViewport']=page.evaluate('window.p3ViewportTest()')
           result['viewportCommands']=page.evaluate('window.p3CommandTest()')
-        page.set_viewport_size({'width':width,'height':height-160});page.wait_for_timeout(350)
+        page.set_viewport_size({'width':width,'height':height-160});page.wait_for_function('window.p3SizeCheck()')
         assert page.evaluate('window.p3SizeCheck()'),'창 높이 변경 반영'
-        page.set_viewport_size({'width':width,'height':height});page.wait_for_timeout(350)
+        page.set_viewport_size({'width':width,'height':height});page.wait_for_function('window.p3SizeCheck()')
         page.wait_for_timeout(600)
         count=len(depth_requests)
         page.evaluate('window.p3SwitchOnly()');page.wait_for_timeout(600)
@@ -70,7 +70,7 @@ try:
     high=page.evaluate('window.p3NativeTest()');assert all(s['dpr']==3 and s['drawingDpr']==2 for s in high['samples'])
     results.append({'highDprNative':high});page.close()
     # SDK 실패와 timeout은 메모리 route로 재현한다. 실제 credential/요청 없음.
-    for failure in ['404','429','offline','timeout','auth']:
+    for failure in ['404','429','offline','timeout','auth','map-init']:
       print('SDK 실패 검사:',failure,flush=True)
       page=browser.new_page();errors=[]
       page.on('pageerror',lambda e:errors.append(str(e)))
@@ -80,6 +80,7 @@ try:
       def fail(route):
         if failure in ('404','429'):route.fulfill(status=int(failure),body='')
         elif failure=='timeout':route.fulfill(content_type='application/javascript',body='/* SDK callback 미응답 */')
+        elif failure=='map-init':route.fulfill(content_type='application/javascript',body='window.naver={maps:{LatLng:class{},MapTypeId:{SATELLITE:1},Map:class{constructor(){throw Error("fixture");}}}};window.naksigwangProviderReady()')
         elif failure=='auth':route.fulfill(content_type='application/javascript',body='window.navermap_authFailure()')
         else:route.abort()
       page.route('**/maps.js?*',fail)
@@ -88,6 +89,8 @@ try:
       page.wait_for_function('window.p3Ready?.()')
       if failure=='timeout':page.clock.fast_forward(13000)
       page.wait_for_function("document.getElementById('providerNotice').textContent.includes('불러오지 못해')",timeout=20000)
+      expected={'404':'sdk-script-load-failed','429':'sdk-script-load-failed','offline':'sdk-script-load-failed','timeout':'sdk-script-timeout','auth':'auth-failed','map-init':'map-init-failed'}[failure]
+      assert page.evaluate('naksigwangTileDiagnostic().lastFallbackReason')==expected,(failure,expected)
       assert page.evaluate('window.p3DepthSnapshot().length===8')
       assert not errors,errors
       results.append({'failure':failure,'passed':True})
@@ -118,4 +121,4 @@ baseline=json.loads((ROOT/'tests/p3_baseline.json').read_text(encoding='utf-8'))
 def no_fonts(page):page.route('https://**/*',lambda r:r.abort())
 current=compact(run(PROBE+CHECK,'window.p3Baseline()',routes=no_fonts))
 assert current==baseline,'main 수심·단면 baseline 변경'
-print('P3 통과: 어댑터, 20 viewport/DPR 조합, 다섯 실패, 수심·단면 baseline 동일')
+print('P3 통과: 어댑터, 20 viewport/DPR 조합, 여섯 SDK 실패, 수심·단면 baseline 동일')
