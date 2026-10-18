@@ -80,6 +80,7 @@ function providerFallback(reason='manual-fallback') {
   providerCancelViewCommand('provider unavailable');
   PROVIDER_MAP.failed = true; PROVIDER_MAP.active = false; clearTimeout(PROVIDER_MAP.timer);
   $('providerMap').style.visibility = 'hidden'; dirty = true;
+  providerCancelGestureDeadline();nativePointers.clear();nativeTap=null;
   cancelAnimationFrame(PROVIDER_MAP.finalWatchRAF);PROVIDER_MAP.finalWatchRAF=0;
   cancelAnimationFrame(PROVIDER_MAP.syncRAF);PROVIDER_MAP.syncRAF=0;PROVIDER_MAP.providerMoving=false;PROVIDER_MAP.gesture=false;PROVIDER_MAP.waitingIdle=false;PROVIDER_MAP.revealAfterBase=true;
   stage.classList.remove('provider-active'); providerUpdateInput();
@@ -115,6 +116,14 @@ function providerRevealOverlay(){
   const p=PROVIDER_MAP;if(p.providerMoving||p.commandPending)return;
   if(p.revealAfterBase){p.revealAfterBase=false;if(p.idleAt&&PERF.enabled){PERF.idleRecoveryMs.push(performance.now()-p.idleAt);if(PERF.idleRecoveryMs.length>100)PERF.idleRecoveryMs.shift();}}
   stage.classList.remove('provider-moving');
+  p.overlayStamp=JSON.stringify([p.signature,cw,ch,DPR()]);
+}
+function providerCancelGestureDeadline(){clearTimeout(PROVIDER_MAP.gestureTimer);PROVIDER_MAP.gestureTimer=0;}
+function providerArmGestureDeadline(){
+  const p=PROVIDER_MAP;providerCancelGestureDeadline();
+  if(!p.gesture||nativePointers.size||p.commandPending||p.failed)return;
+  p.idleAt=performance.now();
+  p.gestureTimer=setTimeout(()=>{p.gestureTimer=0;if(p.failed||p.commandPending||nativePointers.size||!p.gesture)return;p.gesture=false;p.waitingIdle=false;providerSettleTimeout();},250);
 }
 function providerFinalizeViewport(source){
   const p=PROVIDER_MAP;if(p.failed||p.healthPromise||p.commandPending||p.gesture||nativePointers.size)return false;
@@ -184,10 +193,15 @@ function providerViewportChanged(name){
   const p=PROVIDER_MAP;if(p.failed){providerRecordEvent(name);if(p.recoverable&&name==='idle')providerTryRecover('idle');return;}
   if(name==='zoom_changed'&&p.stableZoom!==null)try{const a=p.adapter,scale=a.getViewportScale();if(a.getZoom()!==p.stableZoom&&Math.abs(Math.log2(scale/p.stableScale))<.001)p.pendingZoomScale=scale;}catch(_){providerHandleProjectionFailure();return;}
   p.viewportDirty=true;
-  if(['dragstart','pinchstart','zoomstart'].includes(name)){p.gesture=true;p.waitingIdle=true;providerBeginMove();providerRecordEvent(name);return;}
+  if(['dragstart','pinchstart','zoomstart'].includes(name)){p.gesture=true;p.waitingIdle=true;providerBeginMove();providerRecordEvent(name);providerArmGestureDeadline();return;}
   if(['dragend','pinchend','zoomend'].includes(name)){p.gesture=false;p.waitingIdle=false;}
   if(name==='idle'){p.idleAt=performance.now();if(!nativePointers.size){p.gesture=false;p.waitingIdle=false;}}
   if(['dragend','pinchend','zoomend'].includes(name))p.idleAt=performance.now();
+  if(!p.gesture)providerCancelGestureDeadline();else providerArmGestureDeadline();
+  // 이미 공개된 동일 viewport의 늦은 idle/end/tile 관련 이벤트는 Canvas를 다시 숨기지 않는다.
+  if(p.active&&!p.providerMoving&&!p.revealAfterBase&&!p.commandPending&&!p.healthPromise&&!nativePointers.size&&!p.gesture)try{
+    const key=providerViewportKey();if(p.overlayStamp===JSON.stringify([key,cw,ch,DPR()])&&key===p.signature){p.viewportDirty=false;p.duplicateEvents=(p.duplicateEvents||0)+1;providerRecordEvent(name);return;}
+  }catch(_){providerHandleProjectionFailure();return;}
   providerBeginMove();providerRecordEvent(name);
   if(name==='idle'&&!nativePointers.size&&!p.commandPending&&!p.healthPromise)providerQueueFinalViewport();else providerQueueSettle();
 }
@@ -228,7 +242,7 @@ function providerFinishViewCommand(c,ok,reason=null) {
 }
 function providerApplyView(view = {...V}) {
   const p=PROVIDER_MAP;if(!p.adapter||p.failed)return Promise.resolve({ok:true,status:'fallback',settledView:{...V}});
-  providerCancelViewCommand();p.waitingIdle=false;cancelAnimationFrame(p.syncRAF);p.syncRAF=0;providerBeginMove();
+  providerCancelViewCommand();providerCancelGestureDeadline();p.waitingIdle=false;cancelAnimationFrame(p.syncRAF);p.syncRAF=0;providerBeginMove();
   const c={id:++p.commandId,view:{...view},target:[lonOf(view.cx),latOf(view.cy)],requestedBounds:providerRequestedBounds(view),trace:[],frame:0,stable:0,lastKey:null};
   c.promise=new Promise(resolve=>{c.resolve=resolve;});p.pendingCommand=c;p.commandPending=true;p.requestedView={...view};
   const step=()=>{

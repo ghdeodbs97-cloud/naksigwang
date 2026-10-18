@@ -11,7 +11,7 @@ window.p3SettleTest=async()=>{
   $('providerMap').dispatchEvent(new PointerEvent('pointerup',{pointerId:-7,bubbles:true}));check(nativePointers.size===0,'pointerup capture 종료');f.viewportListener('dragend');f.viewportListener('idle');
   cancelAnimationFrame(p.syncRAF);p.syncRAF=0;providerSettleTimeout();await settle();visible();
   check((PERF.counts.renderBase||0)===bases+1,'idle→강제 timeout 뒤 base 1회');
-  const idleBase=PERF.counts.renderBase||0;f.viewportListener('idle');await settle();for(let i=0;i<20;i++)await tick();visible();check((PERF.counts.renderBase||0)===idleBase+1,'center 3px idle base 횟수 '+((PERF.counts.renderBase||0)-idleBase)+' / '+p.lastFinalViewport.source);
+  const idleBase=PERF.counts.renderBase||0;f.viewportListener('idle');await settle();for(let i=0;i<20;i++)await tick();visible();check((PERF.counts.renderBase||0)===idleBase,'이미 공개된 동일 viewport idle은 redraw 0');
   // idle 없이 dragend만 온 뒤 더 이상 이벤트를 보내지 않는다. 실제 RAF·시계로 자동 복원을 검사한다.
   const before=PERF.counts.renderBase||0,time=performance.now(),timeouts=p.settleTimeoutCount;
   f.viewportListener('dragstart');f.viewportListener('dragend');await settle();const noInputRecoveryMs=performance.now()-time;visible();

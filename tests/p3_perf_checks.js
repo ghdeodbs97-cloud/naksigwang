@@ -22,11 +22,12 @@ window.p3PerfTest=async()=>{
     return Math.hypot(painted[0]-x,painted[1]-y);
   }));
   // 수심 로딩 완료 뒤 analyzeSection의 기존 예약도 SDK 네 면 범위로 다시 통일해야 한다.
+  await p3WaitDepthQuiet();
   const prepare=depthPrepareAreas,captured=[];
   try{
     depthPrepareAreas=async areas=>{captured.push(JSON.stringify(areas));return captured.length===1;};
     scheduleDisplayDepthArea();for(let i=0;i<80&&captured.length<2;i++)await tick();
-    check(captured.length>=2&&captured[0]===captured[1],'수심 갱신 후에도 SDK 전체 viewport 범위 유지');
+    check(captured.length>=2&&captured[0]===captured[1],'수심 갱신 후에도 SDK 전체 viewport 범위 유지 '+JSON.stringify(captured));
   }finally{depthPrepareAreas=prepare;clearTimeout(OFFICIAL_DEPTH.timer);RENDER.depthQueued=false;RENDER.depthKey='';dirty=true;}
   await OFFICIAL_DEPTH.init;
   // 고정 sleep 대신 자료 로딩·예약·단면/base 변경이 실제로 멈춘 구간을 기다린다.

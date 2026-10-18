@@ -1,11 +1,11 @@
 """실 API 없이 3 화면 × 4 DPR의 이동 성능·Canvas 가시성 회귀."""
-import datetime as dt
 import functools
 import http.server
 import json
 from pathlib import Path
 import threading
 from playwright.sync_api import sync_playwright
+from p3_native_clock import fixed_date_script
 from depth_probe import PROBE
 from p3_baseline import CHECK
 
@@ -28,9 +28,10 @@ try:
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.route('https://**/*',lambda r:r.abort())
         page.route('**/index.html',lambda r:r.fulfill(content_type='text/html',body=html))
-        page.clock.set_fixed_time(dt.datetime.fromisoformat(json.loads((ROOT/'data/meta.json').read_text(encoding='utf-8'))['generated']))
+        page.add_init_script(fixed_date_script(json.loads((ROOT/'data/meta.json').read_text(encoding='utf-8'))['generated']))
         page.goto(f'http://localhost:{srv.server_port}/index.html',wait_until='domcontentloaded')
         page.wait_for_function('window.depthProbeReady?.()')
+        assert page.evaluate("requestAnimationFrame.toString().includes('[native code]') && performance.now.toString().includes('[native code]')"), "원본 RAF/performance 필요"
         result=page.evaluate('window.p3PerfTest()');assert not errors,errors
         results.append({'viewport':[w,h],'dpr':dpr,**result})
         (OUT/'results.json').write_text(json.dumps(results,ensure_ascii=False,indent=2),encoding='utf-8')
