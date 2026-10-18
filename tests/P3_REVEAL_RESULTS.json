@@ -840,5 +840,15 @@
     "최신 실 NAVER fit/overlay/렉/잔상/drift 재검증 대기",
     "병렬 회귀의 idle 최대 127ms는 이전 72ms보다 높음; 실 장치 수치와 분리",
     "전체 행렬 뒤 최종 CSS/resize/지속이동/버블 차단 보강은 최종 집중 3화면과 최종 CI 행렬에서 재검증"
-  ]
+  ],
+  "urlPrivacy": {
+    "numericPathsRedacted": true,
+    "subdomainsRedacted": true,
+    "queryAndFragmentRemoved": true,
+    "validatedScreens": [
+      390,
+      1280,
+      1920
+    ]
+  }
 }

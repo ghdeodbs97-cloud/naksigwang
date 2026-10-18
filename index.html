@@ -2654,8 +2654,8 @@ if(PROVIDER_DEV_HOST){
   window.naksigwangPerfDiagnostic.providerOnly=enabled=>{stage.classList.toggle('provider-only',!!enabled);return {providerOnly:stage.classList.contains('provider-only'),canvases:providerCanvasVisibility()};};
   window.naksigwangTileDiagnostic=(x,y)=>{
     const p=PROVIDER_MAP,container=$('providerMap'),rectOf=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};},rect=rectOf(container);
-    // 임의 URL 경로에도 인증정보가 있을 수 있다. 숫자 타일 좌표·공개 확장자만 보존한다.
-    const safeSource=src=>{try{const u=new URL(src,location.href);if(!['https:','http:'].includes(u.protocol))return {hostname:null,path:null};return {hostname:/^(?:[a-z0-9-]+\.)*(?:naver\.com|pstatic\.net|naver\.net)$/.test(u.hostname)?u.hostname:'[비공개 호스트]',path:u.pathname.split('/').map(v=>!v?'':/^\d{1,10}(?:\.(?:png|jpg|jpeg|webp))?$/.test(v)?v:'[비공개]').join('/')};}catch(_){return {hostname:null,path:null};}};
+    // 숫자 경로·하위 호스트에도 인증정보가 있을 수 있다. 공개 기본 도메인과 이미지 확장자만 남긴다.
+    const safeSource=src=>{try{const u=new URL(src,location.href);if(!['https:','http:'].includes(u.protocol))return {hostname:null,path:null};const hostname=['naver.com','pstatic.net','naver.net'].find(d=>u.hostname===d||u.hostname.endsWith('.'+d))||'[비공개 호스트]';return {hostname,path:u.pathname.split('/').map(v=>{if(!v)return '';const ext=/\.(png|jpg|jpeg|webp)$/i.exec(v);return '[비공개]'+(ext?'.'+ext[1].toLowerCase():'');}).join('/')};}catch(_){return {hostname:null,path:null};}};
     const tiles=[...container.querySelectorAll('img')].map(el=>{const r=rectOf(el);let visible=r.width>0&&r.height>0&&r.left<rect.left+rect.width&&r.top<rect.top+rect.height&&r.left+r.width>rect.left&&r.top+r.height>rect.top;
       for(let node=el;node;node=node.parentElement){const css=getComputedStyle(node);if(css.display==='none'||css.visibility!=='visible'||Number(css.opacity)===0)visible=false;}
       return {rect:r,visible,naturalWidth:el.naturalWidth,naturalHeight:el.naturalHeight,complete:el.complete,currentSrc:safeSource(el.currentSrc||el.src)};});

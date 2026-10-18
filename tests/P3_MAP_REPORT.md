@@ -395,7 +395,7 @@ localhost에서만 `naksigwangTileDiagnostic(clientX?, clientY?)`와 `naksigwang
 
 타일 진단은 provider mode/zoom/center/bounds/container rect, provider CSS와 마지막 SDK setSize 시점/횟수, 하위 IMG 개수·보이는 IMG 개수, 각 rect/naturalWidth/naturalHeight/complete, CSS 크기 분포, 네 이동 상태와 세 Canvas opacity/display/visibility, 최근 SDK 이벤트를 반환한다. IMG에는 attribution 등도 포함될 수 있어 IMG 개수 자체를 실패 타일 개수로 해석하지 않는다. viewport와 교차하고 조상 CSS까지 보이는 IMG를 세지만 다른 IMG가 위를 덮는지는 판정하지 않는다.
 
-URL query/fragment/userinfo는 반환하지 않는다. 임의 경로에 credential이 있을 수 있어 숫자 타일 좌표 외의 경로는 비공개로 표시한다. 호스트도 NAVER 계열 allowlist 외에는 가린다. 원본 URL을 로그하지 않는다. 진단은 DOM metadata만 읽으며 타일 요청·교체·캐시 저장을 하지 않는다.
+URL query/fragment/userinfo는 반환하지 않는다. 임의 경로에 credential이 있을 수 있어 숫자 값까지 모든 경로 segment를 비공개로 표시하고 이미지 확장자만 남긴다. 하위 호스트도 가리고 NAVER 계열의 공개 기본 도메인만 남긴다. 원본 URL을 로그하지 않는다. 진단은 DOM metadata만 읽으며 타일 요청·교체·캐시 저장을 하지 않는다.
 
 두 인수는 브라우저 client 좌표다. 해당 위치의 base/flow/ui 실제 RGBA를 읽는다. providerOnly=true에서도 Canvas backing 픽셀은 보존되므로 opacity/visibility와 함께 해석한다. providerOnly는 stage 직계 `#base/#flow/#ui`만 숨기고 providerMap/SDK pane/IMG/control/attribution에는 스타일을 바꾸지 않는다. 이동 CSS와 기존 Canvas 배치/하단 출처 clip CSS도 같은 직계 세 ID로 좁혀 SDK 내부 Canvas에 전파되지 않는다.
 

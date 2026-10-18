@@ -30,11 +30,11 @@ async function p3RevealTest(f){
   Object.assign(PROVIDER_MAP,{failed:false,active:false,loaded:true,gesture:false,waitingIdle:false});providerSync();providerCheck();await settle('fallback 이후 mock 복구');
   // IMG는 DOM 관찰용 fixture. src를 설정하거나 타일을 fetch하지 않는다.
   const image=document.createElement('img');image.style.cssText='position:absolute;left:0;top:0;width:256px;height:256px';
-  Object.defineProperty(image,'currentSrc',{value:'https://map.pstatic.net/private-secret/12/345/678.jpg?clientId=credential-secret#secret'});
+  Object.defineProperty(image,'currentSrc',{value:'https://host-secret.map.pstatic.net/private-secret/1234567890/345/678.jpg?clientId=credential-secret#secret'});
   $('providerMap').append(image);
   Object.defineProperty(image,'naturalWidth',{value:256});Object.defineProperty(image,'naturalHeight',{value:256});Object.defineProperty(image,'complete',{value:false});
   const before=window.naksigwangTileDiagnostic();check(before.childImageCount>=1&&before.visibleTileCount>=1,'보이는 IMG metadata');
-  const serialized=JSON.stringify(before);check(!serialized.includes('credential-secret')&&!serialized.includes('private-secret')&&!serialized.includes('clientId='),'query/path 인증정보 제외');
+  const serialized=JSON.stringify(before);check(!serialized.includes('credential-secret')&&!serialized.includes('private-secret')&&!serialized.includes('clientId=')&&!serialized.includes('1234567890')&&!serialized.includes('host-secret'),'query/path 인증정보 제외');
   const providerVisibility=getComputedStyle($('providerMap')).visibility;
   window.naksigwangPerfDiagnostic.providerOnly(true);const only=window.naksigwangTileDiagnostic();
   check(only.canvases.every(c=>c.visibility==='hidden'),'providerOnly 분석 Canvas만 숨김');check(getComputedStyle(image).visibility==='visible'&&getComputedStyle($('providerMap')).visibility===providerVisibility,'provider IMG 유지');
