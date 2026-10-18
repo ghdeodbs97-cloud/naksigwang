@@ -27,6 +27,6 @@ window.p3SettleTest=async()=>{
     retained();movingHeavy+=(PERF.counts.renderBase||0)-before;
   }
   check(p.settleTimeoutCount-timeoutStart===100&&movingHeavy===0,'100회 pan/zoom timeout·heavy 0');
-  await recover();await fitGround(38.20854,128.5947,10000);await settle();const marker=await naksigwangMapDiagnostic(38.20854,128.5947);check(marker.errorPx<=2&&marker.passes,'최종 복구 native Marker 정합');
-  return {healthyTimeoutRetained:true,nextIdleRecovered:true,reasonCases:['centerErrorPx','zoomScalePending','keyChanges'],repeatedPanZoom:100,repeatedTimeouts:100,fallbacks:p.fallbackCount-falls,movingHeavy,errorPx:marker.errorPx};
+  f.getCenter=center;f.getBounds=bounds;await fitGround(38.20854,128.5947,10000);await settle();check(!p.settleTimedOut&&p.lastCommand.status==='settled','timeout 이후 명시적 fit 성공도 상태 해제');const marker=await naksigwangMapDiagnostic(38.20854,128.5947);check(marker.errorPx<=2&&marker.passes,'최종 복구 native Marker 정합');
+  return {healthyTimeoutRetained:true,nextIdleRecovered:true,fitRecovered:true,reasonCases:['centerErrorPx','zoomScalePending','keyChanges'],repeatedPanZoom:100,repeatedTimeouts:100,fallbacks:p.fallbackCount-falls,movingHeavy,errorPx:marker.errorPx};
 };
