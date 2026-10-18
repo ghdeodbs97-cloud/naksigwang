@@ -35,10 +35,12 @@ window.p3HealthFatal=async()=>{
   const oldWidth=stage.style.width,layoutProject=f.project,layoutUnproject=f.unproject,layoutReference=f.referenceProject;
   const delta=()=>[(f.size[0]-cw)/2,(f.size[1]-ch)/2];f.project=function(...a){const p=layoutProject.apply(f,a),d=delta();return [p[0]+d[0],p[1]+d[1]];};f.referenceProject=function(...a){const p=layoutReference.apply(f,a),d=delta();return [p[0]+d[0],p[1]+d[1]];};f.unproject=function(x,y){const d=delta();return layoutUnproject.call(f,x-d[0],y-d[1]);};
   for(let i=0;i<2;i++){
+    nativePointers.add(-81);f.viewportListener('dragstart');
     dispatchEvent(new Event('offline'));await settle();let d=naksigwangTileDiagnostic();check(d.failed&&!d.active&&d.lastFallbackReason==='browser-offline'&&d.recoverable,'offline 사유와 fallback');
+    check(nativePointers.size===0&&!PROVIDER_MAP.gestureTimer,'fatal 전환은 남은 포인터·종료 timer 취소');
     if(i===0){stage.style.width=(cw-23)+'px';resize();check(f.size[0]!==cw,'offline 중 SDK size 갱신 보류');providerSetMode('normal');}
     check(!(await naksigwangTileDiagnostic.retry()).ok,'offline 중 복구 차단');dispatchEvent(new Event('online'));await PROVIDER_MAP.healthPromise;await settle();d=naksigwangTileDiagnostic();
-    check(!d.failed&&d.active&&f.map===sameMap&&f.instances===1,'online은 기존 SDK 지도 재사용');recoveries.push({reason:d.lastFallbackReason,count:d.recoveryCount});check(f.size[0]===cw&&f.size[1]===ch,'복구의 최종 settle 전에 SDK size 갱신');check(f.modes.at(-1)===PROVIDER_MAP.mode,'offline 중 선택한 지도 모드 복구');if(i===0){stage.style.width=oldWidth;resize();await settle();}
+    check(!d.failed&&d.active&&f.map===sameMap&&f.instances===1,'online은 기존 SDK 지도 재사용');const falls=PROVIDER_MAP.fallbackCount;for(let j=0;j<5;j++){f.viewportListener('idle');await settle();}check(PROVIDER_MAP.fallbackCount===falls,'retry 직후 fallback 재진입 없음');recoveries.push({reason:d.lastFallbackReason,count:d.recoveryCount});check(f.size[0]===cw&&f.size[1]===ch,'복구의 최종 settle 전에 SDK size 갱신');check(f.modes.at(-1)===PROVIDER_MAP.mode,'offline 중 선택한 지도 모드 복구');if(i===0){stage.style.width=oldWidth;resize();await settle();}
   }
   f.project=layoutProject;f.unproject=layoutUnproject;f.referenceProject=layoutReference;
   const project=f.project,falls=PROVIDER_MAP.fallbackCount;

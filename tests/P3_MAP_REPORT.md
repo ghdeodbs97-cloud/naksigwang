@@ -557,3 +557,46 @@ localhost 최신 빌드 후 지도를 drag하고 놓은 다음 아무 입력 없
 최종 로컬 기록은 `tests/P3_FINAL_VIEWPORT_RESULTS.json`에 있다. health 6개 조합의 무입력 자동 복원은 273~306ms, 각 100회(총 600회) drag의 영구 숨김/fallback/moving heavy는 모두 0, 정상 종료와 강제 timeout의 base는 각각 1회였다. 100회 종료 복원 최대는 75ms였다. provider 20개 화면/DPR 및 여섯 SDK 실패 등 총 32개 결과, performance 12개 조합, legacy 전체 12개 명령을 통과했다. performance moving heavy/영구 숨김 0, Marker 최대 0.4469px, A/B 최대 0.9014px, idle 최대 111ms였다. 직전 기록의 98ms와 실행 부하가 달라 이 차이만으로 성능 향상/악화를 단정하지 않는다. 정지 중 SDK/base/mask 재계산 0과 기존 particle budget·cache 구조를 유지했다. 실제 장치 성능은 재검증 대기다.
 
 390×844와 1280×900의 다섯 탭을 확인했고, build missing ids: [], 빌드 플랫폼 일치와 수심 production 무변경을 통과했다. 테스트 중 발견한 빠른 탭 복귀의 이른 zoom/이전 scale 혼합 기준을 보완한 뒤 성능 전체 행렬을 재실행했다. 계측 준비의 취소된 depth timer 플래그 문제는 테스트 fixture/대기 조건에서 정리했으며 보호 소스는 변경하지 않았다. localhost 확인 전 providerOnly 진단 모드를 사용했다면 `naksigwangPerfDiagnostic.providerOnly(false)`로 분석 표시를 켠다.
+
+## Provider lifecycle 전수 감사 (2026-10-18)
+
+이번 감사는 `0e1c42a`에서 이어 진행했다. 사용자의 실제 NAVER 최신 빌드 검증은 아직 없으므로 아래 결과는 코드/회귀 검증이며 P3 완료나 merge 가능 판정이 아니다. 위성 영상의 사각 블록 원인은 미확인이다.
+
+새로 찾은 경로는 두 가지다. 이미 공개한 동일 viewport에 늦은 idle/end가 오면 다시 숨김→heavy redraw를 반복했다. 또한 포인터 없는 zoom에서 end와 idle이 모두 누락되면 gesture/waitingIdle이 남아 settle 감시가 시작되지 않았다. 공개 완료 시 signature·크기·DPR을 기록하고, 같은 viewport의 늦은 이벤트는 기록만 남겨 중복 redraw/숨김을 생략한다. 새 이동이나 바뀐 viewport에는 이 생략을 적용하지 않는다. 포인터 없는 gesture에는 진행 이벤트마다 갱신되는 유한 250ms 종료 감시를 둔다. 포인터를 누르고 있거나 명시적 명령이 진행 중이면 이 감시가 입력을 강제로 끝내지 않는다. fatal 전환은 종료 timer와 남은 포인터를 정리한다.
+
+종료 이벤트 누락 경로의 복원 시간 계측도 마지막 진행 이벤트 시각을 사용한다. 이전 idleAt이 남으면 실제 약 280ms 복원이 이전 작업 대기까지 포함한 수 초로 기록됐다. 종료 감시를 갱신할 때 시각도 갱신하고, 스트레스 검사에서 직접 잰 복원 시간과 기록 시간 차이 <75ms를 확인한다.
+
+| 상태/이벤트 | 처리와 다음 상태 |
+| --- | --- |
+| inactive / 설정 없음 | 자체 지형 사용, credential 재요청 없음 |
+| loading | SDK callback·인증·초기화 결과 확인; script timeout만 fatal |
+| active / 정지 | SDK 읽기·base/mask/단면 재계산 반복 없음 |
+| gesture / moving / waitingIdle | 이전 Canvas만 숨김; heavy·픽셀 읽기·수심 준비 중단 |
+| commandPending | commandId와 실제 viewport 도착 검증; superseded 취소 |
+| idle, 포인터 0, 명령 없음 | 현재 표시 SDK 좌표를 최종 read, dirty→기존 frame DRAW→REVEAL |
+| settle monitoring | 최대 120 RAF 또는 250ms, center/zoom/scale 수치는 diagnostic |
+| settle timeout, 정상 API | provider 유지, 최종 좌표 read·한 번 redraw·자동 공개 |
+| 종료 이벤트 모두 누락, 포인터 0 | 유한 종료 감시→동일 timeout finalization; 다음 입력 불필요 |
+| 이른 idle / 늦은 projection | 즉시 공개 후 필요할 때만 최대 250ms 관찰·최대 한 번 추가 보정 |
+| degraded / 일시 API 예외 | 제한된 3회 health 확인; 회복하면 같은 지도 유지 |
+| recoverable failure / offline | 입력·명령·감시 정리; online/retry에서 기존 map 재사용 |
+| fatal failure | script/auth/init 소실 또는 반복 API 실패만 fallback |
+| providerOnly | 직계 base/flow/ui만 진단용 숨김; SDK 자손·입력·attribution 유지 |
+
+providerFallback 호출을 전수 확인했다. 시작 경로는 script load/timeout·auth·offline·map init 실패, health/finalization 경로는 map 객체 소실, 입력 API 경로는 3회 연속 예외, projection 경로는 3회 상태 확인 실패다. 수동 fallback은 테스트/내부 명시적 호출만 있다. 타일 IMG 오류, tilesloaded 누락, settle timeout, fit 1회 미도달은 fatal 호출 경로가 없다. 이들의 정상 projection은 그대로 유지한다. 일시 Canvas 정합 불일치는 SDK 인스턴스를 파괴하지 않으며 fatal reason으로 저장하지 않는다.
+
+idle에서 reported center 2px 판정은 공개의 필수 gate가 아니다. 원래 120-frame watchdog이 발동한 실제 세부 수치(center인지 zoom/scale인지)는 과거 trace 부재로 확정할 수 없다. 타일 로드는 ready 식의 직접 입력이 아니며 fractional transform/이른 zoom 보고/완전 동일 key 조건은 가능한 원인이다. 현재 표시 중심은 SDK unproject를 사용하고, native Marker의 실제 DOM center와 Canvas crosshair 비교는 별도로 유지한다. 같은 project 경로 두 번의 0px로 실 정합 성공을 선언하지 않는다.
+
+스트레스는 390×844, 768×1024, 1280×900, 1920×1080 × DPR 1/1.25/1.5/2의 16조합이다. 조합마다 drag 100, 실제 WheelEvent 100, 혼합 100, 모드 30, 오늘/지도 왕복 30, resize 30, explicit fit 30, providerOnly 왕복 30, 강제 timeout 100, 실제 IMG error 100, tilesloaded 누락 100을 검사한다. 누락 타일 검사는 건강한 SDK에 실제 mode timeout callback을 직접 실행하며, 기존 health 검사에서 별도로 실제 예약 12초 경계를 가상 시계로 확인한다. 100×12초의 실제 대기를 했다고 주장하지 않는다. 각 최종 공개 뒤 늦은 idle/center/end/idle 4개를 추가하여 중복 redraw 0도 확인한다. 각 fit은 홍원→속초→포항→주문진→묵호→홍원→포항→속초를 순환하며 실제 mock center/key/bounds 변경, target inside/reached, settled, native DOM/Canvas <=2px를 검사한다.
+
+움직이는 동안 renderBase/mask/getImageData/flow/particle/section 계수 차이와 depthPrepareAreas 호출 0을 검사한다. 마지막 자료 갱신이 안정된 뒤 실제 RAF 60프레임 동안 SDK/base/mask 재계산 0을 확인한다. 별도 12조합 성능 suite는 조류를 켠 상태와 지연 SDK projection, A/B 실제 raster까지 검사한다. 스트레스와 별도 suite를 병행한 로컬 부하를 기록하므로 headless FPS/복원 시간은 사용자 PC 성능 보장이 아니다. 300/500ms 목표를 넘는 관측값도 숨기지 않는다. baseline은 원본 301표본을 유지하고 생성기를 재실행하지 않는다.
+
+최종 로컬 수치는 `P3_AUDIT_RESULTS.json`에 기록한다. 위의 이전 보고 수치와 실행 조건이 달라 수 ms 차이를 성능 향상으로 해석하지 않는다. 무한 provider RAF 재시도는 없으며, 기존 앱 RAF는 지도/오늘 탭의 실제 조류·시각 애니메이션을 담당하고 비활성/백그라운드 정지는 유지한다. SDK 타일 URL/credential은 기록·반환하지 않고 native 타일을 별도 수집·저장하지 않는다. SATELLITE 기본과 HYBRID/NORMAL, 기존 key 저장 방식은 유지한다.
+
+계측 도구 감사에서 기존 `page.clock.set_fixed_time`이 Date뿐 아니라 RAF/performance도 Playwright 시계로 감싸는 점을 확인했다. 앞 절의 health 시간/기존 performance FPS는 그 시계 환경의 값이며 실제 프레임 성능 근거로 사용하지 않는다. 이번 performance/stress 최종 실행은 `p3_native_clock.py`로 Date만 고정하고 원본 RAF/performance/timer를 사용한다. 12초 경계 검사에는 기존 가상 시계를 의도적으로 유지한다. 중간에 종료한 가상 시계 stress/performance 결과는 최종 결과 집계에서 제외한다. 수정 전후 duplicateBase 비교는 이벤트/그리기 횟수 재현이며 시간 성능 비교가 아니다.
+
+실사용 마지막 확인: 최신 branch pull→build→localhost 8000→Ctrl+Shift+R 후 2분 drag/pan/zoom, 세 모드, 오늘/지도 왕복, 속초→포항을 확인한다. 항구/갯바위·조류 자동 복원과 위성 유지, 잔상·drift·체감 렉은 **사용자 localhost 최종 검증 대기**다. `const t=naksigwangTileDiagnostic(); console.log(t.providerActive,t.providerFailed,t.lastFallbackReason,t.fallbackCount,t.healthState)`로 간단히 확인하고 `await naksigwangMapDiagnostic.fit(10000,36.05,129.38)`의 command.status/errorPx/sdkViewportUnchanged를 확인한다. providerOnly는 확인 후 반드시 false로 되돌린다.
+
+최종 로컬 결과: 기존 legacy 12명령, provider 32결과, health 6조합, 원본 RAF performance 12조합, 원본 RAF stress 16조합을 통과했다. stress는 총 12,000동작과 늦은 이벤트 25,600개이며 영구 숨김·비의도 fallback·이동 중 heavy/픽셀 읽기/수심 준비·모드 추가 depth fetch는 모두 0이다. 각 이동 종료의 즉시 base는 1회, 공개 후 동일 viewport 늦은 이벤트의 추가 base는 0회다. 원거리 fit은 총 480회 모두 settled/도착/같은 인스턴스/Marker <=2px/visible을 확인했다. 종료 이벤트 누락은 270.2~285.1ms, 반복 종료 복원 최대는 94.4ms였다.
+
+별도 performance 이동 구간은 50.23~60.38fps, 평균 frame 16.61~19.97ms, p95 최대 54.1ms, idle 복원 최대 88.8ms였다. 진단용 Marker/raster 연산을 포함한 48개 구간 합계 long frame은 319개, frame 내부 작업 50ms 이상은 2개였다. 이동 중 heavy 작업은 0이며 이 수치를 실제 NAVER SDK 비용이나 사용자 체감 성능으로 일반화하지 않는다. Marker 최대 0.4469px, A/B raster 최대 0.9014px, 정지 SDK/base/mask/단면/픽셀 읽기 0, particle budget 180/360을 유지했다. 원본 301표본 baseline 동일, build missing ids: [], LF/CRLF 빌드 일치, PR base 대비 production 수심 무변경, 이번 작업 data 무변경도 확인했다. 최종 SHA의 전체 CI 결과는 기존 PR #6 설명과 Conversation 결과 코멘트에 기록한다.

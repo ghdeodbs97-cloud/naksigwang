@@ -22,6 +22,7 @@ if(PROVIDER_DEV_HOST){
       healthState:p.failed?'failed':p.healthPromise?'checking':!health.mapObjectPresent?'unavailable':!health.mapProjectionHealthy?'degraded':p.settleTimedOut&&p.providerMoving?'settle-timeout':!health.providerDOMVisible?'hidden':health.sdkSurfaceCount?'healthy':'waiting-for-tiles',
       settleTimedOut:!!p.settleTimedOut,settleTimeoutCount:p.settleTimeoutCount||0,settleRecoveredAt:p.settleRecoveredAt??null,lastSettleObservation:p.lastSettleObservation?{...p.lastSettleObservation}:null,
       finalViewportCount:p.finalViewportCount||0,lastFinalViewport:p.lastFinalViewport?{...p.lastFinalViewport,center:[...p.lastFinalViewport.center],bounds:p.lastFinalViewport.bounds.map(v=>[...v])}:null,gesture:p.gesture,waitingIdle:p.waitingIdle,nativePointerCount:nativePointers.size,
+      duplicateEvents:p.duplicateEvents||0,gestureDeadlinePending:!!p.gestureTimer,
       recoverable:!!p.recoverable,recoveryCount:p.recoveryCount||0,recoveredAt:p.recoveredAt??null,
       projectionErrorCount:p.projectionErrorCount||0,projectionFailures:p.projectionFailures||0,interactionFailures:p.interactionFailures||0,
       tileErrorCount:p.tileErrorCount||0,tileErrorsLast10s:providerTileErrorsLast10s(),lastTileErrorAt:p.lastTileErrorAt??null,tileErrors:(p.tileErrors||[]).map(e=>({...e})),
