@@ -2265,6 +2265,7 @@ function providerFallback(reason='manual-fallback') {
   providerCancelViewCommand('provider unavailable');
   PROVIDER_MAP.failed = true; PROVIDER_MAP.active = false; clearTimeout(PROVIDER_MAP.timer);
   $('providerMap').style.visibility = 'hidden'; dirty = true;
+  cancelAnimationFrame(PROVIDER_MAP.finalWatchRAF);PROVIDER_MAP.finalWatchRAF=0;
   cancelAnimationFrame(PROVIDER_MAP.syncRAF);PROVIDER_MAP.syncRAF=0;PROVIDER_MAP.providerMoving=false;PROVIDER_MAP.gesture=false;PROVIDER_MAP.waitingIdle=false;PROVIDER_MAP.revealAfterBase=true;
   stage.classList.remove('provider-active'); providerUpdateInput();
   providerNotice('온라인 지도를 불러오지 못해 기본 지형지도로 표시합니다.');
@@ -2276,7 +2277,10 @@ function providerReadView() {
   if (!(scale>0) || !Number.isFinite(scale)) throw Error('지도 배율 변환 실패');
   // SDK의 현재 표시 projection 중심·100m 축척을 호환 상태에 복사한다. SDK에 다시 보내지 않는다.
   V.cx=mxOf(c[0]); V.cy=myOf(c[1]); V.s=scale/kAt(c[1]); p.reads++;
-  p.compatibility={...V};p.groundScale=scale;p.stableZoom=a.getZoom();p.stableScale=a.getViewportScale();
+  p.compatibility={...V};p.groundScale=scale;
+  const zoom=a.getZoom(),viewportScale=a.getViewportScale();
+  // 이른 zoom 보고값과 이전 표시 scale을 확정된 한 쌍으로 저장하지 않는다.
+  if(p.stableZoom===null||zoom===p.stableZoom||Math.abs(Math.log2(viewportScale/p.stableScale))>=.001){p.stableZoom=zoom;p.stableScale=viewportScale;}
   dirty=true;dirtyHover=true;VIEW_T=performance.now();
 }
 function providerViewportKey() {
@@ -2285,6 +2289,7 @@ function providerViewportKey() {
 }
 // 이동 중에는 이전 Canvas를 숨기고 SDK의 마지막 표시 좌표가 안정된 뒤 한 번 갱신한다.
 function providerBeginMove(){
+  cancelAnimationFrame(PROVIDER_MAP.finalWatchRAF);PROVIDER_MAP.finalWatchRAF=0;
   const p=PROVIDER_MAP;p.providerMoving=true;p.revealAfterBase=true;
   if(p.active)stage.classList.add('provider-moving');
   if(RENDER.depthQueued){RENDER.depthQueued=false;RENDER.depthKey='';p.depthDeferred=true;}clearTimeout(OFFICIAL_DEPTH.timer);if(!flowHidden){fctx.setTransform(1,0,0,1,0,0);fctx.clearRect(0,0,flow.width,flow.height);flowHidden=true;}flowStale=true;
@@ -2296,9 +2301,48 @@ function providerRevealOverlay(){
   if(p.revealAfterBase){p.revealAfterBase=false;if(p.idleAt&&PERF.enabled){PERF.idleRecoveryMs.push(performance.now()-p.idleAt);if(PERF.idleRecoveryMs.length>100)PERF.idleRecoveryMs.shift();}}
   stage.classList.remove('provider-moving');
 }
+function providerFinalizeViewport(source){
+  const p=PROVIDER_MAP;if(p.failed||p.healthPromise||p.commandPending||p.gesture||nativePointers.size)return false;
+  const h=providerHealthSnapshot();p.lastHealth=h;
+  if(!h.mapObjectPresent){providerFallback('map-init-failed');return false;}
+  if(!h.mapProjectionHealthy){providerHandleProjectionFailure();return false;}
+  try{
+    providerReadView();p.signature=providerViewportKey();p.viewportDirty=false;
+    p.providerMoving=false;p.gesture=false;p.waitingIdle=false;
+    dirty=true;dirtyHover=true;RENDER.uiKey='';p.revealAfterBase=true;
+    p.healthState='healthy';if(source!=='timeout')p.settleTimedOut=false;
+    if(source!=='idle'||p.pendingZoomScale!==p.adapter.getViewportScale())p.pendingZoomScale=null;
+    p.finalViewportCount=(p.finalViewportCount||0)+1;p.lastFinalViewport={source,time:performance.now(),center:p.adapter.unproject(cw/2,ch/2),zoom:h.zoom,bounds:h.bounds};
+    if(!p.active&&p.loaded)providerCheck();providerUpdateInput();return !p.failed;
+  }catch(_){providerHandleProjectionFailure();return false;}
+}
+function providerQueueFinalViewport(){
+  const p=PROVIDER_MAP;cancelAnimationFrame(p.syncRAF);
+  p.syncRAF=requestAnimationFrame(()=>{
+    p.syncRAF=0;if(p.failed||p.healthPromise||p.commandPending||p.gesture||nativePointers.size)return;
+    try{
+      const a=p.adapter,reported=a.project(...a.getCenter()),scale=a.getViewportScale();
+      const pending=Math.hypot(reported[0]-cw/2,reported[1]-ch/2)>2||(p.pendingZoomScale!=null&&Math.abs(Math.log2(scale/p.pendingZoomScale))<.001)||(p.stableZoom!==null&&a.getZoom()!==p.stableZoom&&Math.abs(Math.log2(scale/p.stableScale))<.001);
+      if(providerFinalizeViewport('idle')&&pending)providerWatchFinalViewport(p.signature);
+    }catch(_){providerHandleProjectionFailure();}
+  });
+}
+function providerWatchFinalViewport(initial){
+  const p=PROVIDER_MAP,started=performance.now();let previous=initial,stable=0;
+  // 이른 idle 뒤 늦게 projection이 바뀌는 SDK도 놓치지 않는다. 표시를 막지 않는 유한한 보정 관찰이다.
+  const probe=()=>{
+    p.finalWatchRAF=0;if(p.failed||p.healthPromise||p.commandPending||p.providerMoving||p.gesture||nativePointers.size)return;
+    try{
+      const key=providerViewportKey();stable=key===previous?stable+1:0;previous=key;
+      if(key!==initial&&(stable>=1||performance.now()-started>=250)){providerFinalizeViewport('late-projection');return;}
+      if(performance.now()-started<250)p.finalWatchRAF=requestAnimationFrame(probe);else p.pendingZoomScale=null;
+    }catch(_){providerHandleProjectionFailure();}
+  };
+  p.finalWatchRAF=requestAnimationFrame(probe);
+}
 function providerQueueSettle(){
   const p=PROVIDER_MAP;if(p.syncRAF||p.healthPromise||p.commandPending||p.gesture||p.waitingIdle||p.failed)return;
-  let previous='',stable=0,frames=0,keyChanges=0;
+  let previous='',stable=0,frames=0,keyChanges=0;const started=performance.now();
   const probe=()=>{
     p.syncRAF=0;if(p.failed||p.healthPromise||p.commandPending||p.gesture||p.waitingIdle)return;
     try{
@@ -2307,7 +2351,7 @@ function providerQueueSettle(){
       const zoomScalePending=p.stableZoom!==null&&zoom!==p.stableZoom&&Math.abs(Math.log2(scale/p.stableScale))<.001;
       const ready=centerErrorPx<=2&&!zoomScalePending;
       stable=ready&&key===previous?stable+1:ready?1:0;if(previous&&key!==previous)keyChanges++;previous=key;
-      p.lastSettleObservation={frames:++frames,stableFrames:stable,keyChanges,centerErrorPx,zoom,scale,stableZoom:p.stableZoom,stableScale:p.stableScale,zoomScalePending,ready};
+      p.lastSettleObservation={frames:++frames,elapsedMs:performance.now()-started,stableFrames:stable,keyChanges,centerErrorPx,zoom,scale,stableZoom:p.stableZoom,stableScale:p.stableScale,zoomScalePending,ready};
       if(stable>=2){
         p.settleTimedOut=false;p.healthState='healthy';p.settleRecoveredAt=performance.now();
         const changed=key!==p.signature; p.providerMoving=false;
@@ -2316,18 +2360,21 @@ function providerQueueSettle(){
         return;
       }
       // 이벤트 뒤 상한이 있는 감시만 실행한다. 정지 상태에서는 SDK를 읽지 않는다.
-      if(frames<120)p.syncRAF=requestAnimationFrame(probe);else providerSettleTimeout();
+      if(frames<120&&performance.now()-started<250)p.syncRAF=requestAnimationFrame(probe);else providerSettleTimeout();
     }catch(_){providerHandleProjectionFailure();}
   };
   p.syncRAF=requestAnimationFrame(probe);
 }
 function providerViewportChanged(name){
   const p=PROVIDER_MAP;if(p.failed){providerRecordEvent(name);if(p.recoverable&&name==='idle')providerTryRecover('idle');return;}
+  if(name==='zoom_changed'&&p.stableZoom!==null)try{const a=p.adapter,scale=a.getViewportScale();if(a.getZoom()!==p.stableZoom&&Math.abs(Math.log2(scale/p.stableScale))<.001)p.pendingZoomScale=scale;}catch(_){providerHandleProjectionFailure();return;}
   p.viewportDirty=true;
   if(['dragstart','pinchstart','zoomstart'].includes(name)){p.gesture=true;p.waitingIdle=true;providerBeginMove();providerRecordEvent(name);return;}
   if(['dragend','pinchend','zoomend'].includes(name)){p.gesture=false;p.waitingIdle=false;}
   if(name==='idle'){p.idleAt=performance.now();if(!nativePointers.size){p.gesture=false;p.waitingIdle=false;}}
-  providerBeginMove();providerRecordEvent(name);providerQueueSettle();
+  if(['dragend','pinchend','zoomend'].includes(name))p.idleAt=performance.now();
+  providerBeginMove();providerRecordEvent(name);
+  if(name==='idle'&&!nativePointers.size&&!p.commandPending&&!p.healthPromise)providerQueueFinalViewport();else providerQueueSettle();
 }
 function providerUseNativePan() { return PROVIDER_MAP.active && !S.lock && S.mode==='pan'; }
 function providerUpdateInput() {
@@ -2676,8 +2723,9 @@ if(PROVIDER_DEV_HOST){
       lastFallbackReason:p.lastFallbackReason||null,providerFallbackReason:p.lastFallbackReason||null,
       fallbackCount:p.fallbackCount||0,lastFallbackAt:p.lastFallbackAt??null,
       mapObjectPresent:health.mapObjectPresent,mapProjectionHealthy:health.mapProjectionHealthy,providerDOMVisible:health.providerDOMVisible,sdkSurfaceCount:health.sdkSurfaceCount,
-      healthState:p.failed?'failed':p.healthPromise?'checking':!health.mapObjectPresent?'unavailable':!health.mapProjectionHealthy?'degraded':p.settleTimedOut?'settle-timeout':!health.providerDOMVisible?'hidden':health.sdkSurfaceCount?'healthy':'waiting-for-tiles',
+      healthState:p.failed?'failed':p.healthPromise?'checking':!health.mapObjectPresent?'unavailable':!health.mapProjectionHealthy?'degraded':p.settleTimedOut&&p.providerMoving?'settle-timeout':!health.providerDOMVisible?'hidden':health.sdkSurfaceCount?'healthy':'waiting-for-tiles',
       settleTimedOut:!!p.settleTimedOut,settleTimeoutCount:p.settleTimeoutCount||0,settleRecoveredAt:p.settleRecoveredAt??null,lastSettleObservation:p.lastSettleObservation?{...p.lastSettleObservation}:null,
+      finalViewportCount:p.finalViewportCount||0,lastFinalViewport:p.lastFinalViewport?{...p.lastFinalViewport,center:[...p.lastFinalViewport.center],bounds:p.lastFinalViewport.bounds.map(v=>[...v])}:null,gesture:p.gesture,waitingIdle:p.waitingIdle,nativePointerCount:nativePointers.size,
       recoverable:!!p.recoverable,recoveryCount:p.recoveryCount||0,recoveredAt:p.recoveredAt??null,
       projectionErrorCount:p.projectionErrorCount||0,projectionFailures:p.projectionFailures||0,interactionFailures:p.interactionFailures||0,
       tileErrorCount:p.tileErrorCount||0,tileErrorsLast10s:providerTileErrorsLast10s(),lastTileErrorAt:p.lastTileErrorAt??null,tileErrors:(p.tileErrors||[]).map(e=>({...e})),
@@ -2765,11 +2813,8 @@ function providerSettleTimeout(){
   p.settleFailure={reason:'settle-timeout',time:performance.now(),observation:{...p.lastSettleObservation},health:h};
   if(!h.mapObjectPresent){providerFallback('map-init-failed');return;}
   if(!h.mapProjectionHealthy){providerHandleProjectionFailure();return;}
-  // 표시 안정화 실패는 SDK 장애가 아니다. 위성·입력을 유지하고 잘못된 Canvas는 보류한다.
-  p.healthState='settle-timeout';providerBeginMove();
-  try{providerReadView();p.viewportDirty=true;providerUpdateInput();}
-  catch(_){providerHandleProjectionFailure();}
-  // RAF를 스스로 다시 시작하지 않는다. 다음 idle/이동 이벤트가 새 감시를 시작한다.
+  // 포인터/명령이 끝난 정상 SDK의 표시 좌표를 최종 기준으로 읽고 한 번 DRAW→REVEAL한다.
+  p.healthState='settle-timeout';providerFinalizeViewport('timeout');
 }
 function providerModeTimeout(){
   const p=PROVIDER_MAP;if(p.failed)return;
