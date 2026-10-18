@@ -1,5 +1,7 @@
 // p3_provider_checks.js — 실제 API 없이 지도 어댑터·상태 보존 검사
 window.p3Ready = () => !!GE;
+window.p3DepthQuiet = () => !OFFICIAL_DEPTH.pending.size&&!dirty&&!PROVIDER_MAP.providerMoving&&!PROVIDER_MAP.commandPending;
+window.p3WaitDepthQuiet = async()=>{let quiet=0,last='',section=null;for(let i=0;i<300&&quiet<45;i++){await new Promise(requestAnimationFrame);const key=JSON.stringify([OFFICIAL_DEPTH.generation,PERF.counts.renderBase||0]);quiet=window.p3DepthQuiet()&&(CR.ready||CR.err)&&key===last&&SEC===section?quiet+1:0;last=key;section=SEC;}if(quiet<45)throw Error('자료 갱신 대기 상한 '+JSON.stringify({pending:OFFICIAL_DEPTH.pending.size,queued:RENDER.depthQueued,dirty,moving:PROVIDER_MAP.providerMoving,command:PROVIDER_MAP.commandPending,cr:CR.ready,err:CR.err,quiet,last}));};
 window.p3SizeCheck = () => ch===Math.round(cw<560?clamp(innerHeight-290,320,cw*1.3):Math.min(cw*.72,Math.max(380,innerHeight-240)));
 // 앱 변환을 호출하지 않는 비선형 세계 좌표. 정수 줌과 회전·곡률을 함께 재현한다.
 const fakeWorld = (lon,lat) => { const y=myOf(lat), d=y-myOf(36); return [mxOf(lon)+.03*d+1e-7*d*d,y]; };
@@ -189,7 +191,7 @@ window.p3NativeTest = async () => {
   const ok=await window.naksigwangMapDiagnostic(38.20854,128.5947);check(ok.passes,'DOM 원점 복구');
   check(saved===JSON.stringify({pin:S.pin,A:S.A,B:S.B,SEC}),'debug 생성 시 분석·핀 상태 유지');
   window.naksigwangMapDiagnostic.clear();drawUI();check(!$('providerMap').querySelector('[data-naksigwang-native-probe]')&&!PROVIDER_DEBUG,'debug 해제');
-  fake.destroy();PROVIDER_MAP.adapter=null;PROVIDER_MAP.active=false;$('providerMap').style.visibility='hidden';stage.classList.remove('provider-active');dirty=true;
+  fake.destroy();PROVIDER_MAP.adapter=null;PROVIDER_MAP.active=false;clearTimeout(OFFICIAL_DEPTH.timer);RENDER.depthQueued=false;$('providerMap').style.visibility='hidden';stage.classList.remove('provider-active');dirty=true;
   const unavailable=await window.naksigwangMapDiagnostic(38.20854,128.5947);check(required.every(k=>k in unavailable)&&!unavailable.valid&&unavailable.errorPx===null,'미준비 진단 필드와 null 오차');
   return {samples,nativeFaultPx:shifted.errorPx,native3pxFaultPx:shifted3.errorPx,domFaultPx:domShift.errorPx};
 };

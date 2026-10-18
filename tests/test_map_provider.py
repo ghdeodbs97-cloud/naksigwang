@@ -45,7 +45,7 @@ try:
         page.set_viewport_size({'width':width,'height':height-160});page.wait_for_function('window.p3SizeCheck()')
         assert page.evaluate('window.p3SizeCheck()'),'창 높이 변경 반영'
         page.set_viewport_size({'width':width,'height':height});page.wait_for_function('window.p3SizeCheck()')
-        page.wait_for_timeout(600)
+        page.evaluate('window.p3WaitDepthQuiet()')
         count=len(depth_requests)
         page.evaluate('window.p3SwitchOnly()');page.wait_for_timeout(600)
         assert len(depth_requests)==count,'전환만으로 수심 요청 증가'

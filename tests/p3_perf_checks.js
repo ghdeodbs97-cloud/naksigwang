@@ -1,7 +1,7 @@
 // p3_perf_checks.js — 연속 입력 중 무거운 렌더 금지와 idle 실제 픽셀 회귀
 window.p3PerfTest=async()=>{
   const check=(ok,msg)=>{if(!ok)throw Error(msg);},tick=()=>new Promise(requestAnimationFrame);
-  const settle=async()=>{for(let i=0;i<40;i++){await tick();if(!PROVIDER_MAP.providerMoving&&!PROVIDER_MAP.commandPending&&!dirty)return;}throw Error('idle 복구 40프레임 초과');};
+  const settle=async()=>{for(let i=0;i<40;i++){await tick();if(!PROVIDER_MAP.providerMoving&&!PROVIDER_MAP.commandPending&&!dirty)return;}throw Error('idle 복구 40프레임 초과 '+JSON.stringify({moving:PROVIDER_MAP.providerMoving,command:PROVIDER_MAP.commandPending,gesture:PROVIDER_MAP.gesture,waiting:PROVIDER_MAP.waitingIdle,pointers:nativePointers.size,failed:PROVIDER_MAP.failed,dirty,TAB,raf:PROVIDER_MAP.syncRAF,health:!!PROVIDER_MAP.healthPromise,beforeZoom:PROVIDER_MAP.pendingCommand?.beforeZoom,beforeScale:PROVIDER_MAP.pendingCommand?.beforeScale,trace:PROVIDER_MAP.pendingCommand?.trace.at(-1)}));};
   showTab('map');await new Promise(r=>setTimeout(r,350));
   const f=new DelayedMapAdapter();f.init($('providerMap'));const sdkSurface=document.createElement('canvas');sdkSurface.width=sdkSurface.height=1;f.container.append(sdkSurface);
   Object.assign(PROVIDER_MAP,{adapter:f,failed:false,loaded:true,active:false,signature:'',sizeKey:'',stableZoom:null});

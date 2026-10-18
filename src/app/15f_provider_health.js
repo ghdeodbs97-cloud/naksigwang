@@ -71,11 +71,8 @@ function providerSettleTimeout(){
   p.settleFailure={reason:'settle-timeout',time:performance.now(),observation:{...p.lastSettleObservation},health:h};
   if(!h.mapObjectPresent){providerFallback('map-init-failed');return;}
   if(!h.mapProjectionHealthy){providerHandleProjectionFailure();return;}
-  // 표시 안정화 실패는 SDK 장애가 아니다. 위성·입력을 유지하고 잘못된 Canvas는 보류한다.
-  p.healthState='settle-timeout';providerBeginMove();
-  try{providerReadView();p.viewportDirty=true;providerUpdateInput();}
-  catch(_){providerHandleProjectionFailure();}
-  // RAF를 스스로 다시 시작하지 않는다. 다음 idle/이동 이벤트가 새 감시를 시작한다.
+  // 포인터/명령이 끝난 정상 SDK의 표시 좌표를 최종 기준으로 읽고 한 번 DRAW→REVEAL한다.
+  p.healthState='settle-timeout';providerFinalizeViewport('timeout');
 }
 function providerModeTimeout(){
   const p=PROVIDER_MAP;if(p.failed)return;

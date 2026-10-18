@@ -24,10 +24,10 @@ async function p3RevealTest(f){
   showTab('today');await tick();showTab('map');await settle('오늘→지도');
   const originalProjection=f.project;f.project=(...args)=>{const p=originalProjection.apply(f,args);return [p[0]+4,p[1]];};
   const fallbackCount=PROVIDER_MAP.fallbackCount||0;
-  // 표시 조건을 못 맞춰도 정상 SDK는 유지하고 Canvas만 보류한다.
+  // 표시 조건을 못 맞춰도 정상 SDK를 유지하고 종료 뒤 Canvas를 자동 복원한다.
   for(let i=0;i<130;i++){f.center=[f.center[0]+.000001,f.center[1]];f.reportedCenter=f.center;f.renderMarkers();f.viewportListener('zoom_changed');await tick();check(!PROVIDER_MAP.failed,'계속 이동하는 SDK의 조기 fallback 금지');}
   f.viewportListener('zoom_changed');for(let i=0;i<125;i++)await tick();
-  const timeout=window.naksigwangTileDiagnostic();check(timeout.active&&!timeout.failed&&timeout.settleTimedOut&&timeout.fallbackCount===fallbackCount&&timeout.providerDOMVisible,'안정화 timeout은 provider 유지');check(timeout.heavyHidden,'timeout Canvas 보류');f.project=originalProjection;
+  await settle('timeout 뒤 무입력 자동 복원');const timeout=window.naksigwangTileDiagnostic();check(timeout.active&&!timeout.failed&&timeout.settleTimedOut&&timeout.fallbackCount===fallbackCount&&timeout.providerDOMVisible,'안정화 timeout은 provider 유지');check(!timeout.heavyHidden,'timeout Canvas 자동 공개');f.project=originalProjection;
   f.viewportListener('idle');await settle('settle timeout 이후 idle 복구');
   // IMG는 DOM 관찰용 fixture. src를 설정하거나 타일을 fetch하지 않는다.
   const image=document.createElement('img');image.style.cssText='position:absolute;left:0;top:0;width:256px;height:256px';

@@ -537,3 +537,23 @@ localhost에서 최신 빌드 후 1~2분 pan/zoom하고 `naksigwangTileDiagnosti
 최종 로컬 결과는 `tests/P3_SETTLE_RESULTS.json`에 기록했다. health 6개 조합에서 각 100회, 총 600회 강제 pan/zoom timeout의 fallback 0·moving heavy 0을 확인했다. 다음 idle 후 base 1회와 Marker 정합을 통과했다. 기존 provider 20 화면/DPR 및 SDK 실패 6종 등 32개 결과, performance 12개 조합, legacy 전체 12개 명령이 모두 통과했다. 기존 reveal 테스트의 과거 fatal 기대값을 새 정책으로 바꾼 후 전체 성능 행렬을 재실행했다. performance의 이동 중 heavy 0, 영구 숨김 0, Marker 최대 0.4469px, A/B 최대 0.9014px, idle 최대 98ms였다. 이 로컬 mock 시간값은 실제 사용자 PC 성능을 보장하지 않는다. 빌드 missing ids: [], 플랫폼 빌드 일치, 수심 production 무변경도 통과했다.
 
 timeout 뒤 다음 idle뿐 아니라 명시적 fit 명령이 settled로 성공한 경우에도 settleTimedOut을 해제한다. 이 진단 상태 해제 경로를 health 6개 조합에 추가하여 재검사했다. 직전 전체 성능/legacy 결과는 유지하고 최종 커밋 전체 검사는 Actions에서 다시 실행한다.
+
+## 정상 provider의 drag 종료 후 무입력 overlay 복원 (2026-10-18)
+
+최신 사용자 진단은 active=true, failed=false, lastFallbackReason=null, fallbackCount=0, healthState=healthy였다. NAVER provider는 살아 있었지만 Canvas가 돌아오지 않았다. 직접 원인은 이전 providerSettleTimeout의 providerBeginMove→providerMoving=true/숨김 유지 후 다음 이벤트 대기였다. 사용자가 손을 놓고 추가 이벤트가 없으면 frame의 moving guard 때문에 renderBase/DRAW/REVEAL을 실행할 수 없었다. 이 새 증거와 수정은 앞 절의 「다음 이벤트까지 보류 가능」 정책을 대체한다.
+
+providerFinalizeViewport는 정상 map/projection/center/bounds와 gesture=false, commandPending=false, native pointer=0일 때 SDK의 현재 표시 중심(unproject)·축척을 최종 기준으로 읽는다. viewportDirty/providerMoving/gesture/waitingIdle을 false로 정리하고 dirty/dirtyHover, 빈 uiKey, revealAfterBase를 설정한다. provider-moving CSS는 여기서 먼저 제거하지 않고 기존 frame이 base→UI/조류/단면을 그린 뒤 providerRevealOverlay에서 제거한다. provider를 fallback하지 않는다. 입력 중에는 이 finalization이 실행되지 않는다.
+
+실제 idle은 한 RAF로 모아서 이 공통 경로를 사용한다. reported center 2px 비교를 공개의 필수 gate로 쓰지 않는다. idle이 누락된 dragend/pointerup 경로는 기존 감시가 총 120 RAF 또는 250ms에 도달하면 정상 SDK 표시 좌표를 받아들여 자동 복원한다. 250ms는 SDK 명령을 지연시키는 sleep이 아니라 이벤트 뒤 감시의 경과 시간 상한이다. 다음 입력은 필요 없다. 숨긴 탭/백그라운드의 RAF 정지는 브라우저 정책에 따르며 표시 복귀 후 처리한다.
+
+기존 이른 idle·지연 projection mock도 유지했다. idle 당시 zoom 보고값과 표시 scale이 아직 다르면 확정 zoom/scale을 섞어 저장하지 않는다. 정상 idle은 한 번 DRAW하며, 이른 idle 뒤 projection이 이벤트 없이 늦게 바뀌는 징후가 있을 때만 표시를 막지 않는 최대 250ms 관찰로 늦은 viewport를 한 번 추가 보정한다. 이 비정상 이벤트 순서의 보정은 매 프레임 heavy redraw가 아니다. 새 이동/명령/실패에서 관찰을 취소한다. 고정 타일 offset, reload, 새 SDK 인스턴스는 사용하지 않는다.
+
+새 테스트는 drag→pointerup→idle 직후 timeout 강제, idle에서 center 3px 차이, idle 없는 dragend 뒤 무입력 자동 복원, 100회 drag(절반 idle·절반 timeout 강제)를 검사한다. 각 정상 종료/timeout은 renderBase 정확히 1회, moving/gesture/waitingIdle/heavyHidden/failed=false, 모든 Canvas visible, 이동 중 heavy 0을 확인한다. 무입력 복원은 실제 RAF/시계로 재며 headless 부하를 고려한 검사 상한은 750ms다. SDK 영상 도착·실 사용자 성능 보장과는 구분한다. 기존 타일 오류 허용·fatal SDK/API 실패·A/B·native Marker 정합 검사도 유지한다.
+
+계측 준비는 비동기 수심 요청·generation·base/section 변경이 안정된 뒤 진행한다. 기존 분석 경로에서 취소한 timer의 queued 플래그만으로 대기하지 않는다. 모드 전환의 추가 depth fetch 금지 assertion은 유지한다. 수심/단면 보호 소스·static/depth·data는 변경하지 않는다.
+
+localhost 최신 빌드 후 지도를 drag하고 놓은 다음 아무 입력 없이 overlay가 돌아오는지 확인한다. `naksigwangTileDiagnostic()`의 providerMoving/gesture/waitingIdle/heavyHidden/providerFailed는 false, nativePointerCount는 0, providerActive/providerDOMVisible은 true여야 한다. lastFinalViewport(source/time/center/zoom/bounds)와 finalViewportCount도 확인할 수 있다. timeout 이력은 settleTimeoutCount/settleFailure에 남고, 정상 공개 후 healthState는 healthy로 표시한다. 반복 drag와 wheel/pinch 후 체감 렉·잔상·drift는 **사용자 localhost 재검증 대기**이며 P3 완료 판정은 하지 않는다.
+
+최종 로컬 기록은 `tests/P3_FINAL_VIEWPORT_RESULTS.json`에 있다. health 6개 조합의 무입력 자동 복원은 273~306ms, 각 100회(총 600회) drag의 영구 숨김/fallback/moving heavy는 모두 0, 정상 종료와 강제 timeout의 base는 각각 1회였다. 100회 종료 복원 최대는 75ms였다. provider 20개 화면/DPR 및 여섯 SDK 실패 등 총 32개 결과, performance 12개 조합, legacy 전체 12개 명령을 통과했다. performance moving heavy/영구 숨김 0, Marker 최대 0.4469px, A/B 최대 0.9014px, idle 최대 111ms였다. 직전 기록의 98ms와 실행 부하가 달라 이 차이만으로 성능 향상/악화를 단정하지 않는다. 정지 중 SDK/base/mask 재계산 0과 기존 particle budget·cache 구조를 유지했다. 실제 장치 성능은 재검증 대기다.
+
+390×844와 1280×900의 다섯 탭을 확인했고, build missing ids: [], 빌드 플랫폼 일치와 수심 production 무변경을 통과했다. 테스트 중 발견한 빠른 탭 복귀의 이른 zoom/이전 scale 혼합 기준을 보완한 뒤 성능 전체 행렬을 재실행했다. 계측 준비의 취소된 depth timer 플래그 문제는 테스트 fixture/대기 조건에서 정리했으며 보호 소스는 변경하지 않았다. localhost 확인 전 providerOnly 진단 모드를 사용했다면 `naksigwangPerfDiagnostic.providerOnly(false)`로 분석 표시를 켠다.
