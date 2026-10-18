@@ -566,6 +566,8 @@ localhost 최신 빌드 후 지도를 drag하고 놓은 다음 아무 입력 없
 
 종료 이벤트 누락 경로의 복원 시간 계측도 마지막 진행 이벤트 시각을 사용한다. 이전 idleAt이 남으면 실제 약 280ms 복원이 이전 작업 대기까지 포함한 수 초로 기록됐다. 종료 감시를 갱신할 때 시각도 갱신하고, 스트레스 검사에서 직접 잰 복원 시간과 기록 시간 차이 <75ms를 확인한다.
 
+마지막 검토에서는 wheel mock의 실제 zoom 변화도 필수 조건으로 강화했다. ±100 WheelEvent를 번갈아 보내면 정수 zoom 누적량이 상쇄되어 이벤트 100개만 통과할 수 있었다. ±500 입력으로 매번 실제 SDK zoom이 바뀌는지 확인하고, 혼합 구간도 wheel 순서별 방향을 번갈아 보내 줌 상한에 붙지 않도록 했다. 조합마다 wheel 100회와 혼합 wheel 50회, 총 150회의 실제 zoom 변경을 확인한다. 구현 지연 조건을 느슨하게 하지 않고 mock의 성공 조건을 더 엄격하게 했다.
+
 | 상태/이벤트 | 처리와 다음 상태 |
 | --- | --- |
 | inactive / 설정 없음 | 자체 지형 사용, credential 재요청 없음 |
@@ -597,6 +599,6 @@ idle에서 reported center 2px 판정은 공개의 필수 gate가 아니다. 원
 
 실사용 마지막 확인: 최신 branch pull→build→localhost 8000→Ctrl+Shift+R 후 2분 drag/pan/zoom, 세 모드, 오늘/지도 왕복, 속초→포항을 확인한다. 항구/갯바위·조류 자동 복원과 위성 유지, 잔상·drift·체감 렉은 **사용자 localhost 최종 검증 대기**다. `const t=naksigwangTileDiagnostic(); console.log(t.providerActive,t.providerFailed,t.lastFallbackReason,t.fallbackCount,t.healthState)`로 간단히 확인하고 `await naksigwangMapDiagnostic.fit(10000,36.05,129.38)`의 command.status/errorPx/sdkViewportUnchanged를 확인한다. providerOnly는 확인 후 반드시 false로 되돌린다.
 
-최종 로컬 결과: 기존 legacy 12명령, provider 32결과, health 6조합, 원본 RAF performance 12조합, 원본 RAF stress 16조합을 통과했다. stress는 총 12,000동작과 늦은 이벤트 25,600개이며 영구 숨김·비의도 fallback·이동 중 heavy/픽셀 읽기/수심 준비·모드 추가 depth fetch는 모두 0이다. 각 이동 종료의 즉시 base는 1회, 공개 후 동일 viewport 늦은 이벤트의 추가 base는 0회다. 원거리 fit은 총 480회 모두 settled/도착/같은 인스턴스/Marker <=2px/visible을 확인했다. 종료 이벤트 누락은 270.2~285.1ms, 반복 종료 복원 최대는 94.4ms였다.
+최종 로컬 결과: 기존 legacy 12명령, provider 32결과, health 6조합, 원본 RAF performance 12조합, 원본 RAF stress 16조합을 통과했다. stress는 총 12,000동작과 늦은 이벤트 25,600개이며 영구 숨김·비의도 fallback·이동 중 heavy/픽셀 읽기/수심 준비·모드 추가 depth fetch는 모두 0이다. 각 이동 종료의 즉시 base는 1회, 공개 후 동일 viewport 늦은 이벤트의 추가 base는 0회다. 원거리 fit은 총 480회 모두 settled/도착/같은 인스턴스/Marker <=2px/visible을 확인했다. 종료 이벤트 누락은 262.3~284.4ms, 반복 종료 복원 최대는 117.6ms였다. 실제 SDK wheel zoom 변경은 조합마다 150회, 총 2,400회였다.
 
 별도 performance 이동 구간은 50.23~60.38fps, 평균 frame 16.61~19.97ms, p95 최대 54.1ms, idle 복원 최대 88.8ms였다. 진단용 Marker/raster 연산을 포함한 48개 구간 합계 long frame은 319개, frame 내부 작업 50ms 이상은 2개였다. 이동 중 heavy 작업은 0이며 이 수치를 실제 NAVER SDK 비용이나 사용자 체감 성능으로 일반화하지 않는다. Marker 최대 0.4469px, A/B raster 최대 0.9014px, 정지 SDK/base/mask/단면/픽셀 읽기 0, particle budget 180/360을 유지했다. 원본 301표본 baseline 동일, build missing ids: [], LF/CRLF 빌드 일치, PR base 대비 production 수심 무변경, 이번 작업 data 무변경도 확인했다. 최종 SHA의 전체 CI 결과는 기존 PR #6 설명과 Conversation 결과 코멘트에 기록한다.

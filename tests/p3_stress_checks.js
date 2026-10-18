@@ -2,7 +2,7 @@
 window.p3StressTest=async()=>{
   const {f,check,settle}=p3HealthFixture,p=PROVIDER_MAP,tick=()=>new Promise(requestAnimationFrame),map=f.map;
   setMode('pan');S.playing=false;S.layers.flow=false;await p3WaitDepthQuiet();naksigwangPerfDiagnostic.reset();
-  const counts={},recovery=[],fits=[],prepare=depthPrepareAreas;let movingHeavy=0,maxMarker=0,duplicates=0,movingDepthPrepare=0;
+  const counts={},recovery=[],fits=[],prepare=depthPrepareAreas;let movingHeavy=0,maxMarker=0,duplicates=0,movingDepthPrepare=0,wheelZoomChanges=0;
   depthPrepareAreas=(...args)=>{if(p.providerMoving)movingDepthPrepare++;return prepare(...args);};
   const visible=()=>{check(p.active&&!p.failed&&!p.fallbackCount,'정상 provider 유지');check(!p.providerMoving&&!p.gesture&&!p.waitingIdle&&!p.commandPending&&!p.revealAfterBase,'종료 상태 해제');check(!stage.classList.contains('provider-moving')&&[base,flow,ui].every(c=>getComputedStyle(c).visibility==='visible'),'영구 숨김 없음');check(f.map===map&&f.instances===1,'같은 SDK 인스턴스');};
   const work=()=>Object.fromEntries(['renderBase','maskRebuild','getImageData','buildFlowField','stepParticles','drawSection'].map(k=>[k,PERF.counts[k]||0]));
@@ -10,7 +10,7 @@ window.p3StressTest=async()=>{
   const move=async(kind,i,timeout=false)=>{
     const before=work();nativePointers.add(-51);f.viewportListener(kind==='drag'?'dragstart':'zoomstart');
     if(kind==='drag')f.map.panBy({x:i%2?5:-5,y:i%2?3:-3});
-    else {setMode('line');const r=stage.getBoundingClientRect();stage.dispatchEvent(new WheelEvent('wheel',{clientX:r.left+cw/2,clientY:r.top+ch/2,deltaY:i%2?100:-100,bubbles:true,cancelable:true}));setMode('pan');}
+    else {setMode('line');const r=stage.getBoundingClientRect(),zoom=f.getZoom();stage.dispatchEvent(new WheelEvent('wheel',{clientX:r.left+cw/2,clientY:r.top+ch/2,deltaY:i%2?500:-500,bubbles:true,cancelable:true}));setMode('pan');check(f.getZoom()!==zoom,'wheel은 실제 SDK zoom 변경');wheelZoomChanges++;}
     await tick();const during=work();for(const k in before){movingHeavy+=during[k]-before[k];check(during[k]===before[k],'이동 중 heavy '+k);}
     nativePointers.delete(-51);f.viewportListener(kind==='drag'?'dragend':'zoomend');
     const start=performance.now();if(timeout){cancelAnimationFrame(p.syncRAF);p.syncRAF=0;providerSettleTimeout();}else f.viewportListener('idle');
@@ -22,7 +22,7 @@ window.p3StressTest=async()=>{
   };
   await phase('drag',100,i=>move('drag',i));
   await phase('wheel',100,i=>move('wheel',i));
-  await phase('mixed',100,i=>move(i%2?'drag':'wheel',i));
+  await phase('mixed',100,i=>move(i%2?'drag':'wheel',Math.floor(i/2)));
   const selected=JSON.stringify([S.pin,S.A,S.B]),originalFetch=fetch;let modeDepthFetches=0;
   window.fetch=(url,...a)=>{if(String(url).includes('static/depth/'))modeDepthFetches++;return originalFetch(url,...a);};
   await phase('mode',30,async i=>{providerSetMode(['satellite','hybrid','normal'][i%3]);await tick();});window.fetch=originalFetch;
@@ -48,5 +48,5 @@ window.p3StressTest=async()=>{
   nativePointers.add(-51);f.viewportListener('dragstart');await new Promise(r=>setTimeout(r,280));check(p.gesture&&p.providerMoving,'포인터 유지 중 숨김 유지');nativePointers.delete(-51);f.viewportListener('idle');await settle();
   await p3WaitDepthQuiet();const activity=naksigwangPerfDiagnostic();naksigwangPerfDiagnostic.reset();for(let i=0;i<60;i++)await tick();const stationary=naksigwangPerfDiagnostic();
   for(const k of ['renderBase','maskRebuild','getImageData','drawSection','providerSync','providerViewportKey','providerAlignment'])check(!stationary.counts[k],'정지 중 '+k+' 0');
-  visible();check(movingDepthPrepare===0,'이동 중 depth prepare 0');depthPrepareAreas=prepare;return {scope:'실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증',counts,lateEvents:duplicates,movingHeavy,movingDepthPrepare,permanentHidden:0,fallbacks:p.fallbackCount,instances:f.instances,modeDepthFetches,missingEndRecoveryMs,missingEndRecordedMs,maxRecoveryMs:Math.max(...recovery),maxMarkerErrorPx:maxMarker,fits,activity,stationary};
+  visible();check(movingDepthPrepare===0,'이동 중 depth prepare 0');check(wheelZoomChanges===150,'wheel 100·혼합 wheel 50 모두 실제 zoom 변경');depthPrepareAreas=prepare;return {scope:'실 RAF·headless SDK mock; 실 NAVER와 사용자 PC 성능은 미검증',counts,wheelZoomChanges,lateEvents:duplicates,movingHeavy,movingDepthPrepare,permanentHidden:0,fallbacks:p.fallbackCount,instances:f.instances,modeDepthFetches,missingEndRecoveryMs,missingEndRecordedMs,maxRecoveryMs:Math.max(...recovery),maxMarkerErrorPx:maxMarker,fits,activity,stationary};
 };
