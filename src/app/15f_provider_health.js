@@ -65,6 +65,18 @@ function providerTryRecover(trigger='manual'){
   if(!p.failed||!p.recoverable||p.offline)return Promise.resolve({ok:false,reason:p.offline?'browser-offline':p.lastFallbackReason||'not-failed'});
   return providerScheduleHealthCheck();
 }
+function providerSettleTimeout(){
+  const p=PROVIDER_MAP,h=providerHealthSnapshot();p.lastHealth=h;
+  p.settleTimeoutCount=(p.settleTimeoutCount||0)+1;p.settleTimedOut=true;
+  p.settleFailure={reason:'settle-timeout',time:performance.now(),observation:{...p.lastSettleObservation},health:h};
+  if(!h.mapObjectPresent){providerFallback('map-init-failed');return;}
+  if(!h.mapProjectionHealthy){providerHandleProjectionFailure();return;}
+  // 표시 안정화 실패는 SDK 장애가 아니다. 위성·입력을 유지하고 잘못된 Canvas는 보류한다.
+  p.healthState='settle-timeout';providerBeginMove();
+  try{providerReadView();p.viewportDirty=true;providerUpdateInput();}
+  catch(_){providerHandleProjectionFailure();}
+  // RAF를 스스로 다시 시작하지 않는다. 다음 idle/이동 이벤트가 새 감시를 시작한다.
+}
 function providerModeTimeout(){
   const p=PROVIDER_MAP;if(p.failed)return;
   p.modeHealthChecks=(p.modeHealthChecks||0)+1;p.lastModeHealthAt=performance.now();

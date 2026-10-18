@@ -23,11 +23,12 @@ async function p3RevealTest(f){
   const width=stage.style.width;stage.style.width=(cw-9)+'px';resize();await settle('resize');stage.style.width=width;resize();await settle('resize 복원');
   showTab('today');await tick();showTab('map');await settle('오늘→지도');
   const originalProjection=f.project;f.project=(...args)=>{const p=originalProjection.apply(f,args);return [p[0]+4,p[1]];};
-  // 실제 viewport가 계속 바뀌는 동안에는 고정 관찰 상한으로 SDK를 실패 처리하지 않는다.
+  const fallbackCount=PROVIDER_MAP.fallbackCount||0;
+  // 표시 조건을 못 맞춰도 정상 SDK는 유지하고 Canvas만 보류한다.
   for(let i=0;i<130;i++){f.center=[f.center[0]+.000001,f.center[1]];f.reportedCenter=f.center;f.renderMarkers();f.viewportListener('zoom_changed');await tick();check(!PROVIDER_MAP.failed,'계속 이동하는 SDK의 조기 fallback 금지');}
-  f.viewportListener('zoom_changed');for(let i=0;i<125&&!PROVIDER_MAP.failed;i++)await tick();
-  check(PROVIDER_MAP.failed,'안정화 불능 상한 fallback');await settle('안정화 timeout/fallback');f.project=originalProjection;
-  Object.assign(PROVIDER_MAP,{failed:false,active:false,loaded:true,gesture:false,waitingIdle:false});providerSync();providerCheck();await settle('fallback 이후 mock 복구');
+  f.viewportListener('zoom_changed');for(let i=0;i<125;i++)await tick();
+  const timeout=window.naksigwangTileDiagnostic();check(timeout.active&&!timeout.failed&&timeout.settleTimedOut&&timeout.fallbackCount===fallbackCount&&timeout.providerDOMVisible,'안정화 timeout은 provider 유지');check(timeout.heavyHidden,'timeout Canvas 보류');f.project=originalProjection;
+  f.viewportListener('idle');await settle('settle timeout 이후 idle 복구');
   // IMG는 DOM 관찰용 fixture. src를 설정하거나 타일을 fetch하지 않는다.
   const image=document.createElement('img');image.style.cssText='position:absolute;left:0;top:0;width:256px;height:256px';
   Object.defineProperty(image,'currentSrc',{value:'https://host-secret.map.pstatic.net/private-secret/1234567890/345/678.jpg?clientId=credential-secret#secret'});

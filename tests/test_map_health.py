@@ -14,7 +14,7 @@ OUT = ROOT / 'test-output/p3-health'
 OUT.mkdir(parents=True, exist_ok=True)
 html = (ROOT / 'index.html').read_text(encoding='utf-8')
 probe = PROBE + CHECK + ''.join((ROOT / 'tests' / name).read_text(encoding='utf-8')
-                              for name in ['p3_provider_checks.js', 'p3_health_checks.js'])
+                              for name in ['p3_provider_checks.js', 'p3_health_checks.js', 'p3_settle_checks.js'])
 pos = html.rindex('\n})();')
 html = html[:pos] + probe + html[pos:]
 http.server.SimpleHTTPRequestHandler.log_message = lambda *a: None
@@ -41,10 +41,11 @@ try:
                 assert mode_start['timerArmed'] and mode_start['loaded'], mode_start
                 page.clock.fast_forward(12050)
                 mode = page.evaluate('window.p3HealthModeFinish()')
+                settle = page.evaluate('window.p3SettleTest()')
                 fatal = page.evaluate('window.p3HealthFatal()')
                 assert not errors, errors
                 results.append({'viewport': [width, height], 'dpr': dpr, 'tile': tile,
-                                'mode': mode, 'fatal': fatal})
+                                'mode': mode, 'settle': settle, 'fatal': fatal})
                 (OUT / 'results.json').write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding='utf-8')
                 print(f'{width}×{height} DPR {dpr}: 타일 허용/12초 누락/offline·projection 복구 통과', flush=True)
                 page.close()

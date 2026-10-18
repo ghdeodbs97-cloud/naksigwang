@@ -75,8 +75,8 @@ try { const saved = localStorage.getItem('naksigwang-map-mode-v2'); if (['satell
 
 function providerNotice(text) { $('providerNotice').textContent = text; }
 function providerFallback(reason='manual-fallback') {
-  const p=PROVIDER_MAP;const allowed=['sdk-script-load-failed','sdk-script-timeout','auth-failed','browser-offline','map-init-failed','map-api-failure','projection-failure','settle-failure','manual-fallback'];
-  p.fallbackCount=(p.fallbackCount||0)+1;p.lastFallbackReason=allowed.includes(reason)?reason:'unknown-provider-failure';p.lastFallbackAt=performance.now();p.recoverable=['browser-offline','map-api-failure','projection-failure','settle-failure'].includes(p.lastFallbackReason);p.healthState='failed';providerCancelHealthCheck(p.lastFallbackReason);
+  const p=PROVIDER_MAP;const allowed=['sdk-script-load-failed','sdk-script-timeout','auth-failed','browser-offline','map-init-failed','map-api-failure','projection-failure','manual-fallback'];
+  p.fallbackCount=(p.fallbackCount||0)+1;p.lastFallbackReason=allowed.includes(reason)?reason:'unknown-provider-failure';p.lastFallbackAt=performance.now();p.recoverable=['browser-offline','map-api-failure','projection-failure'].includes(p.lastFallbackReason);p.healthState='failed';providerCancelHealthCheck(p.lastFallbackReason);
   providerCancelViewCommand('provider unavailable');
   PROVIDER_MAP.failed = true; PROVIDER_MAP.active = false; clearTimeout(PROVIDER_MAP.timer);
   $('providerMap').style.visibility = 'hidden'; dirty = true;
@@ -113,21 +113,25 @@ function providerRevealOverlay(){
 }
 function providerQueueSettle(){
   const p=PROVIDER_MAP;if(p.syncRAF||p.healthPromise||p.commandPending||p.gesture||p.waitingIdle||p.failed)return;
-  let previous='',stable=0,frames=0;
+  let previous='',stable=0,frames=0,keyChanges=0;
   const probe=()=>{
     p.syncRAF=0;if(p.failed||p.healthPromise||p.commandPending||p.gesture||p.waitingIdle)return;
     try{
       const a=p.adapter,key=providerViewportKey(),reported=a.project(...a.getCenter()),scale=a.getViewportScale();
-      const ready=Math.hypot(reported[0]-cw/2,reported[1]-ch/2)<=2&&!(p.stableZoom!==null&&a.getZoom()!==p.stableZoom&&Math.abs(Math.log2(scale/p.stableScale))<.001);
-      stable=ready&&key===previous?stable+1:ready?1:0;if(key!==previous)frames=0;previous=key;
+      const centerErrorPx=Math.hypot(reported[0]-cw/2,reported[1]-ch/2),zoom=a.getZoom();
+      const zoomScalePending=p.stableZoom!==null&&zoom!==p.stableZoom&&Math.abs(Math.log2(scale/p.stableScale))<.001;
+      const ready=centerErrorPx<=2&&!zoomScalePending;
+      stable=ready&&key===previous?stable+1:ready?1:0;if(previous&&key!==previous)keyChanges++;previous=key;
+      p.lastSettleObservation={frames:++frames,stableFrames:stable,keyChanges,centerErrorPx,zoom,scale,stableZoom:p.stableZoom,stableScale:p.stableScale,zoomScalePending,ready};
       if(stable>=2){
+        p.settleTimedOut=false;p.healthState='healthy';p.settleRecoveredAt=performance.now();
         const changed=key!==p.signature; p.providerMoving=false;
         if(changed||!p.active){providerSync();providerCheck();dirty=true;dirtyHover=true;}
         else {p.viewportDirty=false;providerReadView();dirty=true;RENDER.uiKey='';}
         return;
       }
       // 이벤트 뒤 상한이 있는 감시만 실행한다. 정지 상태에서는 SDK를 읽지 않는다.
-      if(++frames<120)p.syncRAF=requestAnimationFrame(probe);else {p.settleFailure='표시 viewport 안정화 실패';providerFallback('settle-failure');}
+      if(frames<120)p.syncRAF=requestAnimationFrame(probe);else providerSettleTimeout();
     }catch(_){providerHandleProjectionFailure();}
   };
   p.syncRAF=requestAnimationFrame(probe);
