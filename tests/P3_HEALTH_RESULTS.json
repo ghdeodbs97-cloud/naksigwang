@@ -1,0 +1,857 @@
+{
+  "date": "2026-10-18",
+  "scope": "headless mock; 실 NAVER 사용자 localhost 재검증 대기",
+  "beforeCommit": "30af6417e6f2d025ef2f6f7b0d1c71e2dba732b5",
+  "rootCauseReproduction": {
+    "before": {
+      "singleImageError": {
+        "failed": true,
+        "active": false,
+        "tileErrorCount": 0
+      },
+      "missingTilesLoaded12s": {
+        "failed": true,
+        "active": false,
+        "modeHealthChecks": 0
+      }
+    },
+    "after": {
+      "singleImageError": {
+        "failed": false,
+        "active": true,
+        "tileErrorCount": 1
+      },
+      "missingTilesLoaded12s": {
+        "failed": false,
+        "active": true,
+        "modeHealthChecks": 1
+      }
+    }
+  },
+  "healthMatrix": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 6.122223575328581e-13,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    }
+  ],
+  "providerResultCount": 32,
+  "sdkFailureCases": [
+    {
+      "failure": "404",
+      "passed": true
+    },
+    {
+      "failure": "429",
+      "passed": true
+    },
+    {
+      "failure": "offline",
+      "passed": true
+    },
+    {
+      "failure": "timeout",
+      "passed": true
+    },
+    {
+      "failure": "auth",
+      "passed": true
+    },
+    {
+      "failure": "map-init",
+      "passed": true
+    }
+  ],
+  "performanceMatrix": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.5590169943749475,
+      "maxIdleRecoveryMs": 569,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.25,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0.44687800704855685,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 64,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.5,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 66,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.25,
+      "maxIdleRecoveryMs": 56,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.7071067811865476,
+      "maxIdleRecoveryMs": 68,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.25,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0.2808883999276688,
+      "maxABErrorPx": 0.25,
+      "maxIdleRecoveryMs": 75,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.5,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 66,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.5590169943749475,
+      "maxIdleRecoveryMs": 61,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.9013878188659974,
+      "maxIdleRecoveryMs": 83,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.25,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0.27961908270946945,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 93,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.5,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0.33318465655668206,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 83,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.5590169943749475,
+      "maxIdleRecoveryMs": 70,
+      "remoteSettled": true
+    }
+  ],
+  "soloPerformance": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.5590169943749475,
+      "maxIdleRecoveryMs": 67,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.7071067811865476,
+      "maxIdleRecoveryMs": 84,
+      "remoteSettled": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.9013878188659974,
+      "maxIdleRecoveryMs": 92,
+      "remoteSettled": true
+    }
+  ],
+  "paired60FrameComparison": {
+    "before": [
+      {
+        "viewport": [
+          390,
+          844
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 950,
+          "fps": 63.1578947368421,
+          "averageFrameMs": 15.833333333333334,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 15
+          },
+          "perSecond": {
+            "stepParticles": 15.789473684210526
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 960,
+          "fps": 62.5,
+          "averageFrameMs": 16,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {},
+          "perSecond": {}
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 3,
+            "drawSection": 1
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 180,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1280,
+          900
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 951,
+          "fps": 63.09148264984227,
+          "averageFrameMs": 15.85,
+          "p95FrameMs": 19,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 20
+          },
+          "perSecond": {
+            "stepParticles": 21.03049421661409
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {},
+          "perSecond": {}
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4,
+            "drawSection": 1
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1920,
+          1080
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 948,
+          "fps": 63.29113924050633,
+          "averageFrameMs": 15.8,
+          "p95FrameMs": 18,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 20
+          },
+          "perSecond": {
+            "stepParticles": 21.09704641350211
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {},
+          "perSecond": {}
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4,
+            "drawSection": 1
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      }
+    ],
+    "after": [
+      {
+        "viewport": [
+          390,
+          844
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 947,
+          "fps": 63.357972544878564,
+          "averageFrameMs": 15.783333333333333,
+          "p95FrameMs": 19,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 15
+          },
+          "perSecond": {
+            "stepParticles": 15.839493136219641
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 961,
+          "fps": 62.43496357960458,
+          "averageFrameMs": 16.016666666666666,
+          "p95FrameMs": 18,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 1
+          },
+          "perSecond": {
+            "stepParticles": 1.0405827263267429
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 3,
+            "drawSection": 1
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 180,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1280,
+          900
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 948,
+          "fps": 63.29113924050633,
+          "averageFrameMs": 15.8,
+          "p95FrameMs": 19,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 20
+          },
+          "perSecond": {
+            "stepParticles": 21.09704641350211
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 1
+          },
+          "perSecond": {
+            "stepParticles": 1.0427528675703859
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4,
+            "drawSection": 1
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1920,
+          1080
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 949,
+          "fps": 63.224446786090624,
+          "averageFrameMs": 15.816666666666666,
+          "p95FrameMs": 19,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 20
+          },
+          "perSecond": {
+            "stepParticles": 21.07481559536354
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 960,
+          "fps": 62.5,
+          "averageFrameMs": 16,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {},
+          "perSecond": {}
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4,
+            "drawSection": 1
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      }
+    ]
+  },
+  "legacyChecks": [
+    {
+      "command": "tests/boot_degradation.mjs",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "build.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "tests/test_collector_resilience.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "tests/smoke.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "tests/smoke_degradation.py",
+      "firstExit": 1,
+      "finalPassed": true,
+      "rerun": true
+    },
+    {
+      "command": "tests/test_bite_confidence.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "tests/test_depth_converter.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "tests/test_depth_foundation.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "tests/test_khoa_fetch.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "tests/test_khoa_depth.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "tests/test_khoa_coverage.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    },
+    {
+      "command": "tests/test_khoa_coverage_browser.py",
+      "firstExit": 0,
+      "finalPassed": true,
+      "rerun": false
+    }
+  ],
+  "legacyNote": "smoke_degradation.py 첫 실행 partial_station 시작 시간 초과; 소스 고정 후 전체 재실행 통과. 원인 미확정.",
+  "visualQA": "390×844 / 1280×900 다섯 탭 확인",
+  "tileURLReturned": false,
+  "protectedDepthAndDataUnchanged": true,
+  "realFallbackCallPath": "미확인: 이전 사용자 세션에 reason 기록 없음",
+  "realSatelliteBlockCause": "미확인: providerOnly 실제 검증 대기"
+}

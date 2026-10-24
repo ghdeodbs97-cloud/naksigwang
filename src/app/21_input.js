@@ -2,6 +2,7 @@
 /* ── 크기 ──────────────────────────────────────────────── */
 function resize() {
   if (!stage.clientWidth) return;                     // 지도 탭이 숨어 있으면 크기를 바꾸지 않음
+  const onlineResize=PROVIDER_MAP.active;if(onlineResize)providerBeginMove();
   const r = DPR(), old = cw ? toM(cw / 2, ch / 2) : null, oldGW = cw ? cw / pxPerGround() : 0;
   cw = stage.clientWidth;                               // 휴대폰: 화면 높이에 맞춰 길게, 넓은 화면: 가로 비율 0.72 (화면 높이 안에서)
   ch = Math.round(S.lock ? cw * (cw < 560 ? .85 : .5) : cw < 560 ? clamp(innerHeight - 290, 320, cw * 1.3) : Math.min(cw * .72, Math.max(380, innerHeight - 240)));   // 오늘 탭에서는 낮게
@@ -10,29 +11,34 @@ function resize() {
   mask.width = Math.ceil(cw / 2); mask.height = Math.ceil(ch / 2);
   sw = $('secWrap').clientWidth; shh = sw < 560 ? 240 : 300;
   sec.width = Math.round(sw * r); sec.height = Math.round(shh * r); sec.style.height = shh + 'px';
-  if (old) { V.cx = old[0]; V.cy = old[1]; V.s = cw / (oldGW * kAt(latOf(V.cy))); clampView(); }
-  dirty = true;
+  if (old && !PROVIDER_MAP.active) { V.cx = old[0]; V.cy = old[1]; V.s = cw / (oldGW * kAt(latOf(V.cy))); clampView(); }
+  RENDER.uiKey='';RENDER.sectionKey='';RENDER.chartKey='';
+  providerSync();if(onlineResize)providerViewportChanged('resize');dirty = true;
 }
 
 /* ── 입력 ──────────────────────────────────────────────── */
 const ptrs = new Map(); let pinch = null, panStart = null;
 const local = e => { const b = ui.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
 ui.addEventListener('pointerdown', e => {
+  if(providerUseNativePan())return;
   ui.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, local(e));
   if (ptrs.size === 2 && S.lock) { S.drag = null; return; }   // 오늘 탭 지도: 두 손가락 확대 안 함
   if (ptrs.size === 2) { S.drag = null; panStart = null; const [p, q] = [...ptrs.values()]; pinch = { d: Math.hypot(p[0] - q[0], p[1] - q[1]), c: [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2] }; return; }
   const [x, y] = local(e);
-  if (S.mode === 'pan' || e.pointerType === 'touch' && S.mode === 'pan') { panStart = { x, y, cx: V.cx, cy: V.cy }; ui.style.cursor = 'grabbing'; return; }
+  if (S.mode === 'pan' || e.pointerType === 'touch' && S.mode === 'pan') { panStart = { x, y, cx: V.cx, cy: V.cy, anchor: providerTransform() ? PROVIDER_MAP.adapter.unproject(x,y) : null }; ui.style.cursor = 'grabbing'; return; }
   const m = toM(x, y); S.drag = { A: m, B: m };
 });
 ui.addEventListener('pointermove', e => {
+  if(providerUseNativePan())return;
   const [x, y] = local(e);
   if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, [x, y]);
   if (pinch && ptrs.size === 2) {
     const [p, q] = [...ptrs.values()], d = Math.hypot(p[0] - q[0], p[1] - q[1]), c = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
-    zoomAt(c[0], c[1], d / pinch.d); V.cx -= (c[0] - pinch.c[0]) / V.s; V.cy += (c[1] - pinch.c[1]) / V.s; clampView(); pinch = { d, c }; return;
+    if(providerTransform()){providerZoomAt(...pinch.c,d/pinch.d);providerPanBy(c[0]-pinch.c[0],c[1]-pinch.c[1]);pinch={d,c};return;}
+    zoomAt(c[0], c[1], d / pinch.d);
+    V.cx -= (c[0] - pinch.c[0]) / V.s; V.cy += (c[1] - pinch.c[1]) / V.s; clampView(); pinch = { d, c }; return;
   }
-  if (panStart) { V.cx = panStart.cx - (x - panStart.x) / V.s; V.cy = panStart.cy + (y - panStart.y) / V.s; clampView(); return; }
+  if (panStart) { if (panStart.anchor && providerTransform()) { providerPanAnchor(panStart.anchor,x,y); return; } V.cx = panStart.cx - (x - panStart.x) / V.s; V.cy = panStart.cy + (y - panStart.y) / V.s; clampView(); return; }
   if (S.drag) { S.drag.B = toM(x, y); return; }
   hoverAt = [x, y];
 });
@@ -53,7 +59,19 @@ function endPtr(e) {
 }
 ui.addEventListener('pointerup', endPtr); ui.addEventListener('pointercancel', endPtr);
 ui.addEventListener('pointerleave', () => { hoverAt = null; setText('cursorRead', '커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다'); });
-ui.addEventListener('wheel', e => { if (S.lock) return; e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
+ui.addEventListener('wheel', e => { if (providerUseNativePan() || S.lock) return; e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
+// 단면 모드에서 Canvas를 숨긴 짧은 이동 중에도 연속 wheel 입력을 받는다.
+stage.addEventListener('wheel',e=>{if(e.target===ui||!providerTransform()||providerUseNativePan()||S.lock)return;e.preventDefault();const [x,y]=local(e);zoomAt(x,y,Math.exp(-e.deltaY*.0016));},{passive:false});
+// 이동은 SDK가 맡는다. 캡처에서 먼저 Canvas를 숨기고 hover와 짧은 탭을 관찰한다.
+let nativeTap=null;const nativePointers=new Set();
+stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;providerBeginNativeInput();nativePointers.add(e.pointerId);PROVIDER_MAP.gesture=true;PROVIDER_MAP.waitingIdle=true;nativeTap=nativePointers.size===1?local(e):null;},true);
+stage.addEventListener('wheel',()=>{if(providerUseNativePan()){providerBeginNativeInput();PROVIDER_MAP.gesture=true;PROVIDER_MAP.waitingIdle=true;providerArmGestureDeadline();}},true);
+stage.addEventListener('pointermove',e=>{if(providerUseNativePan())hoverAt=local(e);},true);
+stage.addEventListener('pointerup',e=>{if(!providerUseNativePan())return;const p=local(e);if(nativeTap&&Math.hypot(p[0]-nativeTap[0],p[1]-nativeTap[1])<6){PROVIDER_MAP.pendingTap=p;}nativeTap=null;nativePointers.delete(e.pointerId);},true);
+stage.addEventListener('pointercancel',e=>{nativeTap=null;nativePointers.delete(e.pointerId);},true);
+// SDK 종료 이벤트가 빠지거나 idle보다 늦어도 마지막 포인터 해제에서 안정화를 재개한다.
+function providerPointerFinished(e){nativePointers.delete(e.pointerId);if(!nativePointers.size&&PROVIDER_MAP.providerMoving){PROVIDER_MAP.gesture=false;PROVIDER_MAP.waitingIdle=false;providerQueueSettle();}}
+addEventListener('pointerup',providerPointerFinished,true);addEventListener('pointercancel',providerPointerFinished,true);
 let hoverAt = null, hoverDone = null;
 function updateHover() {
   if (!hoverAt || (hoverDone && hoverDone[0] === hoverAt[0] && hoverDone[1] === hoverAt[1] && !dirtyHover)) return;
@@ -75,10 +93,12 @@ document.querySelectorAll('[data-bb]').forEach(b => b.addEventListener('click', 
 function setMode(m) {
   S.mode = m; $('mLine').setAttribute('aria-pressed', m === 'line'); $('mPan').setAttribute('aria-pressed', m === 'pan');
   ui.classList.toggle('pan', m === 'pan');
+  providerUpdateInput();
   $('modeHint').textContent = m === 'pan' ? '드래그해서 지도 이동 · 휠/두 손가락으로 확대' : '드래그해서 단면선 긋기 · 휠/두 손가락으로 확대';
 }
 $('mLine').addEventListener('click', () => setMode('line'));
 $('mPan').addEventListener('click', () => setMode('pan'));
+$('providerModes').addEventListener('click', e => { const b = e.target.closest('[data-provider-mode]'); if (b) providerSetMode(b.dataset.providerMode); });
 const normName = v => v.replace(/\s+/g, '').replace(/\(.*?\)/g, '').toLowerCase();
 function fillNameList() {
   const seen = new Set(), opts = [];
@@ -98,6 +118,10 @@ function findPlace(q) {
   for (const o of cands) { const sc = score(o) + (o.pt ? 0 : .5); if (sc < bs) { bs = sc; best = o; } }
   return bs < 9 ? best : null;
 }
+function navigateSearchPoint(lat,lon,width,name,commit) {
+  $('coordMsg').textContent='';
+  return fitGround(lat,lon,width,{targetName:name,onSuccess:commit});
+}
 $('coordForm').addEventListener('submit', e => {
   e.preventDefault();
   const q = $('coordIn').value.trim();
@@ -105,30 +129,29 @@ $('coordForm').addEventListener('submit', e => {
   if (n) {   // 숫자 두 개를 넣으면 예전처럼 좌표로 이동
     let lat = +n[1], lon = +n[2]; if (lat > 90) [lat, lon] = [lon, lat];
     if (lat < 32.5 || lat > 39 || lon < 123.8 || lon > 132.2) { $('coordMsg').textContent = '한국 연안 범위(북위 32.5~39°, 동경 124~132°)를 벗어났습니다.'; return; }
-    $('coordMsg').textContent = ''; S.pin = [mxOf(lon), myOf(lat)]; fitGround(lat, lon, 1500); return;
+    $('coordMsg').textContent = ''; navigateSearchPoint(lat,lon,1500,'좌표 검색',()=>{S.pin=[mxOf(lon),myOf(lat)];}); return;
   }
   const f = findPlace(q);
   if (!f) {
     const k = normName(q).replace(/항$/, ''), st = k && STATIONS.find(o => normName(o.name).startsWith(k));
     if (st) {   // 항구 자료에는 없지만 조석 관측소 이름과 같을 때: 관측소 근처(좌표 정밀도 약 0.1°)로 이동
       let j = 0, bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, st); if (d < bd) { bd = d; j = i; } });
-      selectPoint(j, false); S.pin = null; fitGround(st.lat, st.lon, 12000);
-      $('coordMsg').textContent = `'${q}'은(는) 불러온 항구 자료에 없어 ${st.name} 조석 관측소 부근(대략 위치)으로 이동했습니다.`;
+      navigateSearchPoint(st.lat,st.lon,12000,st.name,()=>{selectPoint(j,false,true);S.pin=null;$('coordMsg').textContent=`'${q}'은(는) 불러온 항구 자료에 없어 ${st.name} 조석 관측소 부근(대략 위치)으로 이동했습니다.`;});
       return;
     }
     $('coordMsg').textContent = `'${q}'을(를) 찾지 못했습니다. 불러온 항구·갯바위 자료에 없는 이름입니다.`; return;
   }
   if (f.rock) {   // 배로만 가는 갯바위: '배로만 가는 곳도 보기'를 켜고 그 포인트를 선택
     S.showBoat = true; $('showBoat').checked = true; buildPoints();
-    const k = POINTS.findIndex(q => q.kind === 'rock' && q.name === f.p.name && q.lat === f.p.lat); if (k >= 0) { selectPoint(k, false); S.pin = null; fitGround(f.p.lat, f.p.lon, 2500); $('coordMsg').textContent = '배로만 갈 수 있는 갯바위라 "배로만 가는 곳도 보기"를 켰습니다.'; dirty = true; return; }
+    const k = POINTS.findIndex(q => q.kind === 'rock' && q.name === f.p.name && q.lat === f.p.lat); if (k >= 0) { navigateSearchPoint(f.p.lat,f.p.lon,2500,f.p.name,()=>{selectPoint(k,false,true);S.pin=null;}); $('coordMsg').textContent = '배로만 갈 수 있는 갯바위라 "배로만 가는 곳도 보기"를 켰습니다.'; dirty = true; return; }
   }
   let j = f.i;
   if (!f.pt) { let bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, f.p); if (d < bd) { bd = d; j = i; } }); }
-  selectPoint(j, false);
-  S.pin = f.pt ? null : [f.p.mx, f.p.my];
-  fitGround(f.p.lat, f.p.lon, 2500);
-  $('coordMsg').textContent = f.pt ? '' : `${f.p.name}: 5 km 간격 포인트에 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
-  $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(f.p.name)},${f.p.lat.toFixed(6)},${f.p.lon.toFixed(6)}`;
+  navigateSearchPoint(f.p.lat,f.p.lon,2500,f.p.name,()=>{
+    selectPoint(j,false,true);S.pin=f.pt?null:[f.p.mx,f.p.my];
+    $('coordMsg').textContent=f.pt?'':`${f.p.name}: 5 km 간격 포인트에 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
+    $('kakaoLink').href=`https://map.kakao.com/link/map/${encodeURIComponent(f.p.name)},${f.p.lat.toFixed(6)},${f.p.lon.toFixed(6)}`;
+  });
 });
 $('toSec').addEventListener('click', () => {
   if (!S.A) return;

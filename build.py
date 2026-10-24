@@ -6,7 +6,9 @@ R = Path(__file__).parent
 STATIC = ['coast', 'ports', 'access', 'rocks', 'ban', 'fish_temp', 'gebco', 'osm', 'crnt']
 tags = []
 for n in STATIC:
-    h = hashlib.md5((R / 'static' / f'{n}.js').read_bytes()).hexdigest()[:8]   # 내용이 바뀔 때만 새로 받게
+    # Git의 Windows CRLF 체크아웃과 Linux LF 체크아웃에서도 같은 캐시 주소를 만든다.
+    content = (R / 'static' / f'{n}.js').read_bytes().replace(b'\r\n', b'\n')
+    h = hashlib.md5(content).hexdigest()[:8]   # 내용이 바뀔 때만 새로 받게
     tags.append(f'<script src="static/{n}.js?v={h}"></script>')
 t = (R / 'src/template.html').read_text(encoding='utf-8')
 parts = sorted((R / 'src/app').glob('*.js'))
@@ -15,6 +17,6 @@ app = '(async () => {\n' + '\n'.join(f.read_text(encoding='utf-8').rstrip('\n') 
 page = t.replace('/*STATIC_SCRIPTS*/', '\n'.join(tags)).replace('/*COAST_DATA*/', '').replace('/*APP*/', app)
 html = ('<!doctype html>\n<html lang="ko">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width,initial-scale=1">\n</head>\n<body>\n' + page + '\n</body>\n</html>\n')
-(R / 'index.html').write_text(html, encoding='utf-8')
+(R / 'index.html').write_text(html, encoding='utf-8', newline='\n')
 used = set(re.findall(r"\$\('([A-Za-z0-9_]+)'\)", app)); ids = set(re.findall(r'id="([A-Za-z0-9_]+)"', t))
 print('index.html', len(html), 'bytes; missing ids:', sorted(used - ids))
