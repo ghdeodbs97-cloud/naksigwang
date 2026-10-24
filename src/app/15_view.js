@@ -140,15 +140,15 @@ function clampRequestedView(request) {
   view.cx=clamp(view.cx,KB.x1+hx,KB.x2-hx);view.cy=clamp(view.cy,KB.y1+hy,KB.y2-hy);return view;
 }
 function clampView() {Object.assign(V,clampRequestedView(V));VIEW_T=performance.now();dirty=true;}
-function applyMapView(request) {
+function applyMapView(request,options={}) {
   const view=clampRequestedView(request);
   // 온라인 목표는 별도로 보관하고, 완료되기 전 V를 목표 또는 옛 SDK 값으로 바꾸지 않는다.
   if(!providerTransform())Object.assign(V,view);
-  VIEW_T=performance.now();dirty=true;return providerApplyView(view);
+  VIEW_T=performance.now();dirty=true;return providerApplyView(view,options);
 }
 function fitBox(x1, y1, x2, y2, pad = .9) {return applyMapView({cx:(x1+x2)/2,cy:(y1+y2)/2,s:Math.min(cw/Math.max(1,x2-x1),ch/Math.max(1,y2-y1))*pad});}
 function fitLonLat(bb) {return fitBox(mxOf(bb[0]),myOf(bb[1]),mxOf(bb[2]),myOf(bb[3]));}
-function fitGround(lat, lon, widthG) {if(S.lock)widthG=TD_MAP_W;return applyMapView({cx:mxOf(lon),cy:myOf(lat),s:cw/(widthG*kAt(lat))});}
+function fitGround(lat, lon, widthG, options={}) {if(S.lock)widthG=TD_MAP_W;return applyMapView({cx:mxOf(lon),cy:myOf(lat),s:cw/(widthG*kAt(lat))},{...options,type:'point'});}
 function zoomAt(px, py, f) { if (providerTransform()) { providerZoomAt(px, py, f); return; } const [mx, my] = toM(px, py); V.s *= f; clampView(); const [nx, ny] = toM(px, py); V.cx += mx - nx; V.cy += my - ny; clampView(); }
 
 /* ── 바탕 그리기 ───────────────────────────────────────── */

@@ -29,11 +29,11 @@
 | `10_tide.js` | 조석: 예보지점·물때·조위 보간 | 40 | `tideAt`, `getTide` |
 | `11_current.js` | 조류 예보(물돌이·최강)와 해 뜨고 지는 시각 | 66 | `loadCrnt`, `crntAt`, `crntDay`, `nearestCrnt`, `flowU`, `sunTimes` |
 | `12_fish.js` | 대상어 정보와 물고기 그림 | 71 | `fishSVG` |
-| `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선 | 119 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
+| `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선·이동 성공 후 선택 확정 | 가변 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
 | `14_bite.js` | 포인트별 입질 조건점수·자료 신뢰도·이유, 실제 시계의 분 단위 갱신 | 107 | `lightF`, `targetF`, `biteTemperature`, `biteDataQuality`, `myF`, `biteEvalAt`, `biteAt`, `biteReasons`, `spark`, `renderBite` |
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 가변 | `rawToS`, `rawToM`, `toS`, `toM`, `viewBounds`, `drawStations`, `stationDetailAllowed`, `stationAt`, `tmToLL`, `clampRequestedView`, `applyMapView`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
-| `15b_map_provider.js` | NAVER SDK viewport 단방향 동기화·명시적 이동 transaction·100m 축척·native 이동, 중복 이벤트 제외·종료 누락 복원·3가지 지도 모드·기본 지형 복구 | 가변 | `NaverMapAdapter` (`handleImageError`), `providerRequestedBounds`, `providerStart`, `providerSync`, `providerAlignment`, `providerReadView`, `providerViewportKey`, `providerTilesLoaded`, `providerRecordEvent`, `providerViewportChanged`, `providerBeginMove`, `providerQueueSettle`, `providerFinalizeViewport`, `providerQueueFinalViewport`, `providerWatchFinalViewport`, `providerRevealOverlay`, `providerCancelGestureDeadline`, `providerArmGestureDeadline`, `providerApplyView`, `providerCommandObservation`, `providerFinishViewCommand`, `providerCancelViewCommand`, `providerUseNativePan`, `providerUpdateInput`, `providerZoomAt`, `providerPanBy`, `providerPanAnchor`, `scheduleDisplayDepthArea`, `providerSetMode`, `providerFallback`, `providerRect`, `providerRectError` |
-| `15c_map_diagnostic.js` | localhost 전용 native Marker DOM 중심과 Canvas 실제 픽셀·DPR·원점·이동 완료 대기·8프레임 진단 | 가변 | `providerMarkerDiagnostic`, `providerCanvasProbePixel`, `providerProbeSample`, `providerDiagnosticRectDeltas`, `drawProviderDebugCrosshair`, `providerClearDiagnostic` |
+| `15b_map_provider.js` | NAVER SDK viewport 단방향 동기화·명시적 이동 transaction·1회 no-op 보정·100m 축척·native 이동, 중복 이벤트 제외·종료 누락 복원·3가지 지도 모드·기본 지형 복구 | 가변 | `NaverMapAdapter` (`handleImageError`, `repairViewport`), `providerRequestedBounds`, `providerStart`, `providerSync`, `providerAlignment`, `providerReadView`, `providerViewportKey`, `providerTilesLoaded`, `providerRecordEvent`, `providerViewportChanged`, `providerBeginMove`, `providerQueueSettle`, `providerFinalizeViewport`, `providerQueueFinalViewport`, `providerWatchFinalViewport`, `providerRevealOverlay`, `providerCancelGestureDeadline`, `providerArmGestureDeadline`, `providerApplyView`, `providerCommandObservation`, `providerFinishViewCommand`, `providerRepairViewCommand`, `providerCancelViewCommand`, `providerUseNativePan`, `providerUpdateInput`, `providerZoomAt`, `providerPanBy`, `providerPanAnchor`, `scheduleDisplayDepthArea`, `providerSetMode`, `providerFallback`, `providerRect`, `providerRectError` |
+| `15c_map_diagnostic.js` | localhost 전용 native Marker DOM 중심과 Canvas 실제 픽셀·DPR·원점·이동 완료 대기·8프레임 진단 | 가변 | `naksigwangMapDiagnostic.lastNavigation`, `providerMarkerDiagnostic`, `providerCanvasProbePixel`, `providerProbeSample`, `providerDiagnosticRectDeltas`, `drawProviderDebugCrosshair`, `providerClearDiagnostic` |
 | `15d_render_state.js` | UI·조류·단면의 별도 무효화, 화살표 bitmap 캐시, localhost FPS·프레임·호출·long task 계측 | 가변 | `perfCount`, `perfWrap`, `drawCurrentOverlay`, `window.naksigwangPerfDiagnostic` |
 | `15e_tile_diagnostic.js` | localhost 타일 DOM·오류/SDK 상태·Canvas 픽셀/가시성·providerOnly 관찰 (URL 비반환) | 가변 | `providerCanvasVisibility`, `window.naksigwangTileDiagnostic`, `naksigwangPerfDiagnostic.providerOnly`, `naksigwangTileDiagnostic.retry` |
 | `15f_provider_health.js` | 타일 오류 계측·SDK API 상태 확인·3회 제한 재확인·비치명적 settle timeout·기존 지도 인스턴스 복구 | 가변 | `providerHealthSnapshot`, `providerRecordTileError`, `providerTileErrorsLast10s`, `providerCancelHealthCheck`, `providerHandleProjectionFailure`, `providerScheduleHealthCheck`, `providerTryRecover`, `providerSettleTimeout`, `providerModeTimeout` |
@@ -44,7 +44,7 @@
 | `19_overlay.js` | 평면도 위 표시(자료 좌표에서 투영한 단면선·단면 표식·핀) | 가변 | `drawUI` |
 | `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |
 | `20b_today.js` | 「오늘」 탭: 선택한 포인트의 오늘·지금 요약, 연속된 좋은 시간 구간 | 70 | `goodHourRanges`, `renderToday`, `drawToday` |
-| `21_input.js` | 화면·터치·검색 입력, 온라인 native 이동/Canvas 단면 전환과 크기 동기화, 수심/출처 상세 | 가변 | `providerPointerFinished`, `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `findPlace`, `renderBasis` |
+| `21_input.js` | 화면·터치·검색 입력, 온라인 native 이동/Canvas 단면 전환과 크기 동기화, 수심/출처 상세 | 가변 | `providerPointerFinished`, `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `navigateSearchPoint`, `findPlace`, `renderBasis` |
 | `22_catchlog.js` | 내 조과 기록 | 45 | `localCatches`, `renderLog` |
 | `23_main.js` | 예시 단면·SDK 시작, 용도별 상태 변경 렌더·background RAF 중지 | 가변 | `exampleSection`, `drawBiteChart`, `apiAutoKick`, `frame` |
 | `24_tabs.js` | 다섯 탭 전환과 지도 stage 이동, 창 높이 변경 시 지도 크기 갱신 | 가변 | `showTab`, `placeMap` |
@@ -82,3 +82,5 @@
 수온은 실제 좌표 캐시와 50 km/24시간 제한을 사용합니다. 자료 신뢰도 배점은 수온 25·풍속 15·파고 20·조류 25·조석 15입니다. 수온 거리/나이와 미래 날짜, 인접 격자/시간 보간/이전 발표, P0 파일 단위 fallback/stale 메타에 따라 감쇠합니다. 조류 추정은 7점입니다. 등급 경계는 높음 80·보통 55이며 적중 확률이 아닙니다. 원천 누락은 기여 0점이고 내 조황기록은 신뢰도와 무관합니다.
 
 `python tests/test_bite_confidence.py`는 앱에 검사 함수를 테스트 중에만 주입하여 실제 동해 항 5곳을 위도 구간별로 고르고(서로 15 km 이상) 동일 시각·감성돔 조건을 비교합니다. 원점수와 기여분의 차이를 검사하며 모든 점수가 고유해야 한다고 강제하지 않습니다. `P1_OUTPUT`으로 JSON 보고서와 모바일/PC 5개 탭 화면을 저장할 수 있습니다.
+
+명시적 이동: point/bounds 목표를 분리 기록하고 500ms 미도착 시 현재 표시 배율에서 정수 zoom을 산출해 1회 보정한다. 항구/검색 선택은 성공 시에만 확정한다. `naksigwangMapDiagnostic.lastNavigation()`은 실제 중심·폭·보정 여부를 credential 없이 반환한다.

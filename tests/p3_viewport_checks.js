@@ -1,7 +1,7 @@
 // p3_viewport_checks.js — projection 지연·이른 idle·연속 이동의 최종 렌더링 검사
 class DelayedMapAdapter extends FakeMapAdapter {
   init(el) {
-    super.init(el);this.reportedCenter=this.center;this.reportedZoom=this.z;this.ticket=0;
+    super.init(el);this.map.setZoom=z=>{if(this.noop||this.repairNoop)return;this.enqueue(this.reportedCenter,z);};this.reportedCenter=this.center;this.reportedZoom=this.z;this.ticket=0;
     this.map.panBy=p=>{const c=fakeWorld(...this.center);this.enqueue(fakeCoord(c[0]+p.x/this.scale(),c[1]-p.y/this.scale()),this.z);};
     this.map.zoomBy=(delta,ll)=>{const p=this.referenceProject(ll.lng(),ll.lat()),w=fakeWorld(ll.lng(),ll.lat()),z=Math.max(6,Math.min(21,this.z+delta)),s=2**z/200000;
       this.enqueue(fakeCoord(w[0]-(p[0]-cw/2)/s,w[1]+(p[1]-ch/2)/s),z);};

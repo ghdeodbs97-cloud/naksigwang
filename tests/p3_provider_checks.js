@@ -24,7 +24,7 @@ class P3NativeMarker {
     this.element.style.position='absolute';this.element.style.left=((w[0]-c[0])*2**f.z/200000+cw/2-anchor.x+(f.nativeOffset||0))+'px';this.element.style.top=((c[1]-w[1])*2**f.z/200000+ch/2-anchor.y)+'px';}
 }
 class FakeMapAdapter {
-  init(container) { this.container=container; this.instances=1; this.modes=[]; this.error=0; this.center=[128,36]; this.z=10; this.markers=new Set();this.sdk={LatLng:P3ProbeLL,LatLngBounds:P3ProbeBounds,Size:P3ProbeXY,Point:P3ProbeXY,Marker:P3NativeMarker};this.map={owner:this,fitBounds:b=>{this.lastRequestedBounds=p3StrictBounds(b);this.applyGeographicBounds(this.lastRequestedBounds);},setZoom:z=>{this.z=z;this.renderMarkers();},
+  init(container) { this.container=container; this.instances=1; this.modes=[]; this.error=0; this.center=[128,36]; this.z=10; this.markers=new Set();this.sdk={LatLng:P3ProbeLL,LatLngBounds:P3ProbeBounds,Size:P3ProbeXY,Point:P3ProbeXY,Marker:P3NativeMarker};this.map={owner:this,fitBounds:b=>{this.lastRequestedBounds=p3StrictBounds(b);this.applyGeographicBounds(this.lastRequestedBounds);},setCenter:ll=>{if(!(ll instanceof P3ProbeLL))throw Error('LatLng 계약');this.setCenter(ll.lng(),ll.lat());},setZoom:z=>{if(this.noop||this.repairNoop)return;this.z=z;this.reportedZoom=z;this.renderMarkers();},
       panBy:p=>{const c=fakeWorld(...this.center),ll=fakeCoord(c[0]+p.x/this.scale(),c[1]-p.y/this.scale());this.setCenter(...ll);},
       zoomBy:(delta,ll)=>{const p=this.referenceProject(ll.lng(),ll.lat()),w=fakeWorld(ll.lng(),ll.lat());this.z=Math.max(6,Math.min(21,this.z+delta));this.center=fakeCoord(w[0]-(p[0]-cw/2)/this.scale(),w[1]+(p[1]-ch/2)/this.scale());this.renderMarkers();this.viewportListener?.('zoom_changed');this.viewportListener?.('idle');}}; }
   setMode(mode) { this.modes.push(mode); this.loaded?.(); }
@@ -45,7 +45,7 @@ class FakeMapAdapter {
   getBounds() { const pts=[this.unproject(0,0),this.unproject(cw,0),this.unproject(0,ch),this.unproject(cw,ch)]; return [[Math.min(...pts.map(p=>p[0])),Math.min(...pts.map(p=>p[1]))],[Math.max(...pts.map(p=>p[0])),Math.max(...pts.map(p=>p[1]))]]; }
   getCenter() { return this.center; }
   getZoom() { return this.z; }
-  setCenter(lon,lat) { this.center=[lon,lat];this.renderMarkers();this.viewportListener?.('center_changed');this.viewportListener?.('idle'); }
+  setCenter(lon,lat) { if(this.noop||this.repairNoop)return;this.center=[lon,lat];this.renderMarkers();this.viewportListener?.('center_changed');this.viewportListener?.('idle'); }
   moveAnchor(ll,x,y) { NaverMapAdapter.prototype.moveAnchor.call(this,ll,x,y); }
   zoomAt(x,y,f) { NaverMapAdapter.prototype.zoomAt.call(this,x,y,f); }
   onTilesLoaded(fn) { this.loaded=fn; }

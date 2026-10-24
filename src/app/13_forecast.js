@@ -73,7 +73,8 @@ function buildPoints() {
   $('stSel').innerHTML = order.map(r => `<optgroup label="항·포구 · ${r}">` + grp(r, false).map(o => `<option value="${o.i}">${o.p.name}</option>`).join('') + '</optgroup>').join('')
     + order.map(r => { const g = grp(r, true); return g.length ? `<optgroup label="갯바위 · ${r}">` + g.map(o => `<option value="${o.i}">${o.p.name}${o.p.access === 'unk' ? ' (접근 확인 필요)' : o.p.access === 'boat' ? ' (배로만)' : ''}</option>`).join('') + '</optgroup>' : ''; }).join('');
 }
-function selectPoint(j, zoom) {
+function selectPoint(j, zoom, navigationCommitted=false) {
+  if(!navigationCommitted&&providerTransform()&&(zoom||S.lock)){const p=POINTS[j];$('stSel').value=String(S.pt);return fitGround(p.lat,p.lon,S.lock?TD_MAP_W:9000,{targetName:p.name,onSuccess:()=>selectPoint(j,false,true)});}
   S.pt = j; const p = POINTS[j];
   S.st = p.st; const st = STATIONS[p.st];
   S.range = (st.maxCm - st.minCm) / 100;
@@ -81,8 +82,8 @@ function selectPoint(j, zoom) {
   $('stName').textContent = p.name;
   $('stReg').textContent = (p.kind === 'rock' ? '갯바위 · ' + ACC_NAME[p.access] + ' · ' : '') + `조석: ${st.name} 예보지점 기준 · ${p.dkm < 1 ? '1 km 이내' : p.dkm.toFixed(0) + ' km'}`;
   $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : '';
-  if (zoom) fitGround(p.lat, p.lon, 9000);
-  if (S.lock) { fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); }   // 오늘 탭 지도: 새 포인트로 옮기고 앞바다 단면
+  if (zoom&&!navigationCommitted) fitGround(p.lat, p.lon, 9000);
+  if (S.lock) { if(!navigationCommitted)fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); }   // 오늘 탭 지도: 새 포인트로 옮기고 앞바다 단면
   $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
   dirty = true; renderDays(); renderBite();
 }
