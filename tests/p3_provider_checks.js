@@ -138,7 +138,8 @@ window.p3AdapterUnit = () => {
   class LL {constructor(lat,lon){this.latitude=lat;this.longitude=lon;}lat(){return this.latitude;}lng(){return this.longitude;}}
   class XY {constructor(x,y){this.x=x;this.y=y;}}
   const sdk={LatLng:LL,LatLngBounds:P3ProbeBounds,Point:XY,Size:XY,MapTypeId:{SATELLITE:'S',NORMAL:'N',HYBRID:'H'},Event:{addListener:()=>1,removeListener:l=>calls.push(['remove',l])},Map:class {
-    constructor(c,o){instances++;this.z=o.zoom;this.c=o.center;}
+    constructor(c,o){instances++;this.z=o.zoom;this.c=o.center;this.pane=document.createElement('div');this.pane.style.cssText='position:absolute;left:0;top:0';c.append(this.pane);}
+    getPanes(){return {overlayLayer:this.pane};}
     setMapTypeId(m){calls.push(m);}setCenter(c){this.c=c;calls.push('center');}getCenter(){return this.c;}
     setZoom(z){this.z=z;}getZoom(){return this.z;}setSize(s){calls.push('size');}setOptions(o){calls.push('options');}
     fitBounds(b){const g=p3StrictBounds(b);this.c=new LL((g.south+g.north)/2,(g.west+g.east)/2);calls.push('fitBounds');}
@@ -157,7 +158,7 @@ window.p3AdapterUnit = () => {
   if(instances!==1 || calls[0]!=='S' || calls[1]!=='H' || calls[2]!=='N' || Math.abs(ll[0]-129)>1e-8 || Math.abs(ll[1]-37)>1e-8 || a.getBounds()[0][0]!==124)throw Error('NAVER 어댑터 계약');
   const ref=a.referenceProject(129,37);if(Math.hypot(ref[0]-p[0],ref[1]-p[1])>1e-6)throw Error('독립 세계 좌표 경로');
   if(Math.abs(a.getViewportScale()-2**a.getZoom()/200000)>1e-8)throw Error('실제 SDK 세계 좌표 화면 배율');
-  a.destroy();if(a.map!==null || !calls.includes('destroy'))throw Error('NAVER 해제');
+  a.map.pane.remove();a.destroy();if(a.map!==null || !calls.includes('destroy'))throw Error('NAVER 해제');
   return true;
 };
 window.p3SwitchOnly = () => {providerSetMode('satellite');providerSetMode('hybrid');providerSetMode('normal');};

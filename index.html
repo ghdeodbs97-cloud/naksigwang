@@ -2238,8 +2238,18 @@ class NaverMapAdapter {
   getBounds() { const b = this.map.getBounds(), sw = b.getSW(), ne = b.getNE(); return [[sw.lng(), sw.lat()], [ne.lng(), ne.lat()]]; }
   getCenter() { const c = this.map.getCenter(); return [c.lng(), c.lat()]; }
   getZoom() { return this.map.getZoom(); }
-  // 정합 기준은 별도 세계 좌표 경로. 앱 toS/toM이나 project를 호출하지 않는다.
-  referenceProject(lon, lat) { const p = this.map.getProjection(), w = p.fromCoordToPoint(new this.sdk.LatLng(lat, lon)), o = p.fromPointToOffset(w); return [o.x, o.y]; }
+  // SDK offset은 pan하는 내부 pane 좌표다. 고정 Canvas 좌표와 같지 않다.
+  refreshScreenOrigin() {
+    const pane=this.map.getPanes().overlayLayer;
+    if(!this.originProbe){this.originProbe=document.createElement('div');this.originProbe.style.cssText='position:absolute;left:0;top:0;width:0;height:0;pointer-events:none';}
+    if(this.originProbe.parentNode!==pane)pane.appendChild(this.originProbe);
+    const a=this.originProbe.getBoundingClientRect(),b=this.container.getBoundingClientRect();
+    this.screenOrigin=[a.left-b.left,a.top-b.top];
+    if(!this.screenOrigin.every(Number.isFinite))throw Error('지도 내부 화면 원점 확인 실패');
+    return this.screenOrigin;
+  }
+  // 별도 세계 좌표 경로도 같은 화면 좌표계로 바꾼다. 실 정합 증거는 Marker DOM이다.
+  referenceProject(lon, lat) { const p = this.map.getProjection(), w = p.fromCoordToPoint(new this.sdk.LatLng(lat, lon)), o = p.fromPointToOffset(w), d=this.screenOrigin||this.refreshScreenOrigin(); return [o.x+d[0], o.y+d[1]]; }
   setCenter(lon, lat) { this.map.setCenter(new this.sdk.LatLng(lat, lon)); }
   moveAnchor(ll,x,y) { const p=this.project(...ll); this.map.panBy(new this.sdk.Point(p[0]-x,p[1]-y)); }
   panPixels(dx,dy) { this.map.panBy(new this.sdk.Point(-dx,-dy)); }
@@ -2248,8 +2258,8 @@ class NaverMapAdapter {
     const delta=Math.round(this.zoomRemainder); this.zoomRemainder-=delta;
     if (delta) this.map.zoomBy(delta,new this.sdk.LatLng(ll[1],ll[0]),false);
   }
-  project(lon, lat) { const p = this.map.getProjection().fromCoordToOffset(new this.sdk.LatLng(lat, lon)); return [p.x, p.y]; }
-  unproject(x, y) { const p = this.map.getProjection().fromOffsetToCoord(new this.sdk.Point(x, y)); return [p.lng(), p.lat()]; }
+  project(lon, lat) { const p = this.map.getProjection().fromCoordToOffset(new this.sdk.LatLng(lat, lon)),d=this.screenOrigin||this.refreshScreenOrigin(); return [p.x+d[0], p.y+d[1]]; }
+  unproject(x, y) { const d=this.screenOrigin||this.refreshScreenOrigin(),p = this.map.getProjection().fromOffsetToCoord(new this.sdk.Point(x-d[0], y-d[1])); return [p.lng(), p.lat()]; }
   resize() { this.map.setSize(new this.sdk.Size(cw, ch)); }
   createDebugMarker(lat, lon) {
     const n = this.sdk, element = document.createElement('div');
@@ -2261,7 +2271,7 @@ class NaverMapAdapter {
   }
   onViewportReady(fn) { for (const name of ['bounds_changed','center_changed','zoom_changed','projection_changed','idle','dragstart','dragend','pinchstart','pinchend','zoomstart','zoomend']) this.listeners.push(this.sdk.Event.addListener(this.map,name,()=>fn(name))); }
   onTilesLoaded(fn) { this.listeners.push(this.sdk.Event.addListener(this.map, 'tilesloaded', fn)); }
-  destroy() { for (const l of this.listeners) this.sdk.Event.removeListener(l); this.listeners = []; this.container?.removeEventListener('error', this.imageError, true); this.map?.destroy(); this.map = null; }
+  destroy() { for (const l of this.listeners) this.sdk.Event.removeListener(l); this.listeners = []; this.originProbe?.remove();this.originProbe=null;this.screenOrigin=null;this.container?.removeEventListener('error', this.imageError, true); this.map?.destroy(); this.map = null; }
 }
 
 const PROVIDER_MAP = { adapter: null, offline:navigator.onLine===false, active: false, failed: false, started: false, mode: 'satellite',
@@ -2285,7 +2295,7 @@ function providerFallback(reason='manual-fallback') {
 function providerTransform() { return !!PROVIDER_MAP.adapter && !PROVIDER_MAP.failed && (PROVIDER_MAP.active || PROVIDER_MAP.checking); }
 function providerReadView() {
   if(PROVIDER_MAP.commandPending||PROVIDER_MAP.navigationFailed)return;
-  const p=PROVIDER_MAP,a=p.adapter,c=a.unproject(cw/2,ch/2),scale=a.getGroundScale();
+  const p=PROVIDER_MAP,a=p.adapter;a.refreshScreenOrigin?.();const c=a.unproject(cw/2,ch/2),scale=a.getGroundScale();
   if (!(scale>0) || !Number.isFinite(scale)) throw Error('지도 배율 변환 실패');
   const key=providerViewportKey(),zoom=a.getZoom(),viewportScale=a.getViewportScale();
   // SDK의 현재 표시 projection 중심·100m 축척을 호환 상태에 복사한다. SDK에 다시 보내지 않는다.
@@ -2297,6 +2307,7 @@ function providerReadView() {
 }
 function providerViewportKey() {
   const a=PROVIDER_MAP.adapter;
+  a.refreshScreenOrigin?.();
   return JSON.stringify([a.getZoom(),a.getCenter(),a.getBounds(),a.unproject(0,0),a.unproject(cw/2,ch/2),a.unproject(cw,ch),cw,ch]);
 }
 // 이동 중에는 이전 Canvas를 숨기고 SDK의 마지막 표시 좌표가 안정된 뒤 한 번 갱신한다.
@@ -2477,6 +2488,7 @@ function providerApplyView(view = {...V},options={}) {
   return c.promise;
 }
 function providerAlignment(adapter) {
+  adapter.refreshScreenOrigin?.();
   // 9곳의 독립 SDK 화면 역변환을 확인하고, 고정 경위도는 별도 세계 좌표 경로와 비교한다.
   // raw 오차는 기존 실패 원인을 계측하는 값이며, 허용 오차를 판정하는 값과 구분한다.
   const samples = [], rawSamples = []; let max = 0;
@@ -2700,7 +2712,7 @@ if (PROVIDER_DEV_HOST) {
   window.naksigwangMapDiagnostic.overlay = () => {
     const p=PROVIDER_MAP,key=p.active&&!p.failed?providerViewportKey():null,sample=PROVIDER_DEBUG?providerProbeSample(PROVIDER_DEBUG,0):null;
     return {visible:!stage.classList.contains('provider-moving')&&getComputedStyle(ui).visibility==='visible',providerActive:p.active,providerFailed:p.failed,providerMoving:p.providerMoving,gesture:p.gesture,commandPending:p.commandPending,nativePointers:nativePointers.size,
-      providerKey:key,renderedKey:RENDER.renderedProviderViewportKey??null,keysMatch:!!key&&providerRenderedViewportMatches(key),
+      providerKey:key,renderedKey:RENDER.renderedProviderViewportKey??null,keysMatch:!!key&&providerRenderedViewportMatches(key),projectionSpace:'pane-to-container-v1',paneScreenOrigin:p.adapter?.screenOrigin??null,
       markerMaxErrorPx:sample?.valid?sample.errorPx:null,markerMeasurement:sample?.valid?'현재 native DOM 대 Canvas 실제 픽셀':'기준점 미측정',
       staleRevealCount:p.staleRevealCount||0,blockedReveals:p.blockedReveals||0,finalizations:p.finalViewportCount||0,generation:p.moveGeneration||0,lastFinalViewport:p.lastFinalViewport??null};
   };
@@ -2827,6 +2839,7 @@ function providerHealthSnapshot(){
   const pair=v=>Array.isArray(v)&&v.length===2&&v.every(Number.isFinite);
   if(!h.mapObjectPresent)return h;
   try{
+    a.refreshScreenOrigin?.();
     const center=a.getCenter(),zoom=a.getZoom(),bounds=a.getBounds();
     h.center=pair(center)?[...center]:null;h.zoom=Number.isFinite(zoom)?zoom:null;h.bounds=Array.isArray(bounds)&&bounds.length===2&&bounds.every(pair)?bounds.map(v=>[...v]):null;
     if(!h.center||h.zoom===null||!h.bounds)return h;

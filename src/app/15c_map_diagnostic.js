@@ -103,7 +103,7 @@ if (PROVIDER_DEV_HOST) {
   window.naksigwangMapDiagnostic.overlay = () => {
     const p=PROVIDER_MAP,key=p.active&&!p.failed?providerViewportKey():null,sample=PROVIDER_DEBUG?providerProbeSample(PROVIDER_DEBUG,0):null;
     return {visible:!stage.classList.contains('provider-moving')&&getComputedStyle(ui).visibility==='visible',providerActive:p.active,providerFailed:p.failed,providerMoving:p.providerMoving,gesture:p.gesture,commandPending:p.commandPending,nativePointers:nativePointers.size,
-      providerKey:key,renderedKey:RENDER.renderedProviderViewportKey??null,keysMatch:!!key&&providerRenderedViewportMatches(key),
+      providerKey:key,renderedKey:RENDER.renderedProviderViewportKey??null,keysMatch:!!key&&providerRenderedViewportMatches(key),projectionSpace:'pane-to-container-v1',paneScreenOrigin:p.adapter?.screenOrigin??null,
       markerMaxErrorPx:sample?.valid?sample.errorPx:null,markerMeasurement:sample?.valid?'현재 native DOM 대 Canvas 실제 픽셀':'기준점 미측정',
       staleRevealCount:p.staleRevealCount||0,blockedReveals:p.blockedReveals||0,finalizations:p.finalViewportCount||0,generation:p.moveGeneration||0,lastFinalViewport:p.lastFinalViewport??null};
   };

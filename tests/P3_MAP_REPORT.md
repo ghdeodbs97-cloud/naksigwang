@@ -740,3 +740,23 @@ markerMaxErrorPx는 기존 native 기준점이 실제 측정될 때만 숫자이
 - 초기 병렬 pan 실행은 최대653.7ms로 500ms 기준을 실패했다. 이를 통과로 세지 않았으며 위 수치는 최종 직렬 전체 실행 결과다. 실행 환경 부하만이 원인이라고 단정하지 않으며 실 사용자 성능은 별도 확인한다.
 
 이번 변경12파일: .github/workflows/ci.yml, index.html(생성), src/README.md, src/app/15b_map_provider.js, 15c_map_diagnostic.js, 15d_render_state.js, 21_input.js, 23_main.js, tests/P3_MAP_REPORT.md, P3_PAN_RESULTS.json, p3_pan_checks.js, test_map_pan.py. 수심 보호 경로/data/와 원본 301표본 baseline 무변경. 새 SHA의 Actions 결과는 PR #6 최종 코멘트에서 확인한다. 실 NAVER는 사용자 localhost 재검증 대기다.
+
+
+### NAVER pane 좌표와 고정 Canvas 화면 좌표 구분 — 사용자 pan 재현 후 수정
+
+앞선 5456d32의 입력 숨김/draw stamp 검사는 실제 사용자 pan 오류를 해결하지 못했다. 기존 FakeMapAdapter는 실제 NaverMapAdapter.project/unproject를 우회하고 처음부터 화면 기준 좌표를 반환했다. 따라서 내부 pane이 이동하지만 SDK offset은 그대로 남는 NAVER 좌표계 계약을 검사하지 못했다. 기존 결과는 해당 mock 결과로 보존하며 실사용 해결 근거로 사용하지 않는다.
+
+공식 [좌표계 설명](https://navermaps.github.io/maps.js.ncp/docs/tutorial-Projection.html)에 따르면 offset은 지도 내부 DOM 컨테이너 좌표다. [사용자 정의 overlay 예제](https://navermaps.github.io/maps.js.ncp/docs/tutorial-6-CustomOverlay.html)는 이를 getPanes().overlayLayer 안에 배치한다. 고정 sibling Canvas의 화면 좌표와 혼용해서는 안 된다.
+
+- 이전: fromCoordToOffset 결과를 Canvas CSS pixel로 직접 사용. fromOffsetToCoord에도 고정 Canvas 좌표를 직접 입력.
+- 수정: 공식 overlayLayer의 (0,0)에 크기 0인 DOM 기준점을 두고 providerMap에 대한 실제 CSS 원점을 읽는다. project는 pane 원점을 더하고, unproject는 빼서 SDK에 전달한다. 임의/항구별 offset이나 Canvas transform을 사용하지 않는다.
+- viewport key/최종 view/health/alignment 확인 때 원점을 갱신하며 각 포인트의 project에서는 저장된 원점을 사용한다. final DRAW→stamp→REVEAL, moving heavy 차단을 유지한다.
+- 실제 NaverMapAdapter를 사용하는 새 SDK mock은 pan 때 pane DOM만 이동하고 offset은 고정한다. 독립 Marker DOM은 그 pane 안에 실제 배치한다. zoom 때 원점을 리셋해 “pan 후 어긋남, zoom 후 다시 맞음”을 재현한다.
+- 이전 실제 index 빌드 5456d32를 같은 검사에 넣어 첫 pan 37.375px 실패를 확인했다. 수정 코드의 원점 미변환 비교 최대 오차는 47.69205px다.
+- 최종 4화면×4DPR=16조합, 총 1,600pan 통과. native DOM↔Canvas raster 최대 0.50526 CSS px, 실제 A/B Canvas arc↔별도 native DOM 최대 0.01650px. 원좌표와 역변환 보존, 종료 후 visible 1,600/1,600.
+- 기존 provider 계약 mock에도 공식 getPanes DOM을 추가했다. 전체 기존 CI에 새 pane 검사를 추가하며 기존 검사/허용 오차는 줄이지 않는다. 해당 새 SHA의 CI 최종 결과는 PR #6 코멘트에 기록한다.
+- 보호 경로 static/depth/, 04_depth.js, 04b_depth_tiles.js, 18_section.js, data/와 원본301 baseline은 무변경이다.
+
+localhost에서 최신 빌드를 Ctrl+Shift+R 후 zoom 없이 pan한다. naksigwangMapDiagnostic.overlay()는 projectionSpace:"pane-to-container-v1" 및 paneScreenOrigin을 추가 반환한다. 내부 pane의 이동량과 고정 Canvas 화면 좌표를 구분하기 위한 값이며 credential은 없다.
+
+실 NAVER pan·조류/갯바위 정합·잔상·렉은 사용자 localhost 재검증 대기다. 자동 검사 통과를 P3 완료나 merge 가능 판정으로 사용하지 않는다.
