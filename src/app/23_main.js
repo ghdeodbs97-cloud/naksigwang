@@ -84,8 +84,10 @@ function frame(now){
   if(timeKey!==RENDER.readKey||RENDER.readSection!==SEC){RENDER.readKey=timeKey;RENDER.readSection=SEC;updateReadouts(tide);}
   if(TAB==='map'||TAB==='today'){
     const moving=PROVIDER_MAP.providerMoving||PROVIDER_MAP.commandPending;
-    if(!moving){
-      const reveal=PROVIDER_MAP.revealAfterBase;
+    const reveal=PROVIDER_MAP.revealAfterBase;
+    if(!moving&&(!reveal||providerPrepareDraw())){
+      const drawStamp=reveal?providerDrawStamp():null;
+      if(PROVIDER_MAP.providerMoving){frameRequest=requestAnimationFrame(frame);return;}
       if(reveal)dirty=true;
       if(dirty){renderBase();dirtyHover=true;apiAutoKick();RENDER.uiKey='';}
       setText('clock2',fmtH(S.t));
@@ -94,11 +96,11 @@ function frame(now){
       const uiKey=JSON.stringify([PROVIDER_MAP.signature,V,cw,ch,DPR(),S.A,S.B,S.drag,S.pin,S.secHover,S.layers.flow,timeKey,CR.ready,PROVIDER_DEBUG?.lat,PROVIDER_DEBUG?.lon]);
       if(reveal||tabChanged||uiKey!==RENDER.uiKey||RENDER.arrowStations!==CR.st){RENDER.uiKey=uiKey;drawUI();drawCurrentOverlay(tide);}
       const flowInterval=innerWidth<560?50:1000/30;
-      if(S.layers.flow&&now-RENDER.lastFlow>=flowInterval){const flowDt=Math.min(.1,(now-RENDER.lastFlow)/1000);RENDER.lastFlow=now;stepParticles(tide,flowDt);}
+      if(S.layers.flow&&(reveal||now-RENDER.lastFlow>=flowInterval)){const flowDt=Math.min(.1,(now-RENDER.lastFlow)/1000);RENDER.lastFlow=now;stepParticles(tide,flowDt);}
       const sectionKey=JSON.stringify([timeKey,S.hs,S.secHover,sw,shh,DPR()]);
       if(reveal||tabChanged||sectionKey!==RENDER.sectionKey||RENDER.section!==SEC){RENDER.sectionKey=sectionKey;RENDER.section=SEC;drawSection(S.playing?now:0,tide);}
       // 최종 base·UI·조류·단면을 모두 준비한 프레임에서만 공개한다.
-      if(reveal)providerRevealOverlay();
+      if(reveal){providerCommitDrawStamp(drawStamp);providerRevealOverlay();}
     }
   }
   const chartKey=JSON.stringify([TAB,timeKey,innerWidth,DPR(),biteDataMinute]);
