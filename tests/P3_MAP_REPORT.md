@@ -602,3 +602,84 @@ idle에서 reported center 2px 판정은 공개의 필수 gate가 아니다. 원
 최종 로컬 결과: 기존 legacy 12명령, provider 32결과, health 6조합, 원본 RAF performance 12조합, 원본 RAF stress 16조합을 통과했다. stress는 총 12,000동작과 늦은 이벤트 25,600개이며 영구 숨김·비의도 fallback·이동 중 heavy/픽셀 읽기/수심 준비·모드 추가 depth fetch는 모두 0이다. 각 이동 종료의 즉시 base는 1회, 공개 후 동일 viewport 늦은 이벤트의 추가 base는 0회다. 원거리 fit은 총 480회 모두 settled/도착/같은 인스턴스/Marker <=2px/visible을 확인했다. 종료 이벤트 누락은 262.3~284.4ms, 반복 종료 복원 최대는 117.6ms였다. 실제 SDK wheel zoom 변경은 조합마다 150회, 총 2,400회였다.
 
 별도 performance 이동 구간은 50.23~60.38fps, 평균 frame 16.61~19.97ms, p95 최대 54.1ms, idle 복원 최대 88.8ms였다. 진단용 Marker/raster 연산을 포함한 48개 구간 합계 long frame은 319개, frame 내부 작업 50ms 이상은 2개였다. 이동 중 heavy 작업은 0이며 이 수치를 실제 NAVER SDK 비용이나 사용자 체감 성능으로 일반화하지 않는다. Marker 최대 0.4469px, A/B raster 최대 0.9014px, 정지 SDK/base/mask/단면/픽셀 읽기 0, particle budget 180/360을 유지했다. 원본 301표본 baseline 동일, build missing ids: [], LF/CRLF 빌드 일치, PR base 대비 production 수심 무변경, 이번 작업 data 무변경도 확인했다. 최종 SHA의 전체 CI 결과는 기존 PR #6 설명과 Conversation 결과 코멘트에 기록한다.
+
+
+## 2026-10-24 명시적 항구 이동: 장봉항 광역 잔류 수정
+
+이번 변경은 provider 건강/settle 정책의 재설계가 아니라 명시적 검색·선택 이동의 보정과 commit 경계 수정이다. 시작 local/origin/PR #6 head는 모두 `7ae30c7af94921e62caa4b3ed51e9fcba59923a7`이었다. 작업 전 tracked 변경은 없었고 기존 untracked `python`은 보존했다.
+
+### 원인과 이전 head 재현
+
+`selectPoint(j,true)`는 먼저 `S.pt`·dropdown·이름을 바꾸고 `fitGround`를 호출했다. 명령은 공식 LatLngBounds fitBounds 1회 뒤 polling만 하고, 8초 뒤 실패해도 `providerFinishViewCommand(false)`가 `commandPending=false` 이후 `providerReadView()`로 옛 SDK 광역 화면을 `V`와 `lastSettledView`에 기록했다. provider 건강 여부와 목표 도착 여부는 다르다.
+
+이전 head index를 git show로 읽어 메모리 route에서 실행했다. 저장소 장봉항 POINTS/PORTS(북위 37.52816, 동경 126.33697), healthy SDK와 fitBounds no-op을 주면 선택은 장봉항, 명령 failed / requested viewport not reached, 실제 폭 1049000.0153m, providerActive=true / providerFailed=false, `VWasOverwritten=true`를 재현한다. 테스트 timeout만 180ms로 단축했으며 production old 코드의 종료 경로는 바꾸지 않았다. 실제 NAVER 내부에서 fit이 무시된 이유까지 이 mock이 증명하는 것은 아니다.
+
+기존 mock은 유효한 bounds를 받으면 결국 center/zoom/projection을 모두 적용했다. 이벤트 순서를 늦추는 검사는 있었지만 API 호출이 정상 반환하면서 영구 no-op/center-only/잘못된 scale이 되는 경우가 부족했다.
+
+### 명령과 V/선택 commit
+
+REQUEST(commandId, target/name, view, geographic bounds, ground scale, before snapshot) → PRIMARY(공식 fitBounds) → 실제 projection VERIFY → 500ms 미도착 시 REPAIR 1회 → VERIFY → FINALIZE 구조다. point(`fitGround`, dropdown, 항구/갯바위/좌표/관측소 검색)와 bounds(`fitBox`, 전국/해역 preset)를 명령 종류로 분리한다. **primary API는 두 종류 모두 기존 공식 LatLngBounds fitBounds를 유지한다.** 목표 중심·폭을 알고 있는 공통 repair에서 공식 `stop`, `setCenter(LatLng)`, `setZoom(zoom,false)`를 쓴다. 재생성·reload·무한 correction은 없다. API 계약은 [NAVER 공식 Map 문서](https://navermaps.github.io/maps.js.ncp/docs/naver.maps.Map.html)와 [이동 예제](https://navermaps.github.io/maps.js.ncp/docs/tutorial-Map.html)를 확인했다.
+
+repair zoom은 현재 표시 projection의 100m ground scale을 목표 위도로 환산하고 `displayedZoom + round(log2(desiredGroundScale / predictedTargetScale))`, 범위 6~21로 계산한다. 보고 zoom만 먼저 변하고 projection scale이 이전 값이면 이전 표시 zoom/scale 쌍을 사용한다. zoom 1단계가 약 2배라 최근접 정수 오차는 약 sqrt(2)배다. 실제 성공은 target이 SDK bounds 및 화면 안에 있고 중심 오차가 짧은 화면 변의 10% 이내(최소 2px), 실제 폭/요청 폭 0.5~2, 기존 corner occupancy 0.35~1.6, 변경된 projection이 두 프레임 같아야 한다. reported center의 2px 조건은 trace로 남기되 성공 gate에서 제외한다. 원래부터 같은 목표·축척인 명령은 idempotent 성공을 허용한다. 2.5km 요청의 1049km 화면은 폭 조건으로 통과할 수 없다.
+
+500ms는 정상 primary 지연(기존 2~12프레임과 신규 20프레임)을 기다리면서 기존 8초보다 일찍 no-op을 복구하는 유한 감시 경계다. 40프레임의 zoom 지연도 별도로 검사한다. 이는 mock 근거의 기본값이며 실 NAVER latency 측정값은 아니다. 8초 전체 명령 상한은 유지한다.
+
+성공한 SDK projection만 V/lastSettledView로 commit하고 base→UI/flow→A/B 재투영→reveal 순서를 유지한다. 실패는 `settledView:null`, actual center/width와 명시적 실패 안내를 남기며 성공한 V를 덮지 않는다. `navigationFailed` 동안 늦은 idle도 V를 성공 값으로 쓰지 못한다. 새 명령·실제 pointer/wheel/drag는 이 상태를 해제한다. fatal provider 전환도 새 flag를 정리한다.
+
+항구 dropdown과 검색의 선택/pin callback은 성공 때만 실행한다. 실패하거나 superseded된 항구를 선택한 것처럼 표시하지 않는다. 기존 선택과 실제 지도 중심이 서로 다른 경우 actual SDK 화면은 진단과 overlay의 투영 기준으로 유지되며 실패 안내에서 이동 실패와 현재 지도 폭을 밝힌다. 일반 사용자의 자유 pan은 이전처럼 선택 지점을 바꾸지 않는다.
+
+새 명령은 이전 timer/RAF를 취소한다. 모든 polling/repair/finalize는 `pendingCommand===c && commandId===c.id`로 제한하고 command 중 일반 providerReadView는 차단한다. SDK native 이벤트에는 generation이 없으므로 이벤트 자체를 새 명령의 성공 증거로 쓰지 않고 현재 실제 projection을 다시 검증한다. 늦은 idle/center/bounds/zoom/tilesloaded는 command generation이나 목표를 바꿀 수 없다.
+
+### 회귀 범위와 진단
+
+`tests/test_map_navigation.py`: 390×844 DPR 1/2, 1280×900 DPR 1.25/2. 각 조합 장봉항 광역→근접 100회, 장봉항→속초→포항→주문진→묵호→장봉항 100 cycle(600명령), fitBounds no-op 100회. 장봉항은 저장소 실제 좌표, 다른 해역은 기존 사용자 trace 좌표다. delayed/40프레임 지연, center-only, idle-before-zoom, late bounds, stale idle, inside-but-wrong-scale, unchanged key, rapid supersession, dropdown/이름/갯바위/좌표/관측소, 전국/동해안/남해안/서해안/제주/fitBox, drag/wheel/mode/tab/resize 직후 이동을 검사한다. 의도된 모든 API no-op 실패도 따로 검사한다.
+
+각 성공에서 실제 projection 도착·visibleWidth·provider 유지·명령 종료·overlay 공개, 실제 Marker DOM 중심 대 Canvas 자홍색 raster 오차 <=2 CSS px를 검사한다. 명령 중 moving heavy=0과 A/B 원좌표를 확인한다. 오늘 탭은 기존 설계상 예제 단면을 갱신하므로 탭 왕복의 의도된 A/B 변경 이후 navigation이 다시 보존하는지 구분한다. baseline 재생성은 하지 않는다.
+
+최종 집계는 `P3_NAVIGATION_RESULTS.json`에 기록한다. normal/nonfatal fallback 및 permanent hidden은 0이어야 한다. expected API no-op 실패와 unexpected 실패 횟수를 구분한다. mock 시간은 NAVER 실제 latency/체감 성능이 아니다.
+
+`naksigwangMapDiagnostic.lastNavigation()`은 ok/status/targetName/target/actualCenter/zoom/visibleWidthM/centerErrorM/usedRepair/providerActive/commandPending을 반환한다. 상세 last command에는 primary/no-op 감지/repair/total latency, requestedBounds, before/after, bounded trace가 있다. credential은 반환·로그하지 않는다.
+
+### 사용자 localhost 재검증 대기
+
+```cmd
+cd C:\Users\TJ-801\naksigwang
+git pull --rebase origin feat/p3-map-foundation
+python build.py
+python -m http.server 8000
+```
+
+http://localhost:8000/index.html#map 에서 Ctrl+Shift+R. 전국/광역에서 장봉항을 선택하고 근접 화면·km 폭인지 확인한다. 속초→포항→장봉항, drag/zoom 후 항구 선택, overlay 복원과 위성 유지를 확인한다. 마지막 콘솔 한 줄:
+
+```js
+naksigwangMapDiagnostic.lastNavigation()
+```
+
+실 NAVER 장봉항/포항 도착·체감 렉·잔상/drift는 **사용자 localhost 재검증 대기**다. P3 완료 또는 merge 가능으로 판정하지 않는다. SDK가 primary와 단 한 번의 공식 repair를 모두 무시하면 명령 실패를 명확히 남기며 강제 reload나 지도 재생성은 하지 않는다. 배경 영상의 구조물과 포인트 원자료 좌표 오차는 별도 한계다.
+
+
+### 이번 navigation 실행 결과 (headless/mock)
+
+- 4개 화면/DPR에서 반복 성공 3,296명령. 장봉항 광역→근접 400회, 원거리 400 cycle/2,400명령, fitBounds no-op 400회 모두 통과했다.
+- 추가 4조합 집중 실행에서 40프레임 지연·빠른 검색 supersession·근접 V를 남긴 all-API no-op 실패를 확인했다. 총 12개 의도된 실패는 성공 처리하지 않고 기존 선택/V를 보존했다. 예상 밖 navigation 실패 0.
+- 2.5km 요청 실제 폭 1,983.55~3,305.28m. 광역 1,049,000m는 성공하지 않았다. 실제 Marker DOM 대 Canvas raster 최대 0.22160 CSS px.
+- 반복 명령 중 repair 417/3,296(12.65%). no-op 주입 400회는 전부 repair 사용. 이 비율은 고의 장애를 포함한 테스트 구성 비율이며 실 NAVER 장애율이 아니다.
+- mock primary 관찰 지연 p50 70.2ms / p95 512.2ms, no-op/미도착 감지 p50 511.7ms / p95 513.8ms, repair p50 82.2ms / p95 84.1ms, total p50 70.2ms / p95 593.5ms / 최대 962.5ms. 감시 경계는 500ms이며 브라우저 프레임 지연으로 실제 감지는 더 늦을 수 있다(최대 906.1ms). native RAF/performance를 유지했고 실제 NAVER latency로 해석하지 않는다.
+- moving heavy/fallback/permanent hidden/pageerror 0. 기존 수심·A/B baseline은 재생성하지 않았다.
+
+검색 완료 안내와 외부 지도 링크도 선택/pin과 함께 성공 callback으로 확정한다. 관측소 fallback의 긴 일반 텍스트 안내가 PC 탭 클릭을 가로채던 문제는 안내에 pointer-events:none을 적용해 해결하고, 해당 안내가 남은 실제 버튼 클릭으로 모바일/PC 다섯 탭을 확인한다.
+
+오늘 탭 잠금 상태의 dropdown도 성공 전 선택 확정을 보류한다. 검색 성공 callback은 이미 완료한 이동을 다시 발행하지 않으므로 관측소/가까운 포인트 선택이 원래 검색 목표를 뒤늦게 덮지 않는다. 잠금 상태 all-API no-op 실패도 별도로 검사한다.
+
+
+### 최종 로컬 회귀와 변경 파일
+
+기존 CI 명령 12개(P0/P1/P2B/P2C, browser/degradation smoke 포함) 종료 0. provider 32결과(20 viewport/DPR, DPR3, SDK 실패6, 설정4, production 진단 비공개), health/settle 6조합, 성능 12조합, lifecycle 스트레스16조합/12,000동작 통과. moving heavy/depth prepare, nonfatal fallback/permanent hidden=0. A/B raster 최대 0.90139px, 성능 검사 native Marker 최대 0.44688px, 원본 301 sample baseline 동일. native mock FPS 51.03~60.35이며 실 NAVER 성능 보장이 아니다. Windows 병렬 초기 실행의 GE 준비 대기 30초 timeout은 provider/stress에서 각각 한 번 발생했고 최종 직렬 재실행은 통과했다. 최종 빌드 missing ids: [], LF/CRLF 일치 및 smoke 재확인. 마지막 잠금/검색 callback 변경은 집중4조합에서 다시 검사했다. GitHub Actions는 push한 새 SHA에서 별도 확인하고 결과를 PR #6 코멘트에 남긴다.
+
+이번 head 대비 변경15파일:
+- 앱/빌드: src/app/13_forecast.js, 15_view.js, 15b_map_provider.js, 15c_map_diagnostic.js, 21_input.js, src/template.html, index.html(빌드 생성)
+- 검사: tests/p3_provider_checks.js, p3_viewport_checks.js, p3_navigation_checks.js, test_map_navigation.py
+- 문서/기록: src/README.md, tests/P3_MAP_REPORT.md, tests/P3_NAVIGATION_RESULTS.json
+- CI: .github/workflows/ci.yml
+
+수심 보호 경로 static/depth/, src/app/04_depth.js, src/app/04b_depth_tiles.js, src/app/18_section.js, data/는 변경하지 않았다. KHOA 42 tiles/35,982 points, verticalDatum/provenance/cache 12/60,000/8MiB, land/extrapolation guards와 기존 fallback을 유지한다. 새로운 브랜치/PR/merge 없이 feat/p3-map-foundation / PR #6만 갱신한다.

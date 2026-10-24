@@ -100,6 +100,12 @@ async function providerMarkerDiagnostic(lat, lon, action) {
 if (PROVIDER_DEV_HOST) {
   window.naksigwangMapDiagnostic = (lat, lon) => lat === undefined && lon === undefined
     ? {...structuredClone(PROVIDER_MAP.diagnostic),measurement:'SDK 내부 일관성 검사',nativeMarkerMeasured:false} : providerMarkerDiagnostic(lat, lon);
+  window.naksigwangMapDiagnostic.lastNavigation = () => {
+    const p=PROVIDER_MAP,c=p.pendingCommand||p.lastCommand,a=p.adapter;
+    return {ok:c?.ok??false,status:p.commandPending?'pending':c?.navigationStatus??'none',targetName:c?.targetName??null,target:c?.target??null,
+      actualCenter:a?.unproject(cw/2,ch/2)??null,zoom:a?.getZoom()??null,visibleWidthM:a?cw/a.getGroundScale():null,centerErrorM:c?.centerErrorM??null,
+      usedRepair:c?.usedRepair??false,providerActive:p.active,commandPending:p.commandPending};
+  };
   window.naksigwangMapDiagnostic.clear = providerClearDiagnostic;
   // 같은 기준점을 남긴 채 명령 직후부터 8프레임을 기록한다.
   window.naksigwangMapDiagnostic.pan = (dx,dy,lat=38.20854,lon=128.5947) => {

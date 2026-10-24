@@ -64,8 +64,8 @@ ui.addEventListener('wheel', e => { if (providerUseNativePan() || S.lock) return
 stage.addEventListener('wheel',e=>{if(e.target===ui||!providerTransform()||providerUseNativePan()||S.lock)return;e.preventDefault();const [x,y]=local(e);zoomAt(x,y,Math.exp(-e.deltaY*.0016));},{passive:false});
 // 이동 모드에서는 SDK가 입력을 소유한다. 캡처 관찰은 hover와 짧은 탭 선택만 한다.
 let nativeTap=null;const nativePointers=new Set();
-stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;providerCancelViewCommand('interrupted');nativePointers.add(e.pointerId);nativeTap=nativePointers.size===1?local(e):null;},true);
-stage.addEventListener('wheel',()=>{if(providerUseNativePan())providerCancelViewCommand('interrupted');},true);
+stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;PROVIDER_MAP.navigationFailed=false;providerCancelViewCommand('interrupted');nativePointers.add(e.pointerId);nativeTap=nativePointers.size===1?local(e):null;},true);
+stage.addEventListener('wheel',()=>{if(providerUseNativePan()){PROVIDER_MAP.navigationFailed=false;providerCancelViewCommand('interrupted');}},true);
 stage.addEventListener('pointermove',e=>{if(providerUseNativePan())hoverAt=local(e);},true);
 stage.addEventListener('pointerup',e=>{if(!providerUseNativePan())return;const p=local(e);if(nativeTap&&Math.hypot(p[0]-nativeTap[0],p[1]-nativeTap[1])<6){const i=stationAt(...p);if(i!=null)selectPoint(i,cw/pxPerGround()>60000);}nativeTap=null;nativePointers.delete(e.pointerId);},true);
 stage.addEventListener('pointercancel',e=>{nativeTap=null;nativePointers.delete(e.pointerId);},true);
@@ -118,6 +118,10 @@ function findPlace(q) {
   for (const o of cands) { const sc = score(o) + (o.pt ? 0 : .5); if (sc < bs) { bs = sc; best = o; } }
   return bs < 9 ? best : null;
 }
+function navigateSearchPoint(lat,lon,width,name,commit) {
+  $('coordMsg').textContent='';
+  return fitGround(lat,lon,width,{targetName:name,onSuccess:commit});
+}
 $('coordForm').addEventListener('submit', e => {
   e.preventDefault();
   const q = $('coordIn').value.trim();
@@ -125,30 +129,29 @@ $('coordForm').addEventListener('submit', e => {
   if (n) {   // 숫자 두 개를 넣으면 예전처럼 좌표로 이동
     let lat = +n[1], lon = +n[2]; if (lat > 90) [lat, lon] = [lon, lat];
     if (lat < 32.5 || lat > 39 || lon < 123.8 || lon > 132.2) { $('coordMsg').textContent = '한국 연안 범위(북위 32.5~39°, 동경 124~132°)를 벗어났습니다.'; return; }
-    $('coordMsg').textContent = ''; S.pin = [mxOf(lon), myOf(lat)]; fitGround(lat, lon, 1500); return;
+    $('coordMsg').textContent = ''; navigateSearchPoint(lat,lon,1500,'좌표 검색',()=>{S.pin=[mxOf(lon),myOf(lat)];}); return;
   }
   const f = findPlace(q);
   if (!f) {
     const k = normName(q).replace(/항$/, ''), st = k && STATIONS.find(o => normName(o.name).startsWith(k));
     if (st) {   // 항구 자료에는 없지만 조석 관측소 이름과 같을 때: 관측소 근처(좌표 정밀도 약 0.1°)로 이동
       let j = 0, bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, st); if (d < bd) { bd = d; j = i; } });
-      selectPoint(j, false); S.pin = null; fitGround(st.lat, st.lon, 12000);
-      $('coordMsg').textContent = `'${q}'은(는) 불러온 항구 자료에 없어 ${st.name} 조석 관측소 부근(대략 위치)으로 이동했습니다.`;
+      navigateSearchPoint(st.lat,st.lon,12000,st.name,()=>{selectPoint(j,false,true);S.pin=null;$('coordMsg').textContent=`'${q}'은(는) 불러온 항구 자료에 없어 ${st.name} 조석 관측소 부근(대략 위치)으로 이동했습니다.`;});
       return;
     }
     $('coordMsg').textContent = `'${q}'을(를) 찾지 못했습니다. 불러온 항구·갯바위 자료에 없는 이름입니다.`; return;
   }
   if (f.rock) {   // 배로만 가는 갯바위: '배로만 가는 곳도 보기'를 켜고 그 포인트를 선택
     S.showBoat = true; $('showBoat').checked = true; buildPoints();
-    const k = POINTS.findIndex(q => q.kind === 'rock' && q.name === f.p.name && q.lat === f.p.lat); if (k >= 0) { selectPoint(k, false); S.pin = null; fitGround(f.p.lat, f.p.lon, 2500); $('coordMsg').textContent = '배로만 갈 수 있는 갯바위라 "배로만 가는 곳도 보기"를 켰습니다.'; dirty = true; return; }
+    const k = POINTS.findIndex(q => q.kind === 'rock' && q.name === f.p.name && q.lat === f.p.lat); if (k >= 0) { navigateSearchPoint(f.p.lat,f.p.lon,2500,f.p.name,()=>{selectPoint(k,false,true);S.pin=null;}); $('coordMsg').textContent = '배로만 갈 수 있는 갯바위라 "배로만 가는 곳도 보기"를 켰습니다.'; dirty = true; return; }
   }
   let j = f.i;
   if (!f.pt) { let bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, f.p); if (d < bd) { bd = d; j = i; } }); }
-  selectPoint(j, false);
-  S.pin = f.pt ? null : [f.p.mx, f.p.my];
-  fitGround(f.p.lat, f.p.lon, 2500);
-  $('coordMsg').textContent = f.pt ? '' : `${f.p.name}: 5 km 간격 포인트에 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
-  $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(f.p.name)},${f.p.lat.toFixed(6)},${f.p.lon.toFixed(6)}`;
+  navigateSearchPoint(f.p.lat,f.p.lon,2500,f.p.name,()=>{
+    selectPoint(j,false,true);S.pin=f.pt?null:[f.p.mx,f.p.my];
+    $('coordMsg').textContent=f.pt?'':`${f.p.name}: 5 km 간격 포인트에 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
+    $('kakaoLink').href=`https://map.kakao.com/link/map/${encodeURIComponent(f.p.name)},${f.p.lat.toFixed(6)},${f.p.lon.toFixed(6)}`;
+  });
 });
 $('toSec').addEventListener('click', () => {
   if (!S.A) return;
