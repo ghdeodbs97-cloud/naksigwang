@@ -5,6 +5,7 @@ function providerHealthSnapshot(){
   const pair=v=>Array.isArray(v)&&v.length===2&&v.every(Number.isFinite);
   if(!h.mapObjectPresent)return h;
   try{
+    a.refreshScreenOrigin?.();
     const center=a.getCenter(),zoom=a.getZoom(),bounds=a.getBounds();
     h.center=pair(center)?[...center]:null;h.zoom=Number.isFinite(zoom)?zoom:null;h.bounds=Array.isArray(bounds)&&bounds.length===2&&bounds.every(pair)?bounds.map(v=>[...v]):null;
     if(!h.center||h.zoom===null||!h.bounds)return h;

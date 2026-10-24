@@ -47,6 +47,8 @@ jobs:
         run: python tests/test_map_stress.py
       - name: P3 native pan 16조합·500회 drift·실제 draw stamp 회귀 (실 API 없음)
         run: python tests/test_map_pan.py
+      - name: P3 NAVER 내부 pane 이동·고정 Canvas 좌표 회귀 (실 API 없음)
+        run: python tests/test_map_pane.py
       - name: 빌드 결과 일치
         run: |
           python tests/test_build_consistency.py
