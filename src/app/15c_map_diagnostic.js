@@ -100,6 +100,13 @@ async function providerMarkerDiagnostic(lat, lon, action) {
 if (PROVIDER_DEV_HOST) {
   window.naksigwangMapDiagnostic = (lat, lon) => lat === undefined && lon === undefined
     ? {...structuredClone(PROVIDER_MAP.diagnostic),measurement:'SDK 내부 일관성 검사',nativeMarkerMeasured:false} : providerMarkerDiagnostic(lat, lon);
+  window.naksigwangMapDiagnostic.overlay = () => {
+    const p=PROVIDER_MAP,key=p.active&&!p.failed?providerViewportKey():null,sample=PROVIDER_DEBUG?providerProbeSample(PROVIDER_DEBUG,0):null;
+    return {visible:!stage.classList.contains('provider-moving')&&getComputedStyle(ui).visibility==='visible',providerActive:p.active,providerFailed:p.failed,providerMoving:p.providerMoving,gesture:p.gesture,commandPending:p.commandPending,nativePointers:nativePointers.size,
+      providerKey:key,renderedKey:RENDER.renderedProviderViewportKey??null,keysMatch:!!key&&providerRenderedViewportMatches(key),
+      markerMaxErrorPx:sample?.valid?sample.errorPx:null,markerMeasurement:sample?.valid?'현재 native DOM 대 Canvas 실제 픽셀':'기준점 미측정',
+      staleRevealCount:p.staleRevealCount||0,blockedReveals:p.blockedReveals||0,finalizations:p.finalViewportCount||0,generation:p.moveGeneration||0,lastFinalViewport:p.lastFinalViewport??null};
+  };
   window.naksigwangMapDiagnostic.lastNavigation = () => {
     const p=PROVIDER_MAP,c=p.pendingCommand||p.lastCommand,a=p.adapter;
     return {ok:c?.ok??false,status:p.commandPending?'pending':c?.navigationStatus??'none',targetName:c?.targetName??null,target:c?.target??null,

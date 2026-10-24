@@ -1,5 +1,25 @@
 // 15d_render_state.js — 용도별 렌더 무효화와 localhost 성능 계측
 const RENDER={uiKey:'',sectionKey:'',section:null,readKey:'',readSection:null,lastTab:'',lastSection:0,lastFlow:0,arrowKey:'',arrowStations:null,arrowCanvas:document.createElement('canvas')};
+// 최종 draw의 앞뒤 SDK 상태와 실제 사용한 V·backing 크기를 함께 보관한다.
+function providerPrepareDraw(){
+  const p=PROVIDER_MAP;
+  try{
+    if(p.active&&!p.failed&&!p.navigationFailed&&p.readViewportKey!==providerViewportKey()){
+      providerReadView();p.signature=p.readViewportKey;p.viewportDirty=false;
+    }
+    return true;
+  }catch(_){providerHandleProjectionFailure();return false;}
+}
+function providerDrawStamp(){
+  const p=PROVIDER_MAP;if(!p.active||p.failed)return null;
+  try{return {key:providerViewportKey(),view:JSON.stringify(V),generation:p.moveGeneration||0,size:JSON.stringify([cw,ch,DPR(),base.width,base.height,flow.width,flow.height,ui.width,ui.height])};}
+  catch(_){providerHandleProjectionFailure();return null;}
+}
+function providerCommitDrawStamp(start){
+  const end=providerDrawStamp();
+  if(start&&end&&JSON.stringify(start)===JSON.stringify(end)){RENDER.providerDrawStamp=end;RENDER.renderedProviderViewportKey=end.key;}
+  else {RENDER.providerDrawStamp=null;RENDER.renderedProviderViewportKey=null;}
+}
 const PERF_NAMES=['frame','providerSync','providerViewportKey','providerCheck','providerAlignment','renderBase','coastPath','structPath','updateHover','drawUI','drawCrnt','stepParticles','drawSection','stationRedraw','maskRebuild','getImageData','buildFlowField','particleRespawn'];
 const PERF={enabled:PROVIDER_DEV_HOST,start:performance.now(),counts:{},costs:{},frames:[],work:[],last:0,idleRecoveryMs:[],particleReductions:0,longTasks:[]};
 function perfCount(name){if(PERF.enabled)PERF.counts[name]=(PERF.counts[name]||0)+1;}

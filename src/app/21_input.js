@@ -62,12 +62,12 @@ ui.addEventListener('pointerleave', () => { hoverAt = null; setText('cursorRead'
 ui.addEventListener('wheel', e => { if (providerUseNativePan() || S.lock) return; e.preventDefault(); const [x, y] = local(e); zoomAt(x, y, Math.exp(-e.deltaY * .0016)); }, { passive: false });
 // 단면 모드에서 Canvas를 숨긴 짧은 이동 중에도 연속 wheel 입력을 받는다.
 stage.addEventListener('wheel',e=>{if(e.target===ui||!providerTransform()||providerUseNativePan()||S.lock)return;e.preventDefault();const [x,y]=local(e);zoomAt(x,y,Math.exp(-e.deltaY*.0016));},{passive:false});
-// 이동 모드에서는 SDK가 입력을 소유한다. 캡처 관찰은 hover와 짧은 탭 선택만 한다.
+// 이동은 SDK가 맡는다. 캡처에서 먼저 Canvas를 숨기고 hover와 짧은 탭을 관찰한다.
 let nativeTap=null;const nativePointers=new Set();
-stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;PROVIDER_MAP.navigationFailed=false;providerCancelViewCommand('interrupted');nativePointers.add(e.pointerId);nativeTap=nativePointers.size===1?local(e):null;},true);
-stage.addEventListener('wheel',()=>{if(providerUseNativePan()){PROVIDER_MAP.navigationFailed=false;providerCancelViewCommand('interrupted');}},true);
+stage.addEventListener('pointerdown',e=>{if(!providerUseNativePan())return;providerBeginNativeInput();nativePointers.add(e.pointerId);PROVIDER_MAP.gesture=true;PROVIDER_MAP.waitingIdle=true;nativeTap=nativePointers.size===1?local(e):null;},true);
+stage.addEventListener('wheel',()=>{if(providerUseNativePan()){providerBeginNativeInput();PROVIDER_MAP.gesture=true;PROVIDER_MAP.waitingIdle=true;providerArmGestureDeadline();}},true);
 stage.addEventListener('pointermove',e=>{if(providerUseNativePan())hoverAt=local(e);},true);
-stage.addEventListener('pointerup',e=>{if(!providerUseNativePan())return;const p=local(e);if(nativeTap&&Math.hypot(p[0]-nativeTap[0],p[1]-nativeTap[1])<6){const i=stationAt(...p);if(i!=null)selectPoint(i,cw/pxPerGround()>60000);}nativeTap=null;nativePointers.delete(e.pointerId);},true);
+stage.addEventListener('pointerup',e=>{if(!providerUseNativePan())return;const p=local(e);if(nativeTap&&Math.hypot(p[0]-nativeTap[0],p[1]-nativeTap[1])<6){PROVIDER_MAP.pendingTap=p;}nativeTap=null;nativePointers.delete(e.pointerId);},true);
 stage.addEventListener('pointercancel',e=>{nativeTap=null;nativePointers.delete(e.pointerId);},true);
 // SDK 종료 이벤트가 빠지거나 idle보다 늦어도 마지막 포인터 해제에서 안정화를 재개한다.
 function providerPointerFinished(e){nativePointers.delete(e.pointerId);if(!nativePointers.size&&PROVIDER_MAP.providerMoving){PROVIDER_MAP.gesture=false;PROVIDER_MAP.waitingIdle=false;providerQueueSettle();}}

@@ -683,3 +683,60 @@ naksigwangMapDiagnostic.lastNavigation()
 - CI: .github/workflows/ci.yml
 
 수심 보호 경로 static/depth/, src/app/04_depth.js, src/app/04b_depth_tiles.js, src/app/18_section.js, data/는 변경하지 않았다. KHOA 42 tiles/35,982 points, verticalDatum/provenance/cache 12/60,000/8MiB, land/extrapolation guards와 기존 fallback을 유지한다. 새로운 브랜치/PR/merge 없이 feat/p3-map-foundation / PR #6만 갱신한다.
+
+## Native pan 종료 정합·실제 draw stamp 보강
+
+이번 범위는 f8dda0c의 explicit navigation repair 이후 남은 native pan overlay drift다. 사용자는 이전 localhost에서 lastNavigation()의 ok:true/status:repaired를 확인했다. pan/zoom의 실제 성능·정합은 이번 변경을 사용자 PC에서 다시 확인해야 한다.
+
+### 원인과 변경
+
+이전 stage pointerdown은 포인터만 등록했고 SDK dragstart를 기다려 Canvas를 숨겼다. 따라서 SDK 렌더가 이벤트보다 먼저 움직이면 이전 Canvas가 그대로 보였다. 이전 reveal은 signature를 overlayStamp에 적을 뿐, 실제 base/UI가 그 viewport로 그려졌는지 증명하지 못했다. pan settle 성공도 providerSync/providerReadView 분기로 나뉘었다. zoom의 후속 invalidation/redraw가 좌표를 새로 읽으면 다시 맞아 보일 수 있었으나, 실 NAVER 내부 이벤트 순서 자체를 자동 테스트가 증명하는 것은 아니다.
+
+수정 후 pointerdown과 native wheel 캡처가 같은 JS task에서 base/flow/ui를 숨긴다. touch/pinch도 pointer 캡처를 사용한다. 짧은 tap의 hit test는 최종 draw 뒤 실행한다. 이동 중에는 SDK만 움직이며 이전 flow를 지우고 새 흐름장은 종료 후 다시 만든다. pointerup은 읽기를 예약하며 즉시 이전 projection을 확정하지 않는다.
+
+idle과 settle 성공/timeout은 providerFinalizeViewport로 합쳤다. 실제 SDK projection 중심·groundScale을 V에 읽고 signature를 맞춘다. 중복 idle은 진행 중인 유한 감시를 재시작하지 않는다. 초기 reported/projection 차이는 관찰하고 지속적인 작은 차이는 idle authority로 허용한다. RAF 감시는 최대 250ms/120프레임이며 정상 provider를 fallback시키지 않는다. 정지 상태에 무한 RAF SDK 감시를 추가하지 않았다.
+
+최종 draw 바로 전에도 live key와 마지막 읽기 key를 확인한다. 종료 읽기와 실제 draw 사이에 projection이 바뀌었으면 최신 V를 읽은 뒤 그린다. draw 앞뒤 key, 실제 V, 이동 generation, CSS 크기/DPR 및 세 Canvas backing 크기를 기록한다. base/UI/current/flow/section을 준비한 뒤 같은 stamp일 때만 reveal한다. mismatch면 hidden을 유지하며 이동 세대당 재읽기/redraw를 한 번 예약한다. 같은 세대에서 계속 불일치하면 공개하지 않고 다음 SDK 이벤트를 기다린다(무한 heavy 재시도 없음). SDK가 계속 변하는 상태에서 무조건 공개하는 대신 안전하게 숨기는 한계다.
+
+명시적 navigation의 실패 시 기존 V/선택 보존 정책은 유지한다. 이 경우 실제 SDK projection으로 그린 draw 앞뒤 stamp와 보존된 V가 일치해야 공개하며, 실패 viewport를 성공한 read/lastSettledView로 위장하지 않는다. 정상 pan은 반드시 최신 providerReadView와 draw V가 일치해야 공개한다.
+
+최종 stamp API가 draw 직후 예외를 내도 RAF를 끊지 않고 숨김 상태에서 기존 health 재검사를 진행한다. viewport 읽기는 필요한 SDK 값을 모두 얻은 뒤 V에 확정하므로 실패한 읽기가 V를 일부만 바꾸지 않는다. 새 회귀는 draw 종료 시점의 일시 API 예외도 직접 주입한다.
+
+### 검사 방법
+
+새 tests/test_map_pan.py는 4개 화면(390×844, 768×1024, 1280×900, 1920×1080) × DPR 1/1.25/1.5/2를 검사한다. 각 조합에서 pan100, dragstart/idle 누락·early idle·late dragend 각50, idle without dragend50, 강제 timeout10, pan→pan100, pan→zoom/zoom→pan/pan→장봉항/장봉항→pan 각50, 같은 항구 동서남북 pan500을 실행한다. pan 후 zoom 없이 1초 대기, 고의 draw stamp race, fitBounds no-op repair도 검사한다.
+
+기준점은 실제 장봉항 좌표다. 독립 mock native Marker DOM 중심과 Canvas 자홍색 실제 raster 중심을 비교한다. A/B는 최종 drawUI가 실제 Canvas arc에 넘긴 중심과 별도 native DOM 중심을 비교하며, 기존 성능 회귀는 실제 A/B raster 검사도 유지한다. 매 paint 기회마다 CSS와 live/rendered key를 독립 감사한다. 원본 301표본 baseline은 재생성하지 않는다. 실제 이전 f8dda0c 빌드를 같은 native pointerdown 검사에 넣으면 첫 프레임 숨김이 실패하는 것을 재현했다.
+
+CI에 native pan 전체 매트릭스를 추가했다. 기존 전체 검사를 생략하지 않으며, 새 장시간 매트릭스가 추가되어 job 상한을 60분에서 120분으로 늘렸다. 결과 수치는 실행 종료 뒤 아래에 기록한다. 모든 성능/오차 수치는 headless mock 측정이며 실 NAVER 결과가 아니다.
+
+### localhost 재검증 — 사용자 확인 대기
+
+```powershell
+cd C:\Users\TJ-801\naksigwang
+git pull --rebase origin feat/p3-map-foundation
+python build.py
+python -m http.server 8000
+```
+
+http://localhost:8000/index.html#map 에서 Ctrl+Shift+R. 근접 위성 항구 화면에서 확대/축소 없이 좌우 drag한다. 이동 중 overlay가 숨고 손을 놓으면 자동 복원되는지, zoom을 추가하지 않아도 항구/갯바위가 맞는지 확인한다. pan 10~20회 → 장봉항 선택 → 다시 pan, 위성 유지와 체감 렉을 확인한다. 콘솔 한 줄:
+
+```js
+naksigwangMapDiagnostic.overlay()
+```
+
+markerMaxErrorPx는 기존 native 기준점이 실제 측정될 때만 숫자이며, 기준점 미측정 시 null이다. credential/SDK 예외 URL은 반환하지 않는다. 실 NAVER pan 정합·잔상·drift·지연·체감 렉은 **사용자 localhost 재검증 대기**. P3 완료/merge 가능으로 판정하지 않으며 PR #6 Draft/미병합을 유지한다.
+
+
+### Native pan 최종 로컬 실행 결과
+
+- 새 pan 16조합: 정합 확인 21,840회, 같은 항구 동서남북 pan 8,000회. stale visible/permanent hidden/fallback/moving heavy/depth prepare 모두 0.
+- Marker DOM ↔ Canvas raster 최대 0.46506px. A/B 실제 Canvas arc 중심 ↔ 독립 DOM 최대 0.01703px. 기존 별도 A/B raster 검사 최대 0.90139px.
+- pointerup/dragend/idle → visible 최대 각각 183.4/183.0/183.0ms. 조합별 p95 최대 각각 111.6/112.0/112.1ms. 최종 base/UI 각 1회(고의 stamp/API 장애 복구는 별도).
+- 실제 watchdog 만료를 기다린 mock timeout 복구 최대 313.0ms, native 종료 이벤트 누락 복구 최대 292.2ms(강제 timeout과 구분).
+- 성능12조합 native mock FPS 50.41~60.11, moving heavy 0. 입자 budget/cache 유지.
+- navigation4조합 성공 3,304명령, 장봉항 광역→근접 400회, fitBounds no-op 400회 보정 통과. 최종 코드의 추가 집중4조합도 통과.
+- 기존 전체12명령, provider32결과, health6조합, 성능12조합, 기존 stress16조합/12,000동작, 새 pan16조합, 최종 build consistency/smoke 통과.
+- 초기 병렬 pan 실행은 최대653.7ms로 500ms 기준을 실패했다. 이를 통과로 세지 않았으며 위 수치는 최종 직렬 전체 실행 결과다. 실행 환경 부하만이 원인이라고 단정하지 않으며 실 사용자 성능은 별도 확인한다.
+
+이번 변경12파일: .github/workflows/ci.yml, index.html(생성), src/README.md, src/app/15b_map_provider.js, 15c_map_diagnostic.js, 15d_render_state.js, 21_input.js, 23_main.js, tests/P3_MAP_REPORT.md, P3_PAN_RESULTS.json, p3_pan_checks.js, test_map_pan.py. 수심 보호 경로/data/와 원본 301표본 baseline 무변경. 새 SHA의 Actions 결과는 PR #6 최종 코멘트에서 확인한다. 실 NAVER는 사용자 localhost 재검증 대기다.
