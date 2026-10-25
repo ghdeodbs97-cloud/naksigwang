@@ -15,6 +15,7 @@ jobs:
         if: startsWith(github.head_ref, 'feat/p3-')
         env:
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: python3 tests/p3_depth_guard.py "$PR_BASE_SHA"
       - uses: actions/setup-python@v6
         with:

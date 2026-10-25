@@ -56,6 +56,7 @@
 - 순수 바다의 301개 좌표·수심 결과 전체(기준면/출처 포함)와 실제 Canvas 수심 경로가 이전 빌드와 정확히 같다.
 - 원본 `p3_baseline.json`은 재생성하지 않았다. 새 상태 메타데이터를 제외한 기존 필드 전체로 비교한 원본 section hash `b682794bd45b25bda79f78ec05e290948b07bb75338bc7c076da4746a36db6af`가 동일하다.
 - 이번 요청이 단면 엔진/renderer 변경을 명시적으로 허용하므로 production guard에서 `18_section.js`만 허용했다. `static/depth/`, `04_depth.js`, `04b_depth_tiles.js` 보호는 유지하고 `data/` 보호를 추가했다.
+- guard는 PR base와 명시적 PR head를 비교한다. GitHub 임시 merge에 포함된 main의 자동 수집 갱신을 PR 수정으로 잘못 세지 않는다. 첫 CI의 이 비교 오류는 수정했으며 production 차단 경로는 줄이지 않았다.
 
 ## 한계
 
