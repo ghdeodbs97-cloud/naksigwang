@@ -4,9 +4,10 @@ from pathlib import Path
 import subprocess
 from depth_probe import PROBE,run
 from p3_baseline import CHECK
+from p3_history import before_added
 
 ROOT=Path(__file__).resolve().parent.parent
-REF='1ea95e6e9b81530172add863ed925ed1800d51f9'
+REF=before_added('src/app/15d_render_state.js')
 results={}
 for label in ['before','after']:
     def source(name):

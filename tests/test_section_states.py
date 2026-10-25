@@ -5,12 +5,14 @@ import subprocess
 import sys
 from pathlib import Path
 from depth_probe import PROBE, run
+from p3_history import before_added
 
 ROOT=Path(__file__).resolve().parent.parent
 (ROOT/'test-output').mkdir(exist_ok=True)
 probe=PROBE+(ROOT/'tests/section_state_checks.js').read_text(encoding='utf-8')
 previous='--previous' in sys.argv
-old_html=subprocess.check_output(['git','show','626488970a88adac06761bf5416aa79085b70de9:index.html']).decode('utf-8')
+baseline_ref=before_added('src/app/17b_section_surface.js')
+old_html=subprocess.check_output(['git','show',baseline_ref+':index.html']).decode('utf-8')
 html=old_html if previous else None
 def routes(page):page.route('https://**/*',lambda r:r.abort())
 if previous:

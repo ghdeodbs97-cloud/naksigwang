@@ -10,12 +10,14 @@ from playwright.sync_api import sync_playwright
 from p3_native_clock import fixed_date_script
 from depth_probe import PROBE
 from p3_baseline import CHECK
+from p3_history import before_added
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'test-output/p3-pane'
 OUT.mkdir(parents=True, exist_ok=True)
 previous = '--previous' in sys.argv
-html = subprocess.run(['git', 'show', '5456d322a1a49a6708ad9b8e05e537727f7d67ca:index.html'], capture_output=True, encoding='utf-8', check=True).stdout if previous else (ROOT / 'index.html').read_text(encoding='utf-8')
+previous_ref = before_added('tests/p3_pane_checks.js') if previous else None
+html = subprocess.run(['git', 'show', previous_ref+':index.html'], capture_output=True, encoding='utf-8', check=True).stdout if previous else (ROOT / 'index.html').read_text(encoding='utf-8')
 probe = PROBE + CHECK + ''.join((ROOT / 'tests' / name).read_text(encoding='utf-8') for name in ['p3_provider_checks.js', 'p3_pane_checks.js'])
 pos = html.rindex('\n})();')
 html = html[:pos] + probe + html[pos:]
@@ -41,7 +43,7 @@ try:
                         page.evaluate('p3PaneTest()')
                     except Exception as error:
                         assert '실제 adapter pane DOM 중심 정합' in str(error), str(error)
-                        print('이전 5456d32 실제 빌드의 pan 좌표 실패 재현: ' + str(error).splitlines()[0], flush=True)
+                        print('이전 '+previous_ref[:7]+' 실제 빌드의 pan 좌표 실패 재현: ' + str(error).splitlines()[0], flush=True)
                         page.close()
                         continue
                     raise AssertionError('이전 빌드에서 같은 pan 좌표 오류를 재현하지 못함')
