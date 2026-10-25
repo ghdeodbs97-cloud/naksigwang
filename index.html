@@ -3403,7 +3403,8 @@ function analyzeSection() {
   const cross = [];
   for (let k = 1; k <= N; k++) if (pts[k].land&&sectionSampleIsWater(pts[k-1])||pts[k-1].land&&sectionSampleIsWater(pts[k])) cross.push(k);
   const transitions=[];for(let k=1;k<=N;k++)if(pts[k].state!==pts[k-1].state)transitions.push({index:k,from:pts[k-1].state,to:pts[k].state,distanceM:pts[k].s});
-  SEC = { pts, L, cross, N,transitions,surfaceIntervals:surface.intervals.map(r=>({...r,startM:r.a*L,endM:r.b*L})) };
+  const distanceAt=f=>{const v=clamp(f,0,1)*N,i=Math.min(N-1,Math.floor(v));return pts[i].s+(pts[i+1].s-pts[i].s)*(v-i);};
+  SEC = { pts, L, cross, N,transitions,surfaceIntervals:surface.intervals.map(r=>({...r,startM:distanceAt(r.a),endM:distanceAt(r.b)})) };
   SEC.blockedEdges=Array.from({length:N+1},(_,k)=>sectionEdgeBlocked(SEC,k));SEC.waterRuns=sectionWaterRuns(SEC);
   SEC.prof = profileFeatures(SEC);
   renderSecInfo();
@@ -3559,7 +3560,7 @@ function drawSection(now, tide) {
   if (S.secHover != null) {
     const k = Math.round(S.secHover * N), x = xk(k), p = pts[k];
     sctx.strokeStyle = 'rgba(255,255,255,.6)'; sctx.lineWidth = 1; sctx.beginPath(); sctx.moveTo(x, mt); sctx.lineTo(x, h - mb); sctx.stroke();
-    const interval=SEC.surfaceIntervals.find(r=>r.state!=='water'&&S.secHover>=r.a&&S.secHover<=r.b),hoverState=interval?.state||p.state,classification=interval||p.classification;
+    const interval=SEC.surfaceIntervals.find(r=>r.state!=='water'&&S.secHover*L>=r.startM&&S.secHover*L<=r.endM),hoverState=interval?.state||p.state,classification=interval||p.classification;
     const lines = ['A에서 ' + fmtD(S.secHover*L), SECTION_STATE[hoverState]];
     if (hoverState==='water'&&sectionSampleIsWater(p)) { const q = p.r; lines.push((q.type === 'est' ? '추정 수심 ' : '수심 ') + fmtDepth(q), '출처 ' + (q.label || DTYPES[q.type].label), '신뢰도 ' + q.conf); }
     else {lines.push(hoverState==='unknown'?'수심을 연결하지 않음':'고도·수심 미측정',classification.source);if(classification.confidence==='point_location_only')lines.push('위치점 주변만 판정·범위 미확인');}

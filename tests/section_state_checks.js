@@ -8,12 +8,12 @@ window.sectionStateTest=({onlyWater=false}={})=>{
   scheduleDepthArea=()=>{};S.autoShore=false;S.playing=false;
   const validDepth=(x,y)=>depthResult({depth:10+(x-x0)/scale/100,type:'survey',verticalDatum:'test_datum',datasetId:'test_survey',conf:'높음',res:1});depthQuery=validDepth;
   const state=p=>p.state||(p.land?'land':'water'),results=[];let waterGolden=null;
-  const run=(name,setup,expected)=>{coast=[];LOD.full=coast;OSM.list=[];ROCKS.length=0;Object.assign(STRUCT,{lines:[],polys:[],seg:[],idx:new Map(),n:0,nb:0});depthQuery=validDepth;setup();S.A=xy(0,0);S.B=xy(300,0);analyzeSection();check(SEC.pts.length===301,name+' 301개 보존');for(const [index,want] of expected)check(state(SEC.pts[index])===want,name+' '+want+' sample '+index+' 실제 '+state(SEC.pts[index]));
+  const run=(name,setup,expected,end=[300,0])=>{coast=[];LOD.full=coast;OSM.list=[];ROCKS.length=0;Object.assign(STRUCT,{lines:[],polys:[],seg:[],idx:new Map(),n:0,nb:0});depthQuery=validDepth;setup();S.A=xy(0,0);S.B=xy(...end);analyzeSection();check(SEC.pts.length===301,name+' 301개 보존');for(const [index,want] of expected)check(state(SEC.pts[index])===want,name+' '+want+' sample '+index+' 실제 '+state(SEC.pts[index]));
     for(const p of SEC.pts)if(p.state&&p.state!=='water')check(p.r===null&&p.depthM===null,'비수중 구간 수심 없음');
     const paths=[];let path=[];const move=sctx.moveTo,line=sctx.lineTo,stroke=sctx.stroke;sctx.moveTo=function(x,y){path=[[x,y]];return move.call(this,x,y);};sctx.lineTo=function(x,y){path.push([x,y]);return line.call(this,x,y);};sctx.stroke=function(...args){if(Math.abs(this.lineWidth-2.8)<.001)paths.push(path.slice());return stroke.apply(this,args);};
     try{drawSection(0,getTide());}finally{sctx.moveTo=move;sctx.lineTo=line;sctx.stroke=stroke;}
     check(!SEC.pts.some(p=>state(p)==='water')||paths.length>0,'바다 수심 stroke가 실제로 그려짐 '+name);
-    if(SEC.surfaceIntervals)for(const path of paths)for(let i=1;i<path.length;i++){const a=(path[i-1][0]-50)/(sw-64),b=(path[i][0]-50)/(sw-64);check(!SEC.surfaceIntervals.some(r=>r.state!=='water'&&r.a<Math.max(a,b)-1e-9&&r.b>Math.min(a,b)+1e-9),'수심 stroke가 비수중 구간을 연결하지 않음 '+name);}
+    if(SEC.surfaceIntervals)for(const path of paths)for(let i=1;i<path.length;i++){const a=(path[i-1][0]-50)/(sw-64),b=(path[i][0]-50)/(sw-64);check(!SEC.surfaceIntervals.some(r=>r.state!=='water'&&r.startM/SEC.L<Math.max(a,b)-1e-9&&r.endM/SEC.L>Math.min(a,b)+1e-9),'수심 stroke가 비수중 구간을 연결하지 않음 '+name);}
     if(name==='전부 바다')waterGolden={positions:SEC.pts.map(p=>[p.mx,p.my,p.s]),depthResults:SEC.pts.map(p=>p.r),depthPaths:paths};
     results.push({name,states:[...new Set(SEC.pts.map(state))],samples:SEC.pts.length,waterStrokes:paths.length,...(['바다→갯바위→바다','바다→방파제→바다','암초 노출 여부 미확인'].includes(name)?{image:sec.toDataURL('image/png')}:{})});return SEC;
   };
@@ -30,6 +30,7 @@ window.sectionStateTest=({onlyWater=false}={})=>{
   run('다각형 구멍',()=>{const o=poly('br',100,160);o.R.push(rect(120,140));OSM.list.push(o);},[[110,'rock_exposed'],[130,'water'],[150,'rock_exposed']]);
   run('겹친 지형 우선순위',()=>{coast.push(rect(90,170));OSM.list.push(poly('br',100,160));addStructLine([xy(130,-10),xy(130,10)],false,false);},[[95,'land'],[110,'rock_exposed'],[130,'breakwater']]);
   run('암반 경계와 나란한 단면',()=>{const o=poly('br',100,130);o.R=[ring([[100,0],[130,0],[130,10],[100,10]])];OSM.list.push(o);},[[115,'rock_exposed']]);
+  const diagonal=run('비스듬한 단면의 거리축',()=>{const o=poly('br',100,130);o.R=[ring([[100,-1000],[130,-1000],[130,1000],[100,1000]])];OSM.list.push(o);},[[50,'water'],[115,'rock_exposed'],[200,'water']],[300,300]);const boundary=diagonal.surfaceIntervals.find(r=>r.state==='rock_exposed');check(Math.abs(boundary.startM-diagonal.pts[100].s)<1e-6&&Math.abs(boundary.endM-diagonal.pts[130].s)<1e-6,'교차 경계와 샘플 누적 지상거리 정합');
   const saveGE=GE,saveModel=modelDepth;GE=null;modelDepth=()=>null;try{run('수심 자료 없음',()=>{depthQuery=()=>null;},[[150,'unknown']]);}finally{GE=saveGE;modelDepth=saveModel;}
   return results;
 };

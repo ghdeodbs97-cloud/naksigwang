@@ -6,9 +6,9 @@
   "sampleCountPolicyUnchanged": true,
   "sourceHashesLF": {
     "src/app/17b_section_surface.js": "16d7debfb3c1b9bfeb192ff353c4cd08f5107d03e4e4571817fd026d1610391f",
-    "src/app/18_section.js": "a9ad86563c831702ade57ad0ac8c8317dc317ea903997e745bfcef330a380da8",
+    "src/app/18_section.js": "1f290023c5427690e6974fb6ef22e9e9cf9f65d28a974eb1ed030e4b15fb01cf",
     "src/app/20_readouts.js": "432cdd65624cc57a9d991dcbed647b442324855ea2cf78880b21e005b4336d0c",
-    "tests/section_state_checks.js": "4068493793520d1405ce9d580e78c87052ba37eba90be2e738e069cb64116a31",
+    "tests/section_state_checks.js": "c7f7113b36ae059c87d654abeebdff6fff55d2e679877349d5580c2cba8c9238",
     "tests/test_section_states.py": "bc6f5d748b0209b8e1cf3d09f337a668021241bf87471692eb27e553765a6fd9"
   },
   "results": [
@@ -110,6 +110,15 @@
         },
         {
           "name": "암반 경계와 나란한 단면",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "비스듬한 단면의 거리축",
           "states": [
             "water",
             "rock_exposed"
@@ -226,6 +235,15 @@
         },
         {
           "name": "암반 경계와 나란한 단면",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "비스듬한 단면의 거리축",
           "states": [
             "water",
             "rock_exposed"
