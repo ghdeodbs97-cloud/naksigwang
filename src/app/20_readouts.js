@@ -27,7 +27,7 @@ function updateReadouts(tide) {
   setText('nextHW', fmtE(nh)); setText('nextLW', fmtE(nl));
   if (SEC) {
     setText('sLen', fmtD(SEC.L)); setText('sCross', SEC.cross.length + '곳');
-    let md = null, sea = 0, me = 0; for (const p of SEC.pts) if (!p.land) { sea++; if (isPub(p.r.type)) me++; if (!md || p.r.depth > md.depth) md = p.r; } setText('sMax', md ? fmtDepth(md) + (md.type === 'est' ? ' (추정)' : md.type === 'gebco' ? ' (GEBCO)' : '') : '—'); setText('sMeas', sea ? Math.round(me / sea * 100) + '%' : '—');
+    let md = null, sea = 0, me = 0; for (const p of SEC.pts) if (sectionSampleIsWater(p)) { sea++; if (isPub(p.r.type)) me++; if (!md || p.r.depth > md.depth) md = p.r; } setText('sMax', md ? fmtDepth(md) + (md.type === 'est' ? ' (추정)' : md.type === 'gebco' ? ' (GEBCO)' : '') : '—'); setText('sMeas', sea ? Math.round(me / sea * 100) + '%' : '—');
   } else { setText('sLen', '—'); setText('sCross', '—'); setText('sMax', '—'); setText('sMeas', '—'); }
   setText('sTide', Math.round(tide.cm) + ' cm (' + STATIONS[S.st].name + ', 기본수준면 기준)');
 }

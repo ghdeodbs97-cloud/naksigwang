@@ -34,6 +34,8 @@ window.p3Baseline=async()=>{
 '''
 def compact(result):
     section=result['section']
+    # 상태 메타데이터 추가 후에도 기존 샘플 좌표·수심·datum/provenance를 같은 원본 hash로 비교한다.
+    section['pts']=[{key:p[key] for key in ['mx','my','s','land','dG','r']} for p in section['pts']]
     result['section']={'A':section['A'],'B':section['B'],'samples':len(section['pts']),
         'sha256':hashlib.sha256(json.dumps(section,ensure_ascii=False,sort_keys=True).encode()).hexdigest()}
     return result

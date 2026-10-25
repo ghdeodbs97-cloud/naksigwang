@@ -39,7 +39,8 @@
 | `15f_provider_health.js` | 타일 오류 계측·SDK API 상태 확인·3회 제한 재확인·비치명적 settle timeout·기존 지도 인스턴스 복구 | 가변 | `providerHealthSnapshot`, `providerRecordTileError`, `providerTileErrorsLast10s`, `providerCancelHealthCheck`, `providerHandleProjectionFailure`, `providerScheduleHealthCheck`, `providerTryRecover`, `providerSettleTimeout`, `providerModeTimeout` |
 | `16_terrain.js` | GEBCO 배경·idle 수심 범위 요청, viewport별 해안 Path·mask 캐시 | 가변 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
 | `17_flow.js` | 조류: 해안 방향장·예보 흐름장·측정 시간 기반 입자 예산·이동 중 정지·화살표 | 102 | `buildFlowField`, `realField`, `spawn`, `stepParticles`, `drawCrnt` |
-| `18_section.js` | KHOA 출처를 보존하는 A→B 단면, 기준면 경계의 특징분석 중단 | 가변 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
+| `17b_section_surface.js` | 단면 샘플의 바다·육상·구조물·암반·미확인 분류, 다중 교차와 샘플 사이 짧은 형상 보호 | 가변 | `sectionSurfaceContext`, `classifySectionSample`, `sectionPointInRings`, `sectionSampleIsWater`, `sectionEdgeBlocked`, `sectionWaterRuns` |
+| `18_section.js` | KHOA 출처를 보존하는 A→B 단면, 비수중 구간에서 곡선·채움·특징분석 중단 | 가변 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
 | `18b_shore.js` | 실제 해안 교차가 있을 때만 해안 종류 판정 | 가변 | `osmDist`, `enclosed`, `classifyShore`, `setShore`, `autoShore` |
 | `19_overlay.js` | 평면도 위 표시(자료 좌표에서 투영한 단면선·단면 표식·핀) | 가변 | `drawUI` |
 | `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |

@@ -35,6 +35,8 @@ jobs:
         run: python build.py
       - name: 기본 브라우저 검사
         run: python tests/smoke.py
+      - name: A-B 상태 분류·다중 지형 교차·수심 곡선 단절 회귀
+        run: python tests/test_section_states.py
       - name: P3 지도 어댑터·모바일·DPR 회귀 (실 API 없음)
         run: python tests/test_map_provider.py
       - name: P3 장봉항 explicit navigation·no-op 보정 회귀 (실 API 없음)
