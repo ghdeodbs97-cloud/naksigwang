@@ -38,14 +38,14 @@ function renderToday() {
   $('tdCur').innerHTML = fu.real ? (fu.r.sp * KN < .2 ? `물돌이 무렵<small>${fu.nc.c.name} 예보 지점</small>` : `${dirName16(fu.r.dir)}쪽 ${(fu.r.sp * KN).toFixed(1)} kn<small>${fu.nc.c.name} 예보 지점 ${fu.nc.km.toFixed(0)} km</small>`) : `${Math.round(Math.abs(u) * 100)}%<small>조류 예보 지점 없음 · 바닷물 높이로 추정</small>`;
   $('tdSun').innerHTML = `${fmtH(sr)} ~ ${fmtH(ss)}<small>해 뜸 ~ 해 짐</small>`;
   // 어종별 오늘 지수
-  const rows = FISH.map((f, i) => { const arr = Array.from({ length: 24 }, (_, hh) => biteAt(f, pt, st, day, hh)); const mx = Math.max(...arr); return { f, i, arr, mx, best: arr.indexOf(mx) }; }).sort((a, b) => b.mx - a.mx);
+  const rows = FISH.filter(fishHasBiteModel).map((f, i) => { const arr = Array.from({ length: 24 }, (_, hh) => biteAt(f, pt, st, day, hh)); const mx = Math.max(...arr); return { f, i, arr, mx, best: arr.indexOf(mx) }; }).sort((a, b) => b.mx - a.mx);
   const bestH = Array.from({ length: 24 }, (_, hh) => Math.max(...rows.map(o => o.arr[hh])));
   TD = { st, day, sr, ss, bestH, h };
   const top = rows.filter(o => o.mx > 0).slice(0, 4);
   $('tdBest').innerHTML = top.length ? top.map(o => {
     const ranges = goodHourRanges(o.arr), [lv, cls] = level(o.mx);
     const when = ranges ? `${ranges} 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
-    return `<li class="${cls}"><span class="pic">${fishSVG(o.f.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}점<small>${lv}</small></span></li>`;
+    return `<li class="${cls}"><span class="pic">${fishPicture(o.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}점<small>${lv}</small></span></li>`;
   }).join('') : '<li class="empty">오늘은 지수가 나오는 어종이 없습니다.</li>';
   drawToday();
 }

@@ -36,7 +36,7 @@ window.__p1ExpirySetup = () => {
 };
 window.__p1ExpirySnapshot = () => {
   const p = POINTS[S.pt], st = STATIONS[S.st];
-  const evaluations = FISH.map(f => ({ name: f.n, ev: biteEvalAt(f, p, st, S.day, Math.floor(S.t)) }));
+  const evaluations = FISH.filter(fishHasBiteModel).map(f => ({ name: f.n, ev: biteEvalAt(f, p, st, S.day, Math.floor(S.t)) }));
   const cards = [...$('fishGrid').children];
   return { calls: refreshCalls, t: S.t, evaluations, matches: evaluations.every(({ name, ev }) => {
     const card = cards.find(c => c.querySelector('.fn').firstChild.textContent === name);

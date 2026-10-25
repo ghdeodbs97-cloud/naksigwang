@@ -32,6 +32,7 @@ function biteTemperature(fish, p, st, day = 0) {
 // 내 조황 기록 보정: 같은 해역에서 기록한 출조 중 그 어종을 잡은 비율을, 모델 기대치(시즌×해역)와 섞어 0.5~1.5배로 반영
 let CATCHES = [];
 function myF(fish, st) {
+  if (!fishHasBiteModel(fish)) return { f: null, n: 0, hit: 0 };
   const reg = st.region, trips = new Map();
   for (const c of CATCHES) if (c.region === reg) { const k = c.date + '|' + c.pt; if (!trips.has(k)) trips.set(k, new Set()); if (c.count > 0) trips.get(k).add(c.species); }
   const n = trips.size; if (!n) return { f: 1, n: 0, hit: 0 };
@@ -42,6 +43,7 @@ function myF(fish, st) {
 // 확률이 아닌 조건점수: 기본 적합도 50점 + 알려진 조건의 기여분.
 // 누락 원천의 기여분은 0이며 확보 여부는 자료 신뢰도에서 별도로 평가한다.
 function biteEvalAt(fish, pt, st, day, h) {
+  if (!fishHasBiteModel(fish)) return { modelStatus: 'provisional', score: null, rawScore: null, confidence: null, confidenceLevel: '미설정', factors: [], sources: {} };
   const p = pt || st, weak = weakTide(st), env = weak ? 1.25 : 1;
   const wx = wxAt(st, day, h + .5, pt), temperature = biteTemperature(fish, p, st, day);
   const fu = flowU(st, pt, day, day * 24 + h + .5), [sr, ss] = sunTimes(p.lat, p.lon, day);
@@ -71,6 +73,7 @@ function biteEvalAt(fish, pt, st, day, h) {
 }
 function biteAt(fish, pt, st, day, h) { return biteEvalAt(fish, pt, st, day, h).score; }
 function biteReasons(ev) {
+  if (ev.modelStatus === 'provisional') return '입질 계산 기준 미설정';
   if (ev.score === 0) return '시즌·해역 기준에 맞지 않음';
   const relevant = ev.factors.filter(f => !['base', 'catch'].includes(f.key));
   const positive = relevant.filter(f => f.effect > .05).sort((a, b) => b.effect - a.effect);
@@ -92,14 +95,14 @@ function renderBite() {
   biteDataMinute = Math.floor(Date.now() / 60000);
   $('biteSub').textContent = `${pt ? pt.name : st.name} · ${d.date.slice(5).replace('-', '/')} ${String(H).padStart(2, '0')}시 · ${d.mul}`;
   const [sr, ss] = sunTimes(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon, S.day);
-  const rows = FISH.map((f, i) => { const arr = Array.from({ length: 24 }, (_, h) => biteAt(f, pt, st, S.day, h)); const best = arr.indexOf(Math.max(...arr)); return { f, i, arr, p: arr[H], best, ev: biteEvalAt(f, pt, st, S.day, H) }; }).sort((a, b) => b.p - a.p || b.arr[b.best] - a.arr[a.best]);
+  const rows = FISH.filter(fishHasBiteModel).map((f, i) => { const arr = Array.from({ length: 24 }, (_, h) => biteAt(f, pt, st, S.day, h)); const best = arr.indexOf(Math.max(...arr)); return { f, i, arr, p: arr[H], best, ev: biteEvalAt(f, pt, st, S.day, H) }; }).sort((a, b) => b.p - a.p || b.arr[b.best] - a.arr[a.best]);
   BITE_H = { sr, ss, best: Array.from({ length: 24 }, (_, h) => { let b = null; for (const r of rows) if (!b || r.arr[h] > b.p) b = { p: r.arr[h], n: r.f.n }; return b; }) };
   const top = rows.filter(r => r.arr[r.best] >= 60);
   $('biteWin').textContent = `해 뜸 ${fmtH(sr)} · 해 짐 ${fmtH(ss)} · ` + (top.length ? '오늘 "높음"이 나오는 시간: ' + top.slice(0, 4).map(r => `${r.f.n} ${String(r.best).padStart(2, '0')}시`).join(', ') : '오늘은 "높음"이 나오는 시간이 없습니다.');
   $('fishGrid').innerHTML = rows.map(({ f, i, arr, p, best, ev }) => {
     const [lv, cls] = level(p);
-    return `<div class="fish ${cls}"><div class="pic">${fishSVG(f.f, i)}</div><div class="fn">${f.n}<span class="lt">${LIGHT_NAME[LIGHT[f.n]]}</span></div><div class="fp"><b>${p}점</b><span class="lv ${cls}">${lv}</span></div>${spark(arr, H)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}점</div><p class="biteConfidence">자료 신뢰도 ${ev.confidenceLevel}</p><p class="biteReasons">${biteReasons(ev)}</p></div>`;
-  }).join('');
+    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${LIGHT_NAME[LIGHT[f.n]]}</span></div><div class="fp"><b>${p}점</b><span class="lv ${cls}">${lv}</span></div>${spark(arr, H)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}점</div><p class="biteConfidence">자료 신뢰도 ${ev.confidenceLevel}</p><p class="biteReasons">${biteReasons(ev)}</p></div>`;
+  }).join('') + FISH.filter(f => !fishHasBiteModel(f)).map((f, i) => `<div class="fish provisional"><div class="pic">${fishPicture(f, 'new' + i)}</div><div class="fn">${f.n}</div><div class="fp"><b>—</b><span class="lv">미설정</span></div><p class="fishModelNote">입질 계산 기준 미설정 · 추천 순위 제외${f.aliasOf ? `<br>${f.aliasOf}과 같은 어종` : ''}</p></div>`).join('');
   if (pt && pt.kind === 'rock') $('rockInfo').innerHTML = rockInfoHTML(pt); else $('rockInfo').innerHTML = '';
   if (typeof renderBasis === 'function') renderBasis();
   if (typeof renderToday === 'function') renderToday();

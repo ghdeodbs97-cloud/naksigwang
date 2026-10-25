@@ -59,6 +59,8 @@ jobs:
         run: python tests/smoke_degradation.py
       - name: 입질 조건·자료 신뢰도 회귀
         run: python tests/test_bite_confidence.py
+      - name: 어종 실사 사진·미설정 모델·모바일/PC 회귀
+        run: python tests/test_fish_photos.py
       - name: 수심 GIS 변환 회귀
         run: python tests/test_depth_converter.py
       - name: 수심 자료 기반 브라우저 회귀
