@@ -36,7 +36,7 @@ for (const n of Object.keys(FISH_PHOTOS)) if (!FISH.some(f => f.n === n)) {
 }
 for (const fish of FISH) fish.image = `static/fish/${FISH_PHOTOS[fish.n]}.webp`;
 function fishHasBiteModel(fish) {
-  return fish.modelStatus !== 'provisional' && Number.isFinite(fish.season) && Array.isArray(fish.reg) && fish.reg.length === 4 && fish.reg.every(Number.isFinite) && Number.isFinite(fish.cur);
+  return !!fish.ecology || fish.modelStatus !== 'provisional' && Number.isFinite(fish.season) && Array.isArray(fish.reg) && fish.reg.length === 4 && fish.reg.every(Number.isFinite) && Number.isFinite(fish.cur);
 }
 function fishPicture(fish, id) {
   const fallback = fishSVG(fish.f || { h: .3, top: '#5f7586', bot: '#e5eaee', tail: 'fork' }, id);

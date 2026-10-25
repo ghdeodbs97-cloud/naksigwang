@@ -505,7 +505,7 @@ details.more[open] summary{margin-bottom:12px}
     <div class="fishGrid" id="fishGrid"></div>
       <details class="basis">
       <summary>입질 지수는 어떻게 계산하나요?</summary>
-      <p class="note">입질 조건은 실제 잡힐 확률이 아닌 규칙 기반 0~99점입니다. 시즌(현재 10월 기준)·해역·대상어 적합도를 기본 50점에 반영하고 시간대(−9~+15점), 수온(−24~+8점), 풍속(−24~+12점), 파고(−20~+10점), 물때와 흐름의 기여분을 더합니다. 마지막에 내 조황기록 보정(0.5~1.5배)을 적용합니다. 각 계수는 조과 통계로 검증되지 않은 가정입니다. 수온은 선택 포인트에서 50 km 안의 가장 가까운 24시간 이내 실측을 사용하며 멀거나 오래되거나 미래 날짜를 볼수록 영향이 약해집니다. 어종별 수온 범위는 FishBase의 AquaMaps 모델값이며 한국 연안에 맞지 않는 4종은 적용하지 않습니다. 풍속 7 m/s, 파고 1 m를 중립으로 삼아 연속적으로 반영합니다. 조차가 60 cm 미만이면 환경 기여도를 1.25배로, 조석과 추정 흐름 기여도를 0.15배로 합니다. 15 km 안 실제 조류 예보가 있으면 우선 사용합니다. <b>자료 없음은 점수에 중립이며 신뢰도를 낮춥니다.</b> 자료 신뢰도는 수온 거리·시각, 기상 격자·발표 시각, 파고, 실제 조류 예보와 이전 자료 사용 여부를 반영합니다. 높음은 80 이상, 보통은 55 이상입니다. 신뢰도도 적중률이 아닙니다. 카드의 +/−는 조건의 기여 방향이며 '참고'는 자료 부족입니다. 내 기록 보정은 자료 신뢰도를 올리지 않습니다. 어종 사진은 제공된 실사 이미지이며, 불러오지 못하면 대체 그림을 표시합니다. 신규 등록 어종은 계산 기준이 마련될 때까지 점수와 추천 순위에서 제외합니다.</p>
+      <p>V2 입질점수는 현재 환경이 어종에 맞는 정도를 나타내는 0~99 조건점수이며 잡힐 확률이 아닙니다. 월별 계절·약한 권역 참고, 수심·서식환경, 수온·활동시간·흐름·조석·파도를 분리합니다. 39종 모두 계산하며 우럭·조피볼락은 같은 모델을 공유합니다. 월별 계절과 수심·서식·활동 선호는 넓은 생태 가정으로 조과 통계 검증 전입니다. 일부 수온 범위는 기존 FishBase/AquaMaps 자료를 재사용합니다. 확인되지 않은 조건은 중립으로 두고 자료 신뢰도를 낮춥니다. 신뢰도는 점수와 별개이며 높음 80 이상, 보통 55 이상입니다. 현재 수온 관측은 미래 예보가 아니며 멀거나 오래되거나 미래 날짜일수록 영향이 줄어듭니다. 조류는 15 km 안 예보 유속을 참고합니다. 예보가 없으면 유속 적합도는 중립으로 두고 조석 변화 조건만 작게 반영합니다. 바닷물 높이의 상승·하강을 조류 방향으로 해석하지 않습니다. 육지와 해안 경사 가정 수심은 점수에 쓰지 않습니다. 바람·파고의 생태 영향은 출조 안전 판단과 별개입니다. +/−는 기여 방향, ‘참고’는 자료 부족입니다. 가까운 내 기록을 조금 반영하며 표본이 적으면 보정이 약합니다.</p>
       <div class="tblWrap"><table id="basisTable"></table></div>
     </details>
     </div>
@@ -524,7 +524,7 @@ details.more[open] summary{margin-bottom:12px}
         <input type="text" id="logMemo" maxlength="120" placeholder="메모 (채비·미끼 등)" aria-label="메모">
         <button class="btn" type="submit">기록</button>
       </form>
-      <p class="note" id="logMsg">다녀온 출조를 남기면, 같은 해역 기록에서 그 어종을 잡은 비율로 지수를 0.5~1.5배 보정합니다 (기록이 적을 땐 보정이 작게 들어갑니다). 못 잡은 날도 "꽝"으로 남겨야 정확해집니다.</p>
+      <p class="note" id="logMsg">출조를 남기면 같은 포인트 기록을 우선 반영합니다. 가까운 기록은 약하게, 같은 해역 기록은 더 약하게 참고합니다. 적은 표본의 보정은 작습니다. 못 잡은 날도 “꽝”으로 남겨 주세요.</p>
       <ul class="logList" id="logList"></ul>
     </div>
     </div>
@@ -598,6 +598,7 @@ out geom;</pre>
       <h2 class="h2">자료 출처</h2>
       <p>온라인 일반·위성 배경: NAVER Maps JavaScript API v3 (설정한 경우). 배경 영상은 수심 자료로 사용하지 않습니다.</p>
       <div class="sources">
+    <p>어종 조건 참고: 기존 수온 범위는 FishBase/AquaMaps 자료를 재사용했습니다. <a href="https://fishbase.se/Ecology/Sebastes_schlegelii" target="_blank" rel="noopener">FishBase 우럭 생태</a>, <a href="https://www.nifs.go.kr/portal/pcon0000206/systA/actionConts.do" target="_blank" rel="noopener">국립수산과학원 어종 목록</a>, <a href="https://www.fao.org/docrep/014/i1920e/i1920e.pdf" target="_blank" rel="noopener">FAO 두족류 도감</a>을 참고했습니다. 월별 계절·선호 수심·활동 계수는 넓은 생태 가정이며 현장 통계 검증 전입니다.</p>
     <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
     <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → 국립해양조사원 자연과학용 자료(KHOA/BADA) 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. KHOA는 유효 자료점으로 둘러싸인 곳만 보간하고 수집 범위 밖에서는 기존 자료로 돌아갑니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
     <p><a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형): 2026년 10월 11일 주문진·남애 등 기존 자료를 보존하고 거진부터 울산까지 검증된 일부 연안 범위를 확대해 35,982점을 제공합니다. 대진·양양 및 포항·울산 일부에는 미탑재 범위가 있으며 동해 전체를 포함하지 않습니다. 약 150 m 간격의 해양수치모델용 자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다. 기준면은 조회 화면의 ‘평균해면하’ 표기를 보존하며 조사연도는 미확인입니다. <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">연안해역기본도</a>는 원본 미확보, <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해수부 수심분포도</a>는 공개 CSV에 수심값이 없어 미탑재입니다.</p>

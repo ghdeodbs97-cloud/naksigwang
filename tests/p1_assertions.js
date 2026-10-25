@@ -47,7 +47,7 @@ try {
   let weather = { sp: 3, wave: .4, near: false, km: 0, ageHours: 2, lagHours: 0 };
   wxAt = () => weather;
   let actual = true;
-  flowU = () => actual ? { real: true, u: .65, nc: { km: 1, c: { name: '검사 조류' } } } : { real: false, u: .65 };
+  flowU = () => actual ? { real: true, u: .65, r: { sp: 65 }, nc: { km: 1, c: { name: '검사 조류' } } } : { real: false, u: .65 };
   for (const k of Object.keys(META)) delete META[k]; META.generated = new Date(clock).toISOString(); CATCHES = [];
   const evaluate = () => biteEvalAt(fish, p, st, day, hour), full = evaluate();
   check(same(full, evaluate()), '고정 입력의 전체 결과 동일'); count++;
@@ -67,11 +67,11 @@ try {
     sstForLocation = () => ({ ...observation, ...patch }); check(evaluate().confidence < full.confidence, '멀거나 오래된 수온'); count++;
   }
   sstForLocation = () => ({ ...observation });
-  weather.sp = 6; e = evaluate(); check(e.score < full.score && e.factors.find(f => f.key === 'wind').effect < full.factors.find(f => f.key === 'wind').effect, '7 m/s 이하 실제 풍속 차이'); count++;
-  weather.sp = 3; weather.wave = .9; check(evaluate().score < full.score, '1 m 이하 실제 파고 차이'); count++; weather.wave = .4;
+  weather.sp = 6; e = evaluate(); check(e.rawScore < full.rawScore && e.factors.find(f => f.key === 'wind').effect < full.factors.find(f => f.key === 'wind').effect, '7 m/s 이하 실제 풍속 차이'); count++;
+  weather.sp = 3; weather.wave = .9; check(evaluate().rawScore < full.rawScore, '1 m 이하 실제 파고 차이'); count++; weather.wave = .4;
   CATCHES = [{ region: st.region, date: '2026-10-09', pt: p.name, count: 1, species: fish.n }]; e = evaluate();
-  check(e.score !== full.score && e.confidence === full.confidence, '내 조황기록 보정 유지·신뢰도 독립'); count++;
-  check(biteEvalAt({ ...fish, season: 0 }, p, st, day, hour).score === 0, '대상어 부적합 0점'); count++;
+  check(e.rawScore !== full.rawScore && e.confidence === full.confidence, '내 조황기록 보정 유지·신뢰도 독립'); count++;
+  check(biteEvalAt({ ...fish, season: 0 }, p, st, day, hour).score === evaluate().score, 'legacy season은 V2 점수를 지배하지 않음'); count++;
 } finally {
   wxAt = savedWx; flowU = savedFlow; sstForLocation = savedSst; CATCHES = savedCatches;
   for (const k of Object.keys(OBS)) delete OBS[k]; Object.assign(OBS, savedObs); SST_C.clear();

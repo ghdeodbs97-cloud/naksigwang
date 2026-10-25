@@ -14,7 +14,7 @@ function goodHourRanges(scores) {
   return ranges.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]) || a[0] - b[0]).slice(0, 3).sort((a, b) => a[0] - b[0])
     .map(([a, b]) => `${String(a).padStart(2, '0')}~${String(b).padStart(2, '0')}시`).join(' · ');
 }
-function renderToday() {
+function renderToday(preparedRows = null) {
   const pt = POINTS[S.pt], st = STATIONS[pt ? pt.st : S.st]; if (!st) return;
   const day = Math.min(TODAY_IDX, st.days.length - 1), d = st.days[day], h = kstHour(), tA = day * 24 + h;
   const wd = '일월화수목금토'[new Date(d.date + 'T12:00:00+09:00').getDay()], [, m, dd] = d.date.split('-');
@@ -38,7 +38,11 @@ function renderToday() {
   $('tdCur').innerHTML = fu.real ? (fu.r.sp * KN < .2 ? `물돌이 무렵<small>${fu.nc.c.name} 예보 지점</small>` : `${dirName16(fu.r.dir)}쪽 ${(fu.r.sp * KN).toFixed(1)} kn<small>${fu.nc.c.name} 예보 지점 ${fu.nc.km.toFixed(0)} km</small>`) : `${Math.round(Math.abs(u) * 100)}%<small>조류 예보 지점 없음 · 바닷물 높이로 추정</small>`;
   $('tdSun').innerHTML = `${fmtH(sr)} ~ ${fmtH(ss)}<small>해 뜸 ~ 해 짐</small>`;
   // 어종별 오늘 지수
-  const rows = FISH.filter(fishHasBiteModel).map((f, i) => { const arr = Array.from({ length: 24 }, (_, hh) => biteAt(f, pt, st, day, hh)); const mx = Math.max(...arr); return { f, i, arr, mx, best: arr.indexOf(mx) }; }).sort((a, b) => b.mx - a.mx);
+  const savedContexts=BITE_CONTEXTS; BITE_CONTEXTS=new Map();
+  // 같은 날짜의 입질 탭에서 이미 계산한 24시간 곡선을 다시 계산하지 않는다.
+  const series = Array.isArray(preparedRows) && day === S.day ? preparedRows : FISH.filter(fishHasBiteModel).map((f, i) => ({ f, i, arr: Array.from({ length: 24 }, (_, hh) => biteAt(f, pt, st, day, hh)) }));
+  const rows = series.map(({ f, i, arr }) => { const mx = Math.max(...arr); return { f, i, arr, mx, best: arr.indexOf(mx) }; }).sort((a, b) => b.mx - a.mx || a.i - b.i);
+  BITE_CONTEXTS=savedContexts;
   const bestH = Array.from({ length: 24 }, (_, hh) => Math.max(...rows.map(o => o.arr[hh])));
   TD = { st, day, sr, ss, bestH, h };
   const top = rows.filter(o => o.mx > 0).slice(0, 4);

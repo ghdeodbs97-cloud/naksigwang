@@ -75,7 +75,7 @@ try:
             assert '%' not in page.locator('#fishGrid').inner_text()
             assert '%' not in page.locator('#tdBest').inner_text()
             assert '%' not in page.locator('.lvKey').inner_text()
-            assert page.locator('.biteConfidence').count() == 18
+            assert page.locator('.biteConfidence').count() == 39
             assert all(page.locator('.biteReasons').all_text_contents())
             page.evaluate('window.__p1ExpirySetup()')
             before = page.evaluate('window.__p1ExpirySnapshot()')
