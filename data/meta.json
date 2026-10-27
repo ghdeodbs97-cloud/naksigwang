@@ -1,28 +1,13 @@
 {
- "errors": [
-  "tide DT_0008 20261030: RuntimeError",
-  "tide SO_0573 20261108: RuntimeError",
-  "tide DT_0010 20261104: RuntimeError",
-  "tide SO_0573 20261109: RuntimeError",
-  "tide DT_0010 20261105: RuntimeError",
-  "tide SO_0753 20261104: RuntimeError",
-  "tide DT_0048 20261110: RuntimeError",
-  "tide SO_0734 20261029: RuntimeError",
-  "tide SO_1251 20261108: RuntimeError",
-  "tide DT_0062 20261026: RuntimeError",
-  "tide DT_0062 20261027: RuntimeError",
-  "tide SO_1251 20261030: RuntimeError",
-  "tide.json: 신선 데이터 2644/2656 (99.5%) — 기준 90% 또는 자료 완전성 미달로 이전 파일 유지"
- ],
+ "errors": [],
  "tide.json": {
-  "fresh": 2644,
-  "fallback": 11,
+  "fresh": 2656,
+  "fallback": 0,
   "requested": 2656,
-  "unrecovered": 1,
-  "fresh_ratio": 0.9955,
-  "error": 12,
-  "status": "kept_previous_incomplete",
-  "minimum_ratio": 0.9
+  "unrecovered": 0,
+  "fresh_ratio": 1.0,
+  "error": 0,
+  "status": "fresh"
  },
  "obs.json": {
   "fresh": 55,
@@ -42,7 +27,7 @@
   "error": 0,
   "status": "fresh"
  },
- "generated": "2026-10-27T00:16+09:00",
- "seconds": 455,
- "error_count": 13
+ "generated": "2026-10-27T08:56+09:00",
+ "seconds": 217,
+ "error_count": 0
 }
