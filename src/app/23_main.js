@@ -76,10 +76,11 @@ let last=performance.now(),frameRequest=0;
 function frame(now){
   frameRequest=0;if(document.hidden)return;
   const workStart=performance.now();const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(TAB==='today'&&todaySelectedHour===null)S.t=kstHour();
   if(S.playing)S.t=(S.t+dt*.7)%24;
   for(const id of ['tIn','tIn2']){const el=$(id);if(document.activeElement!==el&&Math.abs(el.value-S.t)>.01)el.value=S.t;}
   const tide=getTide(),tabChanged=RENDER.lastTab!==TAB;RENDER.lastTab=TAB;
-  if(Math.floor(S.t)!==biteHour||Math.floor(Date.now()/60000)!==biteDataMinute)renderBite();
+  if((TAB!=='today'&&Math.floor(S.t)!==biteHour)||Math.floor(Date.now()/60000)!==biteDataMinute)renderBite();
   const timeKey=JSON.stringify([S.playing?Math.floor(S.t*20):S.t,S.day,S.st,S.pt,TAB,CR.ready]);
   if(timeKey!==RENDER.readKey||RENDER.readSection!==SEC){RENDER.readKey=timeKey;RENDER.readSection=SEC;updateReadouts(tide);}
   if(TAB==='map'||TAB==='today'){

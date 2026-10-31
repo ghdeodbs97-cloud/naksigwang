@@ -395,6 +395,16 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
 #biteChart,#tideChart,#todayChart{border-radius:10px}
 @media(min-width:900px){.tabbar{background:#172c3e}}
 
+
+/* 오늘 시각 선택: 그래프·키보드 조작과 현재 시각 복귀 */
+#todayChart{touch-action:none;cursor:ew-resize}
+.todayTimeControl{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.todayTimeControl label{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--muted)}
+#todayTimeLabel{font-family:var(--font-data);font-size:20px;font-weight:600;color:var(--fg)}
+#todayNow{min-height:40px;font-size:13px;padding:7px 12px;white-space:nowrap}
+#todayNow:disabled{opacity:.45;cursor:default}
+.todayTimeSlider{width:100%;min-width:0;margin:0;height:24px;accent-color:var(--cyan)}
+
 </style>
 
 <div class="app">
@@ -424,7 +434,10 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
       <p class="tdState" id="tdState">—</p>
       <p class="tdNext" id="tdNext"></p>
     </div>
-    <canvas id="todayChart" aria-label="오늘 하루 조석 곡선과 잘 맞는 시간"></canvas>
+    <div class="todayTimeControl"><label for="todayTime">선택 시각 <output id="todayTimeLabel" aria-live="off">—</output></label><button id="todayNow" class="btn ghost" type="button">지금으로</button></div>
+    <canvas id="todayChart" aria-label="오늘 바닷물 높이와 잘 맞는 시간. 누르거나 좌우로 끌어 시각 선택"></canvas>
+    <input id="todayTime" class="todayTimeSlider" type="range" min="0" max="1439" step="1" value="0">
+    <p class="chartHint">그래프를 끌어 시간 선택 · 수온은 최근 관측값</p>
     <p class="tdKey"><span class="k tideK"></span>바닷물 높이 <span class="k bestK"></span>입질 지수 높은 시간 <span class="k nightK"></span>밤</p>
     <dl class="tdFacts">
       <div><dt>물때</dt><dd id="tdMul">—</dd></div>

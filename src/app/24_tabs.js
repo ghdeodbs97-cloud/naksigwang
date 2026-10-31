@@ -22,7 +22,7 @@ function showTab(k, keepHash, focusPt) {
   for (const b of $('tabbar').children) b.setAttribute('aria-current', b.dataset.tab === k ? 'page' : 'false');
   if (!keepHash && location.hash !== '#' + k) history.replaceState(null, '', '#' + k);
   if (k === 'map') requestAnimationFrame(() => { if (stage.clientWidth !== cw) resize(); const p = POINTS[S.pt]; if (focusPt && p) fitGround(p.lat, p.lon, 9000); dirty = true; });
-  if (k === 'today') requestAnimationFrame(drawToday);
+  if (k === 'today') { syncTodayClock(); requestAnimationFrame(drawToday); }
   scrollTo(0, 0);
 }
 $('tabbar').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });

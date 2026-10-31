@@ -49,7 +49,7 @@
 | `18b_shore.js` | 실제 해안 교차가 있을 때만 해안 종류 판정 | 가변 | `osmDist`, `enclosed`, `classifyShore`, `setShore`, `autoShore` |
 | `19_overlay.js` | 평면도 위 표시(자료 좌표에서 투영한 단면선·단면 표식·핀) | 가변 | `drawUI` |
 | `20_readouts.js` | 계기판 값·기상 격자/시각 누락 사유 표시 | 45 | `updateReadouts`, `updateCrnt` |
-| `20b_today.js` | 「오늘」 탭: 오늘·지금 요약, 연속된 좋은 시간 구간, 39종 계산 중 공통 예보와 같은 날짜의 입질 곡선 공유 | 70 | `goodHourRanges`, `renderToday`, `drawToday` |
+| `20b_today.js` | 「오늘」 탭: 분 단위 시각 선택·현재 시각 복귀, 물때·날씨 요약, 좋은 시간 구간과 같은 날짜의 입질 곡선 공유 | 가변 | `goodHourRanges`, `todayHour`, `todayTimeText`, `updateTodaySummary`, `syncTodayClock`, `selectTodayHour`, `selectTodayPointer`, `renderToday`, `drawToday` |
 | `21_input.js` | 화면·터치·검색 입력, 온라인 native 이동/Canvas 단면 전환과 크기 동기화, 수심/출처 상세 | 가변 | `providerPointerFinished`, `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `navigateSearchPoint`, `findPlace`, `renderBasis` |
 | `22_catchlog.js` | 내 조과 기록 | 45 | `localCatches`, `renderLog` |
 | `23_main.js` | 예시 단면·SDK 시작, 용도별 상태 변경 렌더·background RAF 중지 | 가변 | `exampleSection`, `drawBiteChart`, `apiAutoKick`, `frame` |
@@ -116,3 +116,5 @@
 동해안은 기존 5km 대표점을 보존한 뒤 이름이 있는 항·선착장을 보강합니다. 같은 항/선착장 이름이 1km 안에서 겹치면 합치고 서로 다른 항은 가까워도 유지합니다. OSM 항 이름에는 공항·호텔 같은 오인 항목을 제외하며, 묵호·후포는 기존 KHOA 조석 지점의 대표 위치입니다. 해안 출입구·개별 방파제의 낚시 허용 여부를 뜻하지 않습니다.
 
 동해 보강 항구의 기상청 격자는 `collector/points.json` 수집 대상에도 포함합니다. 현 시점의 data/wx.json에 값이 없는 격자는 수집 전까지 없음으로 표시하며 임의 보간하지 않습니다. `tests/test_east_ports.py`가 항구별 수집 격자 설정까지 확인합니다.
+
+오늘 그래프/분 단위 range에서 선택한 시각은 오늘 날짜의 공통 S.t와 동기화하고 지금으로 버튼으로 실시간 추종을 복원합니다. 시간만 바뀔 때 updateTodaySummary/drawToday로 수치와 커서만 갱신하여 39종 하루 곡선을 반복 계산하지 않습니다. 물때 이름은 일별 값이며 바닷물 높이·들물/날물·바람·파고·조류가 선택 시각을 따릅니다. 수온은 현재 유효 관측값으로 유지하고 관측 날짜/시각을 표시합니다.
