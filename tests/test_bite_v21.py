@@ -34,7 +34,8 @@ try:
      assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
      page.screenshot(path=str(output/f'{width}-{tab}.png'))
     page.locator('#tabbar [data-tab="bite"]').click();page.locator('#fishGrid .fish').first.evaluate("el=>el.scrollIntoView({block:'center'})");page.wait_for_timeout(100);page.locator('#fishGrid .fish').first.screenshot(path=str(output/f'{width}-card.png'))
-    assert page.locator('.habitatSummary').count()==page.locator('.catchSpotSummary').count()==page.locator('.biteScores').count()==39
+    assert page.locator('.habitatSummary').count()==page.locator('.catchSpotSummary').count()==39
+    assert page.locator('.biteScores').count()==0
     assert page.locator('.biteConfidence').count()==0
     assert '자료 신뢰도' not in page.locator('#fishGrid').inner_text()
     assert 'undefined' not in page.locator('#fishGrid').inner_text() and 'NaN' not in page.locator('#fishGrid').inner_text()

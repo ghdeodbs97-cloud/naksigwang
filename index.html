@@ -128,7 +128,7 @@ details.api pre{margin:0;font-family:var(--font-data);font-size:10.5px;color:var
 .logList{list-style:none;padding:0;margin:6px 0 0;font-size:13px;display:grid;gap:4px}
 .linkBtn{font:inherit;font-size:12px;background:none;border:0;color:var(--amber);cursor:pointer;text-decoration:underline}
 #biteChart{width:100%;height:120px;display:block;touch-action:none;cursor:ew-resize;border-radius:4px;margin:6px 0 2px}
-.biteScores{font-size:10.5px;color:var(--cyan);margin:5px 0}.fishEcology{font-size:11px;line-height:1.35;overflow-wrap:anywhere}.fishEcology p{margin:4px 0}.ecologyLabel{display:block;font-size:10px;color:var(--muted)}.habitatSummary,.catchSpotSummary{display:block}.biteReasons{font-size:11px;color:var(--muted);margin:0;overflow-wrap:anywhere}
+.fishEcology{font-size:11px;line-height:1.35;overflow-wrap:anywhere}.fishEcology p{margin:4px 0}.ecologyLabel{display:block;font-size:10px;color:var(--muted)}.habitatSummary,.catchSpotSummary{display:block}.biteReasons{font-size:11px;color:var(--muted);margin:0;overflow-wrap:anywhere}
 .bestH{font-family:var(--font-data);font-size:10.5px;color:var(--muted)}
 dl.rock{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0;font-size:12px}
 dl.rock dt{color:var(--muted)}
@@ -177,7 +177,9 @@ footer a{color:var(--cyan)}
 .fish .pic svg{width:92%;height:auto}
 .fish .pic{position:relative}
 .fishMedia{position:relative;display:block;width:100%;height:100%}
-.fish .pic>.fishMedia{position:absolute;inset:8px;width:auto;height:auto}
+.fish .pic>.fishMedia{position:absolute;inset:6%;width:auto;height:auto;display:flex;align-items:center;justify-content:center}
+/* 원본의 투명 여백과 별개로 카드 안에도 안전 여백을 둔다. */
+.fish .pic .fishPhoto{max-width:94%;max-height:92%;flex-shrink:0}
 .fishPhoto,.fishPhotoFallback{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center}
 .fishPhotoFallback{align-items:center;justify-content:center}
 .fishPhotoFallback:not([hidden]){display:flex}
@@ -511,7 +513,7 @@ details.more[open] summary{margin-bottom:12px}
     <div class="fishGrid" id="fishGrid"></div>
       <details class="basis">
       <summary>입질 지수는 어떻게 계산하나요?</summary>
-      <p>V2.1 입질점수는 현재 환경이 어종에 맞는 정도를 나타내는 0~99 조건점수이며 잡힐 확률이 아닙니다. 서식 점수는 월별 계절·약한 권역 참고·수심·지형을, 오늘 조건은 선택한 날짜와 시각의 수온·활동시간·흐름·조석·기상을 뜻합니다. 서식 45%와 오늘 조건 55%를 합친 뒤 내 기록을 조금 반영합니다. 보조 점수는 반올림해 표시하며 최종점수는 반올림 전 값으로 계산합니다. 서식지와 잘 잡히는 곳은 일반적인 지형 안내이며 어획을 보장하지 않습니다. 39종 모두 계산하며 우럭·조피볼락은 같은 모델을 공유합니다. 월별 계절과 수심·서식·활동 선호는 넓은 생태 가정으로 조과 통계 검증 전입니다. 일부 수온 범위는 기존 FishBase/AquaMaps 자료를 재사용합니다. 확인되지 않은 조건은 중립으로 두고 자료 신뢰도를 낮춥니다. 신뢰도는 점수와 별개이며 높음 80 이상, 보통 55 이상입니다. 현재 수온 관측은 미래 예보가 아니며 멀거나 오래되거나 미래 날짜일수록 영향이 줄어듭니다. 조류는 15 km 안 예보 유속을 참고합니다. 예보가 없으면 유속 적합도는 중립으로 두고 조석 변화 조건만 작게 반영합니다. 바닷물 높이의 상승·하강을 조류 방향으로 해석하지 않습니다. 육지와 해안 경사 가정 수심은 점수에 쓰지 않습니다. 바람·파고의 생태 영향은 출조 안전 판단과 별개입니다. +/−는 기여 방향, ‘참고’는 자료 부족입니다. 가까운 내 기록을 조금 반영하며 표본이 적으면 보정이 약합니다.</p>
+      <p>V2.1 입질점수는 현재 환경이 어종에 맞는 정도를 나타내는 0~99 조건점수이며 잡힐 확률이 아닙니다. 서식 점수는 월별 계절·약한 권역 참고·수심·지형을, 오늘 조건은 선택한 날짜와 시각의 수온·활동시간·흐름·조석·기상을 뜻합니다. 서식 45%와 오늘 조건 55%를 합친 뒤 내 기록을 조금 반영합니다. 최종점수는 반올림 전 내부 값으로 계산합니다. 서식지와 잘 잡히는 곳은 일반적인 지형 안내이며 어획을 보장하지 않습니다. 39종 모두 계산하며 우럭·조피볼락은 같은 모델을 공유합니다. 월별 계절과 수심·서식·활동 선호는 넓은 생태 가정으로 조과 통계 검증 전입니다. 일부 수온 범위는 기존 FishBase/AquaMaps 자료를 재사용합니다. 확인되지 않은 조건은 중립으로 두고 자료 신뢰도를 낮춥니다. 신뢰도는 점수와 별개이며 높음 80 이상, 보통 55 이상입니다. 현재 수온 관측은 미래 예보가 아니며 멀거나 오래되거나 미래 날짜일수록 영향이 줄어듭니다. 조류는 15 km 안 예보 유속을 참고합니다. 예보가 없으면 유속 적합도는 중립으로 두고 조석 변화 조건만 작게 반영합니다. 바닷물 높이의 상승·하강을 조류 방향으로 해석하지 않습니다. 육지와 해안 경사 가정 수심은 점수에 쓰지 않습니다. 바람·파고의 생태 영향은 출조 안전 판단과 별개입니다. +/−는 기여 방향, ‘참고’는 자료 부족입니다. 가까운 내 기록을 조금 반영하며 표본이 적으면 보정이 약합니다.</p>
       <div class="tblWrap"><table id="basisTable"></table></div>
     </details>
     </div>
@@ -2218,7 +2220,7 @@ function renderBite() {
   $('biteWin').textContent = `해 뜸 ${fmtH(sr)} · 해 짐 ${fmtH(ss)} · ` + (top.length ? '오늘 "높음"이 나오는 시간: ' + top.slice(0, 4).map(r => `${r.f.n} ${String(r.best).padStart(2, '0')}시`).join(', ') : '오늘은 "높음"이 나오는 시간이 없습니다.');
   $('fishGrid').innerHTML = rows.map(({ f, i, arr, p, best, ev }) => {
     const [lv, cls] = level(p);
-    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><b>${p}점</b><span class="lv ${cls}">${lv}</span></div>${scoreProgress(p, f.n)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}점</div><p class="biteScores">서식 ${Math.round(ev.habitatScore)} · 오늘 조건 ${Math.round(ev.dynamicScore)}</p><div class="fishEcology"><p><span class="ecologyLabel">주 서식지</span><span class="habitatSummary">${f.habitatSummary}</span></p><p><span class="ecologyLabel">잘 잡히는 곳</span><span class="catchSpotSummary">${f.catchSpotSummary}</span></p></div><p class="biteReasons">${biteReasons(ev)}</p></div>`;
+    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><b>${p}점</b><span class="lv ${cls}">${lv}</span></div>${scoreProgress(p, f.n)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}점</div><div class="fishEcology"><p><span class="ecologyLabel">주 서식지</span><span class="habitatSummary">${f.habitatSummary}</span></p><p><span class="ecologyLabel">잘 잡히는 곳</span><span class="catchSpotSummary">${f.catchSpotSummary}</span></p></div><p class="biteReasons">${biteReasons(ev)}</p></div>`;
   }).join('') + FISH.filter(f => !fishHasBiteModel(f)).map((f, i) => `<div class="fish provisional"><div class="pic">${fishPicture(f, 'new' + i)}</div><div class="fn">${f.n}</div><div class="fp"><b>—</b><span class="lv">미설정</span></div><p class="fishModelNote">입질 계산 기준 미설정 · 추천 순위 제외${f.aliasOf ? `<br>${f.aliasOf}과 같은 어종` : ''}</p></div>`).join('');
   if (pt && pt.kind === 'rock') $('rockInfo').innerHTML = rockInfoHTML(pt); else $('rockInfo').innerHTML = '';
   if (typeof renderBasis === 'function') renderBasis();

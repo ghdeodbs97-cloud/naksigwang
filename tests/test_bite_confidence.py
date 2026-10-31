@@ -41,7 +41,7 @@ window.__p1ExpirySnapshot = () => {
   return { calls: refreshCalls, t: S.t, evaluations, matches: evaluations.every(({ name, ev }) => {
     const card = cards.find(c => c.querySelector('.fn').firstChild.textContent === name);
     return card.querySelector('.fp b').textContent === ev.score + '점'
-      && !card.querySelector('.biteConfidence') && card.querySelector('.biteScores').textContent === '서식 ' + Math.round(ev.habitatScore) + ' · 오늘 조건 ' + Math.round(ev.dynamicScore)
+      && !card.querySelector('.biteConfidence') && !card.querySelector('.biteScores') && Number.isFinite(ev.habitatScore) && Number.isFinite(ev.dynamicScore)
       && card.querySelector('.biteReasons').textContent === biteReasons(ev);
   }) };
 };
@@ -76,7 +76,7 @@ try:
             assert '%' not in page.locator('#tdBest').inner_text()
             assert '%' not in page.locator('.lvKey').inner_text()
             assert page.locator('.biteConfidence').count() == 0
-            assert page.locator('.biteScores').count() == 39
+            assert page.locator('.biteScores').count() == 0
             assert all(page.locator('.biteReasons').all_text_contents())
             page.evaluate('window.__p1ExpirySetup()')
             before = page.evaluate('window.__p1ExpirySnapshot()')
