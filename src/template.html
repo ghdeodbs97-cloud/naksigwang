@@ -1,4 +1,5 @@
 <title>낚시광</title>
+<meta name="naver-map-key-id" content="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -6,13 +7,13 @@
 /* Layout: 소나 장비 화면 — 왼쪽 큰 평면도(실제 해안선) + 오른쪽 계기판, 아래 전폭 단면도. 단일 다크 테마(의도적). */
 :root{
   color-scheme: dark;
-  --bg:#060f13;
-  --panel:#0a181e;
-  --line:#173039;
-  --fg:#d5ecee;
-  --muted:#7a9ea6;
-  --cyan:#4fe3d3;
-  --amber:#ffb84d;
+  --bg:#14283a;
+  --panel:#20384b;
+  --line:rgba(177,201,215,.18);
+  --fg:#f7f0e3;
+  --muted:#b1c1cd;
+  --cyan:#8adbd0;
+  --amber:#ffc29d;
   --font-ui:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
   --font-data:'JetBrains Mono',ui-monospace,'SFMono-Regular',Consolas,monospace;
 }
@@ -46,7 +47,14 @@ body{font-family:var(--font-ui);font-size:14px;line-height:1.55}
 .coord .btn.ghost{background:transparent;color:var(--cyan);border:1px solid var(--line)}
 .coord .msg{font-size:12px;color:var(--amber)}
 .stage{position:relative;width:100%;border-radius:4px;overflow:hidden;background:#06131d}
-.stage canvas{position:absolute;inset:0;display:block}
+.stage > #base,.stage > #flow,.stage > #ui{position:absolute;inset:0;display:block}
+#base,#flow{pointer-events:none}
+.provider-native #ui{pointer-events:none}
+.provider-moving > #base,.provider-moving > #flow,.provider-moving > #ui,
+.provider-only > #base,.provider-only > #flow,.provider-only > #ui{visibility:hidden} /* 이전 viewport 잔상을 보이지 않는다 */
+#providerMap{position:absolute;inset:0;visibility:hidden}
+.provider-active > #base,.provider-active > #flow,.provider-active > #ui{clip-path:inset(0 0 28px 0)} /* SDK 하단 출처·로고를 가리지 않는다 */
+#providerNotice{font-size:12px;color:var(--muted);margin:6px 0}
 #ui{touch-action:none;cursor:crosshair}
 #ui.pan{cursor:grab}
 .warn{position:absolute;left:12px;bottom:46px;font-size:11px;white-space:nowrap;color:var(--amber);background:rgba(6,15,19,.85);border:1px solid color-mix(in srgb,var(--amber) 40%,transparent);border-radius:4px;padding:4px 9px;max-width:calc(100% - 76px);pointer-events:none}
@@ -106,15 +114,14 @@ details.api pre{margin:0;font-family:var(--font-data);font-size:10.5px;color:var
 @media (max-width:600px){.hours{grid-template-columns:repeat(12,minmax(0,1fr))}}
 .fish .fn{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
 .fish .lt{font-size:10.5px;font-weight:400;color:var(--muted)}
-.spark{width:100%;height:26px;display:block}
 .logBox{margin:14px 0 6px;padding:12px;border:1px solid var(--line);border-radius:6px}
 .logForm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
 .logForm input,.logForm select{font:inherit;font-size:13px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;min-width:0}
-.logForm #logMemo{flex:1 1 160px}
+.logForm #logMemo{flex:initial}
 .logList{list-style:none;padding:0;margin:6px 0 0;font-size:13px;display:grid;gap:4px}
 .linkBtn{font:inherit;font-size:12px;background:none;border:0;color:var(--amber);cursor:pointer;text-decoration:underline}
 #biteChart{width:100%;height:120px;display:block;touch-action:none;cursor:ew-resize;border-radius:4px;margin:6px 0 2px}
-.biteConfidence{font-size:11px;color:var(--cyan);margin:6px 0 3px}.biteReasons{font-size:11px;color:var(--muted);margin:0;overflow-wrap:anywhere}
+.fishEcology{font-size:11px;line-height:1.35;overflow-wrap:anywhere}.fishEcology p{margin:4px 0}.ecologyLabel{display:block;font-size:10px;color:var(--muted)}.habitatSummary,.catchSpotSummary{display:block}.biteReasons{font-size:11px;color:var(--muted);margin:0;overflow-wrap:anywhere}
 .bestH{font-family:var(--font-data);font-size:10.5px;color:var(--muted)}
 dl.rock{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0;font-size:12px}
 dl.rock dt{color:var(--muted)}
@@ -153,20 +160,29 @@ footer a{color:var(--cyan)}
 .evs .ev b{font-family:var(--font-data);color:var(--fg)}
 .evs .ev.H b{color:var(--amber)}
 #bite .days{max-width:640px;margin-bottom:8px}
-.lvKey{display:flex;flex-wrap:wrap;gap:6px}
 .lv{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
 .lv.hi{color:#5ff0a8}.lv.mid{color:var(--amber)}.lv.lo{color:#8fb3ba}.lv.none{color:#55707a}
 .fishGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:8px}
 .fish{border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#081419}
 .fish.none{opacity:.55}
-.fish .pic{background:radial-gradient(ellipse at 50% 60%,#0f2a33,#081419 70%);border-radius:4px;aspect-ratio:2/1;display:flex;align-items:center;justify-content:center}
+.fish .pic{background:radial-gradient(ellipse at 50% 60%,#0f2a33,#081419 70%);border-radius:4px;aspect-ratio:3/2;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .fish .pic svg{width:92%;height:auto}
+.fish .pic{position:relative}
+.fishMedia{position:relative;display:block;width:100%;height:100%}
+.fish .pic>.fishMedia{position:absolute;inset:6%;width:auto;height:auto;display:flex;align-items:center;justify-content:center}
+/* 원본의 투명 여백과 별개로 카드 안에도 안전 여백을 둔다. */
+.fish .pic .fishPhoto{max-width:94%;max-height:92%;flex-shrink:0}
+.fishPhoto,.fishPhotoFallback{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center}
+.fishPhotoFallback{align-items:center;justify-content:center}
+.fishPhotoFallback:not([hidden]){display:flex}
+.fishPhoto[hidden],.fishPhotoFallback[hidden]{display:none}
+.fishModelNote{font-size:11px;color:var(--muted);margin:0;overflow-wrap:anywhere}
 .fish .fn{font-weight:700;font-size:14px}
 .fish .fp{display:flex;justify-content:space-between;align-items:center}
 .fish .fp b{font-family:var(--font-data);font-size:18px;font-variant-numeric:tabular-nums}
-.fish .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
-.fish .bar i{display:block;height:100%;background:var(--cyan)}
-.fish.hi .bar i{background:#5ff0a8}.fish.mid .bar i{background:var(--amber)}.fish.lo .bar i{background:#5f8790}
+.scoreProgress{width:100%;height:6px;flex-shrink:0;direction:ltr;background:#223840;border-radius:3px;overflow:hidden;box-shadow:inset 0 0 0 1px #304b55}
+.scoreProgressFill{display:block;height:100%;background:var(--cyan)}
+.fish.hi .scoreProgressFill{background:#5ff0a8}.fish.mid .scoreProgressFill{background:var(--amber)}.fish.lo .scoreProgressFill{background:#5f8790}
 .basis{margin-top:12px;font-size:12px}
 .basis summary{cursor:pointer;color:var(--cyan)}
 .basis p{margin:8px 0;max-width:90ch}
@@ -177,7 +193,7 @@ footer a{color:var(--cyan)}
 
 /* ── 3단계: 휴대폰 우선 탭 구조 ──
    한 화면에 한 가지 일. 아래 탭(휴대폰) / 위 탭(넓은 화면). 강조색은 의미로만 쓴다: 청록 = 물(조위·흐름), 호박색 = 해·만조·주의. */
-:root{--bg:#06121a;--panel:#0b1c24;--line:#18323c;--fg:#dcedef;--muted:#86a4ab;--nav-h:62px;--safe-b:env(safe-area-inset-bottom,0px)}
+:root{--bg:#14283a;--panel:#20384b;--line:rgba(177,201,215,.18);--fg:#f7f0e3;--muted:#b1c1cd;--nav-h:62px;--safe-b:env(safe-area-inset-bottom,0px)}
 body{margin:0;font-size:15px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .app{max-width:1100px;padding:0 0 calc(var(--nav-h) + var(--safe-b) + 18px);gap:0}
@@ -191,7 +207,7 @@ body{margin:0;font-size:15px}
 .top .coord input{font-family:var(--font-ui);font-size:14px;padding:8px 12px;border-radius:8px;background:var(--panel)}
 .top .coord .btn{border-radius:8px;padding:8px 14px}
 .top .coord .msg:empty{display:none}
-.top .coord .msg{position:absolute;left:16px;top:100%;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+.top .coord .msg{position:absolute;left:16px;top:100%;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px;pointer-events:none}
 main{padding:14px 16px 0}
 .view{display:flex;flex-direction:column;gap:14px}
 .view[hidden]{display:none}
@@ -237,6 +253,7 @@ main{padding:14px 16px 0}
 .tdBest{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .tdBest li{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
 .tdBest .pic svg{width:56px;height:auto;display:block}
+.tdBest .pic{width:56px;height:32px}
 .tdBest .nm{font-weight:700}
 .tdBest .nm small{display:block;font-weight:400;font-size:12.5px;color:var(--muted)}
 .tdBest .pc{font-family:var(--font-data);font-size:20px;font-weight:600;text-align:right}
@@ -273,6 +290,121 @@ details.more[open] summary{margin-bottom:12px}
 .clock .t{font-size:30px}
 .btn{border-radius:8px}
 
+
+/* 다섯 탭 공통: 핵심 정보와 펼쳐 읽는 설명의 구분 */
+body{line-height:1.65}
+.view{gap:18px}
+.panel{padding:18px;border-radius:12px}
+.ph{align-items:flex-start;margin-bottom:16px;gap:8px 16px}
+.ph h2{font-size:18px;line-height:1.5}
+.ph h2 small{display:block;margin:4px 0 0;font-family:var(--font-ui);font-size:12px}
+.note,.hint{font-size:12.5px;line-height:1.7}
+.note{max-width:80ch;overflow-wrap:anywhere}
+.uiDetails{border-top:1px solid var(--line);padding:12px 0;margin-top:10px;font-size:13px;min-width:0}
+.uiDetails>summary,.cardDetails>summary{cursor:pointer;color:var(--muted);font-weight:500;list-style-position:inside}
+.uiDetails>summary:hover,.cardDetails>summary:hover{color:var(--cyan)}
+.uiDetails>summary:focus-visible,.cardDetails>summary:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+.uiDetails[open]>summary{margin-bottom:12px;color:var(--fg)}
+.uiDetails p+p{margin-top:10px}
+.uiDetails.compact{border:0;padding:0;margin-top:8px}
+.chartHint{font-size:12px;color:var(--muted);margin:8px 0 0}
+.eyebrow{font-size:12px;color:var(--muted);margin-bottom:6px}
+#v-today .tdH{margin-top:12px;font-size:18px}
+.tdFacts{gap:0}.tdFacts>div{padding:16px 12px}.tdFacts dt{font-size:12px}.tdFacts dd{font-size:18px;line-height:1.55}.tdFacts dd small{font-size:12px;line-height:1.6;margin-top:5px}
+#v-map .tools{flex-wrap:wrap;overflow:visible;gap:8px;margin-bottom:14px}
+#v-map .tools .seg{flex-wrap:wrap}
+#v-map .stats{gap:8px 16px;line-height:1.6}
+#v-map .stats>span{padding:5px 0}
+#v-map .legend{line-height:1.8}
+#v-tide .stName{font-size:24px;line-height:1.45}
+#v-tide dl.read{font-size:14px;gap:12px 18px;grid-template-columns:minmax(100px,auto) minmax(0,1fr)}
+#v-tide dl.read dd{font-size:14px;overflow-wrap:anywhere}
+#v-tide .sub{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.biteInfo{margin:8px 0 18px}
+.fishGrid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-top:16px}
+.fish{padding:14px;gap:8px;border-radius:10px}
+.fish .fn{font-size:15px;align-items:flex-start;flex-wrap:wrap}
+.fish .lt{font-size:11px;line-height:1.5}
+.fish .fp b{font-size:22px}
+.fish .bestH{font-size:11.5px}
+.fishEcology{font-size:12.5px;line-height:1.6}
+.fishEcology p{margin:4px 0 10px}
+.ecologyLabel{font-size:11px;margin-bottom:3px}
+.cardDetails{margin-top:auto;border-top:1px solid var(--line);padding-top:10px;font-size:12px}
+.cardDetails[open]>summary{margin-bottom:8px}
+.biteReasons{font-size:12px;line-height:1.7}
+.basis{padding-top:16px;border-top:1px solid var(--line);font-size:13px;margin-top:24px}
+.logHeading{font-size:18px;line-height:1.5;margin:0;color:var(--fg)}
+.logForm{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:end;gap:14px;margin:16px 0}
+.logField{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:12px;color:var(--muted)}
+.logForm input,.logForm select{width:100%;font-size:14px;padding:10px;border-radius:8px;min-height:44px}
+.logLocation,.logField.wide{grid-column:1/-1}
+.logLocation{font-size:13px;color:var(--muted)}
+.logLocation b{display:block;color:var(--fg);font-size:16px;margin-top:3px}
+.logForm .btn{justify-self:start;min-height:44px;padding-inline:24px}
+.sourcePanel{margin:0;padding:18px}
+.sources{font-size:13px;line-height:1.85;gap:16px;max-width:80ch;margin-top:16px;overflow-wrap:anywhere}
+@media(max-width:600px){
+ .panel{padding:14px}.view{gap:14px}.ph h2{font-size:17px}
+ .fishGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.fish{padding:10px}.fish .fn{font-size:14px}.fish .fp b{font-size:20px}
+ .tools .seg[aria-label="지역 바로가기"]{flex-basis:100%}.tools .seg button{padding:8px 9px}
+ .logForm{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .tdFacts>div{padding:14px 8px}.tdFacts dd{font-size:16px}
+}
+
+
+.days button{padding:8px 4px;min-height:48px;border-radius:7px}
+.days button .dd,.days button .mm{font-size:11.5px}
+.mapOptions{color:var(--muted);font-size:13px}
+.mapOptions>summary{cursor:pointer;border:1px solid var(--line);border-radius:8px;padding:8px 12px;list-style-position:inside}
+.mapOptions[open]{flex-basis:100%;order:3}
+.mapOptions[open]>summary{color:var(--cyan);margin-bottom:12px}
+.mapOptionGroups{display:flex;flex-wrap:wrap;gap:10px;padding:12px;background:var(--bg);border-radius:8px}
+.mapOptions>summary:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+
+/* 해 질 무렵의 바다: 남색 바탕·청회색 카드·아이보리 글자 */
+:root{--input:#192f41;--card:#294354;--nav:#1b3043;--soft-shadow:0 10px 28px rgba(3,13,24,.14)}
+html{background:var(--bg)}
+body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rgba(255,194,157,.1),transparent 70%),linear-gradient(155deg,#1b3245 0%,#14283a 65%)}
+.top{background:rgba(23,44,62,.94);border-bottom-color:var(--line)}
+.brand span{color:var(--amber)}
+.ptPick select,.top .coord input{background:var(--input);color:var(--fg);border-color:var(--line)}
+.top .coord input::placeholder,.logForm input::placeholder{color:#a6b8c6;opacity:1}
+.tabbar{background:var(--nav);border-color:var(--line)}
+.tabbar button[aria-current="page"]{background:rgba(138,219,208,.1);border-radius:9px 9px 0 0}
+.panel{background:linear-gradient(150deg,#243e50,#203649);border-color:var(--line);box-shadow:var(--soft-shadow)}
+.ph h2,.stName,.fish .fn,.tdName,.logHeading{color:var(--fg)}
+.btn{color:#132e38;background:var(--cyan);font-weight:700;box-shadow:0 3px 10px rgba(4,24,34,.12)}
+.btn.ghost{color:var(--fg);background:rgba(226,236,241,.035);box-shadow:none}
+.seg{background:rgba(17,37,54,.38);border-color:var(--line)}
+.seg button[aria-pressed="true"]{background:rgba(138,219,208,.16)}
+.days button{background:rgba(17,37,54,.3);border-color:var(--line)}
+.days button[aria-selected="true"]{background:rgba(138,219,208,.15)}
+.tdNow{background:linear-gradient(110deg,rgba(255,194,157,.1),rgba(138,219,208,.035));border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.tdFacts{background:rgba(39,66,84,.55);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tdBest li{background:var(--card);border-color:var(--line)}
+.fish{background:linear-gradient(155deg,#2c4858,#243e50);border-color:rgba(177,201,215,.2);box-shadow:0 6px 18px rgba(3,13,24,.12)}
+.fish .pic{background:radial-gradient(ellipse at 50% 55%,rgba(157,219,215,.13),transparent 72%)}
+.scoreProgress{background:#162e3d;box-shadow:inset 0 0 0 1px rgba(187,211,224,.16)}
+.fish.hi .scoreProgressFill{background:#8cdeb5}.fish.lo .scoreProgressFill{background:#aac7d9}
+.lv.hi,.tdBest li.hi .pc small{color:#a1ebc4}.lv.lo,.tdBest li.lo .pc small{color:#bdd3e0}
+.logForm input,.logForm select,select,details.api input[type=text],details.api input[type=password]{background:var(--input);border-color:var(--line)}
+.mapOptionGroups{background:rgba(17,37,54,.5)}
+.uiDetails[open],.basis[open]{border-top-color:rgba(177,201,215,.3)}
+#biteChart,#tideChart,#todayChart{border-radius:10px}
+@media(min-width:900px){.tabbar{background:#172c3e}}
+
+
+/* 오늘 시각 선택: 그래프·키보드 조작과 현재 시각 복귀 */
+#todayChart{touch-action:none;cursor:ew-resize}
+.todayTimeControl{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.todayTimeControl label{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--muted)}
+#todayTimeLabel{font-family:var(--font-data);font-size:20px;font-weight:600;color:var(--fg)}
+#todayNow{min-height:40px;font-size:13px;padding:7px 12px;white-space:nowrap}
+#todayNow:disabled{opacity:.45;cursor:default}
+.todayTimeSlider{width:100%;min-width:0;margin:0;height:24px;accent-color:var(--cyan)}
+
 </style>
 
 <div class="app">
@@ -282,7 +414,7 @@ details.more[open] summary{margin-bottom:12px}
       <label class="ptPick"><span class="sr">포인트 선택</span><select id="stSel" aria-label="포인트 선택"></select></label>
     </div>
     <form class="coord" id="coordForm">
-        <input id="coordIn" type="search" list="nameList" autocomplete="off" placeholder="항구·갯바위 이름으로 찾기 (예: 주문진항)" aria-label="항구 또는 갯바위 이름">
+        <input id="coordIn" type="search" list="nameList" autocomplete="off" placeholder="항구·갯바위 검색" aria-label="항구 또는 갯바위 이름">
         <datalist id="nameList"></datalist>
         <button class="btn" type="submit">찾기</button>
         
@@ -296,13 +428,16 @@ details.more[open] summary{margin-bottom:12px}
     <div class="tdHead">
       <p class="tdDate" id="tdDate">—</p>
       <h2 class="tdName" id="tdName">—</h2>
-      <p class="hint" id="tdReg"></p>
+      <details class="uiDetails compact"><summary>예보 기준</summary><p class="hint" id="tdReg"></p></details>
     </div>
     <div class="tdNow">
       <p class="tdState" id="tdState">—</p>
       <p class="tdNext" id="tdNext"></p>
     </div>
-    <canvas id="todayChart" aria-label="오늘 하루 조석 곡선과 잘 맞는 시간"></canvas>
+    <div class="todayTimeControl"><label for="todayTime">선택 시각 <output id="todayTimeLabel" aria-live="off">—</output></label><button id="todayNow" class="btn ghost" type="button">지금으로</button></div>
+    <canvas id="todayChart" aria-label="오늘 바닷물 높이와 잘 맞는 시간. 누르거나 좌우로 끌어 시각 선택"></canvas>
+    <input id="todayTime" class="todayTimeSlider" type="range" min="0" max="1439" step="1" value="0">
+    <p class="chartHint">그래프를 끌어 시간 선택 · 수온은 최근 관측값</p>
     <p class="tdKey"><span class="k tideK"></span>바닷물 높이 <span class="k bestK"></span>입질 지수 높은 시간 <span class="k nightK"></span>밤</p>
     <dl class="tdFacts">
       <div><dt>물때</dt><dd id="tdMul">—</dd></div>
@@ -312,7 +447,7 @@ details.more[open] summary{margin-bottom:12px}
       <div><dt>조류</dt><dd id="tdCur">—</dd></div>
       <div><dt>해</dt><dd id="tdSun">—</dd></div>
     </dl>
-    <h3 class="tdH">포인트 주변 바다 <small class="tdHint">손가락으로 끌어 단면선을 그으면 아래에 수심 단면이 나옵니다 · 지도 이동은 「지도」 탭에서</small></h3>
+    <h3 class="tdH">포인트 주변 바다 <small class="tdHint">지도를 드래그하면 수심 단면을 볼 수 있어요</small></h3>
     <div id="tdMapSlot"></div>
     <h3 class="tdH">오늘 잘 맞는 시간</h3>
     <ol class="tdBest" id="tdBest"></ol>
@@ -322,17 +457,18 @@ details.more[open] summary{margin-bottom:12px}
       <button class="btn ghost" type="button" data-go="bite">어종별 지수</button>
       <a class="btn ghost" id="kakaoLink" href="https://map.kakao.com/" target="_blank" rel="noopener" title="새 창에서 카카오맵이 열립니다. 오른쪽 위 스카이뷰를 누르면 위성사진으로 볼 수 있습니다">카카오맵에서 보기 ↗</a>
     </div>
-    <p class="note" id="tdNote">입질 지수는 규칙으로 만든 추정값입니다. 실제 조과 통계가 아닙니다. <b id="dataTime2">—</b></p>
+    <p class="note" id="tdNote">입질 점수는 추정값입니다. <b id="dataTime2">—</b></p>
   </section>
 
   <section class="view" id="v-map" aria-label="지도">
     <div class="panel">
-      <div class="ph"><h2>평면도<small id="viewSize">—</small></h2><span class="hint" id="modeHint">드래그해서 단면선 긋기 · 휠로 확대/축소</span></div>
+      <div class="ph"><h2>지도<small id="viewSize">—</small></h2><span class="hint" id="modeHint">드래그해서 단면선 긋기 · 휠로 확대/축소</span></div>
       <div class="tools">
         <div class="seg" role="group" aria-label="드래그 동작">
           <button type="button" id="mLine" aria-pressed="true">단면선 긋기</button>
           <button type="button" id="mPan" aria-pressed="false">지도 이동</button>
         </div>
+        <details class="mapOptions"><summary>지역·표시 설정</summary><div class="mapOptionGroups">
         <div class="seg" role="group" aria-label="지역 바로가기">
           <button type="button" data-bb="124.4,32.9,131.95,38.7">전국</button>
           <button type="button" data-bb="128.25,35.3,129.65,38.65">동해안</button>
@@ -349,18 +485,27 @@ details.more[open] summary{margin-bottom:12px}
           <button type="button" data-layer="rock" aria-pressed="true">갯바위</button>
           <button type="button" data-layer="flow" aria-pressed="true">조류 흐름</button>
         </div>
+        </div></details>
         <div class="seg" role="group" aria-label="확대">
           <button type="button" id="zOut" aria-label="축소">−</button>
           <button type="button" id="zIn" aria-label="확대">+</button>
         </div>
       </div>
       <div class="mapTime"><span class="t" id="clock2">—</span><input type="range" id="tIn2" min="0" max="23.99" step="0.05" value="6" aria-label="시각 (조류 흐름)"></div>
+      <div class="seg" id="providerModes" role="group" aria-label="온라인 지도 종류">
+        <button type="button" data-provider-mode="satellite" aria-pressed="true">위성</button>
+        <button type="button" data-provider-mode="hybrid" aria-pressed="false">위성+지명</button>
+        <button type="button" data-provider-mode="normal" aria-pressed="false">일반</button>
+      </div>
+      <p id="providerNotice" role="status">온라인 지도 설정 전 · 기본 지형지도로 표시합니다.</p>
       <div class="stage" id="stage">
+        <div id="providerMap" aria-label="NAVER 배경 지도"></div>
         <canvas id="base"></canvas>
         <canvas id="flow"></canvas>
         <canvas id="ui" aria-label="평면도: 드래그해서 단면선 지정"></canvas>
         <div class="warn" id="warn" hidden title="이 배율에서는 해안선이 실제와 수십 m 어긋날 수 있습니다">해안선 오차 수십 m</div>
       </div>
+      <details class="uiDetails"><summary>지도 범례·자료 안내</summary>
       <div class="legend">
         <span id="bandTitle">해안선에서 거리</span>
         <div class="bands" id="bandLegend"></div>
@@ -369,7 +514,8 @@ details.more[open] summary{margin-bottom:12px}
         <span class="key">⚓ 항·포구</span><span class="key">🪨 갯바위 (흐릴수록 접근 어려움)</span>
         <span class="key"><span class="sw p"></span>조류 흐름</span>
       </div>
-      <p class="note" id="terrainNote">지형 배경은 GEBCO 2026의 약 460 m 격자와 해안거리 추정입니다. 가까운 해안의 색과 등심선은 추정이며 수중여·턱을 알 수 없습니다. 위치별 수심과 A→B 단면은 확보된 공식 자료를 우선 사용합니다. 배경의 등심선과 조회값은 다를 수 있습니다. 해안선·시설·이름은 오픈스트리트맵(ODbL) 자료이며 빠지거나 오래된 시설이 있을 수 있습니다. 이름 뒤 *는 실제 항 이름이 확인되지 않았다는 뜻입니다.</p>
+      <p class="note" id="terrainNote">기본 지형지도 배경은 GEBCO 2026의 약 460 m 격자와 해안거리 추정입니다. 가까운 해안의 색과 등심선은 추정이며 수중여·턱을 알 수 없습니다. 위치별 수심과 A→B 단면은 확보된 공식 자료를 우선 사용합니다. 배경의 등심선과 조회값은 다를 수 있습니다. 기본 지도의 해안선·시설·이름은 오픈스트리트맵(ODbL) 자료이며 빠지거나 오래된 시설이 있을 수 있습니다. 이름 뒤 *는 실제 항 이름이 확인되지 않았다는 뜻입니다.</p>
+      </details>
       <div class="legend readout"><span id="cursorRead">커서를 지도 위에 올리면 좌표와 해안까지 거리가 나옵니다</span><span id="depthRead"></span></div>
       <details class="more"><summary>수심 자료 자세히</summary><p class="note" id="depthDetail">지도에서 위치를 확인하면 자료 정보를 표시합니다.</p></details>
       <details class="api"><summary>추정 수심 설정</summary>
@@ -397,7 +543,7 @@ details.more[open] summary{margin-bottom:12px}
     </div>
     <section class="panel">
     <div class="ph">
-      <h2>측면도<small>단면 A → B</small></h2>
+      <h2>수심 단면<small>A → B</small></h2>
       <div class="stats">
         <span>길이 <b id="sLen">—</b></span>
         <span>해안선 교차 <b id="sCross">—</b></span>
@@ -408,6 +554,7 @@ details.more[open] summary{margin-bottom:12px}
         <button class="btn ghost" id="toSec" type="button">단면 위치로 이동</button>
       </div>
     </div>
+    <details class="uiDetails"><summary>단면선 범례·기준면 안내</summary>
     <div class="lineKey">
       <span><i style="border-top:3px solid #d6fff9"></i>실측</span>
       <span><i style="border-top:3px solid #7ff3e6"></i>연안해역기본도</span>
@@ -416,6 +563,7 @@ details.more[open] summary{margin-bottom:12px}
       <span><i style="border-top:2px dashed #7ff3e6"></i>해안거리 추정</span>
       <span class="hint">흐린 실선 = 자료점 사이 보간 · 예측 바닷물 높이는 기준면 일치가 확인되지 않아 수심에 더하지 않습니다</span>
     </div>
+    </details>
     <div id="secWrap"><canvas id="sec" aria-label="단면도"></canvas></div>
     <div id="secInfo"></div>
   </section>
@@ -425,13 +573,12 @@ details.more[open] summary{margin-bottom:12px}
     <div class="panel ctrl">
       <div class="stHead">
         <div class="min0">
-          <div class="hint">포인트 (항 5 km 간격 · 갯바위)</div>
+          <div class="eyebrow">물때</div>
           <div class="stName" id="stName">—</div>
-          <div class="hint" id="stReg"></div>
         </div>
         
       </div>
-      <div id="ptInfo"></div>
+      <details class="uiDetails pointDetails"><summary>포인트 정보</summary><p class="hint" id="stReg"></p><div id="ptInfo"></div></details>
       <div class="days" id="dayStrip" role="tablist" aria-label="날짜 선택"></div>
       <canvas id="tideChart" aria-label="하루 조석 곡선. 눌러서 시각 선택"></canvas>
       <div class="evs" id="dayEvents"></div>
@@ -445,7 +592,7 @@ details.more[open] summary{margin-bottom:12px}
       <input type="range" id="tIn" min="0" max="23.99" step="0.05" value="6" aria-label="시각">
       <div><span class="chip in" id="tideChip">들물</span></div>
       <dl class="read">
-        <dt>바닷물 높이 <small class="hint" style="display:block">기본수준면(대략 가장 낮은 간조면)에서 잰 높이</small></dt><dd id="etaVal">—</dd>
+        <dt>바닷물 높이</dt><dd id="etaVal">—</dd>
         <dt>다음 만조</dt><dd id="nextHW">—</dd>
         <dt>다음 간조</dt><dd id="nextLW">—</dd>
         <dt>물흐름 세기 (그날 최강 대비)</dt><dd id="curVal">—</dd>
@@ -462,7 +609,7 @@ details.more[open] summary{margin-bottom:12px}
         <dt>파고</dt><dd id="wxWave">—</dd>
         <dt>현재 수온</dt><dd id="wxSst">—</dd>
       </dl>
-      <details class="api"><summary>이 숫자들은 어디서 왔나요?</summary><p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
+      <details class="api"><summary>예보 기준·자료 출처</summary><p class="note">바닷물 높이는 기본수준면(대략 가장 낮은 간조면)에서 잰 높이입니다.</p><p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
       <p class="note">조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」(공공데이터포털 Open API, 2026년 10월 4일 내려받음, 199개 지점). 지점별 물돌이(전류)·최강 유속 시각과 유향·유속이며, 그 사이 유속은 사인 곡선으로 보간했습니다. 관측 조류를 조화분석한 천문 예측이라 바람·파도·하천 유량의 영향은 빠져 있고, 조류는 수로·곶마다 크게 달라 예보 지점에서 멀수록 세기와 방향이 어긋납니다. 15 km 안에 지점이 없으면(동해안 대부분) 바닷물 높이 변화 속도로 추정합니다. 지도 화살표는 예보 지점의 그 시각 흐름이고, 흐름 입자는 예보 지점 근처에서는 그 방향을, 해안 가까이에서는 해안선을 따르도록 그린 그림이라 실제 유선은 아닙니다. 파고 예보가 없는 곳은 조과 지수에 파고를 반영하지 않습니다.</p></details>
     </div>
   </section>
@@ -470,18 +617,20 @@ details.more[open] summary{margin-bottom:12px}
   <section class="view" id="v-bite" aria-label="입질">
     <div class="panel" id="bite">
       <div class="ph">
-      <h2>조과 현황<small id="biteSub">—</small></h2>
-      <div class="lvKey"><span class="lv hi">높음 60점 이상</span><span class="lv mid">보통 40–59점</span><span class="lv lo">낮음 1–39점</span><span class="lv none">없음 0점</span></div>
+      <h2>어종별 입질<small id="biteSub">—</small></h2>
     </div>
     <div class="days" id="biteDays" role="tablist" aria-label="날짜 선택"></div>
     <canvas id="biteChart" aria-label="시간별 최고 조과 지수와 조석. 좌우로 끌어서 시간 선택"></canvas>
-    <p class="note">그래프를 좌우로 끌어 시간을 고릅니다. 막대는 그 시간에 가장 높은 어종의 지수, 선은 조석입니다.</p>
-    <p class="note" id="biteWin"></p>
-    <div id="rockInfo"></div>
+    <p class="chartHint">그래프를 끌어 시간을 선택하세요</p>
+    <details class="uiDetails biteInfo"><summary>시간대·포인트 정보</summary>
+      <p class="note">막대는 시간별 최고 입질 점수, 선은 바닷물 높이입니다.</p>
+      <p class="note" id="biteWin"></p>
+      <div id="rockInfo"></div>
+    </details>
     <div class="fishGrid" id="fishGrid"></div>
       <details class="basis">
       <summary>입질 지수는 어떻게 계산하나요?</summary>
-      <p class="note">입질 조건은 실제 잡힐 확률이 아닌 규칙 기반 0~99점입니다. 시즌(현재 10월 기준)·해역·대상어 적합도를 기본 50점에 반영하고 시간대(−9~+15점), 수온(−24~+8점), 풍속(−24~+12점), 파고(−20~+10점), 물때와 흐름의 기여분을 더합니다. 마지막에 내 조황기록 보정(0.5~1.5배)을 적용합니다. 각 계수는 조과 통계로 검증되지 않은 가정입니다. 수온은 선택 포인트에서 50 km 안의 가장 가까운 24시간 이내 실측을 사용하며 멀거나 오래되거나 미래 날짜를 볼수록 영향이 약해집니다. 어종별 수온 범위는 FishBase의 AquaMaps 모델값이며 한국 연안에 맞지 않는 4종은 적용하지 않습니다. 풍속 7 m/s, 파고 1 m를 중립으로 삼아 연속적으로 반영합니다. 조차가 60 cm 미만이면 환경 기여도를 1.25배로, 조석과 추정 흐름 기여도를 0.15배로 합니다. 15 km 안 실제 조류 예보가 있으면 우선 사용합니다. <b>자료 없음은 점수에 중립이며 신뢰도를 낮춥니다.</b> 자료 신뢰도는 수온 거리·시각, 기상 격자·발표 시각, 파고, 실제 조류 예보와 이전 자료 사용 여부를 반영합니다. 높음은 80 이상, 보통은 55 이상입니다. 신뢰도도 적중률이 아닙니다. 카드의 +/−는 조건의 기여 방향이며 '참고'는 자료 부족입니다. 내 기록 보정은 자료 신뢰도를 올리지 않습니다. 물고기 그림은 일러스트입니다.</p>
+      <p>V2.1 입질점수는 현재 환경이 어종에 맞는 정도를 나타내는 0~99 조건점수이며 잡힐 확률이 아닙니다. 서식 점수는 월별 계절·약한 권역 참고·수심·지형을, 오늘 조건은 선택한 날짜와 시각의 수온·활동시간·흐름·조석·기상을 뜻합니다. 서식 45%와 오늘 조건 55%를 합친 뒤 내 기록을 조금 반영합니다. 최종점수는 반올림 전 내부 값으로 계산합니다. 서식지와 잘 잡히는 곳은 일반적인 지형 안내이며 어획을 보장하지 않습니다. 39종 모두 계산하며 우럭·조피볼락은 같은 모델을 공유합니다. 월별 계절과 수심·서식·활동 선호는 넓은 생태 가정으로 조과 통계 검증 전입니다. 일부 수온 범위는 기존 FishBase/AquaMaps 자료를 재사용합니다. 확인되지 않은 조건은 중립으로 두고 자료 신뢰도를 낮춥니다. 신뢰도는 점수와 별개이며 높음 80 이상, 보통 55 이상입니다. 현재 수온 관측은 미래 예보가 아니며 멀거나 오래되거나 미래 날짜일수록 영향이 줄어듭니다. 조류는 15 km 안 예보 유속을 참고합니다. 예보가 없으면 유속 적합도는 중립으로 두고 조석 변화 조건만 작게 반영합니다. 바닷물 높이의 상승·하강을 조류 방향으로 해석하지 않습니다. 육지와 해안 경사 가정 수심은 점수에 쓰지 않습니다. 바람·파고의 생태 영향은 출조 안전 판단과 별개입니다. +/−는 기여 방향, ‘참고’는 자료 부족입니다. 가까운 내 기록을 조금 반영하며 표본이 적으면 보정이 약합니다.</p>
       <div class="tblWrap"><table id="basisTable"></table></div>
     </details>
     </div>
@@ -490,22 +639,22 @@ details.more[open] summary{margin-bottom:12px}
   <section class="view" id="v-log" aria-label="기록">
     <div class="panel">
       <div class="logBox">
-      <div class="sub">내 조황 기록 <small class="hint" id="logCount"></small></div>
+      <h2 class="logHeading">내 조황 기록 <small class="hint" id="logCount"></small></h2>
       <form id="logForm" class="logForm">
-        <span class="hint">포인트: <b id="logPt">—</b></span>
-        <input type="date" id="logDate" aria-label="날짜">
-        <input type="time" id="logHour" aria-label="시각">
-        <select id="logSpecies" aria-label="어종"></select>
-        <input type="number" id="logCount2" min="0" max="999" value="1" aria-label="마릿수" style="width:70px">
-        <input type="text" id="logMemo" maxlength="120" placeholder="메모 (채비·미끼 등)" aria-label="메모">
+        <span class="logLocation">포인트 <b id="logPt">—</b></span>
+        <label class="logField"><span>날짜</span><input type="date" id="logDate" aria-label="날짜"></label>
+        <label class="logField"><span>시각</span><input type="time" id="logHour" aria-label="시각"></label>
+        <label class="logField"><span>어종</span><select id="logSpecies" aria-label="어종"></select></label>
+        <label class="logField"><span>마릿수</span><input type="number" id="logCount2" min="0" max="999" value="1" aria-label="마릿수"></label>
+        <label class="logField wide"><span>메모</span><input type="text" id="logMemo" maxlength="120" placeholder="메모 (채비·미끼 등)" aria-label="메모"></label>
         <button class="btn" type="submit">기록</button>
       </form>
-      <p class="note" id="logMsg">다녀온 출조를 남기면, 같은 해역 기록에서 그 어종을 잡은 비율로 지수를 0.5~1.5배 보정합니다 (기록이 적을 땐 보정이 작게 들어갑니다). 못 잡은 날도 "꽝"으로 남겨야 정확해집니다.</p>
+      <p class="note" id="logMsg">기록은 이 브라우저에 저장됩니다. 못 잡은 날은 ‘꽝’을 선택하세요.</p>
       <ul class="logList" id="logList"></ul>
     </div>
     </div>
     <details class="panel ctrl more">
-      <summary>내 자료 불러오기 (항·갯바위·수심 파일, 수심 API)</summary>
+      <summary>자료 가져오기·설정</summary>
       <div class="field">
         <label for="portFile">항·포구 목록 (CSV)</label>
         <input type="file" id="portFile" accept=".csv,.txt,text/csv">
@@ -565,22 +714,25 @@ out geom;</pre>
         <div class="dataRow"><label class="chk"><input type="checkbox" id="apiAuto"> 지도 이동 시 자동</label><button class="btn small" id="apiGo" type="button">현재 화면 불러오기</button></div>
         <p class="note" id="apiMsg" aria-live="polite">지도 폭 15 km 이하에서 0.03° 타일 단위로 요청하고, 받은 타일은 다시 요청하지 않습니다.</p>
       </details>
-      <p class="note">기본 탑재 716곳: 국가어항 구역 82곳(구역 중심점), 해양수산부 어항정보, 충남 어항, 전남·제주 소규모항·어촌정주어항. 차로 갈 수 없는 전라·남해 섬은 섬마다 대표 항 하나만 남겼습니다. 지도에서 고를 수 있는 포인트는 이 중 5 km 안에 하나씩입니다. 다른 지역 항 좌표 자료: 공공데이터포털
+      <p class="note">기본 탑재 716곳: 국가어항 구역 82곳(구역 중심점), 해양수산부 어항정보, 충남 어항, 전남·제주 소규모항·어촌정주어항. 차로 갈 수 없는 전라·남해 섬은 섬마다 대표 항 하나만 남겼습니다. 다른 해역은 5 km 간격의 대표 포인트를 쓰며, 동해안은 지도 이름과 공식 예보 지점을 보강해 가까운 항도 개별로 고릅니다. 다른 지역 항 좌표 자료: 공공데이터포털
         <a href="https://www.data.go.kr/data/15148635/fileData.do" target="_blank" rel="noopener">소규모항</a> ·
         <a href="https://www.data.go.kr/data/15147417/fileData.do" target="_blank" rel="noopener">어촌정주어항</a>
         (해양수산부 공동활용체계)</p>
     </details>
-    <div class="panel">
-      <h2 class="h2">자료 출처</h2>
+    <details class="panel uiDetails sourcePanel">
+      <summary>자료 출처·이미지 안내</summary>
+      <p>온라인 일반·위성 배경: NAVER Maps JavaScript API v3 (설정한 경우). 배경 영상은 수심 자료로 사용하지 않습니다.</p>
       <div class="sources">
+    <p>어종 이미지: 방어·부시리·학공치·갑오징어·벵에돔·볼락·대구·고등어·광어·자바리·문치가자미·삼치는 잘린 원본 윤곽을 AI로 보완한 참고 이미지입니다.</p>
+    <p>어종 조건 참고: 기존 수온 범위는 FishBase/AquaMaps 자료를 재사용했습니다. <a href="https://fishbase.se/Ecology/Sebastes_schlegelii" target="_blank" rel="noopener">FishBase 우럭 생태</a>, <a href="https://www.nifs.go.kr/portal/pcon0000206/systA/actionConts.do" target="_blank" rel="noopener">국립수산과학원 어종 목록</a>, <a href="https://www.fao.org/docrep/014/i1920e/i1920e.pdf" target="_blank" rel="noopener">FAO 두족류 도감</a>을 참고했습니다. 서식 안내는 기존 프로필과 일반 생태 정보를 낚시 지형으로 풀어 쓴 설명입니다. <a href="https://www.fishbase.se/summary/Mugil_cephalus.html" target="_blank" rel="noopener">FishBase 숭어 서식 정보</a>도 참고했습니다. 월별 계절·선호 수심·활동 계수는 넓은 생태 가정이며 현장 통계 검증 전입니다.</p>
     <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
-    <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → 국립해양조사원 자연과학용 자료(KHOA/BADA) 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. KHOA는 유효 자료점으로 둘러싸인 곳만 보간하고 수집 범위 밖에서는 기존 자료로 돌아갑니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
+    <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → 국립해양조사원 자연과학용 자료(KHOA/BADA) 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. KHOA는 유효 자료점으로 둘러싸인 곳만 보간하고 수집 범위 밖에서는 기존 자료로 돌아갑니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름 및 동해안 보강 항·선착장 위치는 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
     <p><a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형): 2026년 10월 11일 주문진·남애 등 기존 자료를 보존하고 거진부터 울산까지 검증된 일부 연안 범위를 확대해 35,982점을 제공합니다. 대진·양양 및 포항·울산 일부에는 미탑재 범위가 있으며 동해 전체를 포함하지 않습니다. 약 150 m 간격의 해양수치모델용 자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다. 기준면은 조회 화면의 ‘평균해면하’ 표기를 보존하며 조사연도는 미확인입니다. <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">연안해역기본도</a>는 원본 미확보, <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해수부 수심분포도</a>는 공개 CSV에 수심값이 없어 미탑재입니다.</p>
     <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
     <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
     <p>조석·수온은 해양수산부 국립해양조사원(<a href="https://www.data.go.kr/data/15156018/openapi.do" target="_blank" rel="noopener">조석예보(고, 저조)</a>, <a href="https://www.data.go.kr/data/15155508/openapi.do" target="_blank" rel="noopener">조위관측소 최신 관측데이터</a>), 풍향·풍속·파고는 <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noopener">기상청 단기예보 조회서비스</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다. 음력 날짜는 korean_lunar_calendar(한국천문연구원 음양력 기준)로 계산했습니다.</p>
   </div>
-    </div>
+    </details>
   </section>
   </main>
 </div>

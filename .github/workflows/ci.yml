@@ -6,9 +6,16 @@ permissions:
 jobs:
   p0:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: P3 수심 변경금지
+        if: startsWith(github.head_ref, 'feat/p3-')
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 tests/p3_depth_guard.py origin/main
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -26,12 +33,42 @@ jobs:
         run: node tests/boot_degradation.mjs
       - name: 빌드
         run: python build.py
+      - name: 동해 세부 항구·주요 항 검색 회귀
+        run: python tests/test_east_ports.py
+      - name: 오늘 그래프 시각 선택·시간별 요약 회귀
+        run: python tests/test_today_time.py
       - name: 기본 브라우저 검사
         run: python tests/smoke.py
+      - name: A-B 상태 분류·다중 지형 교차·수심 곡선 단절 회귀
+        run: python tests/test_section_states.py
+      - name: P3 지도 어댑터·모바일·DPR 회귀 (실 API 없음)
+        run: python tests/test_map_provider.py
+      - name: P3 장봉항 explicit navigation·no-op 보정 회귀 (실 API 없음)
+        run: python tests/test_map_navigation.py
+      - name: P3 이동 중 렌더 차단·성능 회귀 (실 API 없음)
+        run: python tests/test_map_performance.py
+      - name: P3 타일 오류 허용·SDK 상태·복구 회귀 (실 API 없음)
+        run: python tests/test_map_health.py
+      - name: P3 16조합 lifecycle 반복 스트레스 (실 API 없음)
+        run: python tests/test_map_stress.py
+      - name: P3 native pan 16조합·500회 drift·실제 draw stamp 회귀 (실 API 없음)
+        run: python tests/test_map_pan.py
+      - name: P3 NAVER 내부 pane 이동·고정 Canvas 좌표 회귀 (실 API 없음)
+        run: python tests/test_map_pane.py
+      - name: 빌드 결과 일치
+        run: |
+          python tests/test_build_consistency.py
+          git diff --exit-code -- index.html
       - name: 자료 실패 브라우저 검사
         run: python tests/smoke_degradation.py
       - name: 입질 조건·자료 신뢰도 회귀
         run: python tests/test_bite_confidence.py
+      - name: 어종 실사 사진·V2 숫자 모델·모바일/PC 회귀
+        run: python tests/test_fish_photos.py
+      - name: 입질 V2 환경·계절·39종 행렬 회귀
+        run: python tests/test_bite_v2.py
+      - name: 입질 V2.1 날짜별 분해·39종 서식 안내·카드 회귀
+        run: python tests/test_bite_v21.py
       - name: 수심 GIS 변환 회귀
         run: python tests/test_depth_converter.py
       - name: 수심 자료 기반 브라우저 회귀

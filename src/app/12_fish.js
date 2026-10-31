@@ -1,4 +1,4 @@
-// 12_fish.js — 대상어 정보와 물고기 그림
+// 12_fish.js — 대상어 정보와 실사 사진, 누락 시 물고기 그림
 /* ── 대상어 ───────────────────────────────────────────── */
 // season: 10월 시즌 점수(0~1), reg: [동해, 남해, 서해, 제주] 출현 점수, cur: 물살 선호(1=물때 영향 큼)
 const FISH = [
@@ -21,6 +21,38 @@ const FISH = [
   { n: '백조기', season: .6, reg: [0, .4, 1, .2], cur: .7, f: { h: .28, top: '#b9bdb6', bot: '#eef0ec', tail: 'round' } },
   { n: '전어', season: .9, reg: [.5, 1, 1, .4], cur: .6, f: { h: .32, top: '#3a6a7e', bot: '#e8eef0', tail: 'fork', gspot: 1 } },
 ];
+/* 파일명은 제공된 자산 그대로 사용한다. 점수 미설정 어종에 기존 수치를 복제하지 않는다. */
+const FISH_PHOTOS = {
+  감성돔: 'gamseongdom', 볼락: 'bollak', 벵에돔: 'bengaedom', 농어: 'nongeo', 우럭: 'ureok', 광어: 'gwangeo',
+  노래미: 'noraemi', 삼치: 'samchi', 고등어: 'godeungeo', 참돔: 'chamdom', 잿방어: 'jaetbangeo', 부시리: 'busiri',
+  대구: 'daegu', 숭어: 'sungeo', 전갱이: 'jeongaengi', 돌돔: 'doldom', 백조기: 'baekjogi', 전어: 'jeoneo',
+  독가시치: 'dokgasichi', 방어: 'bangeo', 문치가자미: 'munchigajami', 조피볼락: 'jopibollak', 학공치: 'hakgongchi',
+  무늬오징어: 'munuiojing-eo', 피문어: 'pimuneo', 용가자미: 'yonggajami', 참가자미: 'chamgajami', 참문어: 'chammuneo',
+  갑오징어: 'gabo-jingeo', 갈치: 'galchi', 가숭어: 'gasungeo', 민어: 'mineo', 벤자리: 'benjari', 붕장어: 'bungjangeo',
+  살오징어: 'salojing-eo', 자바리: 'jabari', 쭈꾸미: 'jjukkumi', 한치: 'hanchi', 호래기: 'horaegi'
+};
+for (const n of Object.keys(FISH_PHOTOS)) if (!FISH.some(f => f.n === n)) {
+  FISH.push({ n, modelStatus: 'provisional', season: null, reg: null, cur: null, ...(n === '조피볼락' ? { aliasOf: '우럭' } : {}) });
+}
+for (const fish of FISH) fish.image = `static/fish/${FISH_PHOTOS[fish.n]}.webp`;
+function fishHasBiteModel(fish) {
+  return !!fish.ecology || fish.modelStatus !== 'provisional' && Number.isFinite(fish.season) && Array.isArray(fish.reg) && fish.reg.length === 4 && fish.reg.every(Number.isFinite) && Number.isFinite(fish.cur);
+}
+// 잘린 윤곽을 AI로 보완한 자산만 주소 버전을 바꿔 기존 브라우저 캐시를 갱신한다.
+const FISH_RESTORED_PHOTOS=new Set(['방어','부시리','학공치','갑오징어','벵에돔','볼락','대구','고등어','광어','자바리','문치가자미','삼치']);
+function fishPicture(fish, id) {
+  const fallback = fishSVG(fish.f || { h: .3, top: '#5f7586', bot: '#e5eaee', tail: 'fork' }, id);
+  if (!fish.image) return fallback;
+  const restored=FISH_RESTORED_PHOTOS.has(fish.n);
+  return `<span class="fishMedia"><img class="fishPhoto" src="${fish.image}${restored?'?v=20261031-restored':''}" alt="${fish.n}"${restored?' title="잘린 원본 윤곽을 AI로 보완한 참고 이미지"':''} decoding="async"><span class="fishPhotoFallback" role="img" aria-label="${fish.n} 대체 그림" hidden>${fallback}</span></span>`;
+}
+/* IMG 실패는 버블되지 않아 캡처 단계에서 처리한다. 렌더를 반복해도 리스너는 하나다. */
+document.addEventListener('error', event => {
+  const img = event.target;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains('fishPhoto')) return;
+  img.hidden = true;
+  img.nextElementSibling.hidden = false;
+}, true);
 const REG_IDX = { '동해': 0, '남해': 1, '서해': 2, '제주': 3 };
 /* ── 물고기 일러스트 (SVG) ──────────────────────────── */
 function fishSVG(f, id) {

@@ -1,0 +1,881 @@
+{
+  "date": "2026-10-18",
+  "beforeCommit": "eb28c31ca112f9bbb3c1672268ae1a7df16cef8e",
+  "scope": "headless mock; 사용자 실제 NAVER 최신 재검증 대기",
+  "actualFallbackCause": "사용자 localhost lastFallbackReason=settle-failure: 기존 watchdog의 fatal 호출 확인",
+  "actualBlockedPredicate": "이전 수치가 없어 center 2px 또는 zoom/scale 중 어느 조건인지 미확인",
+  "healthAndSettleMatrix": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "settle": {
+        "healthyTimeoutRetained": true,
+        "nextIdleRecovered": true,
+        "fitRecovered": true,
+        "reasonCases": [
+          "centerErrorPx",
+          "zoomScalePending",
+          "keyChanges"
+        ],
+        "repeatedPanZoom": 100,
+        "repeatedTimeouts": 100,
+        "fallbacks": 0,
+        "movingHeavy": 0,
+        "errorPx": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "settle": {
+        "healthyTimeoutRetained": true,
+        "nextIdleRecovered": true,
+        "fitRecovered": true,
+        "reasonCases": [
+          "centerErrorPx",
+          "zoomScalePending",
+          "keyChanges"
+        ],
+        "repeatedPanZoom": 100,
+        "repeatedTimeouts": 100,
+        "fallbacks": 0,
+        "movingHeavy": 0,
+        "errorPx": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "settle": {
+        "healthyTimeoutRetained": true,
+        "nextIdleRecovered": true,
+        "fitRecovered": true,
+        "reasonCases": [
+          "centerErrorPx",
+          "zoomScalePending",
+          "keyChanges"
+        ],
+        "repeatedPanZoom": 100,
+        "repeatedTimeouts": 100,
+        "fallbacks": 0,
+        "movingHeavy": 0,
+        "errorPx": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "settle": {
+        "healthyTimeoutRetained": true,
+        "nextIdleRecovered": true,
+        "fitRecovered": true,
+        "reasonCases": [
+          "centerErrorPx",
+          "zoomScalePending",
+          "keyChanges"
+        ],
+        "repeatedPanZoom": 100,
+        "repeatedTimeouts": 100,
+        "fallbacks": 0,
+        "movingHeavy": 0,
+        "errorPx": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "settle": {
+        "healthyTimeoutRetained": true,
+        "nextIdleRecovered": true,
+        "fitRecovered": true,
+        "reasonCases": [
+          "centerErrorPx",
+          "zoomScalePending",
+          "keyChanges"
+        ],
+        "repeatedPanZoom": 100,
+        "repeatedTimeouts": 100,
+        "fallbacks": 0,
+        "movingHeavy": 0,
+        "errorPx": 6.122223575328581e-13
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 6.122223575328581e-13,
+        "permanentHidden": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "tile": {
+        "singleErrorRetained": true,
+        "transientErrors": 11,
+        "fallbackCount": 0,
+        "tileErrorsLast10s": 11
+      },
+      "mode": {
+        "retained": true,
+        "modeHealthChecks": 1,
+        "tileErrorsLast10s": 0
+      },
+      "settle": {
+        "healthyTimeoutRetained": true,
+        "nextIdleRecovered": true,
+        "fitRecovered": true,
+        "reasonCases": [
+          "centerErrorPx",
+          "zoomScalePending",
+          "keyChanges"
+        ],
+        "repeatedPanZoom": 100,
+        "repeatedTimeouts": 100,
+        "fallbacks": 0,
+        "movingHeavy": 0,
+        "errorPx": 0
+      },
+      "fatal": {
+        "recoveries": [
+          {
+            "reason": "browser-offline",
+            "count": 1
+          },
+          {
+            "reason": "browser-offline",
+            "count": 2
+          }
+        ],
+        "transientProjectionRetained": true,
+        "persistentReason": "projection-failure",
+        "recovered": true,
+        "instances": 1,
+        "errorPx": 0,
+        "permanentHidden": 0
+      }
+    }
+  ],
+  "providerResultCount": 32,
+  "sdkFailureCases": [
+    {
+      "failure": "404",
+      "passed": true
+    },
+    {
+      "failure": "429",
+      "passed": true
+    },
+    {
+      "failure": "offline",
+      "passed": true
+    },
+    {
+      "failure": "timeout",
+      "passed": true
+    },
+    {
+      "failure": "auth",
+      "passed": true
+    },
+    {
+      "failure": "map-init",
+      "passed": true
+    }
+  ],
+  "performance": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.5590169943749475,
+      "maxIdleRecoveryMs": 87,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 15,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.25,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0.44687800704855685,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 56,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 15,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.5,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 53,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 15,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.25,
+      "maxIdleRecoveryMs": 58,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 15,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.7071067811865476,
+      "maxIdleRecoveryMs": 60,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 20,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.25,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0.2808883999276688,
+      "maxABErrorPx": 0.25,
+      "maxIdleRecoveryMs": 74,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 20,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.5,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 66,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 20,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.5590169943749475,
+      "maxIdleRecoveryMs": 84,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 20,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.9013878188659974,
+      "maxIdleRecoveryMs": 98,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 20,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.25,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0.27961908270946945,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 93,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 20,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.5,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0.33318465655668206,
+      "maxABErrorPx": 0.3535533905932738,
+      "maxIdleRecoveryMs": 85,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 20,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "movingHeavy": 0,
+      "permanentHidden": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.5590169943749475,
+      "maxIdleRecoveryMs": 80,
+      "drawRevealOrder": [
+        "read",
+        "base",
+        "ui",
+        "current",
+        "section",
+        "reveal"
+      ],
+      "stationaryCounts": {
+        "frame": 60,
+        "providerSync": 0,
+        "providerViewportKey": 0,
+        "providerCheck": 0,
+        "providerAlignment": 0,
+        "renderBase": 0,
+        "coastPath": 0,
+        "structPath": 0,
+        "updateHover": 0,
+        "drawUI": 0,
+        "drawCrnt": 0,
+        "stepParticles": 20,
+        "drawSection": 0,
+        "stationRedraw": 0,
+        "maskRebuild": 0,
+        "getImageData": 0,
+        "buildFlowField": 0,
+        "particleRespawn": 0
+      }
+    }
+  ],
+  "legacyChecks": [
+    {
+      "command": "tests/boot_degradation.mjs",
+      "exit": 0
+    },
+    {
+      "command": "build.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_collector_resilience.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/smoke.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/smoke_degradation.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_bite_confidence.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_depth_converter.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_depth_foundation.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_khoa_fetch.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_khoa_depth.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_khoa_coverage.py",
+      "exit": 0
+    },
+    {
+      "command": "tests/test_khoa_coverage_browser.py",
+      "exit": 0
+    }
+  ],
+  "notes": [
+    "100회 timeout 검사는 SDK 이벤트와 실제 probe 함수를 결정적 RAF로 진행하며 NAVER 시간 성능 계측이 아님",
+    "기존 reveal 검사의 fatal 기대값을 새 provider 유지 정책으로 갱신 후 재실행",
+    "분석 Canvas는 다음 이벤트에서도 settle 못 하면 계속 보류될 수 있음"
+  ],
+  "protectedDepthAndDataUnchanged": true,
+  "P3Complete": false
+}

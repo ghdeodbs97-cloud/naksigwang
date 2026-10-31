@@ -36,12 +36,12 @@ window.__p1ExpirySetup = () => {
 };
 window.__p1ExpirySnapshot = () => {
   const p = POINTS[S.pt], st = STATIONS[S.st];
-  const evaluations = FISH.map(f => ({ name: f.n, ev: biteEvalAt(f, p, st, S.day, Math.floor(S.t)) }));
+  const evaluations = FISH.filter(fishHasBiteModel).map(f => ({ name: f.n, ev: biteEvalAt(f, p, st, S.day, Math.floor(S.t)) }));
   const cards = [...$('fishGrid').children];
   return { calls: refreshCalls, t: S.t, evaluations, matches: evaluations.every(({ name, ev }) => {
     const card = cards.find(c => c.querySelector('.fn').firstChild.textContent === name);
     return card.querySelector('.fp b').textContent === ev.score + '점'
-      && card.querySelector('.biteConfidence').textContent === '자료 신뢰도 ' + ev.confidenceLevel
+      && !card.querySelector('.biteConfidence') && !card.querySelector('.biteScores') && Number.isFinite(ev.habitatScore) && Number.isFinite(ev.dynamicScore)
       && card.querySelector('.biteReasons').textContent === biteReasons(ev);
   }) };
 };
@@ -74,8 +74,9 @@ try:
                     page.screenshot(path=str(out / f'{width}-{tab}.png'), full_page=True)
             assert '%' not in page.locator('#fishGrid').inner_text()
             assert '%' not in page.locator('#tdBest').inner_text()
-            assert '%' not in page.locator('.lvKey').inner_text()
-            assert page.locator('.biteConfidence').count() == 18
+            assert page.locator('.lvKey').count() == 0
+            assert page.locator('.biteConfidence').count() == 0
+            assert page.locator('.biteScores').count() == 0
             assert all(page.locator('.biteReasons').all_text_contents())
             page.evaluate('window.__p1ExpirySetup()')
             before = page.evaluate('window.__p1ExpirySnapshot()')

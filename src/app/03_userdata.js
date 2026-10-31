@@ -73,7 +73,7 @@ function importPorts(rows) {
   return { ok, bad, msg: ok ? `항·포구 ${ok.toLocaleString()}곳을 불러왔습니다` + (bad ? ` (좌표 없음·범위 밖 ${bad}건 제외)` : '') + `. ${cols}. 첫 항목: ${first.name} ${first.lat.toFixed(4)}, ${first.lon.toFixed(4)}. 지도 폭 약 100 km 이하로 확대하면 이름이 나타납니다.`
     : `불러온 항목이 없습니다. ${cols}. 첫 줄 값: ${(rows[1] || []).slice(0, 8).join(' | ')}` };
 }
-const portPri = t => /국가/.test(t) ? 0 : /지방|충남|^어항$/.test(t) ? 1 : /정주/.test(t) ? 2 : /소규모|포구/.test(t) ? 3 : 2;
+const portPri = t => /국가|주요항/.test(t) ? 0 : /지방|충남|^어항$/.test(t) ? 1 : /정주/.test(t) ? 2 : /소규모|포구/.test(t) ? 3 : 2;
 function saveLocal() { try { localStorage.setItem('ps_ports', JSON.stringify(PORTS.map(p => [p.name, p.type, p.lat, p.lon]))); } catch (e) {} }
 function loadLocal() {
   const seen = new Set();
@@ -120,7 +120,7 @@ function clearData() {
 function drawPortsAndSoundings(gpp) {
   // 수심 자료점 (확대했을 때만)
   if (totalPts() && gpp < 25) {
-    const [x1, y2] = toM(0, 0), [x2, y1] = toM(cw, ch), used = new Set(); let drawn = 0;
+    const [x1, y1, x2, y2] = viewBounds(), used = new Set(); let drawn = 0;
     bctx.font = '600 9.5px JetBrains Mono, monospace'; bctx.textBaseline = 'middle';
     for (const t of DORDER.slice().reverse()) {
       const Lr = LAYERS[t]; if (!Lr || !Lr.n) continue;

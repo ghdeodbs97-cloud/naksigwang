@@ -8,17 +8,19 @@ function analyzeSection() {
   autoShore();   // 해안 종류에 맞춰 추정 경사·수심 상한을 먼저 정한다 (18b_shore.js)
   const kA = kAt(latOf(S.A[1])), Lg = Math.hypot(S.B[0] - S.A[0], S.B[1] - S.A[1]) / kA;
   const N = Math.round(clamp(Lg / 2, 300, 1000));            // 최소 300개, 길면 약 2 m 간격까지
-  const pts = []; let L = 0;
+  const surface=sectionSurfaceContext(S.A,S.B),pts = []; let L = 0;
   for (let k = 0; k <= N; k++) {
     const f = k / N, mx = S.A[0] + (S.B[0] - S.A[0]) * f, my = S.A[1] + (S.B[1] - S.A[1]) * f;
     if (k) { const p = pts[k - 1]; L += Math.hypot(mx - p.mx, my - p.my) / kAt(latOf((my + p.my) / 2)); }
-    const land = inLand(mx, my), dG = Math.min(groundToCoast(mx, my, 8000), 8000);
-    const r = land ? null : (depthQuery(mx, my) || modelDepth(mx, my, dG));
-    pts.push({ mx, my, s: L, land, dG, r });
+    const dG = Math.min(groundToCoast(mx, my, 8000), 8000);
+    pts.push(classifySectionSample({mx,my,s:L,dG},surface,f));
   }
   const cross = [];
-  for (let k = 1; k <= N; k++) if (pts[k].land !== pts[k - 1].land) cross.push(k);
-  SEC = { pts, L, cross, N };
+  for (let k = 1; k <= N; k++) if (pts[k].land&&sectionSampleIsWater(pts[k-1])||pts[k-1].land&&sectionSampleIsWater(pts[k])) cross.push(k);
+  const transitions=[];for(let k=1;k<=N;k++)if(pts[k].state!==pts[k-1].state)transitions.push({index:k,from:pts[k-1].state,to:pts[k].state,distanceM:pts[k].s});
+  const distanceAt=f=>{const v=clamp(f,0,1)*N,i=Math.min(N-1,Math.floor(v));return pts[i].s+(pts[i+1].s-pts[i].s)*(v-i);};
+  SEC = { pts, L, cross, N,transitions,surfaceIntervals:surface.intervals.map(r=>({...r,startM:distanceAt(r.a),endM:distanceAt(r.b)})) };
+  SEC.blockedEdges=Array.from({length:N+1},(_,k)=>sectionEdgeBlocked(SEC,k));SEC.waterRuns=sectionWaterRuns(SEC);
   SEC.prof = profileFeatures(SEC);
   renderSecInfo();
 }
@@ -29,13 +31,13 @@ function profileFeatures(sec) {
   let c0 = 0, dir = 1;
   if (cross.length) { const c = cross[0]; if (pts[c - 1].land && !pts[c].land) { c0 = c; dir = 1; } else { c0 = c - 1; dir = -1; } }
   const s0 = pts[c0].s, seq = [];
-  for (let k = c0; k >= 0 && k < pts.length; k += dir) { const p = pts[k]; if (p.land) { if (seq.length) break; continue; } seq.push({ x: Math.abs(p.s - s0), d: p.r.depth, t: p.r.type, sourceType: p.r.sourceType }); }
+  for (let k = c0; k >= 0 && k < pts.length; k += dir) { const p = pts[k]; if (!sectionSampleIsWater(p)||seq.length&&sectionEdgeBlocked(sec,dir>0?k:k+1)) break; seq.push({ x: Math.abs(p.s - s0), d: p.r.depth, t: p.r.type, sourceType: p.r.sourceType }); }
   const out = { items: [], note: '', cast: [] };
   if (!cross.length) { out.note = '해안 교차가 없어 해안 기준 캐스팅 거리와 해안 지형을 판정하지 않았습니다.'; return out; }
   if (seq.length < 10) { out.note = '바다 구간이 짧아 분석하지 않았습니다.'; return out; }
   const types = new Set(seq.map(q => q.t)), onlyEst = types.size === 1 && types.has('est'), pubShare = seq.filter(q => isPub(q.t)).length / seq.length;
   for (const m of [50, 100, 150]) { const q = seq.find(q => q.x >= m); out.cast.push({ m, q }); }
-  const refs = new Set(pts.filter(p => !p.land).map(p => p.r.datasetId + '|' + p.r.verticalDatum));
+  const refs = new Set(pts.filter(sectionSampleIsWater).map(p => p.r.datasetId + '|' + p.r.verticalDatum));
   if (refs.size > 1) { out.note = '서로 다른 자료·기준면 구간을 연결해 급심이나 수중여를 판정하지 않았습니다. 각 위치의 수심은 해당 출처 기준입니다.'; return out; }
   if ([...types].every(x => x === 'est' || x === 'gebco') && types.has('gebco')) { out.note = '이 단면은 GEBCO 460 m 격자와 추정값뿐이라 수십 m 단위의 급심·수중여는 찾을 수 없습니다. 아래 결과는 큰 흐름만 참고하세요.'; }
   if (onlyEst) { out.note = '이 단면은 추정 모델만 있어 해저지형 특징을 분석하지 않았습니다. 실측·공공 수심을 불러오면 분석합니다.'; return out; }
@@ -74,6 +76,8 @@ function renderSecInfo() {
   const cast = P.cast.map(({ m, q }) => `<span class="cast"><b>${m} m</b> ${q ? (q.t === 'est' ? '추정 약 ' + Math.round(q.d) + ' m' : q.t === 'gebco' ? '약 ' + Math.round(q.d) + ' m · GEBCO' : (q.t === 'bada' ? '약 ' + Math.round(q.d) : q.t === 'survey' ? q.d.toFixed(1) : '약 ' + Math.round(q.d)) + ' m · ' + (q.sourceType === 'khoa' ? 'KHOA' : DTYPES[q.t].short)) : '단면 밖'}</span>`).join('');
   box.innerHTML = (cast ? `<div class="casts"><span class="hint">해안선에서 캐스팅 거리별 수심</span>${cast}</div>` : '') +
     `<ul class="feats">${P.items.map(t => `<li>${t}</li>`).join('')}</ul>` + (P.note ? `<p class="note warnTxt">${P.note}</p>` : '');
+  const states=[...new Set([...(SEC.pts||[]).map(p=>p.state),...(SEC.surfaceIntervals||[]).map(r=>r.state)].filter(Boolean))];
+  if(states.some(s=>s!=='water'))box.innerHTML+=`<p class="note">단면 구간: ${states.map(s=>SECTION_STATE[s]).join(' · ')}. 비수중 구간은 수심을 연결하지 않으며 고도는 측정하지 않았습니다.</p>`;
 }
 
 function lineStyle(r) {
@@ -90,8 +94,8 @@ function drawSection(now, tide) {
   if (!SEC) { sctx.fillStyle = '#7a9ea6'; sctx.font = '400 13px IBM Plex Sans KR, sans-serif'; sctx.textBaseline = 'middle'; sctx.fillText('평면도에서 해안을 확대한 뒤, 육지에서 바다 쪽으로 단면선을 그어 보세요.', 20, h / 2); return; }
   const { pts, L, cross, N } = SEC;
   const landH = 3;
-  const zs = pts.map(p => p.land ? landH : -p.r.depth);
-  const minZ = Math.min(...zs), maxD = -minZ;
+  const zs = pts.map(p => sectionSampleIsWater(p) ? -p.r.depth : null);
+  const minZ = Math.min(0,...zs.filter(Number.isFinite)), maxD = -minZ;
   const ymin = Math.floor((minZ - 2) / 5) * 5, ymax = landH + 1.5;
   const X = d => ml + d / L * (w - ml - mr), Y = v => mt + (ymax - v) / (ymax - ymin) * (h - mt - mb);
   const xk = k => X(pts[k].s);
@@ -119,28 +123,26 @@ function drawSection(now, tide) {
     const lx = clamp(xk(deep) - 14, ml + 4, w - mr - 36);
     [['상층', 1 / 6], ['중층', .5], ['하층', 5 / 6]].forEach(([t, f]) => sctx.fillText(t, lx, Y(-maxD * f)));
   }
-  // 해저면 채움
-  sctx.beginPath(); sctx.moveTo(xk(0), Y(zs[0]));
-  for (let k = 1; k <= N; k++) { if (pts[k].land !== pts[k - 1].land) sctx.lineTo(xk(k), Y(zs[k - 1])); sctx.lineTo(xk(k), Y(zs[k])); }
-  sctx.lineTo(xk(N), h - mb + 1); sctx.lineTo(xk(0), h - mb + 1); sctx.closePath();
-  const gb = sctx.createLinearGradient(0, Y(0), 0, h); gb.addColorStop(0, '#20302c'); gb.addColorStop(1, '#0a1214'); sctx.fillStyle = gb; sctx.fill();
-  // 육지 구간
-  let k0 = null; const runs = [];
-  for (let k = 0; k <= N + 1; k++) { const isL = k <= N && pts[k].land; if (isL && k0 === null) k0 = k; if (!isL && k0 !== null) { runs.push([k0, k - 1]); k0 = null; } }
-  for (const [a, b] of runs) {
-    const x1 = xk(a), x2 = xk(b);
-    sctx.fillStyle = '#1c2622'; sctx.fillRect(x1, Y(landH), Math.max(1, x2 - x1), h - mb - Y(landH));
-    sctx.save(); sctx.beginPath(); sctx.rect(x1, Y(landH), Math.max(1, x2 - x1), h - mb - Y(landH)); sctx.clip();
+  // 연결 가능한 바다 구간마다 따로 채운다. 짧은 형상이 샘플 사이에 있어도 건너 잇지 않는다.
+  const gb = sctx.createLinearGradient(0, Y(0), 0, h); gb.addColorStop(0, '#20302c'); gb.addColorStop(1, '#0a1214');
+  for(const [a,b] of sectionWaterRuns(SEC)){sctx.beginPath();sctx.moveTo(xk(a),Y(zs[a]));for(let k=a+1;k<=b;k++)sctx.lineTo(xk(k),Y(zs[k]));sctx.lineTo(xk(b),h-mb+1);sctx.lineTo(xk(a),h-mb+1);sctx.closePath();sctx.fillStyle=gb;sctx.fill();}
+  // 비수중 구간은 높이나 0m 수심을 만들어내지 않고 별도 띠로 표시한다.
+  const bands=SEC.surfaceIntervals.filter(r=>r.state!=='water').map(r=>({...r,x1:X(r.startM),x2:X(r.endM)}));
+  let unknownStart=null;for(let k=0;k<=N+1;k++){const missing=k<=N&&pts[k].state==='unknown'&&!SEC.surfaceIntervals.some(r=>r.state==='unknown'&&k/N>=r.a&&k/N<=r.b);if(missing&&unknownStart===null)unknownStart=k;if(!missing&&unknownStart!==null){bands.push({state:'unknown',x1:X(Math.max(0,pts[unknownStart].s-L/N/2)),x2:X(Math.min(L,pts[k-1].s+L/N/2))});unknownStart=null;}}
+  for (const band of bands) {
+    const {x1,x2,state}=band;
+    sctx.fillStyle = {land:'#1c2622',breakwater:'#353b40',rock_exposed:'#493d30',unknown:'#24252c'}[state]; sctx.fillRect(x1, mt, Math.max(1, x2 - x1), h - mb - mt);
+    sctx.save(); sctx.beginPath(); sctx.rect(x1, mt, Math.max(1, x2 - x1), h - mb - mt); sctx.clip();
     sctx.strokeStyle = 'rgba(191,247,239,.08)'; sctx.lineWidth = 1;
     for (let x = x1 - h; x < x2 + h; x += 8) { sctx.beginPath(); sctx.moveTo(x, h); sctx.lineTo(x + h, 0); sctx.stroke(); }
     sctx.restore();
-    if (x2 - x1 > 70) { sctx.fillStyle = '#7a9ea6'; sctx.font = '400 11px IBM Plex Sans KR, sans-serif'; sctx.textBaseline = 'top'; sctx.fillText('육지·구조물 (고도 자료 없음)', x1 + 6, Y(landH) + 6); }
+    if (x2 - x1 > 35) { sctx.fillStyle = '#c5bba8'; sctx.font = '400 11px IBM Plex Sans KR, sans-serif'; sctx.textBaseline = 'top'; sctx.fillText(SECTION_STATE[state], x1 + 3, mt + 6); }
   }
   // 해저면 선: 자료 출처별 스타일
   let seg = null;
   const flush = () => { if (!seg) return; sctx.globalAlpha = seg.st.a ?? 1; sctx.setLineDash(seg.st.dash); sctx.strokeStyle = seg.st.c; sctx.lineWidth = seg.st.w; sctx.stroke(); sctx.setLineDash([]); sctx.globalAlpha = 1; seg = null; };
   for (let k = 0; k <= N; k++) {
-    const p = pts[k]; if (p.land) { flush(); continue; }
+    const p = pts[k]; if (!sectionSampleIsWater(p)) { flush(); continue; }if(sectionEdgeBlocked(SEC,k))flush();
     const st = lineStyle(p.r), ref = p.r.datasetId + '|' + p.r.verticalDatum, key = ref + st.c + st.w + (st.a ?? 1) + st.dash.join();
     const x = xk(k), y = Y(zs[k]);
     if (!seg || seg.key !== key) { const prev = seg && seg.ref === ref && seg.last; flush(); sctx.beginPath(); if (prev) sctx.moveTo(prev[0], prev[1]); else sctx.moveTo(x, y); seg = { key, st, ref }; }
@@ -149,13 +151,14 @@ function drawSection(now, tide) {
   flush();
   // 해안선에서 캐스팅 거리
   sctx.font = '600 10px JetBrains Mono, monospace'; sctx.textBaseline = 'bottom';
-  cross.slice(0, 4).forEach(c => {
+  let lastEdgeLabelX=-Infinity;cross.slice(0, 4).forEach(c => {
     const seaFwd = pts[c - 1].land && !pts[c].land, s0 = (pts[c].s + pts[c - 1].s) / 2;
     sctx.strokeStyle = '#ffb84d'; sctx.lineWidth = 2; sctx.beginPath(); sctx.moveTo(X(s0), Y(landH)); sctx.lineTo(X(s0), Y(S.hs / 2 + .8)); sctx.stroke();
-    sctx.fillStyle = '#ffb84d'; sctx.fillText('해안선', clamp(X(s0) - 18, ml, w - mr - 40), Y(S.hs / 2 + .8) - 2);
+    const solid=pts[c].land?pts[c]:pts[c-1],edgeLabel=solid.state==='breakwater'?'구조물 경계':solid.state==='rock_exposed'?'암반 경계':'해안선';
+    const edgeX=clamp(X(s0)-18,ml,w-mr-40);if(edgeX>lastEdgeLabelX+65){sctx.fillStyle = '#ffb84d'; sctx.fillText(edgeLabel,edgeX,Y(S.hs/2+.8)-2);lastEdgeLabelX=edgeX;}
     for (const m of [50, 100, 150]) {
       const s = seaFwd ? s0 + m : s0 - m; if (s < 0 || s > L) continue;
-      const k = Math.round(s / L * N); if (pts[k].land) continue;
+      const k = Math.round(s / L * N); if (!sectionSampleIsWater(pts[k])||SEC.surfaceIntervals.some(r=>r.state!=='water'&&r.startM<Math.max(s,s0)&&r.endM>Math.min(s,s0))) continue;
       const x = X(s); sctx.setLineDash([2, 4]); sctx.strokeStyle = 'rgba(255,184,77,.6)'; sctx.lineWidth = 1;
       sctx.beginPath(); sctx.moveTo(x, Y(0)); sctx.lineTo(x, Y(zs[k])); sctx.stroke(); sctx.setLineDash([]);
       sctx.fillStyle = 'rgba(255,184,77,.85)'; sctx.fillText(m + 'm', x - 12, Y(zs[k]) - 3);
@@ -163,7 +166,7 @@ function drawSection(now, tide) {
   });
   // 수면(자료 기준면 0 m 주변 파고)
   sctx.beginPath(); let on = false;
-  for (let x = ml; x <= w - mr; x += 2) { const d = (x - ml) / (w - ml - mr) * L, k = Math.round(d / L * N); if (pts[k].land) { on = false; continue; } const y = Y(surf(d)); on ? sctx.lineTo(x, y) : sctx.moveTo(x, y); on = true; }
+  for (let x = ml; x <= w - mr; x += 2) { const d = (x - ml) / (w - ml - mr) * L, k = Math.round(d / L * N); if (!sectionSampleIsWater(pts[k])||SEC.surfaceIntervals.some(r=>r.state!=='water'&&d>=r.startM&&Math.max(0,d-2*L/(w-ml-mr))<=r.endM)) { on = false; continue; } const y = Y(surf(d)); on ? sctx.lineTo(x, y) : sctx.moveTo(x, y); on = true; }
   sctx.strokeStyle = 'rgba(235,255,252,.85)'; sctx.lineWidth = 1.2; sctx.stroke();
   const vx = (L / (w - ml - mr)) / ((ymax - ymin) / (h - mt - mb));
   sctx.font = '400 10px JetBrains Mono, monospace'; sctx.textBaseline = 'top'; sctx.fillStyle = '#7a9ea6';
@@ -172,8 +175,10 @@ function drawSection(now, tide) {
   if (S.secHover != null) {
     const k = Math.round(S.secHover * N), x = xk(k), p = pts[k];
     sctx.strokeStyle = 'rgba(255,255,255,.6)'; sctx.lineWidth = 1; sctx.beginPath(); sctx.moveTo(x, mt); sctx.lineTo(x, h - mb); sctx.stroke();
-    const lines = ['A에서 ' + fmtD(p.s), p.land ? '육지·구조물' : '해안에서 ' + (p.dG >= 8000 ? '8 km+' : fmtD(p.dG))];
-    if (!p.land) { const q = p.r; lines.push((q.type === 'est' ? '추정 수심 ' : '수심 ') + fmtDepth(q), '출처 ' + (q.label || DTYPES[q.type].label), '신뢰도 ' + q.conf); }
+    const interval=SEC.surfaceIntervals.find(r=>r.state!=='water'&&S.secHover*L>=r.startM&&S.secHover*L<=r.endM),hoverState=interval?.state||p.state,classification=interval||p.classification;
+    const lines = ['A에서 ' + fmtD(S.secHover*L), SECTION_STATE[hoverState]];
+    if (hoverState==='water'&&sectionSampleIsWater(p)) { const q = p.r; lines.push((q.type === 'est' ? '추정 수심 ' : '수심 ') + fmtDepth(q), '출처 ' + (q.label || DTYPES[q.type].label), '신뢰도 ' + q.conf); }
+    else {lines.push(hoverState==='unknown'?'수심을 연결하지 않음':'고도·수심 미측정',classification.source);if(classification.confidence==='point_location_only')lines.push('위치점 주변만 판정·범위 미확인');}
     const bw = 168, bh = 8 + lines.length * 15, bx = x + bw + 12 > w ? x - bw - 8 : x + 8;
     sctx.fillStyle = 'rgba(6,15,19,.92)'; sctx.fillRect(bx, mt + 4, bw, bh);
     sctx.font = '600 11px JetBrains Mono, monospace';
