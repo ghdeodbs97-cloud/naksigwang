@@ -14,13 +14,13 @@
 /* Layout: 소나 장비 화면 — 왼쪽 큰 평면도(실제 해안선) + 오른쪽 계기판, 아래 전폭 단면도. 단일 다크 테마(의도적). */
 :root{
   color-scheme: dark;
-  --bg:#060f13;
-  --panel:#0a181e;
-  --line:#173039;
-  --fg:#d5ecee;
-  --muted:#7a9ea6;
-  --cyan:#4fe3d3;
-  --amber:#ffb84d;
+  --bg:#14283a;
+  --panel:#20384b;
+  --line:rgba(177,201,215,.18);
+  --fg:#f7f0e3;
+  --muted:#b1c1cd;
+  --cyan:#8adbd0;
+  --amber:#ffc29d;
   --font-ui:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
   --font-data:'JetBrains Mono',ui-monospace,'SFMono-Regular',Consolas,monospace;
 }
@@ -200,7 +200,7 @@ footer a{color:var(--cyan)}
 
 /* ── 3단계: 휴대폰 우선 탭 구조 ──
    한 화면에 한 가지 일. 아래 탭(휴대폰) / 위 탭(넓은 화면). 강조색은 의미로만 쓴다: 청록 = 물(조위·흐름), 호박색 = 해·만조·주의. */
-:root{--bg:#06121a;--panel:#0b1c24;--line:#18323c;--fg:#dcedef;--muted:#86a4ab;--nav-h:62px;--safe-b:env(safe-area-inset-bottom,0px)}
+:root{--bg:#14283a;--panel:#20384b;--line:rgba(177,201,215,.18);--fg:#f7f0e3;--muted:#b1c1cd;--nav-h:62px;--safe-b:env(safe-area-inset-bottom,0px)}
 body{margin:0;font-size:15px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .app{max-width:1100px;padding:0 0 calc(var(--nav-h) + var(--safe-b) + 18px);gap:0}
@@ -368,6 +368,39 @@ body{line-height:1.65}
 .mapOptions[open]>summary{color:var(--cyan);margin-bottom:12px}
 .mapOptionGroups{display:flex;flex-wrap:wrap;gap:10px;padding:12px;background:var(--bg);border-radius:8px}
 .mapOptions>summary:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+
+/* 해 질 무렵의 바다: 남색 바탕·청회색 카드·아이보리 글자 */
+:root{--input:#192f41;--card:#294354;--nav:#1b3043;--soft-shadow:0 10px 28px rgba(3,13,24,.14)}
+html{background:var(--bg)}
+body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rgba(255,194,157,.1),transparent 70%),linear-gradient(155deg,#1b3245 0%,#14283a 65%)}
+.top{background:rgba(23,44,62,.94);border-bottom-color:var(--line)}
+.brand span{color:var(--amber)}
+.ptPick select,.top .coord input{background:var(--input);color:var(--fg);border-color:var(--line)}
+.top .coord input::placeholder,.logForm input::placeholder{color:#a6b8c6;opacity:1}
+.tabbar{background:var(--nav);border-color:var(--line)}
+.tabbar button[aria-current="page"]{background:rgba(138,219,208,.1);border-radius:9px 9px 0 0}
+.panel{background:linear-gradient(150deg,#243e50,#203649);border-color:var(--line);box-shadow:var(--soft-shadow)}
+.ph h2,.stName,.fish .fn,.tdName,.logHeading{color:var(--fg)}
+.btn{color:#132e38;background:var(--cyan);font-weight:700;box-shadow:0 3px 10px rgba(4,24,34,.12)}
+.btn.ghost{color:var(--fg);background:rgba(226,236,241,.035);box-shadow:none}
+.seg{background:rgba(17,37,54,.38);border-color:var(--line)}
+.seg button[aria-pressed="true"]{background:rgba(138,219,208,.16)}
+.days button{background:rgba(17,37,54,.3);border-color:var(--line)}
+.days button[aria-selected="true"]{background:rgba(138,219,208,.15)}
+.tdNow{background:linear-gradient(110deg,rgba(255,194,157,.1),rgba(138,219,208,.035));border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.tdFacts{background:rgba(39,66,84,.55);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tdBest li{background:var(--card);border-color:var(--line)}
+.fish{background:linear-gradient(155deg,#2c4858,#243e50);border-color:rgba(177,201,215,.2);box-shadow:0 6px 18px rgba(3,13,24,.12)}
+.fish .pic{background:radial-gradient(ellipse at 50% 55%,rgba(157,219,215,.13),transparent 72%)}
+.scoreProgress{background:#162e3d;box-shadow:inset 0 0 0 1px rgba(187,211,224,.16)}
+.fish.hi .scoreProgressFill{background:#8cdeb5}.fish.lo .scoreProgressFill{background:#aac7d9}
+.lv.hi,.tdBest li.hi .pc small{color:#a1ebc4}.lv.lo,.tdBest li.lo .pc small{color:#bdd3e0}
+.logForm input,.logForm select,select,details.api input[type=text],details.api input[type=password]{background:var(--input);border-color:var(--line)}
+.mapOptionGroups{background:rgba(17,37,54,.5)}
+.uiDetails[open],.basis[open]{border-top-color:rgba(177,201,215,.3)}
+#biteChart,#tideChart,#todayChart{border-radius:10px}
+@media(min-width:900px){.tabbar{background:#172c3e}}
 
 </style>
 
