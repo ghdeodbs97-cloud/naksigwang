@@ -129,7 +129,7 @@ details.api pre{margin:0;font-family:var(--font-data);font-size:10.5px;color:var
 .logList{list-style:none;padding:0;margin:6px 0 0;font-size:13px;display:grid;gap:4px}
 .linkBtn{font:inherit;font-size:12px;background:none;border:0;color:var(--amber);cursor:pointer;text-decoration:underline}
 #biteChart{width:100%;height:120px;display:block;touch-action:none;cursor:ew-resize;border-radius:4px;margin:6px 0 2px}
-.biteConfidence{font-size:11px;color:var(--cyan);margin:6px 0 3px}.biteReasons{font-size:11px;color:var(--muted);margin:0;overflow-wrap:anywhere}
+.biteScores{font-size:10.5px;color:var(--cyan);margin:5px 0}.fishEcology{font-size:11px;line-height:1.35;overflow-wrap:anywhere}.fishEcology p{margin:4px 0}.ecologyLabel{display:block;font-size:10px;color:var(--muted)}.habitatSummary,.catchSpotSummary{display:block}.biteReasons{font-size:11px;color:var(--muted);margin:0;overflow-wrap:anywhere}
 .bestH{font-family:var(--font-data);font-size:10.5px;color:var(--muted)}
 dl.rock{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0;font-size:12px}
 dl.rock dt{color:var(--muted)}
@@ -512,7 +512,7 @@ details.more[open] summary{margin-bottom:12px}
     <div class="fishGrid" id="fishGrid"></div>
       <details class="basis">
       <summary>입질 지수는 어떻게 계산하나요?</summary>
-      <p>V2 입질점수는 현재 환경이 어종에 맞는 정도를 나타내는 0~99 조건점수이며 잡힐 확률이 아닙니다. 월별 계절·약한 권역 참고, 수심·서식환경, 수온·활동시간·흐름·조석·파도를 분리합니다. 39종 모두 계산하며 우럭·조피볼락은 같은 모델을 공유합니다. 월별 계절과 수심·서식·활동 선호는 넓은 생태 가정으로 조과 통계 검증 전입니다. 일부 수온 범위는 기존 FishBase/AquaMaps 자료를 재사용합니다. 확인되지 않은 조건은 중립으로 두고 자료 신뢰도를 낮춥니다. 신뢰도는 점수와 별개이며 높음 80 이상, 보통 55 이상입니다. 현재 수온 관측은 미래 예보가 아니며 멀거나 오래되거나 미래 날짜일수록 영향이 줄어듭니다. 조류는 15 km 안 예보 유속을 참고합니다. 예보가 없으면 유속 적합도는 중립으로 두고 조석 변화 조건만 작게 반영합니다. 바닷물 높이의 상승·하강을 조류 방향으로 해석하지 않습니다. 육지와 해안 경사 가정 수심은 점수에 쓰지 않습니다. 바람·파고의 생태 영향은 출조 안전 판단과 별개입니다. +/−는 기여 방향, ‘참고’는 자료 부족입니다. 가까운 내 기록을 조금 반영하며 표본이 적으면 보정이 약합니다.</p>
+      <p>V2.1 입질점수는 현재 환경이 어종에 맞는 정도를 나타내는 0~99 조건점수이며 잡힐 확률이 아닙니다. 서식 점수는 월별 계절·약한 권역 참고·수심·지형을, 오늘 조건은 선택한 날짜와 시각의 수온·활동시간·흐름·조석·기상을 뜻합니다. 서식 45%와 오늘 조건 55%를 합친 뒤 내 기록을 조금 반영합니다. 보조 점수는 반올림해 표시하며 최종점수는 반올림 전 값으로 계산합니다. 서식지와 잘 잡히는 곳은 일반적인 지형 안내이며 어획을 보장하지 않습니다. 39종 모두 계산하며 우럭·조피볼락은 같은 모델을 공유합니다. 월별 계절과 수심·서식·활동 선호는 넓은 생태 가정으로 조과 통계 검증 전입니다. 일부 수온 범위는 기존 FishBase/AquaMaps 자료를 재사용합니다. 확인되지 않은 조건은 중립으로 두고 자료 신뢰도를 낮춥니다. 신뢰도는 점수와 별개이며 높음 80 이상, 보통 55 이상입니다. 현재 수온 관측은 미래 예보가 아니며 멀거나 오래되거나 미래 날짜일수록 영향이 줄어듭니다. 조류는 15 km 안 예보 유속을 참고합니다. 예보가 없으면 유속 적합도는 중립으로 두고 조석 변화 조건만 작게 반영합니다. 바닷물 높이의 상승·하강을 조류 방향으로 해석하지 않습니다. 육지와 해안 경사 가정 수심은 점수에 쓰지 않습니다. 바람·파고의 생태 영향은 출조 안전 판단과 별개입니다. +/−는 기여 방향, ‘참고’는 자료 부족입니다. 가까운 내 기록을 조금 반영하며 표본이 적으면 보정이 약합니다.</p>
       <div class="tblWrap"><table id="basisTable"></table></div>
     </details>
     </div>
@@ -605,7 +605,7 @@ out geom;</pre>
       <h2 class="h2">자료 출처</h2>
       <p>온라인 일반·위성 배경: NAVER Maps JavaScript API v3 (설정한 경우). 배경 영상은 수심 자료로 사용하지 않습니다.</p>
       <div class="sources">
-    <p>어종 조건 참고: 기존 수온 범위는 FishBase/AquaMaps 자료를 재사용했습니다. <a href="https://fishbase.se/Ecology/Sebastes_schlegelii" target="_blank" rel="noopener">FishBase 우럭 생태</a>, <a href="https://www.nifs.go.kr/portal/pcon0000206/systA/actionConts.do" target="_blank" rel="noopener">국립수산과학원 어종 목록</a>, <a href="https://www.fao.org/docrep/014/i1920e/i1920e.pdf" target="_blank" rel="noopener">FAO 두족류 도감</a>을 참고했습니다. 월별 계절·선호 수심·활동 계수는 넓은 생태 가정이며 현장 통계 검증 전입니다.</p>
+    <p>어종 조건 참고: 기존 수온 범위는 FishBase/AquaMaps 자료를 재사용했습니다. <a href="https://fishbase.se/Ecology/Sebastes_schlegelii" target="_blank" rel="noopener">FishBase 우럭 생태</a>, <a href="https://www.nifs.go.kr/portal/pcon0000206/systA/actionConts.do" target="_blank" rel="noopener">국립수산과학원 어종 목록</a>, <a href="https://www.fao.org/docrep/014/i1920e/i1920e.pdf" target="_blank" rel="noopener">FAO 두족류 도감</a>을 참고했습니다. 서식 안내는 기존 프로필과 일반 생태 정보를 낚시 지형으로 풀어 쓴 설명입니다. <a href="https://www.fishbase.se/summary/Mugil_cephalus.html" target="_blank" rel="noopener">FishBase 숭어 서식 정보</a>도 참고했습니다. 월별 계절·선호 수심·활동 계수는 넓은 생태 가정이며 현장 통계 검증 전입니다.</p>
     <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
     <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → 국립해양조사원 자연과학용 자료(KHOA/BADA) 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. KHOA는 유효 자료점으로 둘러싸인 곳만 보간하고 수집 범위 밖에서는 기존 자료로 돌아갑니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
     <p><a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형): 2026년 10월 11일 주문진·남애 등 기존 자료를 보존하고 거진부터 울산까지 검증된 일부 연안 범위를 확대해 35,982점을 제공합니다. 대진·양양 및 포항·울산 일부에는 미탑재 범위가 있으며 동해 전체를 포함하지 않습니다. 약 150 m 간격의 해양수치모델용 자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다. 기준면은 조회 화면의 ‘평균해면하’ 표기를 보존하며 조사연도는 미확인입니다. <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">연안해역기본도</a>는 원본 미확보, <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해수부 수심분포도</a>는 공개 CSV에 수심값이 없어 미탑재입니다.</p>
@@ -1893,6 +1893,50 @@ function ecologyLight(profile,h,sr,ss){
  for(let i=1;i<knots.length;i++)if(h<=knots[i][0]){const [a,x]=knots[i-1],[b,y]=knots[i];return x+(y-x)*clamp((h-a)/(b-a),0,1);}return night;
 }
 function ecologyLightName(f){const names=['해뜰녘','낮','해질녘','밤'],v=f.ecology.light;return names.filter((_,i)=>v[i]>=Math.max(...v)-.1).join('·');}
+// 12c_habitats.js — 어종별 일반 서식지와 낚시 포인트 유형 안내
+// 기존 생태 프로필의 넓은 환경군을 기본으로 한다. 특정 장소의 어획을 보장하지 않는다.
+const FISH_HABITAT_TEXT = {
+ 감성돔:['암반성 연안 · 모래가 섞인 바닥','갯바위 가장자리 · 방파제 기초석'],
+ 볼락:['암반 · 해조류 주변 · 연안 구조물','수중여 가장자리 · 방파제 돌틈'],
+ 벵에돔:['암반성 연안 · 갯바위 주변','갯바위 바깥쪽 · 수중여 주변'],
+ 농어:['연안 · 하구 주변 · 암반과 모래 경계','항 입구 · 여밭 가장자리 · 해변 수심골'],
+ 우럭:['암반 · 수중여 · 해저 구조물','방파제 기초석 · 수중여 옆 깊은 홈'],
+ 광어:['모래 · 사니질 바닥의 연안','해변 수심골 · 항 입구 모래바닥'],
+ 노래미:['암반성 연안 · 해조류 주변','갯바위 가장자리 · 방파제 기초석'],
+ 삼치:['먹잇감 무리가 다니는 연안 중상층','외항 끝 · 조류가 지나는 열린 연안'],
+ 고등어:['연안과 외해의 중상층 · 무리 생활','항 입구 · 외항 끝 · 열린 물길'],
+ 참돔:['암반과 모래가 섞인 연안 바닥','깊은 수중여 주변 · 바닥이 바뀌는 턱'],
+ 잿방어:['따뜻한 바다 · 수중여 주변의 열린 물','외해 쪽 갯바위 · 깊은 여밭 가장자리'],
+ 부시리:['외해와 이어진 연안 · 수중여 주변','곶 끝 · 바깥 여밭 · 깊은 물길'],
+ 대구:['서늘한 바다의 깊은 바닥','깊은 해저면 · 수심이 내려가는 턱'],
+ 숭어:['얕은 연안 · 하구 · 모래와 진흙 바닥','항 주변 · 하구 가장자리 · 잔잔한 연안'],
+ 전갱이:['연안 중층 · 먹잇감 무리 주변','항 입구 · 방파제 바깥 물길'],
+ 돌돔:['암반성 연안 · 수중여 주변','갯바위 바깥쪽 · 깊은 암반 틈 주변'],
+ 백조기:['모래 · 사니질 바닥의 연안','항 바깥 바닥 · 완만한 수심 변화 구간'],
+ 전어:['얕은 연안 · 내만 · 무리 생활','항 주변 · 내만 물길 · 모래바닥 연안'],
+ 독가시치:['따뜻한 암반성 연안 · 해조류 주변','갯바위 가장자리 · 해조류 붙은 구조물'],
+ 방어:['먹잇감 무리를 따라 이동하는 열린 바다','곶 끝 · 외항 끝 · 깊은 물이 가까운 곳'],
+ 문치가자미:['얕은 연안의 모래 · 사니질 바닥','내만 바닥 · 항 입구의 완만한 턱'],
+ 학공치:['얕은 연안의 수면 가까운 층','항 입구 · 잔잔한 방파제 주변'],
+ 무늬오징어:['연안 · 해조류와 암반 주변','갯바위 가장자리 · 항 입구 · 여밭 주변'],
+ 피문어:['서늘하고 깊은 연안의 바닥','깊은 암반 틈 주변 · 수심이 내려가는 곳'],
+ 용가자미:['서늘한 연안의 비교적 깊은 바닥','깊은 바닥면 · 완만하게 이어지는 턱'],
+ 참가자미:['연안의 모래가 섞인 바닥','모래바닥 수심골 · 완만한 턱 주변'],
+ 참문어:['연안 바닥 · 암반과 구조물 틈','방파제 기초석 · 암반과 모래 경계'],
+ 갑오징어:['연안 바닥 · 모래와 구조물 주변','항 바깥 바닥 · 모래와 여밭 경계'],
+ 갈치:['연안과 외해의 중층 · 깊은 물 접근','항 바깥 깊은 물길 · 외해와 이어진 곳'],
+ 가숭어:['얕은 연안 · 하구 주변','항 주변 · 하구 가장자리 · 잔잔한 물길'],
+ 민어:['연안의 모래 · 사니질 바닥','깊은 바닥 수심골 · 내만 바깥 물길'],
+ 벤자리:['따뜻한 연안 · 암반과 여밭 주변','갯바위 바깥쪽 · 수심 있는 여밭'],
+ 붕장어:['연안 바닥 · 모래와 구조물 주변','방파제 기초 주변 · 바닥 경계와 홈'],
+ 살오징어:['연안과 외해의 중층 · 무리 이동','깊은 항 바깥 · 외해와 이어진 물길'],
+ 자바리:['따뜻한 암반성 연안 · 바닥 은신처','깊은 암반 틈 · 수중여 가장자리'],
+ 쭈꾸미:['얕은 연안의 모래 · 진흙 섞인 바닥','내만 바닥 · 작은 구조물 주변'],
+ 한치:['연안과 외해의 중층 · 깊은 물 주변','깊은 방파제 바깥 · 열린 항 입구'],
+ 호래기:['얕은 연안 · 내만의 물속','잔잔한 항 입구 · 연안 구조물 주변']
+};
+FISH_HABITAT_TEXT.조피볼락=FISH_HABITAT_TEXT.우럭;
+for(const fish of FISH){const text=FISH_HABITAT_TEXT[fish.n];fish.habitatSummary=text[0];fish.catchSpotSummary=text[1];}
 // 13_forecast.js — 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선
 /* ── 계기판 (관측소·날짜·조석 곡선) ─────────────────── */
 const tc = $('tideChart'), tcx = tc.getContext('2d');
@@ -2053,6 +2097,20 @@ function getPointEnvironment(pt){
  const value={surface,depth:center?.depth??null,depthConfidence,depthSource:center,depthRelief:relief,depthReliefConfidence:relief==null?0:.5,coastDistance:Number.isFinite(groundToCoast(mx,my))?groundToCoast(mx,my):null,land,habitat,habitatConfidence,evidence,samples};
  if(BITE_ENV_CACHE.size>64)BITE_ENV_CACHE.clear();BITE_ENV_CACHE.set(key,{at:Date.now(),value});return value;
 }
+// 13c_bite_layers.js — 서식과 선택 날짜의 활동 조건을 분리하는 점수 조합
+const BITE_HABITAT_KEYS=new Set(['season','region','depth','habitat','target']);
+const BITE_DYNAMIC_KEYS=new Set(['light','temperature','current','tide','wind','wave']);
+function biteLayerScores(factors){
+ let habitat=0,dynamic=0;
+ for(const factor of factors){
+  factor.layerEffect=factor.effect;
+  if(BITE_HABITAT_KEYS.has(factor.key)){factor.layer='habitat';habitat+=factor.effect;factor.effect*=.45*100/54;}
+  else if(BITE_DYNAMIC_KEYS.has(factor.key)){factor.layer='dynamic';dynamic+=factor.effect;factor.effect*=.55;}
+  else factor.layer='neutral';
+ }
+ return {habitatScore:clamp(50+habitat*100/54,0,100),dynamicScore:clamp(50+dynamic,0,100)};
+}
+function combineBiteScores(habitat,dynamic,personal=1){return clamp((.45*habitat+.55*dynamic)*personal,0,99);}
 // 14_bite.js — 시간별 입질 지수
 // 규칙 기반 조건점수와 자료 신뢰도를 별도로 계산한다.
 // 조차가 작은 바다는 조석 추정의 비중만 줄이고 실제 환경 차이는 유지한다.
@@ -2069,7 +2127,7 @@ function biteTemperature(fish, p, st, day = 0, observation) {
   const ahead = Math.max(0, (Date.parse(dateAdd(DAY0, day) + 'T12:00:00+09:00') - Date.now()) / 36e5);
   const reliability = w ? clamp(1-w.km/50,0,1)*clamp(1-.5*w.ageHours/24,0,1)/(1+ahead/48) : 0;
   const delta=w&&enabled?Math.max(0,pref[0]-w.value,w.value-pref[1]):0;
-  return {observation:w,enabled,reliability,delta,effect:w&&enabled?14*(ecologyRange(w.value,pref)-.5)*reliability:0};
+  return {observation:w,enabled,reliability,delta,effect:w&&enabled?22*(ecologyRange(w.value,pref)-.5)*reliability:0};
 }
 let CATCHES = [];
 function myF(fish, st, pt) {
@@ -2096,11 +2154,11 @@ function biteEvalAt(fish, pt, st, day, h, supplied) {
  const c=supplied||biteContext(pt,st,day,h),{p,environment:e,wx,fu,tide,quality}=c,temperature=biteTemperature(fish,p,st,day,c.observation);
  const factors=[],add=(key,label,effect,quality='estimated')=>factors.push({key,label,effect,quality});
  const season=ecologySeason(profile,c.date||dateAdd(DAY0,day)),prior=profile.regionPrior?.[REG_IDX[pt?.region||st.region]]??.5;
- // 총 100점 범위: 출현 20(권역은 6), 서식 33, 활동 47. 누락은 0.5 적합도.
+ // 서식 0~100과 오늘 조건 0~100을 따로 구한 뒤 45:55로 조합한다. 누락 기여는 중립이다.
  add('neutral','알 수 없는 조건은 중립',50,'rule');
  add('season','월별 계절 적합도',14*(season-.5),'rule');add('region','광역 출현 참고',6*(prior-.5),'rule');
  const depthFit=ecologyRange(e.depth,profile.depth);
- add('depth',e.depth==null?'수심 자료 없음':e.depthConfidence<.4?'넓은 격자 수심 참고 (추정)':depthFit>=.8?'선호 수심대':e.depth<profile.depth[0]?'선호 수심보다 얕음':'선호 수심보다 깊음',14*(depthFit-.5)*e.depthConfidence,e.depth==null?'missing':'estimated');
+ add('depth',e.depth==null?'수심 자료 없음':e.depthConfidence<.4?'넓은 격자 수심 참고 (추정)':depthFit>=.8?'선호 수심대':depthFit>=.5?'활동 가능한 수심대':e.depth<profile.depth[0]?'선호 수심보다 얕음':'선호 수심보다 깊음',14*(depthFit-.5)*e.depthConfidence,e.depth==null?'missing':'estimated');
  let habitatSum=0,habitatWeight=0;const detail=[];
  for(const [key,pref] of Object.entries(profile.habitat)){if(e.habitat[key]==null)continue;const weight=e.habitat[key];habitatSum+=weight*pref;habitatWeight+=weight;detail.push([key,weight*(pref-.5)]);}
  const habitatFit=.5+(habitatSum-.5*habitatWeight)/Math.max(1,habitatWeight);
@@ -2109,38 +2167,36 @@ function biteEvalAt(fish, pt, st, day, h, supplied) {
  add('habitat',detail.length?habitatNames[detail[0][0]]+' '+(habitatFit>=.5?'환경 적합':'환경 덜 적합'):'서식환경 자료 부족',18*(habitatFit-.5)*e.habitatConfidence,habitatWeight?'estimated':'missing');
  add('target','기존 대상어 목록 참고',String(pt?.targets||'').replaceAll('조피볼락','우럭').replaceAll('넙치','광어').replaceAll('보구치','백조기').includes(fish.aliasOf||fish.n)?1:0,'rule');
  const light=ecologyLight(profile,h+.5,...c.sun);
- add('light',ecologyLightName(fish)+' 활동시간 '+(light>=.7?'적합':'밖'),16*(light-.5));
- add('temperature',!temperature.observation?'수온 자료 없음':!temperature.enabled?'수온 기준 미확인':temperature.delta?'선호 수온 범위 밖':'선호 수온대',temperature.effect,temperature.observation&&temperature.enabled?'measured':'missing');
+ add('light',light>=.7?ecologyLightName(fish)+' 활동시간 적합':light>=.5?'활동하기 무난한 시간':'주 활동시간대 밖',24*(light-.5));
+ add('temperature',!temperature.observation?'수온 자료 없음':!temperature.enabled?'수온 기준 미확인':temperature.delta?(temperature.effect>=0?'활동하기 무난한 수온':temperature.observation.value<profile.temperature[0]?'선호 수온보다 낮음':'선호 수온보다 높음'):'선호 수온대',temperature.effect,temperature.observation&&temperature.enabled?'measured':'missing');
  // 실제 cm/s 예보만 m/s 선호와 비교한다. 조석 상대세기는 유속으로 환산하지 않고 조석 조건에서만 참고한다.
  const [preferred,tolerance,sensitivity]=profile.current,realCurrent=fu.real&&Number.isFinite(fu.r?.sp),relativeAvailable=Number.isFinite(fu.u),u=realCurrent?Math.abs(fu.r.sp)/100:null;
  const currentFit=u==null?.5:clamp(1-Math.abs(u-preferred)/tolerance,0,1),currentReliability=realCurrent?1:0;
- add('current',realCurrent?(u<preferred?'선호 흐름보다 약함':'예보 유속 참고'):'조류 예보 없음 · 조석 변화만 참고',9*(currentFit-.5)*sensitivity*currentReliability,realCurrent?'forecast':relativeAvailable?'estimated':'missing');
+ add('current',realCurrent?(currentFit>=.7?'선호하는 흐름 세기':currentFit>=.5?'활동 가능한 흐름 세기':u<preferred?'조류가 선호보다 약함':'조류가 선호보다 강함'):'조류 예보 없음 · 조석 변화만 참고',28*(currentFit-.5)*sensitivity*currentReliability,realCurrent?'forecast':relativeAvailable?'estimated':'missing');
  const [rising,falling,slack,rangeSensitivity]=profile.tide,rate=tide?.rate,phase=rate==null?'unknown':Math.abs(rate)/st.maxRate<.12?'nearSlack':rate>0?'rising':'falling';
  const tideFit=phase==='unknown'?.5:phase==='nearSlack'?slack:phase==='rising'?rising:falling;
  const tideReliability=phase==='unknown'?0:weakTide(st)?.15:1;
- add('tide','바닷물 높이 '+({rising:'오르는 중',falling:'내리는 중',nearSlack:'변화 작음',unknown:'자료 없음'}[phase]),4*(tideFit-.5)*tideReliability*rangeSensitivity*(.5+.5*(st.days[day]?.pct??50)/100),phase==='unknown'?'missing':'forecast');
+ add('tide','바닷물 높이 '+({rising:'오르는 중',falling:'내리는 중',nearSlack:'변화 작음',unknown:'자료 없음'}[phase]),10*(tideFit-.5)*tideReliability*rangeSensitivity*(.5+.5*(st.days[day]?.pct??50)/100),phase==='unknown'?'missing':'forecast');
  const [windSensitivity,wavePreferred,waveTolerance]=profile.weather,exposure=e.habitat.openSea??.5;
- add('wind',wx?.sp==null?'풍속 자료 없음':'바람의 수면 영향 (추정)',wx?.sp==null?0:2*(.5-clamp(wx.sp/14,0,1))*windSensitivity*(.5+exposure),wx?.sp==null?'missing':'forecast');
+ add('wind',wx?.sp==null?'풍속 자료 없음':wx.sp<=7?'약한 바람의 영향 (추정)':'강한 바람의 영향 (추정)',wx?.sp==null?0:6*(.5-clamp(wx.sp/14,0,1))*windSensitivity*(.5+exposure),wx?.sp==null?'missing':'forecast');
  const waveFit=wx?.wave==null?.5:clamp(1-Math.abs(wx.wave-wavePreferred)/waveTolerance,0,1);
- add('wave',wx?.wave==null?'파고 자료 없음':waveFit>.6?'활동에 맞는 파도 (추정)':'선호 파도 범위 밖',4*(waveFit-.5)*(.5+exposure)/1.5,wx?.wave==null?'missing':'forecast');
+ add('wave',wx?.wave==null?'파고 자료 없음':waveFit>=.5?'활동에 맞는 파도 (추정)':'선호 파도 범위 밖',10*(waveFit-.5)*(.5+exposure)/1.5,wx?.wave==null?'missing':'forecast');
+ const {habitatScore,dynamicScore}=biteLayerScores(factors);
  const subtotal=factors.reduce((s,f)=>s+f.effect,0),mine=myF(fish,st,pt);add('catch','가까운 내 조황기록 보정',subtotal*(mine.f-1),'personal');
  const wxQuality=wx?clamp((wx.near?Math.max(.5,1-wx.km/25):1)*(wx.ageHours==null?.5:wx.ageHours>24?.6:1)*(1-.1*(wx.lagHours||0))*quality.weather.multiplier,0,1):0;
  const confidence=Math.round(clamp(15*profile.confidence+15*e.depthConfidence+15*e.habitatConfidence+20*temperature.reliability*(temperature.enabled?1:0)*quality.temperature.multiplier+(wx?.sp==null?0:5*wxQuality)+(wx?.wave==null?0:10*wxQuality)+(realCurrent?15*clamp(1-.3*fu.nc.km/15,0,1):relativeAvailable?3*quality.tide.multiplier:0)+5*tideReliability*quality.tide.multiplier,0,100));
- const rawScore=clamp(subtotal*mine.f,0,99);
- return {modelStatus:'partial',score:Math.round(rawScore),rawScore,confidence,confidenceLevel:confidence>=80?'높음':confidence>=55?'보통':'낮음',factors,components:{occurrenceFit:.7*season+.3*prior,habitatFit,depthFit,lightFit:light},sources:{profile:profile.provenance,environment:e,temperature:{...temperature,...quality.temperature},weather:{...(wx||{}),...quality.weather,stale:quality.weather.stale||!!wx&&(wx.ageHours==null||wx.ageHours>24),quality:wx?'forecast':'missing'},tide:{station:st.id,phase,km:gdist(p,st),weak:weakTide(st),...quality.tide},current:{source:realCurrent?'forecast':relativeAvailable?'tide_estimate':'missing',station:fu.real?fu.nc.c.name:st.id,km:fu.real?fu.nc.km:gdist(p,st),u:fu.u,speed:u,unit:realCurrent?'m/s':'relative_estimate'}}};
+ const rawScore=combineBiteScores(habitatScore,dynamicScore,mine.f);
+ const correction=rawScore-factors.reduce((s,f)=>s+f.effect,0);if(Math.abs(correction)>1e-10)add('limit','점수 범위 조정',correction,'rule');
+ return {modelStatus:'partial',score:Math.round(rawScore),finalScore:Math.round(rawScore),rawScore,habitatScore,dynamicScore,confidence,confidenceLevel:confidence>=80?'높음':confidence>=55?'보통':'낮음',factors,components:{occurrenceFit:.7*season+.3*prior,habitatFit,depthFit,lightFit:light},sources:{profile:profile.provenance,environment:e,temperature:{...temperature,...quality.temperature},weather:{...(wx||{}),...quality.weather,stale:quality.weather.stale||!!wx&&(wx.ageHours==null||wx.ageHours>24),quality:wx?'forecast':'missing'},tide:{station:st.id,phase,km:gdist(p,st),weak:weakTide(st),...quality.tide},current:{source:realCurrent?'forecast':relativeAvailable?'tide_estimate':'missing',station:fu.real?fu.nc.c.name:st.id,km:fu.real?fu.nc.km:gdist(p,st),u:fu.u,speed:u,unit:realCurrent?'m/s':'relative_estimate'}}};
 }
 function biteAt(fish, pt, st, day, h) { return biteEvalAt(fish, pt, st, day, h).score; }
 function biteReasons(ev) {
-  if (ev.modelStatus === 'provisional') return '입질 계산 기준 미설정';
-  if (ev.score === 0) return '현재 알려진 조건의 적합도가 매우 낮음';
-  const relevant = ev.factors.filter(f => !['neutral', 'base', 'catch', 'region'].includes(f.key));
-  const positive = relevant.filter(f => f.effect > .05).sort((a, b) => b.effect - a.effect);
-  const negative = relevant.filter(f => f.effect < -.05).sort((a, b) => a.effect - b.effect);
-  const environmental = relevant.filter(f => ['depth', 'habitat'].includes(f.key) && Math.abs(f.effect) > .4).sort((a,b) => Math.abs(b.effect)-Math.abs(a.effect));
-  const chosen = environmental.slice(0,1);
-  for (const f of [...positive.slice(0,1), ...negative.slice(0,1)]) if (!chosen.includes(f)) chosen.push(f);
-  for (const f of [...relevant.filter(f => f.quality === 'missing' || f.key === 'current' && f.quality === 'estimated'), ...positive, ...negative]) if (!chosen.includes(f) && chosen.length < 4) chosen.push(f);
-  return chosen.map(f => `${f.quality === 'missing' || f.key === 'current' && f.quality === 'estimated' ? '참고' : f.effect > 0 ? '+' : '−'} ${f.label}`).join(' · ');
+ if(ev.modelStatus==='provisional')return '입질 계산 기준 미설정';
+ const relevant=ev.factors.filter(f=>(BITE_DYNAMIC_KEYS.has(f.key)||f.key==='depth')&&(f.key!=='current'||f.quality==='forecast')&&f.quality!=='missing'&&Math.abs(f.effect)>.05);
+ const positive=relevant.filter(f=>f.effect>0).sort((a,b)=>b.effect-a.effect),negative=relevant.filter(f=>f.effect<0).sort((a,b)=>a.effect-b.effect);
+ const chosen=[...positive.slice(0,1),...negative.slice(0,1)];
+ for(const f of relevant.sort((a,b)=>Math.abs(b.effect)-Math.abs(a.effect)))if(chosen.length<3&&!chosen.includes(f))chosen.push(f);
+ return chosen.map(f=>`${f.effect>0?'+':'−'} ${f.key==='depth'?'현재 ':''}${f.label}`).join(' · ')||'선택한 시간의 알려진 조건을 참고하세요';
 }
 const level = p => p >= 60 ? ['높음', 'hi'] : p >= 40 ? ['보통', 'mid'] : p > 0 ? ['낮음', 'lo'] : ['없음', 'none'];
 function spark(arr, sel) {
@@ -2163,7 +2219,7 @@ function renderBite() {
   $('biteWin').textContent = `해 뜸 ${fmtH(sr)} · 해 짐 ${fmtH(ss)} · ` + (top.length ? '오늘 "높음"이 나오는 시간: ' + top.slice(0, 4).map(r => `${r.f.n} ${String(r.best).padStart(2, '0')}시`).join(', ') : '오늘은 "높음"이 나오는 시간이 없습니다.');
   $('fishGrid').innerHTML = rows.map(({ f, i, arr, p, best, ev }) => {
     const [lv, cls] = level(p);
-    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><b>${p}점</b><span class="lv ${cls}">${lv}</span></div>${spark(arr, H)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}점</div><p class="biteConfidence">자료 신뢰도 ${ev.confidenceLevel}</p><p class="biteReasons">${biteReasons(ev)}</p></div>`;
+    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><b>${p}점</b><span class="lv ${cls}">${lv}</span></div>${spark(arr, H)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}점</div><p class="biteScores">서식 ${Math.round(ev.habitatScore)} · 오늘 조건 ${Math.round(ev.dynamicScore)}</p><div class="fishEcology"><p><span class="ecologyLabel">주 서식지</span><span class="habitatSummary">${f.habitatSummary}</span></p><p><span class="ecologyLabel">잘 잡히는 곳</span><span class="catchSpotSummary">${f.catchSpotSummary}</span></p></div><p class="biteReasons">${biteReasons(ev)}</p></div>`;
   }).join('') + FISH.filter(f => !fishHasBiteModel(f)).map((f, i) => `<div class="fish provisional"><div class="pic">${fishPicture(f, 'new' + i)}</div><div class="fn">${f.n}</div><div class="fp"><b>—</b><span class="lv">미설정</span></div><p class="fishModelNote">입질 계산 기준 미설정 · 추천 순위 제외${f.aliasOf ? `<br>${f.aliasOf}과 같은 어종` : ''}</p></div>`).join('');
   if (pt && pt.kind === 'rock') $('rockInfo').innerHTML = rockInfoHTML(pt); else $('rockInfo').innerHTML = '';
   if (typeof renderBasis === 'function') renderBasis();

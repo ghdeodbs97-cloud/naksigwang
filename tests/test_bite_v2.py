@@ -70,7 +70,8 @@ try:
     result = samples[0]
     result['performanceByViewport'] = {label:{k:v for k,v in r.items() if k not in ('points','validation')} for label,r in zip(['1280x900','390x844'], samples)}
     result['mobileChecks'] = samples[1].get('validation',{}).get('checks',0)
-    (ROOT/f'tests/bite_v2_{mode}.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+    target=ROOT/f'tests/bite_v2_{mode}.json' if mode=='before' else ROOT/'test-output/v2_regression_latest.json'
+    target.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
 finally:
     server.shutdown()
     server.server_close()

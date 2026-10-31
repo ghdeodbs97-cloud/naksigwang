@@ -30,9 +30,11 @@
 | `11_current.js` | 조류 예보(물돌이·최강)와 해 뜨고 지는 시각 | 66 | `loadCrnt`, `crntAt`, `crntDay`, `nearestCrnt`, `flowU`, `sunTimes` |
 | `12_fish.js` | 대상어 39개 표시명·사진 매핑, 모델 사용 가능 판정, 이미지 실패 대체 그림 | 가변 | `fishHasBiteModel`, `fishPicture`, `fishSVG` |
 | `12b_ecology.js` | 39개 표시명의 생태 프로필·12개월 단계값·우럭 별칭 공유·연속 적합도 | 가변 | `ecologySeason`, `ecologyRange`, `ecologyLight`, `ecologyLightName` |
+| `12c_habitats.js` | 39종 주 서식지·낚시 포인트 유형 문구와 별칭 공유 | 가변 | `FISH_HABITAT_TEXT` |
 | `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선·이동 성공 후 선택 확정 | 가변 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
 | `13b_environment.js` | 기존 수심·OSM·갯바위·항 좌표의 환경 추출, 자료 버전·좌표별 64개 제한 캐시 | 가변 | `getPointEnvironment` |
-| `14_bite.js` | V2 출현·서식·활동·개인 기록 조건점수, 신뢰도·기여 이유, 렌더 안의 공통 예보 공유 | 가변 | `biteTemperature`, `biteDataQuality`, `myF`, `biteContext`, `biteEvalAt`, `biteAt`, `biteReasons`, `spark`, `renderBite` |
+| `13c_bite_layers.js` | 서식 0~100·선택 날짜 조건 0~100의 분리와 45:55 조합 | 가변 | `biteLayerScores`, `combineBiteScores` |
+| `14_bite.js` | V2.1 서식·오늘 조건·개인 기록 조건점수, 내부 신뢰도·기여 이유, 렌더 안의 공통 예보 공유 | 가변 | `biteTemperature`, `biteDataQuality`, `myF`, `biteContext`, `biteEvalAt`, `biteAt`, `biteReasons`, `spark`, `renderBite` |
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 가변 | `rawToS`, `rawToM`, `toS`, `toM`, `viewBounds`, `drawStations`, `stationDetailAllowed`, `stationAt`, `tmToLL`, `clampRequestedView`, `applyMapView`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
 | `15b_map_provider.js` | NAVER SDK viewport 단방향 동기화·명시적 이동 transaction·1회 no-op 보정·100m 축척·native 입력 선행 숨김·실제 draw stamp 검증, 중복 이벤트 제외·종료 누락 복원·3가지 지도 모드·기본 지형 복구 | 가변 | `NaverMapAdapter` (`handleImageError`, `repairViewport`, `refreshScreenOrigin`), `providerRequestedBounds`, `providerStart`, `providerSync`, `providerAlignment`, `providerReadView`, `providerViewportKey`, `providerTilesLoaded`, `providerRecordEvent`, `providerViewportChanged`, `providerBeginMove`, `providerBeginNativeInput`, `providerRenderedViewportMatches`, `providerQueueSettle`, `providerFinalizeViewport`, `providerQueueFinalViewport`, `providerRevealOverlay`, `providerCancelGestureDeadline`, `providerArmGestureDeadline`, `providerApplyView`, `providerCommandObservation`, `providerFinishViewCommand`, `providerRepairViewCommand`, `providerCancelViewCommand`, `providerUseNativePan`, `providerUpdateInput`, `providerZoomAt`, `providerPanBy`, `providerPanAnchor`, `scheduleDisplayDepthArea`, `providerSetMode`, `providerFallback`, `providerRect`, `providerRectError` |
 | `15c_map_diagnostic.js` | localhost 전용 native Marker DOM 중심과 Canvas 실제 픽셀·DPR·원점·이동 완료 대기·8프레임 진단·overlay stamp 상태 | 가변 | `naksigwangMapDiagnostic.lastNavigation`, `naksigwangMapDiagnostic.overlay`, `providerMarkerDiagnostic`, `providerCanvasProbePixel`, `providerProbeSample`, `providerDiagnosticRectDeltas`, `drawProviderDebugCrosshair`, `providerClearDiagnostic` |
@@ -78,15 +80,19 @@
 
 기상 자료의 `cells` 형식은 유지하고 `bases[격자]`에 실제 발표 시각을 저장합니다. 구형 파일은 전역 `base`로 대체합니다. 날짜가 빠진 조석 지점은 제외하고, 현재 날짜가 없는 조석 파일은 명확한 안내 후 시작을 중단합니다.
 
-## V2 입질 조건과 자료 신뢰도
+## V2.1 입질 조건과 자료 신뢰도
 
-`biteEvalAt(fish, pt, st, day, h)`는 기존 score/rawScore/confidence/confidenceLevel/factors/sources 인터페이스와 `biteAt` 숫자 API를 유지합니다. 중립 50점에서 출현(계절 14·권역 6), 서식(수심 14·환경 18·대상어 목록 최대 1), 활동(시간 16·수온 14·흐름 9·조석 4·바람 2·파도 4) 적합도의 중립 대비 기여분을 합산합니다. 수심·환경과 수온은 원천 신뢰도로 감쇠합니다. 개인 기록 보정 뒤 0~99로 제한합니다. legacy season/reg/cur는 표시 호환용이며 regionPrior만 약하게 재사용합니다.
+`biteEvalAt(fish, pt, st, day, h)`는 기존 API에 `habitatScore`, `dynamicScore`, `finalScore`를 추가합니다. 서식은 `50 + (계절·권역·수심·환경·대상어 기여 합) × 100/54`, 오늘 조건은 `50 + 활동 조건 기여 합`으로 각각 0~100입니다. 활동 배점 범위는 시간 24·수온 22·실제 흐름 28·조석 10·바람 6·파도 10이며 원천이 없으면 중립입니다. 서식 45%와 오늘 조건 55%를 합쳐 개인 기록을 조금 반영하고 0~99로 제한합니다. 권역 변화 폭은 최종 약 5점, 대상어 목록은 최대 약 0.83점입니다. `factors.layerEffect`는 각 층 내부 기여, `factors.effect`는 최종 점수 기여이며 제한 보정도 기록합니다. 점수는 어획 확률이 아닙니다.
+
+카드에는 서식·오늘 조건 정수와 39종의 `habitatSummary`/`catchSpotSummary`를 표시합니다. confidence/confidenceLevel과 원천 품질 계산은 유지하며 카드에서는 숨기고 도움말·진단에서만 확인합니다. 이유는 현재 활동 조건과 확인된 수심을 우선해 최대 3개입니다. 월별/서식 문구는 일반적 환경 안내이며 어획을 보장하지 않습니다.
 
 39개 표시명 모두 부분 프로필로 숫자를 계산합니다. 우럭·조피볼락은 같은 ecology 객체와 기록 별칭을 공유합니다. 모르는 수온 기준·권역 prior는 중립이며, 계절·수심·서식·활동의 넓은 생태 가정은 통계 검증 전입니다. 점수와 별도로 profile confidence를 낮게 배정합니다. 상세 근거 구분은 `tests/BITE_V2_REPORT.md`를 봅니다.
 
 `getPointEnvironment`는 수심 엔진을 읽기만 합니다. 기존 P3 지형 상태 판정을 읽어 육지·구조물·노출 암반·미확인 구간에 수심을 붙이지 않으며 경사 가정 수심을 사용하지 않습니다. 250/500 m 주변 8방향 수심은 출처를 보존하고, 자료집·기준면이 같고 해상도 250 m 이하인 표본 3개 이상에서만 주변 변화량을 구합니다. 이 값은 측량된 경사나 캐스팅 거리의 수심이 아닙니다. OSM·항·갯바위 자료와 노출도 추정의 evidence를 보존합니다. 포인트·자료 버전 기준 환경 캐시는 최대 64개/60초이며 렌더 안에서 24개 공통 시간 조건을 재사용합니다. 같은 날짜라면 입질 탭의 39×24 곡선을 오늘 탭에서도 재사용하며 동점은 원래 어종 순서로 정렬합니다.
 
 수온의 50 km/24시간·미래 날짜 감쇠 및 기상 발표·격자/자료 상태 처리를 유지합니다. 실제 조류 예보 cm/s를 m/s로 변환하며, 없는 곳에서는 유속 적합도를 중립으로 두고 조석 변화 조건만 작게 참고합니다. 조석 상대세기를 m/s로 해석하지 않습니다. 조석 상승·하강을 실제 조류 방향과 구분합니다. 신뢰도 배점은 프로필 15·수심 15·환경 15·수온 20·바람 5·파도 10·조류 15·조석 5입니다. 등급 경계 80/55는 유지합니다. 누락 기여는 0이며 신뢰도 하락과 점수를 구분합니다.
+
+`python tests/test_bite_v21.py`는 7일×39종 실제 입력·층별 기여와 날짜 조회·동일 입력·카드 회귀를 기록합니다. 상세 근거와 전후 결과는 `tests/BITE_V21_REPORT.md`를 봅니다.
 
 `python tests/test_bite_v2.py`는 318개 방향/불변조건, 실제 동해 8곳의 24시간×39종 행렬·상관도·순위 및 렌더 성능을 기록합니다. `before` 인자는 수정 전 고정 커밋을 재현합니다. `tests/test_bite_confidence.py`는 기존 P1의 실제 포인트 비교·자료 만료 검사를 39종으로 확장합니다. 사진 테스트는 V2 숫자 모델을 전제로 디코딩·대체 그림·모바일/PC 다섯 탭을 보존합니다.
 

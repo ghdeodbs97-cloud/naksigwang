@@ -63,6 +63,8 @@ jobs:
         run: python tests/test_fish_photos.py
       - name: 입질 V2 환경·계절·39종 행렬 회귀
         run: python tests/test_bite_v2.py
+      - name: 입질 V2.1 날짜별 분해·39종 서식 안내·카드 회귀
+        run: python tests/test_bite_v21.py
       - name: 수심 GIS 변환 회귀
         run: python tests/test_depth_converter.py
       - name: 수심 자료 기반 브라우저 회귀

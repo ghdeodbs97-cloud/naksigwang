@@ -14,7 +14,7 @@ function biteTemperature(fish, p, st, day = 0, observation) {
   const ahead = Math.max(0, (Date.parse(dateAdd(DAY0, day) + 'T12:00:00+09:00') - Date.now()) / 36e5);
   const reliability = w ? clamp(1-w.km/50,0,1)*clamp(1-.5*w.ageHours/24,0,1)/(1+ahead/48) : 0;
   const delta=w&&enabled?Math.max(0,pref[0]-w.value,w.value-pref[1]):0;
-  return {observation:w,enabled,reliability,delta,effect:w&&enabled?14*(ecologyRange(w.value,pref)-.5)*reliability:0};
+  return {observation:w,enabled,reliability,delta,effect:w&&enabled?22*(ecologyRange(w.value,pref)-.5)*reliability:0};
 }
 let CATCHES = [];
 function myF(fish, st, pt) {
@@ -41,11 +41,11 @@ function biteEvalAt(fish, pt, st, day, h, supplied) {
  const c=supplied||biteContext(pt,st,day,h),{p,environment:e,wx,fu,tide,quality}=c,temperature=biteTemperature(fish,p,st,day,c.observation);
  const factors=[],add=(key,label,effect,quality='estimated')=>factors.push({key,label,effect,quality});
  const season=ecologySeason(profile,c.date||dateAdd(DAY0,day)),prior=profile.regionPrior?.[REG_IDX[pt?.region||st.region]]??.5;
- // 총 100점 범위: 출현 20(권역은 6), 서식 33, 활동 47. 누락은 0.5 적합도.
+ // 서식 0~100과 오늘 조건 0~100을 따로 구한 뒤 45:55로 조합한다. 누락 기여는 중립이다.
  add('neutral','알 수 없는 조건은 중립',50,'rule');
  add('season','월별 계절 적합도',14*(season-.5),'rule');add('region','광역 출현 참고',6*(prior-.5),'rule');
  const depthFit=ecologyRange(e.depth,profile.depth);
- add('depth',e.depth==null?'수심 자료 없음':e.depthConfidence<.4?'넓은 격자 수심 참고 (추정)':depthFit>=.8?'선호 수심대':e.depth<profile.depth[0]?'선호 수심보다 얕음':'선호 수심보다 깊음',14*(depthFit-.5)*e.depthConfidence,e.depth==null?'missing':'estimated');
+ add('depth',e.depth==null?'수심 자료 없음':e.depthConfidence<.4?'넓은 격자 수심 참고 (추정)':depthFit>=.8?'선호 수심대':depthFit>=.5?'활동 가능한 수심대':e.depth<profile.depth[0]?'선호 수심보다 얕음':'선호 수심보다 깊음',14*(depthFit-.5)*e.depthConfidence,e.depth==null?'missing':'estimated');
  let habitatSum=0,habitatWeight=0;const detail=[];
  for(const [key,pref] of Object.entries(profile.habitat)){if(e.habitat[key]==null)continue;const weight=e.habitat[key];habitatSum+=weight*pref;habitatWeight+=weight;detail.push([key,weight*(pref-.5)]);}
  const habitatFit=.5+(habitatSum-.5*habitatWeight)/Math.max(1,habitatWeight);
@@ -54,38 +54,36 @@ function biteEvalAt(fish, pt, st, day, h, supplied) {
  add('habitat',detail.length?habitatNames[detail[0][0]]+' '+(habitatFit>=.5?'환경 적합':'환경 덜 적합'):'서식환경 자료 부족',18*(habitatFit-.5)*e.habitatConfidence,habitatWeight?'estimated':'missing');
  add('target','기존 대상어 목록 참고',String(pt?.targets||'').replaceAll('조피볼락','우럭').replaceAll('넙치','광어').replaceAll('보구치','백조기').includes(fish.aliasOf||fish.n)?1:0,'rule');
  const light=ecologyLight(profile,h+.5,...c.sun);
- add('light',ecologyLightName(fish)+' 활동시간 '+(light>=.7?'적합':'밖'),16*(light-.5));
- add('temperature',!temperature.observation?'수온 자료 없음':!temperature.enabled?'수온 기준 미확인':temperature.delta?'선호 수온 범위 밖':'선호 수온대',temperature.effect,temperature.observation&&temperature.enabled?'measured':'missing');
+ add('light',light>=.7?ecologyLightName(fish)+' 활동시간 적합':light>=.5?'활동하기 무난한 시간':'주 활동시간대 밖',24*(light-.5));
+ add('temperature',!temperature.observation?'수온 자료 없음':!temperature.enabled?'수온 기준 미확인':temperature.delta?(temperature.effect>=0?'활동하기 무난한 수온':temperature.observation.value<profile.temperature[0]?'선호 수온보다 낮음':'선호 수온보다 높음'):'선호 수온대',temperature.effect,temperature.observation&&temperature.enabled?'measured':'missing');
  // 실제 cm/s 예보만 m/s 선호와 비교한다. 조석 상대세기는 유속으로 환산하지 않고 조석 조건에서만 참고한다.
  const [preferred,tolerance,sensitivity]=profile.current,realCurrent=fu.real&&Number.isFinite(fu.r?.sp),relativeAvailable=Number.isFinite(fu.u),u=realCurrent?Math.abs(fu.r.sp)/100:null;
  const currentFit=u==null?.5:clamp(1-Math.abs(u-preferred)/tolerance,0,1),currentReliability=realCurrent?1:0;
- add('current',realCurrent?(u<preferred?'선호 흐름보다 약함':'예보 유속 참고'):'조류 예보 없음 · 조석 변화만 참고',9*(currentFit-.5)*sensitivity*currentReliability,realCurrent?'forecast':relativeAvailable?'estimated':'missing');
+ add('current',realCurrent?(currentFit>=.7?'선호하는 흐름 세기':currentFit>=.5?'활동 가능한 흐름 세기':u<preferred?'조류가 선호보다 약함':'조류가 선호보다 강함'):'조류 예보 없음 · 조석 변화만 참고',28*(currentFit-.5)*sensitivity*currentReliability,realCurrent?'forecast':relativeAvailable?'estimated':'missing');
  const [rising,falling,slack,rangeSensitivity]=profile.tide,rate=tide?.rate,phase=rate==null?'unknown':Math.abs(rate)/st.maxRate<.12?'nearSlack':rate>0?'rising':'falling';
  const tideFit=phase==='unknown'?.5:phase==='nearSlack'?slack:phase==='rising'?rising:falling;
  const tideReliability=phase==='unknown'?0:weakTide(st)?.15:1;
- add('tide','바닷물 높이 '+({rising:'오르는 중',falling:'내리는 중',nearSlack:'변화 작음',unknown:'자료 없음'}[phase]),4*(tideFit-.5)*tideReliability*rangeSensitivity*(.5+.5*(st.days[day]?.pct??50)/100),phase==='unknown'?'missing':'forecast');
+ add('tide','바닷물 높이 '+({rising:'오르는 중',falling:'내리는 중',nearSlack:'변화 작음',unknown:'자료 없음'}[phase]),10*(tideFit-.5)*tideReliability*rangeSensitivity*(.5+.5*(st.days[day]?.pct??50)/100),phase==='unknown'?'missing':'forecast');
  const [windSensitivity,wavePreferred,waveTolerance]=profile.weather,exposure=e.habitat.openSea??.5;
- add('wind',wx?.sp==null?'풍속 자료 없음':'바람의 수면 영향 (추정)',wx?.sp==null?0:2*(.5-clamp(wx.sp/14,0,1))*windSensitivity*(.5+exposure),wx?.sp==null?'missing':'forecast');
+ add('wind',wx?.sp==null?'풍속 자료 없음':wx.sp<=7?'약한 바람의 영향 (추정)':'강한 바람의 영향 (추정)',wx?.sp==null?0:6*(.5-clamp(wx.sp/14,0,1))*windSensitivity*(.5+exposure),wx?.sp==null?'missing':'forecast');
  const waveFit=wx?.wave==null?.5:clamp(1-Math.abs(wx.wave-wavePreferred)/waveTolerance,0,1);
- add('wave',wx?.wave==null?'파고 자료 없음':waveFit>.6?'활동에 맞는 파도 (추정)':'선호 파도 범위 밖',4*(waveFit-.5)*(.5+exposure)/1.5,wx?.wave==null?'missing':'forecast');
+ add('wave',wx?.wave==null?'파고 자료 없음':waveFit>=.5?'활동에 맞는 파도 (추정)':'선호 파도 범위 밖',10*(waveFit-.5)*(.5+exposure)/1.5,wx?.wave==null?'missing':'forecast');
+ const {habitatScore,dynamicScore}=biteLayerScores(factors);
  const subtotal=factors.reduce((s,f)=>s+f.effect,0),mine=myF(fish,st,pt);add('catch','가까운 내 조황기록 보정',subtotal*(mine.f-1),'personal');
  const wxQuality=wx?clamp((wx.near?Math.max(.5,1-wx.km/25):1)*(wx.ageHours==null?.5:wx.ageHours>24?.6:1)*(1-.1*(wx.lagHours||0))*quality.weather.multiplier,0,1):0;
  const confidence=Math.round(clamp(15*profile.confidence+15*e.depthConfidence+15*e.habitatConfidence+20*temperature.reliability*(temperature.enabled?1:0)*quality.temperature.multiplier+(wx?.sp==null?0:5*wxQuality)+(wx?.wave==null?0:10*wxQuality)+(realCurrent?15*clamp(1-.3*fu.nc.km/15,0,1):relativeAvailable?3*quality.tide.multiplier:0)+5*tideReliability*quality.tide.multiplier,0,100));
- const rawScore=clamp(subtotal*mine.f,0,99);
- return {modelStatus:'partial',score:Math.round(rawScore),rawScore,confidence,confidenceLevel:confidence>=80?'높음':confidence>=55?'보통':'낮음',factors,components:{occurrenceFit:.7*season+.3*prior,habitatFit,depthFit,lightFit:light},sources:{profile:profile.provenance,environment:e,temperature:{...temperature,...quality.temperature},weather:{...(wx||{}),...quality.weather,stale:quality.weather.stale||!!wx&&(wx.ageHours==null||wx.ageHours>24),quality:wx?'forecast':'missing'},tide:{station:st.id,phase,km:gdist(p,st),weak:weakTide(st),...quality.tide},current:{source:realCurrent?'forecast':relativeAvailable?'tide_estimate':'missing',station:fu.real?fu.nc.c.name:st.id,km:fu.real?fu.nc.km:gdist(p,st),u:fu.u,speed:u,unit:realCurrent?'m/s':'relative_estimate'}}};
+ const rawScore=combineBiteScores(habitatScore,dynamicScore,mine.f);
+ const correction=rawScore-factors.reduce((s,f)=>s+f.effect,0);if(Math.abs(correction)>1e-10)add('limit','점수 범위 조정',correction,'rule');
+ return {modelStatus:'partial',score:Math.round(rawScore),finalScore:Math.round(rawScore),rawScore,habitatScore,dynamicScore,confidence,confidenceLevel:confidence>=80?'높음':confidence>=55?'보통':'낮음',factors,components:{occurrenceFit:.7*season+.3*prior,habitatFit,depthFit,lightFit:light},sources:{profile:profile.provenance,environment:e,temperature:{...temperature,...quality.temperature},weather:{...(wx||{}),...quality.weather,stale:quality.weather.stale||!!wx&&(wx.ageHours==null||wx.ageHours>24),quality:wx?'forecast':'missing'},tide:{station:st.id,phase,km:gdist(p,st),weak:weakTide(st),...quality.tide},current:{source:realCurrent?'forecast':relativeAvailable?'tide_estimate':'missing',station:fu.real?fu.nc.c.name:st.id,km:fu.real?fu.nc.km:gdist(p,st),u:fu.u,speed:u,unit:realCurrent?'m/s':'relative_estimate'}}};
 }
 function biteAt(fish, pt, st, day, h) { return biteEvalAt(fish, pt, st, day, h).score; }
 function biteReasons(ev) {
-  if (ev.modelStatus === 'provisional') return '입질 계산 기준 미설정';
-  if (ev.score === 0) return '현재 알려진 조건의 적합도가 매우 낮음';
-  const relevant = ev.factors.filter(f => !['neutral', 'base', 'catch', 'region'].includes(f.key));
-  const positive = relevant.filter(f => f.effect > .05).sort((a, b) => b.effect - a.effect);
-  const negative = relevant.filter(f => f.effect < -.05).sort((a, b) => a.effect - b.effect);
-  const environmental = relevant.filter(f => ['depth', 'habitat'].includes(f.key) && Math.abs(f.effect) > .4).sort((a,b) => Math.abs(b.effect)-Math.abs(a.effect));
-  const chosen = environmental.slice(0,1);
-  for (const f of [...positive.slice(0,1), ...negative.slice(0,1)]) if (!chosen.includes(f)) chosen.push(f);
-  for (const f of [...relevant.filter(f => f.quality === 'missing' || f.key === 'current' && f.quality === 'estimated'), ...positive, ...negative]) if (!chosen.includes(f) && chosen.length < 4) chosen.push(f);
-  return chosen.map(f => `${f.quality === 'missing' || f.key === 'current' && f.quality === 'estimated' ? '참고' : f.effect > 0 ? '+' : '−'} ${f.label}`).join(' · ');
+ if(ev.modelStatus==='provisional')return '입질 계산 기준 미설정';
+ const relevant=ev.factors.filter(f=>(BITE_DYNAMIC_KEYS.has(f.key)||f.key==='depth')&&(f.key!=='current'||f.quality==='forecast')&&f.quality!=='missing'&&Math.abs(f.effect)>.05);
+ const positive=relevant.filter(f=>f.effect>0).sort((a,b)=>b.effect-a.effect),negative=relevant.filter(f=>f.effect<0).sort((a,b)=>a.effect-b.effect);
+ const chosen=[...positive.slice(0,1),...negative.slice(0,1)];
+ for(const f of relevant.sort((a,b)=>Math.abs(b.effect)-Math.abs(a.effect)))if(chosen.length<3&&!chosen.includes(f))chosen.push(f);
+ return chosen.map(f=>`${f.effect>0?'+':'−'} ${f.key==='depth'?'현재 ':''}${f.label}`).join(' · ')||'선택한 시간의 알려진 조건을 참고하세요';
 }
 const level = p => p >= 60 ? ['높음', 'hi'] : p >= 40 ? ['보통', 'mid'] : p > 0 ? ['낮음', 'lo'] : ['없음', 'none'];
 function spark(arr, sel) {
@@ -108,7 +106,7 @@ function renderBite() {
   $('biteWin').textContent = `해 뜸 ${fmtH(sr)} · 해 짐 ${fmtH(ss)} · ` + (top.length ? '오늘 "높음"이 나오는 시간: ' + top.slice(0, 4).map(r => `${r.f.n} ${String(r.best).padStart(2, '0')}시`).join(', ') : '오늘은 "높음"이 나오는 시간이 없습니다.');
   $('fishGrid').innerHTML = rows.map(({ f, i, arr, p, best, ev }) => {
     const [lv, cls] = level(p);
-    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><b>${p}점</b><span class="lv ${cls}">${lv}</span></div>${spark(arr, H)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}점</div><p class="biteConfidence">자료 신뢰도 ${ev.confidenceLevel}</p><p class="biteReasons">${biteReasons(ev)}</p></div>`;
+    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><b>${p}점</b><span class="lv ${cls}">${lv}</span></div>${spark(arr, H)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}점</div><p class="biteScores">서식 ${Math.round(ev.habitatScore)} · 오늘 조건 ${Math.round(ev.dynamicScore)}</p><div class="fishEcology"><p><span class="ecologyLabel">주 서식지</span><span class="habitatSummary">${f.habitatSummary}</span></p><p><span class="ecologyLabel">잘 잡히는 곳</span><span class="catchSpotSummary">${f.catchSpotSummary}</span></p></div><p class="biteReasons">${biteReasons(ev)}</p></div>`;
   }).join('') + FISH.filter(f => !fishHasBiteModel(f)).map((f, i) => `<div class="fish provisional"><div class="pic">${fishPicture(f, 'new' + i)}</div><div class="fn">${f.n}</div><div class="fp"><b>—</b><span class="lv">미설정</span></div><p class="fishModelNote">입질 계산 기준 미설정 · 추천 순위 제외${f.aliasOf ? `<br>${f.aliasOf}과 같은 어종` : ''}</p></div>`).join('');
   if (pt && pt.kind === 'rock') $('rockInfo').innerHTML = rockInfoHTML(pt); else $('rockInfo').innerHTML = '';
   if (typeof renderBasis === 'function') renderBasis();
