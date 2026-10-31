@@ -42,7 +42,7 @@
 | `15d_render_state.js` | UI·조류·단면의 별도 무효화, 화살표 bitmap 캐시, localhost FPS·프레임·호출·long task 계측 | 가변 | `perfCount`, `perfWrap`, `drawCurrentOverlay`, `providerPrepareDraw`, `providerDrawStamp`, `providerCommitDrawStamp`, `window.naksigwangPerfDiagnostic` |
 | `15e_tile_diagnostic.js` | localhost 타일 DOM·오류/SDK 상태·Canvas 픽셀/가시성·providerOnly 관찰 (URL 비반환) | 가변 | `providerCanvasVisibility`, `window.naksigwangTileDiagnostic`, `naksigwangPerfDiagnostic.providerOnly`, `naksigwangTileDiagnostic.retry` |
 | `15f_provider_health.js` | 타일 오류 계측·SDK API 상태 확인·3회 제한 재확인·비치명적 settle timeout·기존 지도 인스턴스 복구 | 가변 | `providerHealthSnapshot`, `providerRecordTileError`, `providerTileErrorsLast10s`, `providerCancelHealthCheck`, `providerHandleProjectionFailure`, `providerScheduleHealthCheck`, `providerTryRecover`, `providerSettleTimeout`, `providerModeTimeout` |
-| `16_terrain.js` | GEBCO 배경·idle 수심 범위 요청, viewport별 해안 Path·mask 캐시 | 가변 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
+| `16_terrain.js` | GEBCO 배경·idle 수심 범위 요청, 표시 좌표에서 해안 꼭짓점 생략·viewport별 Path와 mask 캐시 | 가변 | `loadGebco`, `gebcoAt`, `makeLUT`, `renderTerrain`, `drawDepthContours`, `drawContours`, `buildPath`, `renderBase` |
 | `17_flow.js` | 조류: 해안 방향장·예보 흐름장·측정 시간 기반 입자 예산·이동 중 정지·화살표 | 102 | `buildFlowField`, `realField`, `spawn`, `stepParticles`, `drawCrnt` |
 | `17b_section_surface.js` | 단면 샘플의 바다·육상·구조물·암반·미확인 분류, 다중 교차와 샘플 사이 짧은 형상 보호 | 가변 | `sectionSurfaceContext`, `classifySectionSample`, `sectionPointInRings`, `sectionSampleIsWater`, `sectionEdgeBlocked`, `sectionWaterRuns` |
 | `18_section.js` | KHOA 출처를 보존하는 A→B 단면, 비수중 구간에서 곡선·채움·특징분석 중단 | 가변 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |

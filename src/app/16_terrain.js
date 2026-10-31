@@ -158,16 +158,13 @@ const CITIES = [['서울', 37.566, 126.978], ['인천', 37.456, 126.705], ['태�
 function buildPath(rings, margin) {
   const p = new Path2D(), x0 = -margin, x1 = cw + margin, y0 = -margin, y1 = ch + margin;
   const oc = (x, y) => (x < x0 ? 1 : 0) | (x > x1 ? 2 : 0) | (y < y0 ? 4 : 0) | (y > y1 ? 8 : 0);
-  // 화면 밖의 같은 쪽에 머무는 긴 해안 구간은 비싼 SDK 투영 전에 생략한다.
-  // 화면을 포함하는 세계 좌표 bbox를 써서 보이는 꼭짓점의 실제 투영은 그대로 보존한다.
-  const [wx0,wy0,wx1,wy1]=viewBounds(margin),worldCode=(x,y)=>(x<wx0?1:0)|(x>wx1?2:0)|(y<wy0?4:0)|(y>wy1?8:0);
+  // 꼭짓점을 먼저 표시 좌표로 바꾼다. 세계 bbox에서 먼저 생략하면
+  // 아래의 이웃점·거리 생략 결과가 달라져 해안 마스크까지 바뀔 수 있다.
+  // 이 경로는 viewport별로 캐시하며 이동 중에는 다시 만들지 않는다.
   for (const r of rings) {
-    const codes=new Uint8Array(r.n),X=[],Y=[],C=[];
-    for(let i=0;i<r.n;i++)codes[i]=worldCode(r.xs[i],r.ys[i]);
-    let previous=codes[0];
+    const X=[],Y=[],C=[];
     for(let i=0;i<r.n;i++){
-      if(i>0&&i<r.n-1&&(previous&codes[i]&codes[i+1]))continue;
-      const [x,y]=toS(r.xs[i],r.ys[i]);X.push(x);Y.push(y);C.push(oc(x,y));previous=codes[i];
+      const [x,y]=toS(r.xs[i],r.ys[i]);X.push(x);Y.push(y);C.push(oc(x,y));
     }
     const n=X.length;
     let lx = X[0], ly = Y[0], lc = C[0];
