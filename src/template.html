@@ -114,7 +114,6 @@ details.api pre{margin:0;font-family:var(--font-data);font-size:10.5px;color:var
 @media (max-width:600px){.hours{grid-template-columns:repeat(12,minmax(0,1fr))}}
 .fish .fn{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
 .fish .lt{font-size:10.5px;font-weight:400;color:var(--muted)}
-.spark{width:100%;height:26px;display:block}
 .logBox{margin:14px 0 6px;padding:12px;border:1px solid var(--line);border-radius:6px}
 .logForm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
 .logForm input,.logForm select{font:inherit;font-size:13px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;min-width:0}
@@ -167,12 +166,12 @@ footer a{color:var(--cyan)}
 .fishGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:8px}
 .fish{border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#081419}
 .fish.none{opacity:.55}
-.fish .pic{background:radial-gradient(ellipse at 50% 60%,#0f2a33,#081419 70%);border-radius:4px;aspect-ratio:2/1;display:flex;align-items:center;justify-content:center}
+.fish .pic{background:radial-gradient(ellipse at 50% 60%,#0f2a33,#081419 70%);border-radius:4px;aspect-ratio:3/2;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .fish .pic svg{width:92%;height:auto}
 .fish .pic{position:relative}
 .fishMedia{position:relative;display:block;width:100%;height:100%}
-.fish .pic>.fishMedia{position:absolute;inset:0}
-.fishPhoto,.fishPhotoFallback{display:block;width:100%;height:100%;object-fit:contain}
+.fish .pic>.fishMedia{position:absolute;inset:8px;width:auto;height:auto}
+.fishPhoto,.fishPhotoFallback{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center}
 .fishPhotoFallback{align-items:center;justify-content:center}
 .fishPhotoFallback:not([hidden]){display:flex}
 .fishPhoto[hidden],.fishPhotoFallback[hidden]{display:none}
@@ -180,9 +179,9 @@ footer a{color:var(--cyan)}
 .fish .fn{font-weight:700;font-size:14px}
 .fish .fp{display:flex;justify-content:space-between;align-items:center}
 .fish .fp b{font-family:var(--font-data);font-size:18px;font-variant-numeric:tabular-nums}
-.fish .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
-.fish .bar i{display:block;height:100%;background:var(--cyan)}
-.fish.hi .bar i{background:#5ff0a8}.fish.mid .bar i{background:var(--amber)}.fish.lo .bar i{background:#5f8790}
+.scoreProgress{width:100%;height:6px;flex-shrink:0;direction:ltr;background:#223840;border-radius:3px;overflow:hidden;box-shadow:inset 0 0 0 1px #304b55}
+.scoreProgressFill{display:block;height:100%;background:var(--cyan)}
+.fish.hi .scoreProgressFill{background:#5ff0a8}.fish.mid .scoreProgressFill{background:var(--amber)}.fish.lo .scoreProgressFill{background:#5f8790}
 .basis{margin-top:12px;font-size:12px}
 .basis summary{cursor:pointer;color:var(--cyan)}
 .basis p{margin:8px 0;max-width:90ch}
