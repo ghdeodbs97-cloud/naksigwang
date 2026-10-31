@@ -74,7 +74,7 @@ try:
                     page.screenshot(path=str(out / f'{width}-{tab}.png'), full_page=True)
             assert '%' not in page.locator('#fishGrid').inner_text()
             assert '%' not in page.locator('#tdBest').inner_text()
-            assert '%' not in page.locator('.lvKey').inner_text()
+            assert page.locator('.lvKey').count() == 0
             assert page.locator('.biteConfidence').count() == 0
             assert page.locator('.biteScores').count() == 0
             assert all(page.locator('.biteReasons').all_text_contents())

@@ -34,7 +34,7 @@
 | `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선·이동 성공 후 선택 확정 | 가변 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
 | `13b_environment.js` | 기존 수심·OSM·갯바위·항 좌표의 환경 추출, 자료 버전·좌표별 64개 제한 캐시 | 가변 | `getPointEnvironment` |
 | `13c_bite_layers.js` | 서식 0~100·선택 날짜 조건 0~100의 분리와 45:55 조합 | 가변 | `biteLayerScores`, `combineBiteScores` |
-| `14_bite.js` | V2.1 서식·오늘 조건·개인 기록 조건점수, 내부 신뢰도·기여 이유, 렌더 안의 공통 예보 공유 | 가변 | `biteTemperature`, `biteDataQuality`, `myF`, `biteContext`, `biteEvalAt`, `biteAt`, `biteReasons`, `scoreProgress`, `renderBite` |
+| `14_bite.js` | V2.1 서식·오늘 조건·개인 기록 조건점수, 내부 신뢰도·접는 조건 설명, 렌더 안의 공통 예보 공유 | 가변 | `biteTemperature`, `biteDataQuality`, `myF`, `biteContext`, `biteEvalAt`, `biteAt`, `biteReasons`, `scoreProgress`, `renderBite` |
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 가변 | `rawToS`, `rawToM`, `toS`, `toM`, `viewBounds`, `drawStations`, `stationDetailAllowed`, `stationAt`, `tmToLL`, `clampRequestedView`, `applyMapView`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
 | `15b_map_provider.js` | NAVER SDK viewport 단방향 동기화·명시적 이동 transaction·1회 no-op 보정·100m 축척·native 입력 선행 숨김·실제 draw stamp 검증, 중복 이벤트 제외·종료 누락 복원·3가지 지도 모드·기본 지형 복구 | 가변 | `NaverMapAdapter` (`handleImageError`, `repairViewport`, `refreshScreenOrigin`), `providerRequestedBounds`, `providerStart`, `providerSync`, `providerAlignment`, `providerReadView`, `providerViewportKey`, `providerTilesLoaded`, `providerRecordEvent`, `providerViewportChanged`, `providerBeginMove`, `providerBeginNativeInput`, `providerRenderedViewportMatches`, `providerQueueSettle`, `providerFinalizeViewport`, `providerQueueFinalViewport`, `providerRevealOverlay`, `providerCancelGestureDeadline`, `providerArmGestureDeadline`, `providerApplyView`, `providerCommandObservation`, `providerFinishViewCommand`, `providerRepairViewCommand`, `providerCancelViewCommand`, `providerUseNativePan`, `providerUpdateInput`, `providerZoomAt`, `providerPanBy`, `providerPanAnchor`, `scheduleDisplayDepthArea`, `providerSetMode`, `providerFallback`, `providerRect`, `providerRectError` |
 | `15c_map_diagnostic.js` | localhost 전용 native Marker DOM 중심과 Canvas 실제 픽셀·DPR·원점·이동 완료 대기·8프레임 진단·overlay stamp 상태 | 가변 | `naksigwangMapDiagnostic.lastNavigation`, `naksigwangMapDiagnostic.overlay`, `providerMarkerDiagnostic`, `providerCanvasProbePixel`, `providerProbeSample`, `providerDiagnosticRectDeltas`, `drawProviderDebugCrosshair`, `providerClearDiagnostic` |
@@ -103,3 +103,7 @@
 카드의 서식/오늘 조건 세부점수 문구는 숨기며 `habitatScore`/`dynamicScore` 계산·진단은 유지합니다. 사진의 원본 윤곽 결손과 표시 여백 검토는 `tests/FISH_CARD_UI_AUDIT.md`를 참고하세요.
 
 원본 잘림이 확인된 12종은 사용자 승인 후 AI로 윤곽을 보완했습니다. 같은 WebP 경로를 유지하고 `FISH_RESTORED_PHOTOS`에 한해 주소 버전과 설명을 붙입니다. 복원 과정과 프롬프트는 `tests/FISH_IMAGE_RESTORATION.md`에 기록합니다.
+
+다섯 탭은 핵심 수치·조작을 먼저 표시하고 긴 안내는 native details로 펼쳐 봅니다. 입질의 점수 등급 범례를 제거하고 포인트/시간대 정보와 카드의 현재 조건을 접어 두며, 기록의 출처는 펼쳐 확인합니다. 기존 DOM id·지도 stage/단면 패널·계산은 유지합니다.
+
+화면별 정보 배치와 검증 결과: `tests/UI_READABILITY_REPORT.md`.
