@@ -33,6 +33,8 @@ jobs:
         run: node tests/boot_degradation.mjs
       - name: 빌드
         run: python build.py
+      - name: 동해 세부 항구·주요 항 검색 회귀
+        run: python tests/test_east_ports.py
       - name: 기본 브라우저 검사
         run: python tests/smoke.py
       - name: A-B 상태 분류·다중 지형 교차·수심 곡선 단절 회귀

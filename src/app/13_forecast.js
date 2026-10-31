@@ -57,10 +57,18 @@ function buildPoints() {
   const cand = PORTS.slice().sort((a, b) => portPri(a.type) - portPri(b.type) || a.name.localeCompare(b.name, 'ko'));
   const kept = [];
   for (const p of cand) if (!inBan(p.lat, p.lon) && !kept.some(q => gdist(p, q) < 5)) kept.push(p);
+  // 다른 해역의 기존 5 km 대표점은 유지하고, 동해의 서로 다른 항은 별도로 더한다.
+  const nearest=new Map(),stationFor=p=>{if(nearest.has(p))return nearest.get(p);let bi=0,bd=Infinity;STATIONS.forEach((st,i)=>{const d=gdist(p,st);if(d<bd){bd=d;bi=i;}});const r={bi,bd};nearest.set(p,r);return r;};
+  const supplements=eastPortSupplements().sort((a,b)=>Number(/선착장|나루터/.test(a.name))-Number(/선착장|나루터/.test(b.name)));
+  for(const p of [...cand,...supplements]){
+    if(STATIONS[stationFor(p).bi].region!=='동해'||inBan(p.lat,p.lon))continue;
+    if(kept.some(q=>eastPortName(q.name)===eastPortName(p.name)&&gdist(p,q)<1))continue;
+    kept.push(p);
+  }
   POINTS = kept.map(p => {
-    let bi = 0, bd = Infinity; STATIONS.forEach((st, i) => { const d = gdist(p, st); if (d < bd) { bd = d; bi = i; } });
+    const {bi,bd}=stationFor(p);
     p.isPt = true;
-    return { name: p.name, type: p.type, lat: p.lat, lon: p.lon, mx: p.mx, my: p.my, st: bi, dkm: bd, region: STATIONS[bi].region };
+    return { name: p.name, type: p.type, lat: p.lat, lon: p.lon, mx: p.mx, my: p.my, st: bi, dkm: bd, region: STATIONS[bi].region, ...(p.portSource?{portSource:p.portSource}:{}) };
   });
   for (const p of PORTS) if (!kept.includes(p)) p.isPt = false;
   for (const r of ROCKS) {
@@ -68,9 +76,11 @@ function buildPoints() {
     let bi = 0, bd = Infinity; STATIONS.forEach((st, i) => { const d = gdist(r, st); if (d < bd) { bd = d; bi = i; } });
     POINTS.push({ ...r, st: bi, dkm: bd, region: STATIONS[bi].region });
   }
+  const labelCounts=new Map();for(const p of POINTS)if(p.kind!=='rock'){const key=p.region+'|'+p.name;labelCounts.set(key,(labelCounts.get(key)||0)+1);}
+  for(const p of POINTS)if(p.kind!=='rock')p.optionLabel=labelCounts.get(p.region+'|'+p.name)>1?p.name+' · '+STATIONS[p.st].name+' 인근':p.name;
   const order = ['동해', '남해', '서해', '제주'];
   const grp = (r, rock) => POINTS.map((p, i) => ({ p, i })).filter(o => o.p.region === r && (o.p.kind === 'rock') === rock).sort((a, b) => b.p.lat - a.p.lat);
-  $('stSel').innerHTML = order.map(r => `<optgroup label="항·포구 · ${r}">` + grp(r, false).map(o => `<option value="${o.i}">${o.p.name}</option>`).join('') + '</optgroup>').join('')
+  $('stSel').innerHTML = order.map(r => `<optgroup label="항·포구 · ${r}">` + grp(r, false).map(o => `<option value="${o.i}">${o.p.optionLabel||o.p.name}</option>`).join('') + '</optgroup>').join('')
     + order.map(r => { const g = grp(r, true); return g.length ? `<optgroup label="갯바위 · ${r}">` + g.map(o => `<option value="${o.i}">${o.p.name}${o.p.access === 'unk' ? ' (접근 확인 필요)' : o.p.access === 'boat' ? ' (배로만)' : ''}</option>`).join('') + '</optgroup>' : ''; }).join('');
 }
 function selectPoint(j, zoom, navigationCommitted=false) {
@@ -81,7 +91,7 @@ function selectPoint(j, zoom, navigationCommitted=false) {
   $('stSel').value = String(j);
   $('stName').textContent = p.name;
   $('stReg').textContent = (p.kind === 'rock' ? '갯바위 · ' + ACC_NAME[p.access] + ' · ' : '') + `조석: ${st.name} 예보지점 기준 · ${p.dkm < 1 ? '1 km 이내' : p.dkm.toFixed(0) + ' km'}`;
-  $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : '';
+  $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : `<p class="note">${p.portSource||'기본 어항 자료의 대표 위치'} · 조석은 가까운 예보 지점, 바람·파고는 이 위치의 예보 격자를 참고합니다.</p>`;
   if (zoom&&!navigationCommitted) fitGround(p.lat, p.lon, 9000);
   if (S.lock) { if(!navigationCommitted)fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); }   // 오늘 탭 지도: 새 포인트로 옮기고 앞바다 단면
   $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;

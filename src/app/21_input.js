@@ -103,7 +103,7 @@ const normName = v => v.replace(/\s+/g, '').replace(/\(.*?\)/g, '').toLowerCase(
 function fillNameList() {
   const seen = new Set(), opts = [];
   const add = (n, tag) => { if (!n || seen.has(n)) return; seen.add(n); opts.push(`<option value="${n.replace(/"/g, '&quot;')}">${tag}</option>`); };
-  for (const p of POINTS) add(p.name, p.kind === 'rock' ? '갯바위' : p.type || '항');
+  for (const p of POINTS) add(p.optionLabel||p.name, p.kind === 'rock' ? '갯바위' : p.type || '항');
   for (const p of PORTS) add(p.name, p.type || '항');
   for (const r of ROCKS) if (!r.banned) add(r.name, '갯바위 · ' + (r.area || ''));
   for (const o of OSM.list) if (o.c === 'hn' || o.c === 'dk') add(o.name, o.c === 'dk' ? '방조제' : '항·선착장 (오픈스트리트맵)');
@@ -113,7 +113,7 @@ function findPlace(q) {
   const k = normName(q); if (!k) return null;
   const osmP = OSM.list.filter(o => o.c === 'hn' || o.c === 'dk').map(o => { const mx = o.R[0].xs[0], my = o.R[0].ys[0]; return { p: { name: o.name, mx, my, lat: latOf(my), lon: lonOf(mx) }, pt: false }; });
   const cands = [...POINTS.map((p, i) => ({ p, i, pt: true })), ...ROCKS.filter(r => !r.banned && !POINTS.some(q => q.kind === 'rock' && q.name === r.name && q.lat === r.lat)).map(p => ({ p, pt: false, rock: true })), ...PORTS.map(p => ({ p, pt: false })), ...osmP];
-  const score = o => { const n = normName(o.p.name); return n === k ? 0 : n === k + '항' || n === k + '포구' ? 1 : n.startsWith(k) ? 2 : n.includes(k) ? 3 : 9; };
+  const score = o => Math.min(...[o.p.name,o.p.optionLabel].filter(Boolean).map(v=>{const n=normName(v);return n===k?0:n===k+'항'||n===k+'포구'?1:n.startsWith(k)?2:n.includes(k)?3:9;}));
   let best = null, bs = 9;
   for (const o of cands) { const sc = score(o) + (o.pt ? 0 : .5); if (sc < bs) { bs = sc; best = o; } }
   return bs < 9 ? best : null;
@@ -149,7 +149,7 @@ $('coordForm').addEventListener('submit', e => {
   if (!f.pt) { let bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, f.p); if (d < bd) { bd = d; j = i; } }); }
   navigateSearchPoint(f.p.lat,f.p.lon,2500,f.p.name,()=>{
     selectPoint(j,false,true);S.pin=f.pt?null:[f.p.mx,f.p.my];
-    $('coordMsg').textContent=f.pt?'':`${f.p.name}: 5 km 간격 포인트에 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
+    $('coordMsg').textContent=f.pt?'':`${f.p.name}: 개별 선택 포인트가 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
     $('kakaoLink').href=`https://map.kakao.com/link/map/${encodeURIComponent(f.p.name)},${f.p.lat.toFixed(6)},${f.p.lon.toFixed(6)}`;
   });
 });

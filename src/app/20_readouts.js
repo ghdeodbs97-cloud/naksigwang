@@ -18,7 +18,8 @@ function updateReadouts(tide) {
   setText('wxWind', wx ? wx.dir + '풍 ' + (wx.sp == null ? '(세기 정성 예보)' : wx.sp.toFixed(1) + ' m/s') : '자료 없음');
   setText('wxWave', wx && wx.wave != null ? wx.wave.toFixed(2) + ' m' : '자료 없음');
   const sw = sstFor(pt || STATIONS[S.st]); setText('wxSst', sw ? `${sw[0].toFixed(1)} ℃ (${sw[2]} ${sw[3]} km · ${sw[1]} 관측)` : '50 km 안 최근 관측 없음');
-  setText('wxSlot', wx ? String(wx.slot).padStart(2, '0') + '시 예보 · ' + wx.from + (wx.near ? ` (약 ${wx.km} km 옆 격자)` : '') : S.day <= TODAY_IDX ? '이 시각 예보 없음 (이미 지난 시각)' : '이 시각 예보 없음 (기상청 단기예보는 3~5일 뒤까지)');
+  const weatherLocation=pt||STATIONS[S.st],missingWeather=!wxCell(weatherLocation.lat,weatherLocation.lon)?'이 위치의 예보 격자 자료 없음':S.day>TODAY_IDX?'이 시각 예보 없음 (기상청 단기예보는 3~5일 뒤까지)':'선택한 시각의 예보 자료 없음';
+  setText('wxSlot', wx ? String(wx.slot).padStart(2, '0') + '시 예보 · ' + wx.from + (wx.near ? ` (약 ${wx.km} km 옆 격자)` : '') : missingWeather);
   const chip = $('tideChip');
   const label = slack ? (tide.eta > 0 ? '만조 전후 · 정조' : '간조 전후 · 정조') : tide.u > 0 ? '들물' : '날물';
   if (chip.textContent !== label) { chip.textContent = label; chip.className = 'chip ' + (slack ? 'slack' : tide.u > 0 ? 'in' : 'out'); }

@@ -31,7 +31,8 @@
 | `12_fish.js` | 대상어 39개 표시명·사진 매핑, AI 보완 12종 버전 주소, 모델 판정과 이미지 실패 대체 그림 | 가변 | `fishHasBiteModel`, `fishPicture`, `fishSVG` |
 | `12b_ecology.js` | 39개 표시명의 생태 프로필·12개월 단계값·우럭 별칭 공유·연속 적합도 | 가변 | `ecologySeason`, `ecologyRange`, `ecologyLight`, `ecologyLightName` |
 | `12c_habitats.js` | 39종 주 서식지·낚시 포인트 유형 문구와 별칭 공유 | 가변 | `FISH_HABITAT_TEXT` |
-| `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선·이동 성공 후 선택 확정 | 가변 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
+| `13_forecast.js` | 동해 세부 항구를 포함한 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선·이동 성공 후 선택 확정 | 가변 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
+| `13a_east_ports.js` | 기존 OSM 이름·KHOA 지점의 동해 항구 보강과 같은 항 이름 정규화 | 가변 | `eastPortSupplements`, `eastPortName` |
 | `13b_environment.js` | 기존 수심·OSM·갯바위·항 좌표의 환경 추출, 자료 버전·좌표별 64개 제한 캐시 | 가변 | `getPointEnvironment` |
 | `13c_bite_layers.js` | 서식 0~100·선택 날짜 조건 0~100의 분리와 45:55 조합 | 가변 | `biteLayerScores`, `combineBiteScores` |
 | `14_bite.js` | V2.1 서식·오늘 조건·개인 기록 조건점수, 내부 신뢰도·접는 조건 설명, 렌더 안의 공통 예보 공유 | 가변 | `biteTemperature`, `biteDataQuality`, `myF`, `biteContext`, `biteEvalAt`, `biteAt`, `biteReasons`, `scoreProgress`, `renderBite` |
@@ -47,7 +48,7 @@
 | `18_section.js` | KHOA 출처를 보존하는 A→B 단면, 비수중 구간에서 곡선·채움·특징분석 중단 | 가변 | `analyzeSection`, `profileFeatures`, `renderSecInfo`, `lineStyle`, `drawSection` |
 | `18b_shore.js` | 실제 해안 교차가 있을 때만 해안 종류 판정 | 가변 | `osmDist`, `enclosed`, `classifyShore`, `setShore`, `autoShore` |
 | `19_overlay.js` | 평면도 위 표시(자료 좌표에서 투영한 단면선·단면 표식·핀) | 가변 | `drawUI` |
-| `20_readouts.js` | 계기판 값 표시 | 45 | `updateReadouts`, `updateCrnt` |
+| `20_readouts.js` | 계기판 값·기상 격자/시각 누락 사유 표시 | 45 | `updateReadouts`, `updateCrnt` |
 | `20b_today.js` | 「오늘」 탭: 오늘·지금 요약, 연속된 좋은 시간 구간, 39종 계산 중 공통 예보와 같은 날짜의 입질 곡선 공유 | 70 | `goodHourRanges`, `renderToday`, `drawToday` |
 | `21_input.js` | 화면·터치·검색 입력, 온라인 native 이동/Canvas 단면 전환과 크기 동기화, 수심/출처 상세 | 가변 | `providerPointerFinished`, `resize`, `endPtr`, `updateHover`, `setMode`, `fillNameList`, `navigateSearchPoint`, `findPlace`, `renderBasis` |
 | `22_catchlog.js` | 내 조과 기록 | 45 | `localCatches`, `renderLog` |
@@ -66,7 +67,7 @@
 | `TIDE`, `OBS`, `WXG`, `META` | `00_boot.js` | `data/*.json` (수집기가 매일 갱신) |
 | `S` | `02_state.js` | 화면 상태: 선택 날짜(`day`), 시각(`t`), 레이어, 단면 A·B 등 |
 | `STATIONS` | `10_tide.js` | 조석 예보지점 166곳 (날짜별 만조·간조, 물때, 물때 세기) |
-| `POINTS` | `13_forecast.js` | 항·포구(5 km 간격)와 갯바위, 각자 가장 가까운 예보지점 번호 |
+| `POINTS` | `13_forecast.js` | 항·포구(동해는 개별 항, 다른 해역은 5 km 대표점)와 갯바위, 각자 가장 가까운 예보지점 번호 |
 | `CR` | `11_current.js` | 조류 예보 199개 지점 (`static/crnt.js` 해제) |
 | `FISH` | `12_fish.js` | 39개 표시명(조피볼락은 우럭의 별칭): 사진·legacy 값·V2 ecology 프로필 |
 
@@ -111,3 +112,7 @@
 화면 테마는 남색 배경·청회색 패널/카드·아이보리 본문·청록 조작·살구색 물때 강조로 구성합니다. 색상과 표면 스타일은 template CSS에만 두고 지도/그래프의 원본 색과 계산은 유지합니다.
 
 수집 자료는 `main`에서 갱신됩니다. 작업 브랜치는 최신 `main`을 반영해야 로컬에서도 현재 예보를 볼 수 있습니다. meta 시각 고정 회귀와 별개로 실제 현재 시각의 바람·파고·24시간 이내 수온도 확인합니다.
+
+동해안은 기존 5km 대표점을 보존한 뒤 이름이 있는 항·선착장을 보강합니다. 같은 항/선착장 이름이 1km 안에서 겹치면 합치고 서로 다른 항은 가까워도 유지합니다. OSM 항 이름에는 공항·호텔 같은 오인 항목을 제외하며, 묵호·후포는 기존 KHOA 조석 지점의 대표 위치입니다. 해안 출입구·개별 방파제의 낚시 허용 여부를 뜻하지 않습니다.
+
+동해 보강 항구의 기상청 격자는 `collector/points.json` 수집 대상에도 포함합니다. 현 시점의 data/wx.json에 값이 없는 격자는 수집 전까지 없음으로 표시하며 임의 보간하지 않습니다. `tests/test_east_ports.py`가 항구별 수집 격자 설정까지 확인합니다.

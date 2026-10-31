@@ -708,7 +708,7 @@ out geom;</pre>
         <div class="dataRow"><label class="chk"><input type="checkbox" id="apiAuto"> 지도 이동 시 자동</label><button class="btn small" id="apiGo" type="button">현재 화면 불러오기</button></div>
         <p class="note" id="apiMsg" aria-live="polite">지도 폭 15 km 이하에서 0.03° 타일 단위로 요청하고, 받은 타일은 다시 요청하지 않습니다.</p>
       </details>
-      <p class="note">기본 탑재 716곳: 국가어항 구역 82곳(구역 중심점), 해양수산부 어항정보, 충남 어항, 전남·제주 소규모항·어촌정주어항. 차로 갈 수 없는 전라·남해 섬은 섬마다 대표 항 하나만 남겼습니다. 지도에서 고를 수 있는 포인트는 이 중 5 km 안에 하나씩입니다. 다른 지역 항 좌표 자료: 공공데이터포털
+      <p class="note">기본 탑재 716곳: 국가어항 구역 82곳(구역 중심점), 해양수산부 어항정보, 충남 어항, 전남·제주 소규모항·어촌정주어항. 차로 갈 수 없는 전라·남해 섬은 섬마다 대표 항 하나만 남겼습니다. 다른 해역은 5 km 간격의 대표 포인트를 쓰며, 동해안은 지도 이름과 공식 예보 지점을 보강해 가까운 항도 개별로 고릅니다. 다른 지역 항 좌표 자료: 공공데이터포털
         <a href="https://www.data.go.kr/data/15148635/fileData.do" target="_blank" rel="noopener">소규모항</a> ·
         <a href="https://www.data.go.kr/data/15147417/fileData.do" target="_blank" rel="noopener">어촌정주어항</a>
         (해양수산부 공동활용체계)</p>
@@ -720,7 +720,7 @@ out geom;</pre>
     <p>어종 이미지: 방어·부시리·학공치·갑오징어·벵에돔·볼락·대구·고등어·광어·자바리·문치가자미·삼치는 잘린 원본 윤곽을 AI로 보완한 참고 이미지입니다.</p>
     <p>어종 조건 참고: 기존 수온 범위는 FishBase/AquaMaps 자료를 재사용했습니다. <a href="https://fishbase.se/Ecology/Sebastes_schlegelii" target="_blank" rel="noopener">FishBase 우럭 생태</a>, <a href="https://www.nifs.go.kr/portal/pcon0000206/systA/actionConts.do" target="_blank" rel="noopener">국립수산과학원 어종 목록</a>, <a href="https://www.fao.org/docrep/014/i1920e/i1920e.pdf" target="_blank" rel="noopener">FAO 두족류 도감</a>을 참고했습니다. 서식 안내는 기존 프로필과 일반 생태 정보를 낚시 지형으로 풀어 쓴 설명입니다. <a href="https://www.fishbase.se/summary/Mugil_cephalus.html" target="_blank" rel="noopener">FishBase 숭어 서식 정보</a>도 참고했습니다. 월별 계절·선호 수심·활동 계수는 넓은 생태 가정이며 현장 통계 검증 전입니다.</p>
     <p>해안선은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL)의 해안선(natural=coastline, 2026년 10월 3일 내려받음)을 남한 연안 10개 구역에서 이어 붙여 만들었고(약 1 m 허용오차로 단순화), 그 구역 밖의 내륙과 백령도 등은 통계청 SGIS 행정동 경계(공공누리 제1유형, <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener">vuski/admdongkor</a> 가공, CC BY 4.0)를 씁니다. 북한·대마도 쪽 해안선은 뺐습니다.</p>
-    <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → 국립해양조사원 자연과학용 자료(KHOA/BADA) 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. KHOA는 유효 자료점으로 둘러싸인 곳만 보간하고 수집 범위 밖에서는 기존 자료로 돌아갑니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름은 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
+    <p>수심은 내 입력 → 연안해역기본도 → 해수부 수심분포도 → 공개 해도 → 국립해양조사원 자연과학용 자료(KHOA/BADA) 순으로 찾고, 없으면 GEBCO 또는 해안거리 추정을 씁니다. 내 입력은 관리자 검수가 확인되지 않은 개인 자료입니다. 같은 자료집·기준면 안에서만 보간하며 육지·구조물 너머의 자료점을 제외합니다. KHOA는 유효 자료점으로 둘러싸인 곳만 보간하고 수집 범위 밖에서는 기존 자료로 돌아갑니다. 방파제·도류제·부두·안벽, 해변·암반·절벽·암초·갯벌·등대와 이름 및 동해안 보강 항·선착장 위치는 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap 기여자</a>(ODbL, 2026년 10월 3일) 자료이며 방파제·부두는 육지로 처리합니다.</p>
     <p><a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형): 2026년 10월 11일 주문진·남애 등 기존 자료를 보존하고 거진부터 울산까지 검증된 일부 연안 범위를 확대해 35,982점을 제공합니다. 대진·양양 및 포항·울산 일부에는 미탑재 범위가 있으며 동해 전체를 포함하지 않습니다. 약 150 m 간격의 해양수치모델용 자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다. 기준면은 조회 화면의 ‘평균해면하’ 표기를 보존하며 조사연도는 미확인입니다. <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">연안해역기본도</a>는 원본 미확보, <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해수부 수심분포도</a>는 공개 CSV에 수심값이 없어 미탑재입니다.</p>
     <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
     <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
@@ -993,7 +993,7 @@ function importPorts(rows) {
   return { ok, bad, msg: ok ? `항·포구 ${ok.toLocaleString()}곳을 불러왔습니다` + (bad ? ` (좌표 없음·범위 밖 ${bad}건 제외)` : '') + `. ${cols}. 첫 항목: ${first.name} ${first.lat.toFixed(4)}, ${first.lon.toFixed(4)}. 지도 폭 약 100 km 이하로 확대하면 이름이 나타납니다.`
     : `불러온 항목이 없습니다. ${cols}. 첫 줄 값: ${(rows[1] || []).slice(0, 8).join(' | ')}` };
 }
-const portPri = t => /국가/.test(t) ? 0 : /지방|충남|^어항$/.test(t) ? 1 : /정주/.test(t) ? 2 : /소규모|포구/.test(t) ? 3 : 2;
+const portPri = t => /국가|주요항/.test(t) ? 0 : /지방|충남|^어항$/.test(t) ? 1 : /정주/.test(t) ? 2 : /소규모|포구/.test(t) ? 3 : 2;
 function saveLocal() { try { localStorage.setItem('ps_ports', JSON.stringify(PORTS.map(p => [p.name, p.type, p.lat, p.lon]))); } catch (e) {} }
 function loadLocal() {
   const seen = new Set();
@@ -2112,10 +2112,18 @@ function buildPoints() {
   const cand = PORTS.slice().sort((a, b) => portPri(a.type) - portPri(b.type) || a.name.localeCompare(b.name, 'ko'));
   const kept = [];
   for (const p of cand) if (!inBan(p.lat, p.lon) && !kept.some(q => gdist(p, q) < 5)) kept.push(p);
+  // 다른 해역의 기존 5 km 대표점은 유지하고, 동해의 서로 다른 항은 별도로 더한다.
+  const nearest=new Map(),stationFor=p=>{if(nearest.has(p))return nearest.get(p);let bi=0,bd=Infinity;STATIONS.forEach((st,i)=>{const d=gdist(p,st);if(d<bd){bd=d;bi=i;}});const r={bi,bd};nearest.set(p,r);return r;};
+  const supplements=eastPortSupplements().sort((a,b)=>Number(/선착장|나루터/.test(a.name))-Number(/선착장|나루터/.test(b.name)));
+  for(const p of [...cand,...supplements]){
+    if(STATIONS[stationFor(p).bi].region!=='동해'||inBan(p.lat,p.lon))continue;
+    if(kept.some(q=>eastPortName(q.name)===eastPortName(p.name)&&gdist(p,q)<1))continue;
+    kept.push(p);
+  }
   POINTS = kept.map(p => {
-    let bi = 0, bd = Infinity; STATIONS.forEach((st, i) => { const d = gdist(p, st); if (d < bd) { bd = d; bi = i; } });
+    const {bi,bd}=stationFor(p);
     p.isPt = true;
-    return { name: p.name, type: p.type, lat: p.lat, lon: p.lon, mx: p.mx, my: p.my, st: bi, dkm: bd, region: STATIONS[bi].region };
+    return { name: p.name, type: p.type, lat: p.lat, lon: p.lon, mx: p.mx, my: p.my, st: bi, dkm: bd, region: STATIONS[bi].region, ...(p.portSource?{portSource:p.portSource}:{}) };
   });
   for (const p of PORTS) if (!kept.includes(p)) p.isPt = false;
   for (const r of ROCKS) {
@@ -2123,9 +2131,11 @@ function buildPoints() {
     let bi = 0, bd = Infinity; STATIONS.forEach((st, i) => { const d = gdist(r, st); if (d < bd) { bd = d; bi = i; } });
     POINTS.push({ ...r, st: bi, dkm: bd, region: STATIONS[bi].region });
   }
+  const labelCounts=new Map();for(const p of POINTS)if(p.kind!=='rock'){const key=p.region+'|'+p.name;labelCounts.set(key,(labelCounts.get(key)||0)+1);}
+  for(const p of POINTS)if(p.kind!=='rock')p.optionLabel=labelCounts.get(p.region+'|'+p.name)>1?p.name+' · '+STATIONS[p.st].name+' 인근':p.name;
   const order = ['동해', '남해', '서해', '제주'];
   const grp = (r, rock) => POINTS.map((p, i) => ({ p, i })).filter(o => o.p.region === r && (o.p.kind === 'rock') === rock).sort((a, b) => b.p.lat - a.p.lat);
-  $('stSel').innerHTML = order.map(r => `<optgroup label="항·포구 · ${r}">` + grp(r, false).map(o => `<option value="${o.i}">${o.p.name}</option>`).join('') + '</optgroup>').join('')
+  $('stSel').innerHTML = order.map(r => `<optgroup label="항·포구 · ${r}">` + grp(r, false).map(o => `<option value="${o.i}">${o.p.optionLabel||o.p.name}</option>`).join('') + '</optgroup>').join('')
     + order.map(r => { const g = grp(r, true); return g.length ? `<optgroup label="갯바위 · ${r}">` + g.map(o => `<option value="${o.i}">${o.p.name}${o.p.access === 'unk' ? ' (접근 확인 필요)' : o.p.access === 'boat' ? ' (배로만)' : ''}</option>`).join('') + '</optgroup>' : ''; }).join('');
 }
 function selectPoint(j, zoom, navigationCommitted=false) {
@@ -2136,7 +2146,7 @@ function selectPoint(j, zoom, navigationCommitted=false) {
   $('stSel').value = String(j);
   $('stName').textContent = p.name;
   $('stReg').textContent = (p.kind === 'rock' ? '갯바위 · ' + ACC_NAME[p.access] + ' · ' : '') + `조석: ${st.name} 예보지점 기준 · ${p.dkm < 1 ? '1 km 이내' : p.dkm.toFixed(0) + ' km'}`;
-  $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : '';
+  $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : `<p class="note">${p.portSource||'기본 어항 자료의 대표 위치'} · 조석은 가까운 예보 지점, 바람·파고는 이 위치의 예보 격자를 참고합니다.</p>`;
   if (zoom&&!navigationCommitted) fitGround(p.lat, p.lon, 9000);
   if (S.lock) { if(!navigationCommitted)fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); }   // 오늘 탭 지도: 새 포인트로 옮기고 앞바다 단면
   $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
@@ -2173,6 +2183,25 @@ function drawTideChart(tide) {
   tcx.fillStyle = '#fff'; tcx.beginPath(); tcx.arc(x, Y(tide.cm), 4, 0, 7); tcx.fill();
 }
 tc.addEventListener('pointerdown', e => { const set = ev => { const b = tc.getBoundingClientRect(); S.t = clamp((ev.clientX - b.left - 34) / (b.width - 42) * 24, 0, 23.99); $('tIn').value = S.t; }; tc.setPointerCapture(e.pointerId); set(e); tc.onpointermove = ev => { if (tc.hasPointerCapture(ev.pointerId)) set(ev); }; });
+// 13a_east_ports.js — 기존 지도 이름·공식 예보 지점으로 동해 항구 목록 보강
+const EAST_MAJOR_PORTS=new Set(['주문진항','속초항','묵호항','동해항','삼척항','옥계항','후포항','강구항','구룡포항','포항구항','포항영일신항만']);
+// 2026-10-31 수집본의 KHOA 조석 지점. 하루 예보의 일시 누락과 항구 목록을 분리한다.
+const EAST_PORT_REFS=[['묵호',37.55027,129.11638],['후포',36.6775,129.45305]];
+function eastPortName(name){return String(name).replace(/\([^)]*\)/g,'').replace(/\s+/g,'').replace(/(?:선착장|나루터|포구|항구|항)$/,'');}
+function eastPortSupplements(){
+ const ports=[];
+ for(const o of OSM.list){
+  if(o.c!=='hn'||!o.name||o.name.includes('*')||/공항|비행장|호텔|크루즈|크루스/.test(o.name)||['포항','북포항'].includes(o.name))continue;
+  if(!/(?:항|포구|선착장|나루터|항만)(?:\([^)]*\))?$/.test(o.name)||!o.R?.[0]?.n)continue;
+  const name=o.name.replace(/\([^)]*\)/g,'').trim(),mx=o.R[0].xs[0],my=o.R[0].ys[0];
+  ports.push({name,lat:latOf(my),lon:lonOf(mx),mx,my,type:EAST_MAJOR_PORTS.has(name)?'주요항 · OSM':'항·선착장 · OSM',portSource:'OpenStreetMap 항·선착장 이름 위치'});
+ }
+ // 지도 이름 자료에 없는 두 주요 항은 기존 국립해양조사원 지점을 대표 위치로 쓴다.
+ for(const [name,lat,lon] of EAST_PORT_REFS){
+  ports.push({name:name+'항',lat,lon,mx:mxOf(lon),my:myOf(lat),type:'주요항 · KHOA',portSource:'국립해양조사원 '+name+' 조석 예보 대표 위치'});
+ }
+ return ports;
+}
 // 13b_environment.js — 포인트 환경을 한 번 추출하고 수심 출처·기준면을 보존
 const BITE_ENV_CACHE=new Map();
 function getPointEnvironment(pt){
@@ -4007,7 +4036,8 @@ function updateReadouts(tide) {
   setText('wxWind', wx ? wx.dir + '풍 ' + (wx.sp == null ? '(세기 정성 예보)' : wx.sp.toFixed(1) + ' m/s') : '자료 없음');
   setText('wxWave', wx && wx.wave != null ? wx.wave.toFixed(2) + ' m' : '자료 없음');
   const sw = sstFor(pt || STATIONS[S.st]); setText('wxSst', sw ? `${sw[0].toFixed(1)} ℃ (${sw[2]} ${sw[3]} km · ${sw[1]} 관측)` : '50 km 안 최근 관측 없음');
-  setText('wxSlot', wx ? String(wx.slot).padStart(2, '0') + '시 예보 · ' + wx.from + (wx.near ? ` (약 ${wx.km} km 옆 격자)` : '') : S.day <= TODAY_IDX ? '이 시각 예보 없음 (이미 지난 시각)' : '이 시각 예보 없음 (기상청 단기예보는 3~5일 뒤까지)');
+  const weatherLocation=pt||STATIONS[S.st],missingWeather=!wxCell(weatherLocation.lat,weatherLocation.lon)?'이 위치의 예보 격자 자료 없음':S.day>TODAY_IDX?'이 시각 예보 없음 (기상청 단기예보는 3~5일 뒤까지)':'선택한 시각의 예보 자료 없음';
+  setText('wxSlot', wx ? String(wx.slot).padStart(2, '0') + '시 예보 · ' + wx.from + (wx.near ? ` (약 ${wx.km} km 옆 격자)` : '') : missingWeather);
   const chip = $('tideChip');
   const label = slack ? (tide.eta > 0 ? '만조 전후 · 정조' : '간조 전후 · 정조') : tide.u > 0 ? '들물' : '날물';
   if (chip.textContent !== label) { chip.textContent = label; chip.className = 'chip ' + (slack ? 'slack' : tide.u > 0 ? 'in' : 'out'); }
@@ -4211,7 +4241,7 @@ const normName = v => v.replace(/\s+/g, '').replace(/\(.*?\)/g, '').toLowerCase(
 function fillNameList() {
   const seen = new Set(), opts = [];
   const add = (n, tag) => { if (!n || seen.has(n)) return; seen.add(n); opts.push(`<option value="${n.replace(/"/g, '&quot;')}">${tag}</option>`); };
-  for (const p of POINTS) add(p.name, p.kind === 'rock' ? '갯바위' : p.type || '항');
+  for (const p of POINTS) add(p.optionLabel||p.name, p.kind === 'rock' ? '갯바위' : p.type || '항');
   for (const p of PORTS) add(p.name, p.type || '항');
   for (const r of ROCKS) if (!r.banned) add(r.name, '갯바위 · ' + (r.area || ''));
   for (const o of OSM.list) if (o.c === 'hn' || o.c === 'dk') add(o.name, o.c === 'dk' ? '방조제' : '항·선착장 (오픈스트리트맵)');
@@ -4221,7 +4251,7 @@ function findPlace(q) {
   const k = normName(q); if (!k) return null;
   const osmP = OSM.list.filter(o => o.c === 'hn' || o.c === 'dk').map(o => { const mx = o.R[0].xs[0], my = o.R[0].ys[0]; return { p: { name: o.name, mx, my, lat: latOf(my), lon: lonOf(mx) }, pt: false }; });
   const cands = [...POINTS.map((p, i) => ({ p, i, pt: true })), ...ROCKS.filter(r => !r.banned && !POINTS.some(q => q.kind === 'rock' && q.name === r.name && q.lat === r.lat)).map(p => ({ p, pt: false, rock: true })), ...PORTS.map(p => ({ p, pt: false })), ...osmP];
-  const score = o => { const n = normName(o.p.name); return n === k ? 0 : n === k + '항' || n === k + '포구' ? 1 : n.startsWith(k) ? 2 : n.includes(k) ? 3 : 9; };
+  const score = o => Math.min(...[o.p.name,o.p.optionLabel].filter(Boolean).map(v=>{const n=normName(v);return n===k?0:n===k+'항'||n===k+'포구'?1:n.startsWith(k)?2:n.includes(k)?3:9;}));
   let best = null, bs = 9;
   for (const o of cands) { const sc = score(o) + (o.pt ? 0 : .5); if (sc < bs) { bs = sc; best = o; } }
   return bs < 9 ? best : null;
@@ -4257,7 +4287,7 @@ $('coordForm').addEventListener('submit', e => {
   if (!f.pt) { let bd = Infinity; POINTS.forEach((p, i) => { const d = gdist(p, f.p); if (d < bd) { bd = d; j = i; } }); }
   navigateSearchPoint(f.p.lat,f.p.lon,2500,f.p.name,()=>{
     selectPoint(j,false,true);S.pin=f.pt?null:[f.p.mx,f.p.my];
-    $('coordMsg').textContent=f.pt?'':`${f.p.name}: 5 km 간격 포인트에 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
+    $('coordMsg').textContent=f.pt?'':`${f.p.name}: 개별 선택 포인트가 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
     $('kakaoLink').href=`https://map.kakao.com/link/map/${encodeURIComponent(f.p.name)},${f.p.lat.toFixed(6)},${f.p.lon.toFixed(6)}`;
   });
 });
