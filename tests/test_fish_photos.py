@@ -54,6 +54,8 @@ try:
                 content = (ROOT/f['image']).read_bytes()
                 assert content[:4]==b'RIFF' and content[8:12]==b'WEBP', f
             assert page.locator('#fishGrid .fish').count()==39
+            assert page.locator('#fishGrid img[src*="?v=20261031-restored"]').count()==12
+            assert page.locator('#fishGrid img[title*="AI"]').count()==12
             assert page.locator('#fishGrid .provisional').count()==0
             assert page.locator('#fishGrid .provisional .spark').count()==0
             assert page.locator('#fishGrid .provisional .fp b').all_text_contents()==[]
@@ -77,7 +79,7 @@ try:
                     page.screenshot(path=str(OUT/f'{width}-new.png'))
                     page.evaluate('scrollTo(0,0)')
             assert '<svg' in page.evaluate('fishTestMissing()')
-            page.route('**/static/fish/*.webp',lambda r:r.abort())
+            page.route('**/static/fish/*.webp*',lambda r:r.abort())
             page.reload()
             page.wait_for_function('window.fishTestReady?.()')
             page.locator('#tabbar [data-tab="bite"]').click()

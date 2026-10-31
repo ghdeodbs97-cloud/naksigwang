@@ -38,10 +38,13 @@ for (const fish of FISH) fish.image = `static/fish/${FISH_PHOTOS[fish.n]}.webp`;
 function fishHasBiteModel(fish) {
   return !!fish.ecology || fish.modelStatus !== 'provisional' && Number.isFinite(fish.season) && Array.isArray(fish.reg) && fish.reg.length === 4 && fish.reg.every(Number.isFinite) && Number.isFinite(fish.cur);
 }
+// 잘린 윤곽을 AI로 보완한 자산만 주소 버전을 바꿔 기존 브라우저 캐시를 갱신한다.
+const FISH_RESTORED_PHOTOS=new Set(['방어','부시리','학공치','갑오징어','벵에돔','볼락','대구','고등어','광어','자바리','문치가자미','삼치']);
 function fishPicture(fish, id) {
   const fallback = fishSVG(fish.f || { h: .3, top: '#5f7586', bot: '#e5eaee', tail: 'fork' }, id);
   if (!fish.image) return fallback;
-  return `<span class="fishMedia"><img class="fishPhoto" src="${fish.image}" alt="${fish.n}" decoding="async"><span class="fishPhotoFallback" role="img" aria-label="${fish.n} 대체 그림" hidden>${fallback}</span></span>`;
+  const restored=FISH_RESTORED_PHOTOS.has(fish.n);
+  return `<span class="fishMedia"><img class="fishPhoto" src="${fish.image}${restored?'?v=20261031-restored':''}" alt="${fish.n}"${restored?' title="잘린 원본 윤곽을 AI로 보완한 참고 이미지"':''} decoding="async"><span class="fishPhotoFallback" role="img" aria-label="${fish.n} 대체 그림" hidden>${fallback}</span></span>`;
 }
 /* IMG 실패는 버블되지 않아 캡처 단계에서 처리한다. 렌더를 반복해도 리스너는 하나다. */
 document.addEventListener('error', event => {

@@ -28,7 +28,7 @@
 | `09_rocks.js` | 낚시 제한구역과 갯바위 포인트 | 68 | `inBan`, `nearestRing`, `accessAt`, `addRock`, `importRocks`, `saveRocks`, `loadRocks`, `rockInfoHTML` |
 | `10_tide.js` | 조석: 예보지점·물때·조위 보간 | 40 | `tideAt`, `getTide` |
 | `11_current.js` | 조류 예보(물돌이·최강)와 해 뜨고 지는 시각 | 66 | `loadCrnt`, `crntAt`, `crntDay`, `nearestCrnt`, `flowU`, `sunTimes` |
-| `12_fish.js` | 대상어 39개 표시명·사진 매핑, 모델 사용 가능 판정, 이미지 실패 대체 그림 | 가변 | `fishHasBiteModel`, `fishPicture`, `fishSVG` |
+| `12_fish.js` | 대상어 39개 표시명·사진 매핑, AI 보완 12종 버전 주소, 모델 판정과 이미지 실패 대체 그림 | 가변 | `fishHasBiteModel`, `fishPicture`, `fishSVG` |
 | `12b_ecology.js` | 39개 표시명의 생태 프로필·12개월 단계값·우럭 별칭 공유·연속 적합도 | 가변 | `ecologySeason`, `ecologyRange`, `ecologyLight`, `ecologyLightName` |
 | `12c_habitats.js` | 39종 주 서식지·낚시 포인트 유형 문구와 별칭 공유 | 가변 | `FISH_HABITAT_TEXT` |
 | `13_forecast.js` | 포인트 목록, 바람·파고·수온, 날짜 선택, 조석 곡선·이동 성공 후 선택 확정 | 가변 | `kmaGrid`, `wxCell`, `wxAt`, `sstForLocation`, `sstFor`, `buildPoints`, `selectPoint`, `renderDays`, `setDay` 외 |
@@ -101,3 +101,5 @@
 입질 카드의 `scoreProgress`는 표시된 종합점수를 0~100 가로 진행바와 ARIA 값으로 그대로 사용합니다. 카드 사진은 공통 3:2 영역의 사방 6% 안전 영역 안에서 최대 94%×92% 크기로 비율을 유지하며 중앙에 전체 표시합니다. 39종 자산 매핑과 점수 계산은 유지합니다.
 
 카드의 서식/오늘 조건 세부점수 문구는 숨기며 `habitatScore`/`dynamicScore` 계산·진단은 유지합니다. 사진의 원본 윤곽 결손과 표시 여백 검토는 `tests/FISH_CARD_UI_AUDIT.md`를 참고하세요.
+
+원본 잘림이 확인된 12종은 사용자 승인 후 AI로 윤곽을 보완했습니다. 같은 WebP 경로를 유지하고 `FISH_RESTORED_PHOTOS`에 한해 주소 버전과 설명을 붙입니다. 복원 과정과 프롬프트는 `tests/FISH_IMAGE_RESTORATION.md`에 기록합니다.
