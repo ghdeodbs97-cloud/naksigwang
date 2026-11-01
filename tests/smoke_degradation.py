@@ -49,6 +49,8 @@ try:
                         station['days'] = {day: [['06:00', 100, 'H'], ['12:00', 0, 'L']]}
                 page = browser.new_page(viewport={'width': width, 'height': height})
                 page.clock.set_fixed_time(CLOCK)
+                # 이 검사는 보완 API도 사용할 수 없는 상황이다. 모델 정상/부분 실패는 별도 mock 검사에서 다룬다.
+                page.route('https://**/*', lambda route: route.abort())
                 errors = []
                 page.on('pageerror', lambda error: errors.append(str(error)))
                 for name, doc in data.items():
@@ -82,7 +84,7 @@ try:
                     assert text == '확인 불가', text
                 if case in ['obs', 'empty_obs', 'all']:
                     assert '수온·관측' in notices
-                    assert '최근 관측 없음' in page.locator('#wxSst').inner_text()
+                    assert '최근 관측 없음' in page.locator('#wxSstNote').inner_text()
                 if case in ['wx', 'empty_wx', 'all']:
                     assert '기상' in notices
                     assert '자료 없음' in page.locator('#wxWave').inner_text()
