@@ -93,6 +93,10 @@ def valid_doc(name, doc):
                    for o in doc.values())
     if name == 'wx.json':
         cells = doc.get('cells')
+        if 'humidity' in doc and (not isinstance(doc['humidity'], dict) or not all(
+                isinstance(o, dict) and all(v is None or finite(v) and 0 <= v <= 100 for v in o.values())
+                for o in doc['humidity'].values())):
+            return False
         if 'bases' in doc and (not isinstance(doc['bases'], dict) or not all(isinstance(v, str) for v in doc['bases'].values())):
             return False
         return isinstance(doc.get('base'), str) and isinstance(cells, dict) and bool(cells) and all(
@@ -335,10 +339,14 @@ def wx():
         return cell, o
 
     fresh_out = {f'{nx},{ny}': o for (nx, ny), o in pmap(guard_station(one, 'wx'), cells) if o}
+    # 기존 공개 배열 [풍향, 풍속, 파고]는 그대로 둬 캐시된 구형 앱도 계속 읽게 한다.
+    humidity = {k: {h: values.pop() for h, values in o.items() if len(values) == 4}
+                for k, o in fresh_out.items()}
     out = dict(fresh_out)
     prev_doc = read_prev('wx.json') or {}
     prev = prev_doc.get('cells') or {}
     previous_bases = prev_doc.get('bases') or {}
+    previous_humidity = prev_doc.get('humidity') or {}
     bases = {k: bd + bt for k in fresh_out}
     today = NOW.strftime('%Y%m%d') + '00'
 
@@ -348,6 +356,8 @@ def wx():
         for h, v in (prev.get(k) or {}).items():
             if today <= h < first_hour and h not in o:
                 o[h] = v
+                if h in previous_humidity.get(k, {}):
+                    humidity.setdefault(k, {})[h] = previous_humidity[k][h]
         out[k] = dict(sorted(o.items()))
 
     # 요청 자체가 실패한 격자는 이전 격자를 통째로 유지한다.
@@ -356,9 +366,10 @@ def wx():
         k = f'{nx},{ny}'
         if k not in out and k in prev:
             out[k] = prev[k]
+            humidity[k] = previous_humidity.get(k, {})
             bases[k] = previous_bases.get(k) or prev_doc['base']
             fallback += 1
-    return {'base': bd + bt, 'bases': bases, 'cells': out}, stat(len(fresh_out), fallback, len(cells))
+    return {'base': bd + bt, 'bases': bases, 'cells': out, 'humidity': humidity}, stat(len(fresh_out), fallback, len(cells))
 
 
 def save(name, data, stats):

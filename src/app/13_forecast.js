@@ -26,10 +26,11 @@ function wxAt(st, day, h, pt) {
   const date = dateAdd(DAY0, day).replace(/-/g, '');
   for (let hh = Math.floor(h); hh >= Math.max(0, Math.floor(h) - 2); hh--) {   // 4일째부터는 3시간 간격
     const v = r.c[date + String(hh).padStart(2, '0')];
+    const humidity=WXG.humidity?.[r.key]?.[date+String(hh).padStart(2,'0')] ?? v?.[3];
     const base = WXG.bases?.[r.key] || WXG.base;
     const issued = Date.parse(`${base.slice(0, 4)}-${base.slice(4, 6)}-${base.slice(6, 8)}T${base.slice(8, 10)}:${base.slice(10, 12)}:00+09:00`);
     const source = Number.isFinite(issued) ? `기상청 ${base.slice(0, 4)}/${base.slice(4, 6)}/${base.slice(6, 8)} ${base.slice(8, 10)}시 발표${Date.now() - issued > 24 * 36e5 ? ' (이전 발표)' : ''}` : '기상청 발표 시각 확인 불가';
-    if (v) return { dir: v[0] == null ? '—' : dirName(v[0]), deg: v[0], sp: v[1], wave: v[2], ...(v.length>3?{humidity:v[3]}:{}), slot: hh, from: source, near: r.near > 0, km: r.near, grid: r.key, requestedGrid: kmaGrid(p.lat, p.lon).join(','), base, ageHours: Number.isFinite(issued) ? Math.max(0, (Date.now() - issued) / 36e5) : null, lagHours: Math.floor(h) - hh };
+    if (v) return { dir: v[0] == null ? '—' : dirName(v[0]), deg: v[0], sp: v[1], wave: v[2], ...(Number.isFinite(humidity)?{humidity}:{}), slot: hh, from: source, near: r.near > 0, km: r.near, grid: r.key, requestedGrid: kmaGrid(p.lat, p.lon).join(','), base, ageHours: Number.isFinite(issued) ? Math.max(0, (Date.now() - issued) / 36e5) : null, lagHours: Math.floor(h) - hh };
   }
   return null;
 }

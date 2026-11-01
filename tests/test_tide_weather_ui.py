@@ -22,7 +22,7 @@ window.weatherTest={ready:()=>CR.ready, state:()=>({status:WEEK_FORECAST.cache.g
  condition:(day=0)=>tideWeatherAt(STATIONS[S.st],POINTS[S.pt],TODAY_IDX+day,S.t),
  parser:(r,kind)=>{try{const p=POINTS[S.pt];return {ok:true,first:[...parseWeekForecast(r,kind,p).rows.values()][0]};}catch(e){return {ok:false};}},
  khoa:()=>{const c=CR.st.find(c=>crntAt(c,12)),p={lat:c.lat,lon:c.lon};return tideWeatherAt(STATIONS[S.st],p,S.day,12).current;},
- kmaHumidity:v=>{const p=POINTS[S.pt],key=kmaGrid(p.lat,p.lon).join(','),date=dateAdd(DAY0,S.day).replaceAll('-',''),hour=String(Math.floor(S.t)).padStart(2,'0');WXG.cells[key]??={};WXG.cells[key][date+hour]=[90,3.6,.8,v];WX_CELL.clear();RENDER.readKey='';},
+ kmaHumidity:v=>{const p=POINTS[S.pt],key=kmaGrid(p.lat,p.lon).join(','),date=dateAdd(DAY0,S.day).replaceAll('-',''),hour=String(Math.floor(S.t)).padStart(2,'0');WXG.cells[key]??={};WXG.cells[key][date+hour]=[90,3.6,.8];WXG.humidity??={};WXG.humidity[key]??={};WXG.humidity[key][date+hour]=v;WX_CELL.clear();RENDER.readKey='';},
  acceptWx:d=>validBootData('wx',d),scores:()=>FISH.map(f=>biteAt(f,POINTS[S.pt],STATIONS[S.st],S.day,S.t)),
  fallback:()=>{const e=WEEK_FORECAST.cache.get(weekPointKey(POINTS[S.pt]));if(e)e.sea=null;WEEK_FORECAST.revision++;RENDER.readKey='';},
  missingCompression:()=>{CR.ready=false;CR.err='압축 해제 미지원';RENDER.readKey='';}
