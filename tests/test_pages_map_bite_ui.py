@@ -178,10 +178,10 @@ with sync_playwright() as pw:
         for value in scores:
             # 이름의 부분 일치(참문어/피문어 등)를 피하고 첫 텍스트로 정확히 선택한다.
             card=next(cards.nth(i) for i in range(cards.count()) if cards.nth(i).locator('.fn').evaluate('el=>el.firstChild.textContent')==value['name'])
-            assert card.locator('.scoreValue').inner_text()==f'조건점수 {value["score"]}점'
+            assert card.locator('.scoreValue').count()==0,'카드의 중복 조건점수 표시 제거'
             assert card.locator('.scoreProgress').get_attribute('aria-valuenow')==str(value['score'])
             assert '최고 ' not in card.locator('.bestH').inner_text() and '점' not in card.locator('.bestH').inner_text()
-            assert card.locator('.bestH').get_attribute('title')==f'이 시간 조건점수 {value["peak"]}점'
+            assert card.locator('.bestH').get_attribute('title') is None,'중복 점수 tooltip 제거'
         cards.first.evaluate('el=>el.scrollIntoView({block:"center"})');cards.first.screenshot(path=str(OUT/f'{width}-card.png'))
         assert not errors,errors
         results.append({'viewport':[width,height],'cards':39,'scoreHoursUnchanged':936,'tabs':5})

@@ -8,6 +8,7 @@ import threading
 from pathlib import Path
 from urllib.parse import urlsplit, parse_qs
 from playwright.sync_api import sync_playwright
+from p3_history import before_added
 
 ROOT=Path(__file__).resolve().parent.parent
 OUT=ROOT/'test-output/tide-weather'
@@ -15,7 +16,7 @@ OUT.mkdir(parents=True,exist_ok=True)
 CLOCK=dt.datetime.fromisoformat(json.loads((ROOT/'data/meta.json').read_text(encoding='utf-8'))['generated'])
 DAY=CLOCK.date().isoformat()
 HTML=(ROOT/'index.html').read_text(encoding='utf-8')
-BASE=subprocess.check_output(['git','show','origin/main:index.html'],cwd=ROOT).decode('utf-8')
+BASE=subprocess.check_output(['git','show',before_added('tests/test_tide_weather_ui.py')+':index.html'],cwd=ROOT).decode('utf-8')
 PROBE='''
 window.weatherTest={ready:()=>CR.ready, state:()=>({status:WEEK_FORECAST.cache.get(weekPointKey(POINTS[S.pt]))?.status,day:S.day,today:TODAY_IDX,days:NDAYS,cache:WEEK_FORECAST.cache.size}),
  point:()=>({lat:POINTS[S.pt].lat,lon:POINTS[S.pt].lon}),day:i=>setDay(TODAY_IDX+i),hour:h=>{S.t=h;RENDER.readKey='';},
@@ -98,7 +99,11 @@ try:
    page.locator('.fish').first.locator('.fishEcology').wait_for(state='visible')
    page.locator('.fish .cardDetails summary').first.click()
    page.locator('[data-tab="tide"]').click()
-   assert page.locator('#weekWeatherBody tr').count()==7
+   assert page.locator('#weekWeatherBody').count()==0,'중복된 7일 나열표 제거'
+   assert page.locator('.weatherDashboard .weatherMetric').count()==6,'선택한 날의 6칸 유지'
+   assert page.locator('#dayStrip button').count()==7,'위 날짜 선택 7일 유지'
+   assert page.locator('#kakaoLink').count()==0,'오늘 카카오맵 링크 제거'
+   assert page.locator('#fishGrid .scoreValue').count()==0,'조건점수 숫자 표시 제거'
    assert '67' in page.locator('#wxHumidity').inner_text()
    assert '해류 모델' in page.locator('#crNow').inner_text()
    c=page.evaluate('weatherTest.condition()');assert abs(c['current']['value']-1)<1e-10,'km/h → m/s'
@@ -139,7 +144,7 @@ try:
   setup(late,injected(HTML),clock=CLOCK+dt.timedelta(days=1))
   late.wait_for_function("weatherTest.state().status==='ready'")
   late.locator('[data-tab="tide"]').click()
-  late.wait_for_function("document.querySelectorAll('#weekWeatherBody tr').length===7")
+  late.wait_for_function("document.querySelectorAll('#dayStrip button').length===7")
   assert late.locator('#dayStrip button').count()==7,'갱신 전 어제 자료여도 오늘부터 7일'
   assert late.evaluate('weatherTest.state().days-weatherTest.state().today')==7
   late.close()

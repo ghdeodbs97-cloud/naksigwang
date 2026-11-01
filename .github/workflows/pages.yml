@@ -31,6 +31,15 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - name: Actions 전용 배포 소스 확인
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pages_type=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type')
+          if [ "$pages_type" != "workflow" ]; then
+            echo "::error::Settings > Pages > Source를 GitHub Actions로 설정하세요. main 직접 배포는 지도 설정 주입을 덮어씁니다."
+            exit 1
+          fi
       - name: 공개 산출물 생성 · 설정 누락 시 배포 차단
         env:
           NAVER_MAP_KEY_ID: ${{ secrets.NAVER_MAP_KEY_ID || vars.NAVER_MAP_KEY_ID }}

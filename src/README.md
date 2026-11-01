@@ -11,6 +11,10 @@
 3. `python tests/smoke.py` → `통과` 확인
 4. 커밋·푸시하면 GitHub Pages가 1~3분 뒤 반영
 
+공개 배포는 Settings → Pages → Source가 **GitHub Actions**여야 합니다.
+main 원본 직접 배포(legacy)는 지도 설정이 없는 저장소 index를 공개하므로 사용하지 않습니다.
+`pages.yml`이 공개 산출물에만 지도 설정을 주입하며, 배포 전에 Source가 workflow인지 검사합니다.
+
 ## 파일별 역할
 
 | 파일 | 하는 일 | 줄 수 | 주요 함수 |
@@ -35,8 +39,8 @@
 | `13a_east_ports.js` | 기존 OSM 이름·KHOA 지점의 동해 항구 보강과 같은 항 이름 정규화 | 가변 | `eastPortSupplements`, `eastPortName` |
 | `13b_environment.js` | 기존 수심·OSM·갯바위·항 좌표의 환경 추출, 자료 버전·좌표별 64개 제한 캐시 | 가변 | `getPointEnvironment` |
 | `13c_bite_layers.js` | 서식 0~100·선택 날짜 조건 0~100의 분리와 45:55 조합 | 가변 | `biteLayerScores`, `combineBiteScores` |
-| `13d_week_forecast.js` | 선택 포인트의 7일 보완 예보·단위/격자 검증·8개 캐시, 관측/모델 구분과 물때 요약/비교표 | 가변 | `parseWeekForecast`, `fetchWeekForecast`, `requestWeekForecast`, `weekForecastAt`, `tideWeatherAt`, `updateWeatherDashboard` |
-| `14_bite.js` | V2.1 조건점수·공통 예보 공유, 입질 확률 제목·4열 요약 카드·펼치면 한 줄 상세 | 가변 | `biteTemperature`, `biteDataQuality`, `myF`, `biteContext`, `biteEvalAt`, `biteAt`, `biteReasons`, `scoreProgress`, `biteBestTime`, `renderBite` |
+| `13d_week_forecast.js` | 선택 포인트의 7일 보완 예보·단위/격자 검증·8개 캐시, 관측/모델 구분과 선택한 날의 물때 6칸 요약 | 가변 | `parseWeekForecast`, `fetchWeekForecast`, `requestWeekForecast`, `weekForecastAt`, `tideWeatherAt`, `updateWeatherDashboard` |
+| `14_bite.js` | V2.1 조건점수·공통 예보 공유, 입질 확률·높음 뱃지·4열 요약 카드(중복 점수 제거)·펼치면 한 줄 상세 | 가변 | `biteTemperature`, `biteDataQuality`, `myF`, `biteContext`, `biteEvalAt`, `biteAt`, `biteReasons`, `scoreProgress`, `biteBestTime`, `renderBite` |
 | `15_view.js` | 지도 표시 보조, 좌표 변환, 화면 보기 상태 | 가변 | `rawToS`, `rawToM`, `toS`, `toM`, `viewBounds`, `drawStations`, `stationDetailAllowed`, `stationAt`, `tmToLL`, `clampRequestedView`, `applyMapView`, `clampView`, `fitBox`, `fitLonLat`, `fitGround`, `zoomAt` |
 | `15b_map_provider.js` | NAVER SDK viewport 단방향 동기화·명시적 이동 transaction·1회 no-op 보정·100m 축척·native 입력 선행 숨김·실제 draw stamp 검증, 중복 이벤트 제외·종료 누락 복원·3가지 지도 모드·기본 지형 복구 | 가변 | `NaverMapAdapter` (`handleImageError`, `repairViewport`, `refreshScreenOrigin`), `providerRequestedBounds`, `providerStart`, `providerLoadSnapshot`, `providerLoadLog`, `providerWaitForAPI`, `providerSync`, `providerAlignment`, `providerReadView`, `providerViewportKey`, `providerTilesLoaded`, `providerRecordEvent`, `providerViewportChanged`, `providerBeginMove`, `providerBeginNativeInput`, `providerRenderedViewportMatches`, `providerQueueSettle`, `providerFinalizeViewport`, `providerQueueFinalViewport`, `providerRevealOverlay`, `providerCancelGestureDeadline`, `providerArmGestureDeadline`, `providerApplyView`, `providerCommandObservation`, `providerFinishViewCommand`, `providerRepairViewCommand`, `providerCancelViewCommand`, `providerUseNativePan`, `providerUpdateInput`, `providerZoomAt`, `providerPanBy`, `providerPanAnchor`, `scheduleDisplayDepthArea`, `providerSetMode`, `providerFallback`, `providerRect`, `providerRectError` |
 | `15c_map_diagnostic.js` | localhost 전용 native Marker DOM 중심과 Canvas 실제 픽셀·DPR·원점·이동 완료 대기·8프레임 진단·overlay stamp 상태 | 가변 | `naksigwangMapDiagnostic.lastNavigation`, `naksigwangMapDiagnostic.overlay`, `providerMarkerDiagnostic`, `providerCanvasProbePixel`, `providerProbeSample`, `providerDiagnosticRectDeltas`, `drawProviderDebugCrosshair`, `providerClearDiagnostic` |

@@ -95,7 +95,6 @@ function selectPoint(j, zoom, navigationCommitted=false) {
   $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : `<p class="note">${p.portSource||'기본 어항 자료의 대표 위치'} · 조석은 가까운 예보 지점, 바람·파고는 이 위치의 예보 격자를 참고합니다.</p>`;
   if (zoom&&!navigationCommitted) fitGround(p.lat, p.lon, 9000);
   if (S.lock) { if(!navigationCommitted)fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); }   // 오늘 탭 지도: 새 포인트로 옮기고 앞바다 단면
-  $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
   dirty = true; renderDays(); renderBite();
   setTimeout(requestWeekForecast,0);
 }
