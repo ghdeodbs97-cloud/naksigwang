@@ -90,6 +90,10 @@ function scoreProgress(score, fishName) {
  const value=clamp(score,0,100);
  return `<div class="scoreProgress" role="progressbar" aria-label="${fishName} 종합점수" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${value}"><span class="scoreProgressFill" style="width:${value}%"></span></div>`;
 }
+function biteBestTime(hour) {
+  const period=hour<12?'오전':'오후',clockHour=hour%12||12;
+  return `${S.day===TODAY_IDX?'오늘':'이날'} 베스트: ${period} ${clockHour}시`;
+}
 let biteHour = -1, biteDataMinute = -1, BITE_H = null;
 function renderBite() {
   const st = STATIONS[S.st], d = st.days[S.day], pt = POINTS[S.pt], H = Math.floor(S.t);
@@ -106,7 +110,7 @@ function renderBite() {
   $('biteWin').textContent = `해 뜸 ${fmtH(sr)} · 해 짐 ${fmtH(ss)} · ` + (top.length ? '오늘 "높음"이 나오는 시간: ' + top.slice(0, 4).map(r => `${r.f.n} ${String(r.best).padStart(2, '0')}시`).join(', ') : '오늘은 "높음"이 나오는 시간이 없습니다.');
   $('fishGrid').innerHTML = rows.map(({ f, i, arr, p, best, ev }) => {
     const [lv, cls] = level(p);
-    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><b>${p}점</b><span class="lv ${cls}">${lv}</span></div>${scoreProgress(p, f.n)}<div class="bestH">최고 ${String(best).padStart(2, '0')}시 ${arr[best]}점</div><div class="fishEcology"><p><span class="ecologyLabel">주 서식지</span><span class="habitatSummary">${f.habitatSummary}</span></p><p><span class="ecologyLabel">잘 잡히는 곳</span><span class="catchSpotSummary">${f.catchSpotSummary}</span></p></div><details class="cardDetails"><summary>현재 조건</summary><p class="biteReasons">${biteReasons(ev)}</p></details></div>`;
+    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><div class="biteScoreHeading"><b>입질 확률</b><small class="scoreValue">조건점수 ${p}점</small></div><span class="lv ${cls}">${lv}</span></div>${scoreProgress(p, f.n)}<div class="bestH" title="이 시간 조건점수 ${arr[best]}점">${biteBestTime(best)}</div><div class="fishEcology"><p><span class="ecologyLabel">주 서식지</span><span class="habitatSummary">${f.habitatSummary}</span></p><p><span class="ecologyLabel">잘 잡히는 곳</span><span class="catchSpotSummary">${f.catchSpotSummary}</span></p></div><details class="cardDetails"><summary>현재 조건</summary><p class="biteReasons">${biteReasons(ev)}</p></details></div>`;
   }).join('') + FISH.filter(f => !fishHasBiteModel(f)).map((f, i) => `<div class="fish provisional"><div class="pic">${fishPicture(f, 'new' + i)}</div><div class="fn">${f.n}</div><div class="fp"><b>—</b><span class="lv">미설정</span></div><p class="fishModelNote">입질 계산 기준 미설정 · 추천 순위 제외${f.aliasOf ? `<br>${f.aliasOf}과 같은 어종` : ''}</p></div>`).join('');
   if (pt && pt.kind === 'rock') $('rockInfo').innerHTML = rockInfoHTML(pt); else $('rockInfo').innerHTML = '';
   if (typeof renderBasis === 'function') renderBasis();

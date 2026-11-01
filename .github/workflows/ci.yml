@@ -12,7 +12,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: P3 수심 변경금지
-        if: startsWith(github.head_ref, 'feat/p3-')
+        if: startsWith(github.head_ref, 'feat/p3-') || github.head_ref == 'fix/pages-map-bite-ui'
         env:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: python3 tests/p3_depth_guard.py origin/main
@@ -39,6 +39,10 @@ jobs:
         run: python tests/test_today_time.py
       - name: 기본 브라우저 검사
         run: python tests/smoke.py
+      - name: Pages 공개 산출물·설정 보호 회귀
+        run: python tests/test_pages_build.py
+      - name: 공개/로컬 NAVER 로드 진단·입질 카드 UX 회귀
+        run: python tests/test_pages_map_bite_ui.py
       - name: A-B 상태 분류·다중 지형 교차·수심 곡선 단절 회귀
         run: python tests/test_section_states.py
       - name: P3 지도 어댑터·모바일·DPR 회귀 (실 API 없음)
