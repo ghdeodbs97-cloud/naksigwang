@@ -12,7 +12,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: P3 수심 변경금지
-        if: startsWith(github.head_ref, 'feat/p3-') || github.head_ref == 'fix/pages-map-bite-ui'
+        if: startsWith(github.head_ref, 'feat/p3-') || github.head_ref == 'fix/pages-map-bite-ui' || github.head_ref == 'codex/tide-weather-ui'
         env:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: python3 tests/p3_depth_guard.py origin/main
@@ -37,6 +37,8 @@ jobs:
         run: python tests/test_east_ports.py
       - name: 오늘 그래프 시각 선택·시간별 요약 회귀
         run: python tests/test_today_time.py
+      - name: 화면 밀도·7일 기상·습도·해류 모델 회귀 (실 API 없음)
+        run: python tests/test_tide_weather_ui.py
       - name: 기본 브라우저 검사
         run: python tests/smoke.py
       - name: Pages 공개 산출물·설정 보호 회귀

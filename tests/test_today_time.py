@@ -8,7 +8,7 @@ html=(ROOT/'index.html').read_text(encoding='utf-8');pos=html.rindex('\n})();')
 probe="""
 window.todayReady=()=>CR.ready&&!!TD;
 window.todayPoint=name=>POINTS.findIndex(p=>p.name===name);
-window.todaySnapshot=()=>{const p=POINTS[S.pt],st=STATIONS[p.st],day=Math.min(TODAY_IDX,st.days.length-1),h=todayHour(),r=tideAt(st,day*24+h),wx=wxAt(st,day,h,p),fu=flowU(st,p,day,day*24+h),sw=sstFor(p),u=r.rate/st.maxRate;return {name:p.name,h,day,stateDay:S.day,stateHour:S.t,manual:todaySelectedHour,label:$('todayTimeLabel').textContent,slider:+$('todayTime').value,tideCm:Math.round(r.cm),mul:$('tdMul').textContent,wind:$('tdWind').textContent,wave:$('tdWave').textContent,sst:$('tdSst').textContent,current:$('tdCur').textContent,expected:{wind:wx?.sp??null,wave:wx?.wave??null,sst:sw?.[0]??null,sourceDate:sw?.[1]??null,real:fu.real,current:fu.real?(fu.r.sp*KN<.2?'물돌이 무렵':dirName16(fu.r.dir)+'쪽 '+(fu.r.sp*KN).toFixed(1)+' kn'):Math.round(Math.abs(u)*100)+'%'},recommendations:$('tdBest').textContent};};
+window.todaySnapshot=()=>{const p=POINTS[S.pt],st=STATIONS[p.st],day=Math.min(TODAY_IDX,st.days.length-1),h=todayHour(),r=tideAt(st,day*24+h),wx=wxAt(st,day,h,p),fu=flowU(st,p,day,day*24+h),sw=sstFor(p),u=r.rate/st.maxRate;return {name:p.name,h,day,stateDay:S.day,stateHour:S.t,manual:todaySelectedHour,label:$('todayTimeLabel').textContent,slider:+$('todayTime').value,tideCm:Math.round(r.cm),mul:$('tdMul').textContent,wind:$('tdWind').textContent,wave:$('tdWave').textContent,sst:$('tdSst').textContent,current:$('tdCur').textContent,expected:{wind:wx?.sp??null,wave:wx?.wave??null,sst:sw?.[0]??null,sourceDate:sw?.[1]??null,real:fu.real,current:fu.real?(fu.r.sp*KN<.2?'물돌이 무렵':dirName16(fu.r.dir)+'쪽 '+(fu.r.sp*KN).toFixed(1)+' kn'):'자료 없음'},recommendations:$('tdBest').textContent};};
 window.todayCountStart=()=>{window.todayCounts={eval:0,recommendations:0};const ev=biteEvalAt,rt=renderToday;biteEvalAt=(...a)=>{window.todayCounts.eval++;return ev(...a);};renderToday=(...a)=>{window.todayCounts.recommendations++;return rt(...a);};};
 window.todaySyntheticWeather=()=>{const p=POINTS[S.pt],key=kmaGrid(p.lat,p.lon).join(','),date=dateAdd(DAY0,TODAY_IDX).replaceAll('-','');window.todaySavedWeather={cells:WXG.cells,contexts:BITE_CONTEXTS};WXG.cells={[key]:{[date+'06']:[90,2,.3],[date+'18']:[270,8,1.8]}};WX_CELL.clear();BITE_CONTEXTS=null;};
 window.todayRestoreWeather=()=>{WXG.cells=window.todaySavedWeather.cells;WX_CELL.clear();BITE_CONTEXTS=window.todaySavedWeather.contexts;selectTodayHour(18);};
@@ -44,7 +44,11 @@ try:
     for minute in [0,360,720,1080,1439]:
      r=set_minute(page,minute);check_row(r);assert r['slider']==minute;rows.append(r)
     assert len({r['mul'] for r in rows if r['name']==point})>1
-    assert len({r['current'] for r in rows if r['name']==point})>1
+    current_rows=[r for r in rows if r['name']==point]
+    if any(r['expected']['real'] for r in current_rows):
+     assert len({r['current'] for r in current_rows})>1
+    else:
+     assert all('자료 없음' in r['current'] and '%' not in r['current'] for r in current_rows),'조석 상대 세기를 실제 조류 수치로 표시하지 않음'
    page.evaluate('todaySyntheticWeather()');a=set_minute(page,360);b=set_minute(page,1080);check_row(a);check_row(b)
    assert a['wind']!=b['wind'] and a['wave']!=b['wave'] and a['sst']==b['sst'];page.evaluate('todayRestoreWeather()')
    page.locator('#todayTime').focus();page.keyboard.press('Home');assert page.evaluate('todaySnapshot().slider')==0

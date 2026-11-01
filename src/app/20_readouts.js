@@ -15,11 +15,7 @@ function updateReadouts(tide) {
   const wst = STATIONS[S.st]; setText('curDir', dd.mul + ' (물때 세기 ' + dd.pct + '%)' + (weakTide(wst) ? ` · 조차 ${Math.round(wst.maxCm - wst.minCm)} cm라 점수에 작게 반영` : ''));
   const wx = wxAt(STATIONS[S.st], S.day, S.t, POINTS[S.pt]);
   S.hs = wx && wx.wave != null ? wx.wave : .5;
-  setText('wxWind', wx ? wx.dir + '풍 ' + (wx.sp == null ? '(세기 정성 예보)' : wx.sp.toFixed(1) + ' m/s') : '자료 없음');
-  setText('wxWave', wx && wx.wave != null ? wx.wave.toFixed(2) + ' m' : '자료 없음');
-  const sw = sstFor(pt || STATIONS[S.st]); setText('wxSst', sw ? `${sw[0].toFixed(1)} ℃ (${sw[2]} ${sw[3]} km · ${sw[1]} 관측)` : '50 km 안 최근 관측 없음');
-  const weatherLocation=pt||STATIONS[S.st],missingWeather=!wxCell(weatherLocation.lat,weatherLocation.lon)?'이 위치의 예보 격자 자료 없음':S.day>TODAY_IDX?'이 시각 예보 없음 (기상청 단기예보는 3~5일 뒤까지)':'선택한 시각의 예보 자료 없음';
-  setText('wxSlot', wx ? String(wx.slot).padStart(2, '0') + '시 예보 · ' + wx.from + (wx.near ? ` (약 ${wx.km} km 옆 격자)` : '') : missingWeather);
+  updateWeatherDashboard(STATIONS[S.st],pt||STATIONS[S.st]);
   const chip = $('tideChip');
   const label = slack ? (tide.eta > 0 ? '만조 전후 · 정조' : '간조 전후 · 정조') : tide.u > 0 ? '들물' : '날물';
   if (chip.textContent !== label) { chip.textContent = label; chip.className = 'chip ' + (slack ? 'slack' : tide.u > 0 ? 'in' : 'out'); }
@@ -35,9 +31,14 @@ function updateReadouts(tide) {
 
 
 function updateCrnt(pt, tide) {
-  if (!CR.ready) { setText('crNow', CR.err ? '불러오지 못함: ' + CR.err : '불러오는 중…'); setText('crDay', '—'); setText('crSrc', '—'); return; }
-  const st = STATIONS[S.st], nc = nearestCrnt(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon);
-  if (!nc || nc.km > CR_NEAR) { setText('crNow', '15 km 안에 예보 지점 없음'); setText('crDay', '—'); setText('crSrc', nc ? `가장 가까운 지점: ${nc.c.name} ${nc.km.toFixed(0)} km` : '—'); return; }
+  const st=STATIONS[S.st],p=pt||st,nc=CR.ready?nearestCrnt(p.lat,p.lon):null;
+  if (!CR.ready || !nc || nc.km > CR_NEAR || !crntAt(nc.c,tide.tA)) {
+    const w=tideWeatherAt(st,p,S.day,S.t),c=w.current;
+    setText('crNow',Number.isFinite(c.value)?`${Number.isFinite(c.direction)?dirName16(c.direction)+'쪽으로 ':''}${(c.value*1.943844).toFixed(1)} kn (${c.value.toFixed(2)} m/s) · 해류 모델`:w.extra.status==='loading'?'해류 모델 불러오는 중…':'이 시각 해류 모델 자료 없음');
+    setText('crDay','가까운 KHOA 조류 예보가 없어 물돌이·최강 시각은 표시하지 않습니다.');
+    setText('crSrc',!CR.ready?(CR.err?'KHOA 자료 불러오기 실패':'KHOA 자료 불러오는 중'):nc?`KHOA 가장 가까운 지점 ${nc.c.name} ${nc.km.toFixed(0)} km · 적용 범위 밖`:'KHOA 예보 지점 없음');
+    return;
+  }
   const r = crntAt(nc.c, tide.tA);
   setText('crNow', !r ? '예보 기간 밖' : r.sp * KN < .2 ? `물돌이 무렵 (${(r.sp * KN).toFixed(1)} 노트)` : `${dirName16(r.dir)}쪽으로 ${(r.sp * KN).toFixed(1)} 노트 (${Math.round(r.sp)} cm/s)`);
   const ev = crntDay(nc.c, S.day);

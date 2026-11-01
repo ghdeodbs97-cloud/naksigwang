@@ -96,7 +96,7 @@ def valid_doc(name, doc):
         if 'bases' in doc and (not isinstance(doc['bases'], dict) or not all(isinstance(v, str) for v in doc['bases'].values())):
             return False
         return isinstance(doc.get('base'), str) and isinstance(cells, dict) and bool(cells) and all(
-            isinstance(o, dict) and bool(o) and all(isinstance(v, list) and len(v) == 3
+            isinstance(o, dict) and bool(o) and all(isinstance(v, list) and len(v) in (3, 4)
             and all(x is None or finite(x) for x in v) for v in o.values()) for o in cells.values())
     if name == 'tide.json':
         lunar, stations = doc.get('lunar'), doc.get('st')
@@ -274,7 +274,7 @@ def obs():
     return out, stat(len(fresh_out), fallback, len(targets))
 
 
-# ── 3. 기상청 단기예보 (바다 격자: 풍향 VEC, 풍속 WSD, 파고 WAV) ─────
+# ── 3. 기상청 단기예보 (바다 격자: 풍향 VEC, 풍속 WSD, 파고 WAV, 습도 REH) ─────
 def base_time():
     """가장 최근에 나온 발표 (02·05·08·11·14·17·20·23시, 10분 뒤부터 제공)"""
     t = NOW - dt.timedelta(minutes=15)
@@ -314,7 +314,7 @@ def wx():
         o = {}
         for r in rows:
             c = r['category']
-            if c not in ('VEC', 'WSD', 'WAV'):
+            if c not in ('VEC', 'WSD', 'WAV', 'REH'):
                 continue
             k = r['fcstDate'] + r['fcstTime'][:2]
             try:
@@ -323,7 +323,13 @@ def wx():
                 v = None                                 # 연장 기간 풍속은 정성 코드라 숫자로 못 씀
             if v is not None and v <= -900:              # 결측 (-999 등)
                 v = None
-            o.setdefault(k, [None, None, None])[('VEC', 'WSD', 'WAV').index(c)] = v
+            if c == 'REH' and v is not None and not 0 <= v <= 100:
+                v = None
+            index = ('VEC', 'WSD', 'WAV', 'REH').index(c)
+            values = o.setdefault(k, [None, None, None])
+            while len(values) <= index:
+                values.append(None)
+            values[index] = v
         if not valid_doc('wx.json', {'base': bd + bt, 'cells': {'cell': o}}) or not any(any(v is not None for v in vs) for vs in o.values()):
             raise ValueError('사용 가능한 기상값 없음')
         return cell, o

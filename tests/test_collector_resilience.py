@@ -17,6 +17,16 @@ def write_json(path, data):
 
 
 class CollectorResilienceTest(unittest.TestCase):
+    def test_weather_humidity_keeps_old_three_field_rows_compatible(self):
+        rows=[{'category':c,'fcstDate':collect.NOW.strftime('%Y%m%d'),'fcstTime':'1200','fcstValue':v}
+              for c,v in [('VEC','90'),('WSD','3.2'),('WAV','0.8'),('REH','67')]]
+        with patch.object(collect,'get',return_value={'items':{'item':rows},'totalCount':4}):
+            result,stats=collect.wx()
+        self.assertEqual(stats['fresh'],2)
+        self.assertEqual(next(iter(result['cells']['1,1'].values())),[90,3.2,.8,67])
+        self.assertTrue(collect.valid_doc('wx.json',result))
+        self.assertTrue(collect.valid_doc('wx.json',{'base':'202611010800','cells':{'1,1':{'2026110112':[90,3.2,.8]}}}))
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.out = Path(self.tmp.name)

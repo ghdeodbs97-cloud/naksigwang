@@ -418,6 +418,46 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
 #todayNow:disabled{opacity:.45;cursor:default}
 .todayTimeSlider{width:100%;min-width:0;margin:0;height:24px;accent-color:var(--cyan)}
 
+/* 전체 화면 밀도: 지도 좌표계는 유지하고 글자·여백만 정돈한다. */
+body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+:root{--nav-h:56px}
+.top{padding:7px 12px 6px}.topRow{gap:8px}.brand h1{font-size:19px}
+.ptPick select,.top .coord input{font-size:13px;padding:6px 9px}.top .coord{margin-top:5px}
+.panel{padding:13px;border-radius:9px}.view{gap:11px}.ph{margin-bottom:10px}.ph h2,#v-today .tdH{font-size:16px}
+.note,.hint,.uiDetails{font-size:11.5px;line-height:1.55}.uiDetails{padding-top:8px;margin-top:8px}.uiDetails[open]>summary{margin-bottom:8px}
+.tdFacts>div{padding:10px 8px}.tdFacts dd{font-size:16px}.tdFacts dd small{font-size:10.5px;line-height:1.4}
+.tdName{font-size:23px}.tdState{font-size:34px}.tdNext{font-size:13px}.tdNow{padding:13px}
+.tdBest li{padding:6px 8px;gap:7px;grid-template-columns:46px 1fr auto}.tdBest .pc{font-family:var(--font-ui);font-size:12px}
+#v-tide .stName{font-size:21px}#v-tide .ctrl{max-width:none}.ctrl{gap:10px}#v-tide dl.read{font-size:12px;gap:7px 10px}#v-tide dl.read dd{font-size:12px}
+.clock .t{font-size:25px}#v-tide .sub{margin-top:9px;padding-top:9px}.days{grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.days button{min-height:44px;padding:5px 2px}.days button .dd,.days button .mm{font-size:10px}
+#v-map .tools{gap:5px;margin-bottom:9px}.seg button{font-size:12px;padding:7px 9px}.stats{font-size:11px}
+.logForm{gap:10px;margin:10px 0}.logForm input,.logForm select{font-size:13px;padding:8px}.sources{font-size:12px;line-height:1.65}.sourcePanel{padding:13px}
+.fishGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:10px;align-items:start}
+.fish{padding:7px;gap:5px;min-width:0}.fish .fn{font-size:13px;gap:3px}.fish .lt{font-size:10px}.fish .biteScoreHeading b{font-size:12px}
+.fish .fp{flex-wrap:wrap;gap:4px}.scoreValue{font-size:10px}.fish .lv{font-size:10px;padding:1px 5px}.fish .bestH{font-size:10px;line-height:1.4}
+.fishEcology{display:none}.fish.expanded{grid-column:1/-1}.fish.expanded .fishEcology{display:block}
+.fish.expanded .pic{width:110px}.cardDetails{font-size:11px;padding-top:5px}.cardDetails>summary{min-height:32px;display:flex;align-items:center}
+.weatherHeader{display:flex;align-items:baseline;gap:7px;justify-content:space-between;flex-wrap:wrap;margin:10px 0 7px}.weatherHeader h3{font-size:15px;margin:0}
+.weatherDashboard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0}
+.weatherMetric{min-width:0;padding:9px 7px;background:var(--input);border:1px solid var(--line);border-radius:8px}
+.weatherMetric dt{font-size:11px;color:var(--muted)}.weatherMetric dd{margin:3px 0 0;font-family:var(--font-data);font-size:17px;font-weight:600;white-space:nowrap}
+.weatherMetric small{display:block;font-size:10px;line-height:1.4;margin-top:4px;color:var(--muted);overflow-wrap:anywhere}
+#windCompass{display:inline-block;font-family:var(--font-ui);color:var(--cyan);margin-right:3px}
+.weekWeather{width:100%;table-layout:fixed;border-collapse:collapse;font-size:11px;margin-top:8px}
+.weekWeather th,.weekWeather td{padding:7px 2px;text-align:center;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.weekWeather thead{color:var(--muted)}.weekWeather th:first-child{width:14%}.weekWeather td:nth-child(2){width:21%}.weekWeather small{display:block;color:var(--muted);font-size:9px;line-height:1.3}
+.weekWeather button{font:inherit;color:var(--fg);background:transparent;border:0;min-height:40px;padding:2px;cursor:pointer}.weekWeather .selected{background:rgba(138,219,208,.1)}
+.weatherFootnote{font-size:10.5px;line-height:1.5;color:var(--muted);margin:7px 0}
+@media(max-width:600px){
+ .panel{padding:10px}.view{gap:10px}.ph h2{font-size:16px}.fishGrid{gap:5px}
+ .fish{padding:5px;gap:4px}.fish .fn{font-size:11px;display:block;line-height:1.35;overflow-wrap:anywhere}.fish .lt{display:none}
+ .fish .pic{aspect-ratio:1.25}.fish .fp{display:block}.fish .biteScoreHeading b{font-size:10px;white-space:nowrap}.scoreValue{font-size:9px}
+ .fish .lv{display:inline-block;margin-top:3px}.fish .bestH{font-size:9.5px}.cardDetails{font-size:10px}.fish.expanded{padding:12px}
+ .fish.expanded .fn{font-size:15px}.fish.expanded .lt{display:inline}.fish.expanded .bestH{font-size:12px}
+ .tdFacts dd{font-size:15px}.tdFacts>div{padding:9px 7px}.ph h2 small{font-size:11px}.logForm{gap:8px}
+ .weatherMetric dd{font-size:15px}.weatherMetric{padding:8px 6px}.weatherMetric small{font-size:9px}.weekWeather{font-size:10px}
+}
+@media(min-width:900px){.fishGrid{grid-template-columns:repeat(6,minmax(0,1fr))}.weatherDashboard{grid-template-columns:repeat(6,minmax(0,1fr))}.weatherMetric dd{font-size:18px}}
 </style>
 
 <div class="app">
@@ -470,7 +510,7 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
       <button class="btn ghost" type="button" data-go="bite">어종별 지수</button>
       <a class="btn ghost" id="kakaoLink" href="https://map.kakao.com/" target="_blank" rel="noopener" title="새 창에서 카카오맵이 열립니다. 오른쪽 위 스카이뷰를 누르면 위성사진으로 볼 수 있습니다">카카오맵에서 보기 ↗</a>
     </div>
-    <p class="note" id="tdNote">입질 점수는 추정값입니다. <b id="dataTime2">—</b></p>
+    <p class="note" id="tdNote">‘입질 확률’은 조건을 종합한 참고 지수이며 실제 포획 확률은 아닙니다. <b id="dataTime2">—</b></p>
   </section>
 
   <section class="view" id="v-map" aria-label="지도">
@@ -593,6 +633,20 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
       </div>
       <details class="uiDetails pointDetails"><summary>포인트 정보</summary><p class="hint" id="stReg"></p><div id="ptInfo"></div></details>
       <div class="days" id="dayStrip" role="tablist" aria-label="날짜 선택"></div>
+      <section aria-label="선택한 날의 낚시 날씨">
+        <div class="weatherHeader"><h3>출조 날씨 한눈에</h3><span class="hint" id="weatherWhen">—</span></div>
+        <dl class="weatherDashboard">
+          <div class="weatherMetric"><dt>풍향</dt><dd><span id="windCompass" aria-hidden="true" title="바람이 향하는 방향">↑</span><span id="wxDirection">—</span></dd><small id="wxDirectionNote">—</small></div>
+          <div class="weatherMetric"><dt>풍속</dt><dd id="wxWind">—</dd><small id="wxWindNote">—</small></div>
+          <div class="weatherMetric"><dt>파고</dt><dd id="wxWave">—</dd><small id="wxWaveNote">—</small></div>
+          <div class="weatherMetric"><dt id="wxSstLabel">수온</dt><dd id="wxSst">—</dd><small id="wxSstNote">—</small></div>
+          <div class="weatherMetric"><dt>습도</dt><dd id="wxHumidity">—</dd><small id="wxHumidityNote">—</small></div>
+          <div class="weatherMetric"><dt>물 흐름</dt><dd id="weatherCurrent">—</dd><small id="weatherCurrentNote">—</small></div>
+        </dl>
+        <p class="weatherFootnote" id="wxSlot">—</p>
+        <table class="weekWeather" aria-label="선택한 시각 기준 7일 출조 날씨 비교"><thead><tr><th>날짜</th><th>바람</th><th>파고</th><th>수온</th><th>습도</th><th>흐름</th></tr></thead><tbody id="weekWeatherBody"></tbody></table>
+        <p class="weatherFootnote">날짜를 누르면 해당 날로 이동합니다. 기상청 단기예보를 우선하고, 없는 항목은 7일 모델 예측으로 보완합니다. 미래 수온은 관측값이 아닙니다. 해류 모델은 연안 약 8 km 격자의 참고값이며 갯바위·방파제 주변의 정밀 조류나 출항 안전을 보장하지 않습니다.</p>
+      </section>
       <canvas id="tideChart" aria-label="하루 조석 곡선. 눌러서 시각 선택"></canvas>
       <div class="evs" id="dayEvents"></div>
       <div class="clock">
@@ -615,12 +669,6 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
       <dl class="read">
         <dt>지금 흐름</dt><dd id="crNow">—</dd>
         <dt>이날 물돌이 · 최강</dt><dd id="crDay">—</dd>
-      </dl>
-      <div class="sub">예보 <small id="wxSlot" class="hint">—</small></div>
-      <dl class="read">
-        <dt>풍향 · 풍속</dt><dd id="wxWind">—</dd>
-        <dt>파고</dt><dd id="wxWave">—</dd>
-        <dt>현재 수온</dt><dd id="wxSst">—</dd>
       </dl>
       <details class="api"><summary>예보 기준·자료 출처</summary><p class="note">바닷물 높이는 기본수준면(대략 가장 낮은 간조면)에서 잰 높이입니다.</p><p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
       <p class="note">조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」(공공데이터포털 Open API, 2026년 10월 4일 내려받음, 199개 지점). 지점별 물돌이(전류)·최강 유속 시각과 유향·유속이며, 그 사이 유속은 사인 곡선으로 보간했습니다. 관측 조류를 조화분석한 천문 예측이라 바람·파도·하천 유량의 영향은 빠져 있고, 조류는 수로·곶마다 크게 달라 예보 지점에서 멀수록 세기와 방향이 어긋납니다. 15 km 안에 지점이 없으면(동해안 대부분) 바닷물 높이 변화 속도로 추정합니다. 지도 화살표는 예보 지점의 그 시각 흐름이고, 흐름 입자는 예보 지점 근처에서는 그 방향을, 해안 가까이에서는 해안선을 따르도록 그린 그림이라 실제 유선은 아닙니다. 파고 예보가 없는 곳은 조과 지수에 파고를 반영하지 않습니다.</p></details>
@@ -744,6 +792,7 @@ out geom;</pre>
     <p><a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형): 2026년 10월 11일 주문진·남애 등 기존 자료를 보존하고 거진부터 울산까지 검증된 일부 연안 범위를 확대해 35,982점을 제공합니다. 대진·양양 및 포항·울산 일부에는 미탑재 범위가 있으며 동해 전체를 포함하지 않습니다. 약 150 m 간격의 해양수치모델용 자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다. 기준면은 조회 화면의 ‘평균해면하’ 표기를 보존하며 조사연도는 미확인입니다. <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">연안해역기본도</a>는 원본 미확보, <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해수부 수심분포도</a>는 공개 CSV에 수심값이 없어 미탑재입니다.</p>
     <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
     <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
+    <p>7일 보완 기상·파고·해수면 수온·해류 모델: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> 및 기상·해양 모델 제공기관, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. 선택한 포인트 좌표로 공개 API를 조회합니다. 자료가 없거나 연결에 실패하면 해당 값은 표시하지 않으며, 현재 수온 관측을 미래 예보로 복사하지 않습니다.</p>
     <p>조석·수온은 해양수산부 국립해양조사원(<a href="https://www.data.go.kr/data/15156018/openapi.do" target="_blank" rel="noopener">조석예보(고, 저조)</a>, <a href="https://www.data.go.kr/data/15155508/openapi.do" target="_blank" rel="noopener">조위관측소 최신 관측데이터</a>), 풍향·풍속·파고는 <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noopener">기상청 단기예보 조회서비스</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다. 음력 날짜는 korean_lunar_calendar(한국천문연구원 음양력 기준)로 계산했습니다.</p>
   </div>
     </details>
@@ -791,7 +840,7 @@ function validBootData(name, data) {
     (Array.isArray(o.sst) && Number.isFinite(o.sst[0]) && typeof o.sst[1] === 'string')));
   if (name === 'wx') return typeof data.base === 'string' && obj(data.cells) && Object.keys(data.cells).length > 0 &&
     (!data.bases || (obj(data.bases) && Object.values(data.bases).every(v => typeof v === 'string'))) && Object.values(data.cells).every(c =>
-    obj(c) && Object.keys(c).length > 0 && Object.values(c).every(v => Array.isArray(v) && v.length === 3 && v.every(x => x === null || Number.isFinite(x))));
+    obj(c) && Object.keys(c).length > 0 && Object.values(c).every(v => Array.isArray(v) && [3,4].includes(v.length) && v.every(x => x === null || Number.isFinite(x))));
   if (name === 'tide') {
     if (typeof data.from !== 'string' || !Number.isFinite(Date.parse(data.from)) || !obj(data.lunar) || !obj(data.st)) return false;
     const dates = Object.keys(data.lunar).sort();
@@ -1771,9 +1820,10 @@ function rockInfoHTML(p) {
 /* ── 조석: 국립해양조사원 조석예보(고, 저조) 예보지점 166곳, 오늘부터 15일 ─
    물때 이름은 음력 날짜로 정한다 (서해 7물때식: 음력 1일 = 7물, 그 밖 8물때식: 음력 1일 = 8물).
    물때 세기(%)는 그 지점의 15일(사리~조금 한 주기) 중 하루 조차가 가장 큰 날을 100으로 본 그날 조차 비율. */
-const DAY0 = TIDE.from, NDAYS = Math.min(7, Object.keys(TIDE.lunar).length);
+const DAY0 = TIDE.from;
 const KST_NOW = new Date(Date.now() + 9 * 36e5), TODAY = KST_NOW.toISOString().slice(0, 10);
 const TODAY_IDX = Math.max(0, Math.round((new Date(TODAY + 'T12:00:00Z') - new Date(DAY0 + 'T12:00:00Z')) / 864e5));   // 새벽 갱신 전이면 1
+const NDAYS = Math.min(TODAY_IDX+7, Object.keys(TIDE.lunar).length);
 const dateAdd = (d, n) => { const x = new Date(d + 'T12:00:00+09:00'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
 const regionOf = (lat, lon) => (lon > 129.15 && lat > 35.3) || (lat > 35.9 && lon > 128.3) || lon > 130 ? '동해'
   : lat < 33.75 || (lat < 34.05 && lon > 126.1 && lon < 126.45) ? '제주' : (lat > 34.6 && lon < 126.95) || lon < 126 ? '서해' : '남해';
@@ -2104,7 +2154,7 @@ function wxAt(st, day, h, pt) {
     const base = WXG.bases?.[r.key] || WXG.base;
     const issued = Date.parse(`${base.slice(0, 4)}-${base.slice(4, 6)}-${base.slice(6, 8)}T${base.slice(8, 10)}:${base.slice(10, 12)}:00+09:00`);
     const source = Number.isFinite(issued) ? `기상청 ${base.slice(0, 4)}/${base.slice(4, 6)}/${base.slice(6, 8)} ${base.slice(8, 10)}시 발표${Date.now() - issued > 24 * 36e5 ? ' (이전 발표)' : ''}` : '기상청 발표 시각 확인 불가';
-    if (v) return { dir: v[0] == null ? '—' : dirName(v[0]), deg: v[0], sp: v[1], wave: v[2], slot: hh, from: source, near: r.near > 0, km: r.near, grid: r.key, requestedGrid: kmaGrid(p.lat, p.lon).join(','), base, ageHours: Number.isFinite(issued) ? Math.max(0, (Date.now() - issued) / 36e5) : null, lagHours: Math.floor(h) - hh };
+    if (v) return { dir: v[0] == null ? '—' : dirName(v[0]), deg: v[0], sp: v[1], wave: v[2], ...(v.length>3?{humidity:v[3]}:{}), slot: hh, from: source, near: r.near > 0, km: r.near, grid: r.key, requestedGrid: kmaGrid(p.lat, p.lon).join(','), base, ageHours: Number.isFinite(issued) ? Math.max(0, (Date.now() - issued) / 36e5) : null, lagHours: Math.floor(h) - hh };
   }
   return null;
 }
@@ -2171,10 +2221,12 @@ function selectPoint(j, zoom, navigationCommitted=false) {
   if (S.lock) { if(!navigationCommitted)fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); }   // 오늘 탭 지도: 새 포인트로 옮기고 앞바다 단면
   $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
   dirty = true; renderDays(); renderBite();
+  setTimeout(requestWeekForecast,0);
 }
 function renderDays() {
   const st = STATIONS[S.st];
-  const html = st.days.slice(0, NDAYS).map((d, i) => {
+  const html = st.days.slice(TODAY_IDX, NDAYS).map((d, offset) => {
+    const i=TODAY_IDX+offset;
     const [, m, dd] = d.date.split('-'), wd = '일월화수목금토'[new Date(d.date + 'T12:00:00+09:00').getDay()];
     return `<button type="button" role="tab" aria-selected="${i === S.day}" data-day="${i}"><span class="dd">${+m}/${+dd} ${wd}</span><span class="mm">${d.mul}</span>${i === TODAY_IDX ? '<i>오늘</i>' : ''}</button>`;
   }).join('');
@@ -2276,6 +2328,99 @@ function biteLayerScores(factors){
  return {habitatScore:clamp(50+habitat*100/54,0,100),dynamicScore:clamp(50+dynamic,0,100)};
 }
 function combineBiteScores(habitat,dynamic,personal=1){return clamp((.45*habitat+.55*dynamic)*personal,0,99);}
+// 13d_week_forecast.js — 선택 포인트의 7일 보완 예보와 물때 날씨 요약 (입질·지도 계산과 분리)
+const WEEK_FORECAST = { cache:new Map(), revision:0, tableKey:'' };
+const WEEK_FIELDS = { air:['wind_speed_10m','wind_direction_10m','relative_humidity_2m'], sea:['wave_height','sea_surface_temperature','ocean_current_velocity','ocean_current_direction'] };
+const weekPointKey = p => p.lat.toFixed(3)+','+p.lon.toFixed(3);
+function parseWeekForecast(raw, kind, point) {
+  if(!raw || raw.utc_offset_seconds!==32400 || !Number.isFinite(raw.latitude) || !Number.isFinite(raw.longitude) || gdist(point,{lat:raw.latitude,lon:raw.longitude})>25)throw Error('예보 격자 확인 실패');
+  const times=raw.hourly?.time,units=raw.hourly_units||{};
+  if(!Array.isArray(times)||!times.length||times.length>400||new Set(times).size!==times.length||times.some(t=>!/^\d{4}-\d{2}-\d{2}T\d{2}:00$/.test(t)))throw Error('예보 시각 확인 실패');
+  const ranges={wind_speed_10m:[0,100],wind_direction_10m:[0,360],relative_humidity_2m:[0,100],wave_height:[0,40],sea_surface_temperature:[-3,45],ocean_current_velocity:[0,15],ocean_current_direction:[0,360]};
+  const rows=new Map(times.map(t=>[t,{}]));
+  for(const name of WEEK_FIELDS[kind]){
+    const values=raw.hourly[name],unit=units[name];
+    if(!Array.isArray(values)||values.length!==times.length)throw Error('예보 항목 누락');
+    let factor=1;
+    if(name==='wind_speed_10m'||name==='ocean_current_velocity'){
+      if(unit==='km/h')factor=1/3.6;else if(unit==='kn')factor=1/1.943844;else if(unit!=='m/s')throw Error('유속·풍속 단위 확인 실패');
+    }else if(name==='wave_height'&&unit!=='m'||name==='sea_surface_temperature'&&unit!=='°C'||name==='relative_humidity_2m'&&unit!=='%'||name.endsWith('direction')&&unit!=='°'||name==='wind_direction_10m'&&unit!=='°')throw Error('예보 단위 확인 실패');
+    const [lo,hi]=ranges[name];
+    values.forEach((v,i)=>{const n=typeof v==='number'&&Number.isFinite(v)?v*factor:null;rows.get(times[i])[name]=n!==null&&n>=lo&&n<=hi?n:null;});
+  }
+  return {rows,km:gdist(point,{lat:raw.latitude,lon:raw.longitude}),lat:raw.latitude,lon:raw.longitude};
+}
+async function fetchWeekForecast(kind,point,signal) {
+  const url=new URL(kind==='air'?'https://api.open-meteo.com/v1/forecast':'https://marine-api.open-meteo.com/v1/marine');
+  const args={latitude:point.lat.toFixed(3),longitude:point.lon.toFixed(3),hourly:WEEK_FIELDS[kind].join(','),forecast_days:'7',timezone:'Asia/Seoul',wind_speed_unit:'ms'};
+  if(kind==='sea')args.cell_selection='sea';
+  for(const [k,v] of Object.entries(args))url.searchParams.set(k,v);
+  const response=await fetch(url,{signal,credentials:'omit',referrerPolicy:'no-referrer'});
+  if(!response.ok)throw Error('보완 예보 응답 실패');
+  return parseWeekForecast(await response.json(),kind,point);
+}
+async function requestWeekForecast() {
+  if(TAB!=='today'&&TAB!=='tide')return;
+  const p=POINTS[S.pt]||STATIONS[S.st],key=weekPointKey(p),old=WEEK_FORECAST.cache.get(key);
+  if(old&&(old.status==='loading'||Date.now()-old.at<(old.status==='error'?60000:30*60000)))return;
+  const entry={at:Date.now(),status:'loading',air:null,sea:null};
+  WEEK_FORECAST.cache.delete(key);WEEK_FORECAST.cache.set(key,entry);
+  while(WEEK_FORECAST.cache.size>8)WEEK_FORECAST.cache.delete(WEEK_FORECAST.cache.keys().next().value);
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+  try{
+    await Promise.allSettled(['air','sea'].map(async kind=>{entry[kind]=await fetchWeekForecast(kind,p,controller.signal);}));
+    entry.status=entry.air&&entry.sea?'ready':entry.air||entry.sea?'partial':'error';
+  }finally{
+    clearTimeout(timer);WEEK_FORECAST.revision++;RENDER.readKey='';
+    if(TAB==='today')updateTodaySummary();
+  }
+}
+function weekForecastAt(p,day,h) {
+  const entry=WEEK_FORECAST.cache.get(weekPointKey(p));
+  if(!entry||Date.now()-entry.at>30*60000)return {status:entry?.status||'idle'};
+  const time=dateAdd(DAY0,day)+'T'+String(Math.floor(h)).padStart(2,'0')+':00';
+  return {status:entry.status,air:entry.air?.rows.get(time),sea:entry.sea?.rows.get(time),airKm:entry.air?.km,seaKm:entry.sea?.km,at:entry.at};
+}
+function tideWeatherAt(st,p,day,h) {
+  const kma=wxAt(st,day,h,p),extra=weekForecastAt(p,day,h),a=extra.air||{},m=extra.sea||{},ob=day===TODAY_IDX?sstForLocation(p):null;
+  const field=(value,source,km)=>({value,source,km});
+  const pick=(value,other,kmaKm,modelKm)=>Number.isFinite(value)?field(value,'기상청 예보',kmaKm):field(other??null,'Open-Meteo 모델',modelKm);
+  const speed=pick(kma?.sp,a.wind_speed_10m,kma?.km,extra.airKm),direction=pick(kma?.deg,a.wind_direction_10m,kma?.km,extra.airKm),wave=pick(kma?.wave,m.wave_height,kma?.km,extra.seaKm),humidity=pick(kma?.humidity,a.relative_humidity_2m,kma?.km,extra.airKm);
+  const sst=ob?field(ob.value,ob.name+' 현재 관측',ob.km):field(m.sea_surface_temperature??null,'해수면 수온 모델',extra.seaKm);
+  const nc=CR.ready?nearestCrnt(p.lat,p.lon):null,r=nc&&nc.km<=CR_NEAR?crntAt(nc.c,day*24+h):null;
+  const current=r?{value:r.sp/100,direction:r.dir,source:'KHOA '+nc.c.name+' 예보',km:nc.km,nc}: {value:m.ocean_current_velocity??null,direction:m.ocean_current_direction??null,source:'해류 모델 · 연안 정밀 조류 아님',km:extra.seaKm};
+  return {speed,direction,wave,humidity,sst,current,extra,kma,ob,nc};
+}
+function weatherValue(o,unit,digits=1) {return Number.isFinite(o.value)?o.value.toFixed(digits)+' '+unit:'자료 없음';}
+function weatherSource(o) {return o.source+(Number.isFinite(o.km)?' · 격자/지점 '+o.km.toFixed(0)+' km':'');}
+function updateWeatherDashboard(st,p) {
+  const w=tideWeatherAt(st,p,S.day,S.t),day=st.days[S.day],has=v=>Number.isFinite(v);
+  setText('weatherWhen',day.date+' · '+String(Math.floor(S.t)).padStart(2,'0')+'시 기준');
+  setText('wxDirection',has(w.direction.value)?dirName16(w.direction.value)+'풍':'자료 없음');
+  setText('wxWind',weatherValue(w.speed,'m/s'));
+  setText('wxWave',weatherValue(w.wave,'m'));
+  setText('wxHumidity',weatherValue(w.humidity,'%',0));
+  setText('wxSst',weatherValue(w.sst,'℃'));
+  setText('weatherCurrent',Number.isFinite(w.current.value)?(w.current.value*1.943844).toFixed(1)+' kn':'자료 없음');
+  setText('weatherCurrentNote',(Number.isFinite(w.current.direction)?dirName16(w.current.direction)+'쪽 · ':'')+weatherSource(w.current));
+  setText('wxSstLabel',w.ob?'현재 수온':'수온 예측');
+  for(const [id,field] of [['wxDirectionNote',w.direction],['wxWindNote',w.speed],['wxWaveNote',w.wave],['wxHumidityNote',w.humidity],['wxSstNote',w.sst]])setText(id,weatherSource(field));
+  const wind=w.direction.value;
+  $('windCompass').style.transform=has(wind)?`rotate(${wind+180}deg)`:'none';$('windCompass').hidden=!has(wind);
+  setText('wxSlot',w.extra.status==='loading'?'7일 보완 예보 불러오는 중…':w.extra.status==='error'?'보완 예보 연결 실패 · 기존 기상청 자료는 유지됩니다':w.kma?w.kma.from:'선택 시각의 모델 예측 · 예보는 바뀔 수 있습니다');
+  const key=[p.lat,p.lon,S.day,Math.floor(S.t),WEEK_FORECAST.revision,CR.ready].join('|');
+  if(key!==WEEK_FORECAST.tableKey){
+    WEEK_FORECAST.tableKey=key;
+    $('weekWeatherBody').innerHTML=st.days.slice(TODAY_IDX,NDAYS).map((d,offset)=>{
+      const i=TODAY_IDX+offset;
+      const x=tideWeatherAt(st,p,i,S.t),dir=has(x.direction.value)?dirName16(x.direction.value):'—',val=(o,u,n=1)=>has(o.value)?o.value.toFixed(n)+u:'—';
+      return `<tr${i===S.day?' class="selected"':''}><th><button type="button" data-weather-day="${i}" aria-label="${d.date} 날씨 선택" aria-pressed="${i===S.day}">${d.date.slice(5).replace('-','/')}</button></th><td title="${weatherSource(x.speed)}">${dir}<small>${val(x.speed,'m/s')}</small></td><td title="${weatherSource(x.wave)}">${val(x.wave,'m')}</td><td title="${weatherSource(x.sst)}">${val(x.sst,'℃')}<small>${x.ob?'관측':'모델'}</small></td><td title="${weatherSource(x.humidity)}">${val(x.humidity,'%',0)}</td><td title="${weatherSource(x.current)}">${has(x.current.value)?(x.current.value*1.943844).toFixed(1)+'kn':'—'}<small>${x.current.nc?'KHOA':'해류모델'}</small></td></tr>`;
+    }).join('');
+  }
+  return w;
+}
+
+$('weekWeatherBody').addEventListener('click',e=>{const button=e.target.closest('[data-weather-day]');if(button)setDay(+button.dataset.weatherDay);});
 // 14_bite.js — 시간별 입질 지수
 // 규칙 기반 조건점수와 자료 신뢰도를 별도로 계산한다.
 // 조차가 작은 바다는 조석 추정의 비중만 줄이고 실제 환경 차이는 유지한다.
@@ -2395,6 +2540,9 @@ function renderBite() {
   if (typeof renderToday === 'function') renderToday(rows);
   if (typeof renderLog === 'function') renderLog();
 }
+
+/* 좁은 카드에서도 상세를 열면 한 줄을 써서 읽는다. 구형 WebView에서도 같은 동작이다. */
+$('fishGrid').addEventListener('toggle',e=>{if(e.target.matches('.cardDetails'))e.target.closest('.fish').classList.toggle('expanded',e.target.open);},true);
 // 15_view.js — 지도 표시 보조, 좌표 변환, 화면 보기 상태
 /* ── 항·갯바위 아이콘: 기기의 그림 문자(⚓, 🪨)로 그린다 ──
    그림 문자가 없는 기기(오래된 Windows 등)는 직접 그린 모양으로 대신한다. 크기별로 한 번 그려 두고 복사해 쓴다. */
@@ -4093,11 +4241,7 @@ function updateReadouts(tide) {
   const wst = STATIONS[S.st]; setText('curDir', dd.mul + ' (물때 세기 ' + dd.pct + '%)' + (weakTide(wst) ? ` · 조차 ${Math.round(wst.maxCm - wst.minCm)} cm라 점수에 작게 반영` : ''));
   const wx = wxAt(STATIONS[S.st], S.day, S.t, POINTS[S.pt]);
   S.hs = wx && wx.wave != null ? wx.wave : .5;
-  setText('wxWind', wx ? wx.dir + '풍 ' + (wx.sp == null ? '(세기 정성 예보)' : wx.sp.toFixed(1) + ' m/s') : '자료 없음');
-  setText('wxWave', wx && wx.wave != null ? wx.wave.toFixed(2) + ' m' : '자료 없음');
-  const sw = sstFor(pt || STATIONS[S.st]); setText('wxSst', sw ? `${sw[0].toFixed(1)} ℃ (${sw[2]} ${sw[3]} km · ${sw[1]} 관측)` : '50 km 안 최근 관측 없음');
-  const weatherLocation=pt||STATIONS[S.st],missingWeather=!wxCell(weatherLocation.lat,weatherLocation.lon)?'이 위치의 예보 격자 자료 없음':S.day>TODAY_IDX?'이 시각 예보 없음 (기상청 단기예보는 3~5일 뒤까지)':'선택한 시각의 예보 자료 없음';
-  setText('wxSlot', wx ? String(wx.slot).padStart(2, '0') + '시 예보 · ' + wx.from + (wx.near ? ` (약 ${wx.km} km 옆 격자)` : '') : missingWeather);
+  updateWeatherDashboard(STATIONS[S.st],pt||STATIONS[S.st]);
   const chip = $('tideChip');
   const label = slack ? (tide.eta > 0 ? '만조 전후 · 정조' : '간조 전후 · 정조') : tide.u > 0 ? '들물' : '날물';
   if (chip.textContent !== label) { chip.textContent = label; chip.className = 'chip ' + (slack ? 'slack' : tide.u > 0 ? 'in' : 'out'); }
@@ -4113,9 +4257,14 @@ function updateReadouts(tide) {
 
 
 function updateCrnt(pt, tide) {
-  if (!CR.ready) { setText('crNow', CR.err ? '불러오지 못함: ' + CR.err : '불러오는 중…'); setText('crDay', '—'); setText('crSrc', '—'); return; }
-  const st = STATIONS[S.st], nc = nearestCrnt(pt ? pt.lat : st.lat, pt ? pt.lon : st.lon);
-  if (!nc || nc.km > CR_NEAR) { setText('crNow', '15 km 안에 예보 지점 없음'); setText('crDay', '—'); setText('crSrc', nc ? `가장 가까운 지점: ${nc.c.name} ${nc.km.toFixed(0)} km` : '—'); return; }
+  const st=STATIONS[S.st],p=pt||st,nc=CR.ready?nearestCrnt(p.lat,p.lon):null;
+  if (!CR.ready || !nc || nc.km > CR_NEAR || !crntAt(nc.c,tide.tA)) {
+    const w=tideWeatherAt(st,p,S.day,S.t),c=w.current;
+    setText('crNow',Number.isFinite(c.value)?`${Number.isFinite(c.direction)?dirName16(c.direction)+'쪽으로 ':''}${(c.value*1.943844).toFixed(1)} kn (${c.value.toFixed(2)} m/s) · 해류 모델`:w.extra.status==='loading'?'해류 모델 불러오는 중…':'이 시각 해류 모델 자료 없음');
+    setText('crDay','가까운 KHOA 조류 예보가 없어 물돌이·최강 시각은 표시하지 않습니다.');
+    setText('crSrc',!CR.ready?(CR.err?'KHOA 자료 불러오기 실패':'KHOA 자료 불러오는 중'):nc?`KHOA 가장 가까운 지점 ${nc.c.name} ${nc.km.toFixed(0)} km · 적용 범위 밖`:'KHOA 예보 지점 없음');
+    return;
+  }
   const r = crntAt(nc.c, tide.tA);
   setText('crNow', !r ? '예보 기간 밖' : r.sp * KN < .2 ? `물돌이 무렵 (${(r.sp * KN).toFixed(1)} 노트)` : `${dirName16(r.dir)}쪽으로 ${(r.sp * KN).toFixed(1)} 노트 (${Math.round(r.sp)} cm/s)`);
   const ev = crntDay(nc.c, S.day);
@@ -4165,8 +4314,8 @@ function updateTodaySummary() {
   $('tdWind').innerHTML = wx ? `${wx.dir}풍 ${wx.sp == null ? '' : wx.sp.toFixed(1) + ' m/s'}<small>${wx.sp == null ? '세기는 정성 예보' : wx.sp <= 4 ? '약한 바람' : wx.sp < 9 ? '약간 강한 바람' : '강한 바람'}</small>` : '예보 없음';
   $('tdWave').innerHTML = wx && wx.wave != null ? `${wx.wave.toFixed(1)} m<small>${wx.wave <= 1 ? '잔잔한 편' : wx.wave <= 2 ? '조금 높음' : '높음, 갯바위 주의'}</small>` : '예보 없음';
   $('tdSst').innerHTML = sw ? `${sw[0].toFixed(1)} ℃<small>${sw[2]} ${sw[3]} km · ${sw[1]} 관측</small>` : '관측 없음<small>50 km 안 최근 관측 없음</small>';
-  const fu = flowU(st, pt, day, tA);
-  $('tdCur').innerHTML = fu.real ? (fu.r.sp * KN < .2 ? `물돌이 무렵<small>${fu.nc.c.name} 예보 지점</small>` : `${dirName16(fu.r.dir)}쪽 ${(fu.r.sp * KN).toFixed(1)} kn<small>${fu.nc.c.name} 예보 지점 ${fu.nc.km.toFixed(0)} km</small>`) : `${Math.round(Math.abs(u) * 100)}%<small>조류 예보 지점 없음 · 바닷물 높이로 추정</small>`;
+  const fu = flowU(st, pt, day, tA), supplement=tideWeatherAt(st,pt||st,day,h);
+  $('tdCur').innerHTML = fu.real ? (fu.r.sp * KN < .2 ? `물돌이 무렵<small>${fu.nc.c.name} 예보 지점</small>` : `${dirName16(fu.r.dir)}쪽 ${(fu.r.sp * KN).toFixed(1)} kn<small>${fu.nc.c.name} 예보 지점 ${fu.nc.km.toFixed(0)} km</small>`) : Number.isFinite(supplement.current.value)?`${(supplement.current.value*1.943844).toFixed(1)} kn<small>${Number.isFinite(supplement.current.direction)?dirName16(supplement.current.direction)+'쪽 · ':''}해류 모델 · 연안 정밀 조류 아님</small>`:'자료 없음<small>가까운 조류 예보와 해류 모델 없음</small>';
   $('tdSun').innerHTML = `${fmtH(sr)} ~ ${fmtH(ss)}<small>해 뜸 ~ 해 짐</small>`;
   if(TD&&TD.pt===pt&&TD.day===day)Object.assign(TD,{h,sr,ss});
   return {pt,st,day,h,sr,ss};
@@ -4198,7 +4347,7 @@ function renderToday(preparedRows = null) {
   $('tdBest').innerHTML = top.length ? top.map(o => {
     const ranges = goodHourRanges(o.arr), [lv, cls] = level(o.mx);
     const when = ranges ? `${ranges} 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
-    return `<li class="${cls}"><span class="pic">${fishPicture(o.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}점<small>${lv}</small></span></li>`;
+    return `<li class="${cls}"><span class="pic">${fishPicture(o.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">입질 확률<small>${lv}</small></span></li>`;
   }).join('') : '<li class="empty">오늘은 지수가 나오는 어종이 없습니다.</li>';
   drawToday();
 }
@@ -4601,6 +4750,7 @@ function showTab(k, keepHash, focusPt) {
   if (k === 'map') requestAnimationFrame(() => { if (stage.clientWidth !== cw) resize(); const p = POINTS[S.pt]; if (focusPt && p) fitGround(p.lat, p.lon, 9000); dirty = true; });
   if (k === 'today') { syncTodayClock(); requestAnimationFrame(drawToday); }
   scrollTo(0, 0);
+  if(k==='today'||k==='tide')requestWeekForecast();
 }
 $('tabbar').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) showTab(b.dataset.go, false, b.dataset.go === 'map'); });

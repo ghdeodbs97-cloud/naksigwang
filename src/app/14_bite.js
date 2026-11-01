@@ -117,3 +117,6 @@ function renderBite() {
   if (typeof renderToday === 'function') renderToday(rows);
   if (typeof renderLog === 'function') renderLog();
 }
+
+/* 좁은 카드에서도 상세를 열면 한 줄을 써서 읽는다. 구형 WebView에서도 같은 동작이다. */
+$('fishGrid').addEventListener('toggle',e=>{if(e.target.matches('.cardDetails'))e.target.closest('.fish').classList.toggle('expanded',e.target.open);},true);

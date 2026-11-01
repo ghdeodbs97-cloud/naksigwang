@@ -41,8 +41,8 @@ function updateTodaySummary() {
   $('tdWind').innerHTML = wx ? `${wx.dir}풍 ${wx.sp == null ? '' : wx.sp.toFixed(1) + ' m/s'}<small>${wx.sp == null ? '세기는 정성 예보' : wx.sp <= 4 ? '약한 바람' : wx.sp < 9 ? '약간 강한 바람' : '강한 바람'}</small>` : '예보 없음';
   $('tdWave').innerHTML = wx && wx.wave != null ? `${wx.wave.toFixed(1)} m<small>${wx.wave <= 1 ? '잔잔한 편' : wx.wave <= 2 ? '조금 높음' : '높음, 갯바위 주의'}</small>` : '예보 없음';
   $('tdSst').innerHTML = sw ? `${sw[0].toFixed(1)} ℃<small>${sw[2]} ${sw[3]} km · ${sw[1]} 관측</small>` : '관측 없음<small>50 km 안 최근 관측 없음</small>';
-  const fu = flowU(st, pt, day, tA);
-  $('tdCur').innerHTML = fu.real ? (fu.r.sp * KN < .2 ? `물돌이 무렵<small>${fu.nc.c.name} 예보 지점</small>` : `${dirName16(fu.r.dir)}쪽 ${(fu.r.sp * KN).toFixed(1)} kn<small>${fu.nc.c.name} 예보 지점 ${fu.nc.km.toFixed(0)} km</small>`) : `${Math.round(Math.abs(u) * 100)}%<small>조류 예보 지점 없음 · 바닷물 높이로 추정</small>`;
+  const fu = flowU(st, pt, day, tA), supplement=tideWeatherAt(st,pt||st,day,h);
+  $('tdCur').innerHTML = fu.real ? (fu.r.sp * KN < .2 ? `물돌이 무렵<small>${fu.nc.c.name} 예보 지점</small>` : `${dirName16(fu.r.dir)}쪽 ${(fu.r.sp * KN).toFixed(1)} kn<small>${fu.nc.c.name} 예보 지점 ${fu.nc.km.toFixed(0)} km</small>`) : Number.isFinite(supplement.current.value)?`${(supplement.current.value*1.943844).toFixed(1)} kn<small>${Number.isFinite(supplement.current.direction)?dirName16(supplement.current.direction)+'쪽 · ':''}해류 모델 · 연안 정밀 조류 아님</small>`:'자료 없음<small>가까운 조류 예보와 해류 모델 없음</small>';
   $('tdSun').innerHTML = `${fmtH(sr)} ~ ${fmtH(ss)}<small>해 뜸 ~ 해 짐</small>`;
   if(TD&&TD.pt===pt&&TD.day===day)Object.assign(TD,{h,sr,ss});
   return {pt,st,day,h,sr,ss};
@@ -74,7 +74,7 @@ function renderToday(preparedRows = null) {
   $('tdBest').innerHTML = top.length ? top.map(o => {
     const ranges = goodHourRanges(o.arr), [lv, cls] = level(o.mx);
     const when = ranges ? `${ranges} 좋음` : `가장 나은 때 ${String(o.best).padStart(2, '0')}시`;
-    return `<li class="${cls}"><span class="pic">${fishPicture(o.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">${o.mx}점<small>${lv}</small></span></li>`;
+    return `<li class="${cls}"><span class="pic">${fishPicture(o.f, 'td' + o.i)}</span><span class="nm">${o.f.n}<small>${when}</small></span><span class="pc">입질 확률<small>${lv}</small></span></li>`;
   }).join('') : '<li class="empty">오늘은 지수가 나오는 어종이 없습니다.</li>';
   drawToday();
 }

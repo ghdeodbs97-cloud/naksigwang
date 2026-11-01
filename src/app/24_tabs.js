@@ -24,6 +24,7 @@ function showTab(k, keepHash, focusPt) {
   if (k === 'map') requestAnimationFrame(() => { if (stage.clientWidth !== cw) resize(); const p = POINTS[S.pt]; if (focusPt && p) fitGround(p.lat, p.lon, 9000); dirty = true; });
   if (k === 'today') { syncTodayClock(); requestAnimationFrame(drawToday); }
   scrollTo(0, 0);
+  if(k==='today'||k==='tide')requestWeekForecast();
 }
 $('tabbar').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) showTab(b.dataset.go, false, b.dataset.go === 'map'); });
