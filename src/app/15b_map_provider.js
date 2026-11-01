@@ -96,7 +96,7 @@ try { const saved = localStorage.getItem('naksigwang-map-mode-v2'); if (['satell
 
 function providerNotice(text) { $('providerNotice').textContent = text; }
 /* 공개 사이트에서도 조회 가능한 로드 진단. 키·SDK URL query·원본 예외는 담지 않는다. */
-const PROVIDER_LOAD = {status:'not-started',keyConfigured:false,keySource:'none',scriptRequested:false,scriptLoaded:false,callbackReceived:false,authFailure:false,initStatus:'not-started',reason:null,history:[]};
+const PROVIDER_LOAD = {status:'not-started',keyConfigured:false,keySource:'none',scriptRequested:false,scriptLoaded:false,callbackReceived:false,authFailure:false,initStatus:'not-started',apiWaitLimitMs:3000,apiWaitMs:0,apiWaitChecks:0,reason:null,history:[]};
 function providerLoadSnapshot() {
   return {...PROVIDER_LOAD,history:PROVIDER_LOAD.history.map(e=>({...e})),origin:location.origin,scriptEndpoint:'https://oapi.map.naver.com/openapi/v3/maps.js',naverPresent:!!window.naver,apiReady:typeof window.naver?.maps?.Map==='function',providerActive:PROVIDER_MAP.active,providerFailed:PROVIDER_MAP.failed,referrerPolicy:document.querySelector('meta[name="referrer"]')?.content||'browser-default'};
 }
@@ -106,6 +106,21 @@ function providerLoadLog(status, reason=null) {
   console.info('[낚시광 NAVER 로드]',providerLoadSnapshot());
 }
 window.naksigwangMapLoadDiagnostic=providerLoadSnapshot;
+async function providerWaitForAPI() {
+  const started=performance.now(),limit=PROVIDER_LOAD.apiWaitLimitMs,interval=25,maxChecks=Math.ceil(limit/interval)+1;
+  // 콜백 다음의 동기 코드와 이미 예약된 microtask가 먼저 완료되게 한다.
+  await Promise.resolve();
+  for(let attempt=0;attempt<maxChecks;attempt++){
+    PROVIDER_LOAD.apiWaitChecks++;
+    PROVIDER_LOAD.apiWaitMs=performance.now()-started;
+    if(PROVIDER_LOAD.authFailure||PROVIDER_MAP.failed)return false;
+    if(PROVIDER_LOAD.apiWaitMs>=limit)return false;
+    if(typeof window.naver?.maps?.Map==='function'){providerLoadLog('api-ready');return true;}
+    if(PROVIDER_LOAD.apiWaitChecks===1)providerLoadLog('waiting-api');
+    if(attempt<maxChecks-1)await new Promise(resolve=>setTimeout(resolve,Math.min(interval,limit-PROVIDER_LOAD.apiWaitMs)));
+  }
+  return false;
+}
 function providerFallback(reason='manual-fallback') {
   const p=PROVIDER_MAP;const allowed=['sdk-script-load-failed','sdk-script-timeout','auth-failed','browser-offline','map-init-failed','map-api-failure','projection-failure','manual-fallback'];
   p.fallbackCount=(p.fallbackCount||0)+1;p.lastFallbackReason=allowed.includes(reason)?reason:'unknown-provider-failure';p.lastFallbackAt=performance.now();p.recoverable=['browser-offline','map-api-failure','projection-failure'].includes(p.lastFallbackReason);p.healthState='failed';providerCancelHealthCheck(p.lastFallbackReason);
@@ -423,7 +438,7 @@ async function providerStart() {
       const finish = fn => {if(finished)return;finished=true;clearTimeout(timer);script.onload=script.onerror=null;fn();};
       const timer = setTimeout(() => {script.remove();startupReason='sdk-script-timeout';providerLoadLog('timeout',PROVIDER_LOAD.scriptLoaded?'callback-timeout':'script-timeout');finish(()=>reject(Error('SDK timeout')));},12000);
       window.navermap_authFailure = () => {PROVIDER_LOAD.authFailure=true;PROVIDER_LOAD.scriptLoaded=true;startupReason='auth-failed';providerLoadLog('auth-failed','check-key-domain-and-dynamic-map');finish(() => reject(Error('SDK 인증 실패')));providerFallback('auth-failed');};
-      window.naksigwangProviderReady = () => {if(finished)return;PROVIDER_LOAD.callbackReceived=true;PROVIDER_LOAD.scriptLoaded=true;providerLoadLog('callback-received');if(!ready()){startupReason='map-init-failed';providerLoadLog('api-missing','map-constructor-missing');finish(()=>reject(Error('SDK API 없음')));}else finish(resolve);};
+      window.naksigwangProviderReady = () => {if(finished)return;PROVIDER_LOAD.callbackReceived=true;PROVIDER_LOAD.scriptLoaded=true;providerLoadLog('callback-received');finish(resolve);};
       script.onload=()=>{PROVIDER_LOAD.scriptLoaded=true;providerLoadLog('script-loaded');};
       script.onerror = () => {providerLoadLog('script-error','network-or-content-blocked');finish(() => reject(Error('SDK 로드 실패')));};
       script.referrerPolicy='strict-origin-when-cross-origin';
@@ -434,6 +449,9 @@ async function providerStart() {
     // SDK가 미리 있어도 앱의 탭 배치(24_tabs)와 초기 크기 설정이 끝난 뒤 만든다.
     await Promise.resolve();
     if (p.failed) return;
+    const apiReady=await providerWaitForAPI();
+    if(p.failed)return;
+    if(!apiReady){startupReason='map-init-failed';providerLoadLog('api-missing','map-constructor-timeout');throw Error('SDK API 준비 대기 초과');}
     startupReason='map-init-failed';PROVIDER_LOAD.initStatus='initializing';providerLoadLog('initializing');
     p.adapter = new NaverMapAdapter(window.naver.maps); p.adapter.init($('providerMap'));
     p.adapter.onTilesLoaded(providerTilesLoaded);

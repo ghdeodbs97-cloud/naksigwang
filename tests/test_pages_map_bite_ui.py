@@ -31,6 +31,14 @@ def routes(page, source, origin, mode='missing'):
             body={
                 'success':"if(typeof naksigwangProviderReady!=='function'||typeof navermap_authFailure!=='function')throw Error('callback order');window.naver={maps:{Map:function(){}}};naksigwangProviderReady();",
                 'local':'window.naver={maps:{Map:function(){}}};naksigwangProviderReady();',
+                'callback-before-sync':'window.naver={maps:{}};naksigwangProviderReady();window.naver.maps.Map=function(){};',
+                'callback-before-microtask':'window.naver={maps:{}};naksigwangProviderReady();queueMicrotask(()=>window.naver.maps.Map=function(){});',
+                'callback-before-task':'window.naver={maps:{}};naksigwangProviderReady();setTimeout(()=>window.naver.maps.Map=function(){},50);',
+                'callback-before-delayed':'window.naver={maps:{}};naksigwangProviderReady();setTimeout(()=>window.naver.maps.Map=function(){},1000);',
+                'auth-during-wait':'window.naver={maps:{}};naksigwangProviderReady();setTimeout(()=>navermap_authFailure(),30);setTimeout(()=>window.naver.maps.Map=function(){},100);',
+                'local-race-microtask':'window.naver={maps:{}};naksigwangProviderReady();queueMicrotask(()=>window.naver.maps.Map=function(){});',
+                'local-race-task':'window.naver={maps:{}};naksigwangProviderReady();setTimeout(()=>window.naver.maps.Map=function(){},50);',
+                'api-too-late':'window.naver={maps:{}};naksigwangProviderReady();setTimeout(()=>window.naver.maps.Map=function(){},3500);',
                 'auth':'navermap_authFailure();',
                 'no-callback':'window.naver={maps:{Map:function(){}}};',
                 'api-missing':'window.naver={maps:{}};naksigwangProviderReady();',
@@ -61,7 +69,7 @@ providerApplyView=()=>Promise.resolve({ok:true});providerSync=()=>false;
 '''
 def loader_html(mode):
     source=html
-    if mode not in ['missing','local','preloaded']:
+    if mode not in ['missing','preloaded'] and not mode.startswith('local'):
         source=source.replace('name="naver-map-key-id" content=""','name="naver-map-key-id" content="'+KEY+'"',1)
     pos=source.index('// 23_main.js')
     return source[:pos]+loader_probe+source[pos:]
@@ -79,14 +87,14 @@ def ui_html(source):
 results=[]
 with sync_playwright() as pw:
     browser=pw.chromium.launch()
-    for mode in ['missing','success','local','auth','network','no-callback','api-missing','init-failed','preloaded']:
+    for mode in ['missing','success','local','auth','network','no-callback','api-missing','init-failed','preloaded','callback-before-sync','callback-before-microtask','callback-before-task','callback-before-delayed','auth-during-wait','local-race-microtask','local-race-task','api-too-late']:
         page=browser.new_page()
         page.clock.install(time=clock)
-        origin='http://localhost:8080' if mode=='local' else 'https://ghdeodbs97-cloud.github.io'
+        origin='http://localhost:8080' if mode.startswith('local') else 'https://ghdeodbs97-cloud.github.io'
         messages=[];errors=[]
         page.on('pageerror',lambda error:errors.append(str(error)))
         page.on('console',lambda message:messages.append([arg.json_value() for arg in message.args]) if message.text.startswith('[낚시광 NAVER 로드]') else None)
-        if mode=='local':page.add_init_script("localStorage.setItem('naksigwang-naver-key-id',"+json.dumps(KEY)+")")
+        if mode.startswith('local'):page.add_init_script("localStorage.setItem('naksigwang-naver-key-id',"+json.dumps(KEY)+")")
         if mode=='preloaded':page.add_init_script('window.naver={maps:{Map:function(){}}};')
         if mode=='init-failed':page.add_init_script('window.__pagesInitFail=true;')
         requests=routes(page,loader_html(mode),origin,mode)
@@ -95,6 +103,37 @@ with sync_playwright() as pw:
         if mode=='no-callback':
             page.wait_for_function('naksigwangMapLoadDiagnostic().scriptLoaded')
             page.clock.fast_forward(13000)
+        if mode=='api-missing':
+            page.wait_for_function('naksigwangMapLoadDiagnostic().callbackReceived')
+            page.clock.fast_forward(3100)
+        if mode=='auth-during-wait':
+            page.wait_for_function('naksigwangMapLoadDiagnostic().callbackReceived')
+            page.clock.fast_forward(150)
+            result=page.evaluate('naksigwangMapLoadDiagnostic()')
+            assert result['status']=='auth-failed' and result['providerFailed'] and page.evaluate('__pagesInitCalls')==0
+            results.append({'case':mode,'status':result['status'],'redacted':True});page.close();continue
+        if mode=='api-too-late':
+            page.wait_for_function('naksigwangMapLoadDiagnostic().callbackReceived')
+            page.clock.fast_forward(3100)
+            assert page.evaluate('naksigwangMapLoadDiagnostic().status')=='api-missing'
+            page.clock.fast_forward(500)
+            result=page.evaluate('naksigwangMapLoadDiagnostic()')
+            assert result['apiReady'] and result['providerFailed'] and result['status']=='api-missing' and page.evaluate('__pagesInitCalls')==0
+            results.append({'case':mode,'status':result['status'],'redacted':True});page.close();continue
+        if mode.startswith('callback-before-') or mode.startswith('local-race-'):
+            page.wait_for_function('naksigwangMapLoadDiagnostic().callbackReceived')
+            page.clock.fast_forward(1100)
+            page.wait_for_function('["initialized","api-missing","auth-failed"].includes(naksigwangMapLoadDiagnostic().status)')
+            result=page.evaluate('naksigwangMapLoadDiagnostic()')
+            assert result['status']=='initialized', f'{mode}: callback 뒤 Map 공개 race: {result["status"]}'
+            assert result['apiReady'] and result['initStatus']=='ready' and not result['providerFailed'] and page.evaluate('__pagesInitCalls')==1
+            assert KEY not in json.dumps(result) and KEY not in json.dumps(messages)
+            if mode.startswith('local-race-'):
+                assert result['keySource']=='local-storage'
+                assert page.evaluate("localStorage.getItem('naksigwang-naver-key-id')")==KEY
+            page.close()
+            results.append({'case':mode,'status':result['status'],'redacted':True})
+            continue
         expected={'missing':'configuration-missing','success':'initialized','local':'initialized','auth':'auth-failed','network':'script-error','no-callback':'timeout','api-missing':'api-missing','init-failed':'init-failed','preloaded':'initialized'}[mode]
         page.wait_for_function('(expected)=>naksigwangMapLoadDiagnostic().status===expected',arg=expected)
         result=page.evaluate('naksigwangMapLoadDiagnostic()')
@@ -108,6 +147,8 @@ with sync_playwright() as pw:
         if mode=='success':assert result['keySource']=='meta' and result['callbackReceived'] and result['scriptLoaded']
         if mode=='no-callback':assert result['reason']=='callback-timeout'
         if mode=='api-missing':assert not result['apiReady'] and result['callbackReceived']
+        if mode=='api-missing':assert result['reason']=='map-constructor-timeout' and result['apiWaitMs']>=3000
+        assert result['apiWaitChecks']<=121, '준비 확인 횟수에도 유한 상한 적용'
         assert KEY not in json.dumps(result) and KEY not in json.dumps(messages), '앱 진단/콘솔에 ID 노출 금지'
         assert 'fixture private details' not in json.dumps(messages), '원본 SDK 예외를 기록하지 않음'
         assert not errors,errors
@@ -148,4 +189,4 @@ with sync_playwright() as pw:
     browser.close()
 (OUT/'results.json').write_text(json.dumps(results,ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps(results,ensure_ascii=False))
-print('공개/로컬 SDK 로드9종·진단 비노출·카드 UX/점수 보존 통과')
+print(f'공개/로컬 SDK 로드{sum("case" in r for r in results)}종·진단 비노출·카드 UX/점수 보존 통과')

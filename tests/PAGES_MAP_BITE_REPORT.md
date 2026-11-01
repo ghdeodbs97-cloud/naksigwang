@@ -30,7 +30,8 @@ naksigwangMapLoadDiagnostic()
 | script-error | 네트워크·콘텐츠 차단 등. Network에서 HTTP/CSP/차단 상태 확인 |
 | timeout / callback-timeout | script는 로드됐지만 준비 callback이 오지 않음 |
 | auth-failed / authFailure | NCP 인증 실패 callback. ID·Web 서비스 URL·Dynamic Map 확인 |
-| api-missing | callback이 왔지만 Map 생성자가 없음 |
+| waiting-api / apiWaitMs | callback 이후 Map 생성자 공개를 최대 3초간 관찰 중 |
+| api-missing / map-constructor-timeout | callback 후 관찰 기한이 지나도 Map 생성자가 없음 |
 | init-failed | Map/이벤트/초기 viewport 설정 중 실패 |
 | initialized / initStatus=ready | SDK 초기화 경계 통과. providerActive는 실제 표시 상태를 별도로 확인 |
 
@@ -78,3 +79,29 @@ Pages: 위 외부 설정과 main 반영/배포 성공 후 공개 URL을 Ctrl+Shi
 - 로드: 공개/로컬 origin, 키 누락, meta/localStorage, 정상 callback, 인증 실패, 네트워크 오류, callback timeout, API 없음, init 실패, 이미 준비된 SDK. 진단/앱 로그에서 fixture ID와 원본 예외 미노출.
 - 카드: 모바일390×844 / PC1280×900, 39종×24시간936개 평가의 전체 점수/기여/출처가 수정 전과 동일. progress 값·작은 조건점수·베스트 문구, 오전/오후12시 경계, 다섯 탭과 가로 넘침 검사.
 - 기존 smoke/입질/사진/지도 provider/빌드 일치 검사를 실행해 최종 결과를 PR에 보고한다. 생산 수심과 data는 수정하지 않는다.
+
+## PR #7 loader callback race 수정
+
+사용자 localhost의 실제 진단은 keyConfigured=true, keySource=local-storage, scriptRequested/scriptLoaded=true인데 status=api-missing이었다. 이 상황은 키 누락이나 script 요청 실패와 구분한다. 키·localStorage·NCP 설정은 변경하지 않았다.
+
+수정 전 loader는 callback 안에서 즉시 `typeof window.naver?.maps?.Map==='function'`을 검사하고, 없으면 map-init-failed fallback을 실행했다. Fake SDK가 `callback(); Map=...`처럼 **같은 script의 바로 다음 동기 코드**에서 생성자를 등록해도 api-missing으로 실패하는 것을 수정 전 빌드에서 재현했다. callback 수신과 API 공개 완료를 같은 시점으로 간주한 코드 회귀다. 실제 NCP 설정 오류로 단정할 근거가 아니다.
+
+기존 성공 mock은 Map을 먼저 등록한 뒤 callback을 호출했기 때문에 이 순서 차이를 놓쳤다. 이번에는 constructor가 늦게 공개되는 순서를 별도 계약으로 검사한다.
+
+수정 후 callback은 수신/실행만 기록하고 로드 promise를 완료한다. 앱 탭 배치와 현재 JS/microtask가 완료된 뒤 Map 준비를 관찰한다. 아직 없을 때만 25ms 간격으로, 총3초·최대121회 한도로 재확인한다. 생성자를 발견하면 즉시 init으로 진행하며 3초를 무조건 기다리는 delay가 아니다. 기한이 지나도 없으면 api-missing/map-constructor-timeout으로 실패한다. 늦게 생성자가 나타나도 이미 실패한 초기화를 다시 시작하지 않는다. authFailure는 즉시 fallback하며 wait와 init을 취소한다. script-error와 callback 미수신12초 timeout은 기존대로 분리한다.
+
+추가 진단: apiWaitLimitMs, apiWaitMs, apiWaitChecks. fallback 성공으로 위장하거나 providerActive를 강제로 true로 만들지 않는다. providerActive는 계속 기존 SDK viewport/투영 검사 결과를 따른다.
+
+로컬 기존 회귀 재실행: build missing ids: [], build consistency, smoke, provider 20개 화면/DPR·SDK 실패6종·원본 수심/단면 baseline 통과. performance 12개 화면/DPR 모두 movingHeavy=0, maskChangedPixels=0, 최대 Marker오차0.446878px·A/B오차0.707107px, overlay permanentHidden=0. pan quick도 기존500ms/300ms 상한을 유지한 채 최대 복구164.7ms로 통과했다. 이 수치는 실 API가 아닌 기존 mock 검사 결과다.
+
+검사 범위를 로더17개로 확장했다. callback 뒤 동기/microtask/task/1초 지연 생성, localStorage 경로의 microtask/task 생성과 저장값 보존, 기한 초과 후 생성, 영구 미생성, wait 중 authFailure를 포함한다. 기존 준비 완료·공개/로컬 origin·script 오류/timeout·중복 init 방지·카드936개 평가 동일성도 유지한다. 로더 검사는 SDK 초기화 경계 대역이며 providerActive=true 또는 실제 NAVER 표시의 증거로 쓰지 않는다. 지도/overlay 검증은 기존 provider/performance/pan 검사로 별도 실행한다.
+
+실제 localhost 브라우저 검증은 Windows에서 현재 URL을 안전하게 판별할 수 없다는 computer-use 도구의 차단으로 중단됐다. 이를 우회해 사용자 브라우저/프로필/키에 접근하지 않았다. 실사용의 apiReady=true / initStatus=ready / providerActive=true는 아직 확인하지 못했으며 사용자 재검증 결과와 mock 결과를 분리한다. 기존 localhost 탭을 강력 새로고침 후 다음 값만 공유하면 된다(키 값 전송 불필요).
+
+사용자가 추가로 제공한 실제 탭 값은 apiReady=true, initStatus=not-started, providerActive=false, reason=map-constructor-missing, apiWaitMs=undefined였다. Map이 결국 공개됐지만 즉시 실패한 기존 loader 상태를 뒷받침한다. 다만 이 reason과 apiWaitMs 미존재는 **수정 전 코드가 탭에서 실행 중이라는 표시**다. 수정 버전의 기한 초과 reason은 map-constructor-timeout이며 apiWaitMs는 항상 숫자다. 서버 HTML의 providerWaitForAPI 포함 여부와 탭의 진단 필드 존재를 별도로 확인해, 서버의 이전 파일/탭의 이전 실행 상태를 구분한다. 키 교체나 저장소 초기화로 해결하지 않는다.
+
+```js
+((d) => ({status:d.status, apiReady:d.apiReady, initStatus:d.initStatus,
+  providerActive:d.providerActive, reason:d.reason, apiWaitMs:d.apiWaitMs}))(
+  naksigwangMapLoadDiagnostic())
+```
