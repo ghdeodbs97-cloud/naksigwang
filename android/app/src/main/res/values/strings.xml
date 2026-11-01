@@ -1,0 +1,9 @@
+<resources>
+    <string name="startup_picture">낚시광 시작 화면 · 바다 소식을 불러오는 중</string>
+    <string name="connection_title">바다 소식을 불러오지 못했어요</string>
+    <string name="connection_hint">인터넷 연결을 확인하고 다시 시도해 주세요.\n저장한 앱 기록은 지우지 않아요.</string>
+    <string name="retry">다시 시도</string>
+    <string name="open_browser">브라우저로 열기</string>
+    <string name="no_handler">이 링크를 열 수 있는 앱이 없어요.</string>
+    <string name="choose_file">가져올 자료 선택</string>
+</resources>

@@ -4,3 +4,9 @@ test-output/
 _site/
 tools/depth-data/raw/*
 !tools/depth-data/raw/README.md
+android/.gradle/
+android/local.properties
+android/**/build/
+*.jks
+*.keystore
+android/signing.properties
