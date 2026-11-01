@@ -49,3 +49,9 @@ KHOA 우선, km/h 변환, 잘못된 단위·UTC·먼 격자 거부, 날짜 전�
 실 API는 개발 중 주문진 1곳에 두 번만 비인증 조회해 168시간 응답과 단위를 확인했다.
 실사용자의 기기·네트워크 검증은 별도다. 테스트 화면의 일정한 예보 수치는 mock 값이다.
 data/, static/depth/, 04_depth.js, 04b_depth_tiles.js, 18_section.js는 변경하지 않는다.
+
+지도 20개 viewport/DPR와 6개 SDK 실패 검사는 통과했다. 기존 baseline의 해양 수심 조회 전체와
+301개 단면 좌표·수심·datum/provenance hash도 동일했다. 다만 여백 변경으로 화면 중앙 hover가
+경도 129.10840에서 129.08491로 옮겨져 육지 표고 표시만 달랐다. `p3_baseline.py`의 hover 입력을
+기존 baseline의 고정 경위도(35.85301, 129.10840)로 지정해 같은 장소를 비교하도록 수정했다.
+기존 baseline JSON이나 허용오차, 수심·지도 코드는 바꾸지 않았다.
