@@ -3,6 +3,7 @@
 기존 홈페이지 `https://ghdeodbs97-cloud.github.io/naksigwang/#today`를 Android WebView로 연다.
 지도·수심·입질 계산 코드를 복제하거나 변경하지 않는다. 홈페이지 배포가 앱에도 반영된다.
 NAVER 웹 SDK는 기존 HTTPS 출처를 사용한다. APK에 별도 키나 로컬 브라우저 설정을 넣지 않는다.
+어신을 참고한 기능 흐름과 다음 작업 범위는 [벤치마킹 방향](BENCHMARK.md)에 정리했다.
 
 ## 설치와 확인
 

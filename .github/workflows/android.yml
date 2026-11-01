@@ -25,7 +25,7 @@ jobs:
         run: |
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$APK"
-          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | head -n 8
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | sed -n '1,8p'
           mkdir -p apk-output
           cp "$APK" apk-output/naksigwang-debug.apk
           cd apk-output

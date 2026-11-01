@@ -1,7 +1,6 @@
 package io.github.ghdeodbs97cloud.naksigwang;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
@@ -144,7 +143,7 @@ public final class MainActivity extends ComponentActivity {
             @Override public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 handler.cancel();
                 /* 하위 지도 타일 오류로 앱 전체를 가리지 않는다. 인증서 검증은 항상 유지한다. */
-                if (error.getUrl().equals(view.getUrl())) showConnectionError();
+                if (java.util.Objects.equals(error.getUrl(), view.getUrl())) showConnectionError();
             }
         });
         web.setWebChromeClient(new WebChromeClient() {
