@@ -1,5 +1,5 @@
 // 13d_week_forecast.js — 선택 포인트의 7일 보완 예보와 물때 날씨 요약 (입질·지도 계산과 분리)
-const WEEK_FORECAST = { cache:new Map(), revision:0, tableKey:'' };
+const WEEK_FORECAST = { cache:new Map(), revision:0 };
 const WEEK_FIELDS = { air:['wind_speed_10m','wind_direction_10m','relative_humidity_2m'], sea:['wave_height','sea_surface_temperature','ocean_current_velocity','ocean_current_direction'] };
 const weekPointKey = p => p.lat.toFixed(3)+','+p.lon.toFixed(3);
 function parseWeekForecast(raw, kind, point) {
@@ -81,16 +81,5 @@ function updateWeatherDashboard(st,p) {
   const localSource=w.kma?w.kma.from:!wxCell(p.lat,p.lon)?'기상청 예보 격자 자료 없음':'선택한 시각의 기상청 예보 없음';
   const extraState=w.extra.status==='loading'?'7일 보완 예보 불러오는 중…':w.extra.status==='error'?'보완 예보 연결 실패':w.extra.status==='partial'?'일부 보완 예보만 사용':'7일 모델 보완 · 예보는 바뀔 수 있습니다';
   setText('wxSlot',localSource+' · '+extraState);
-  const key=[p.lat,p.lon,S.day,Math.floor(S.t),WEEK_FORECAST.revision,CR.ready].join('|');
-  if(key!==WEEK_FORECAST.tableKey){
-    WEEK_FORECAST.tableKey=key;
-    $('weekWeatherBody').innerHTML=st.days.slice(TODAY_IDX,NDAYS).map((d,offset)=>{
-      const i=TODAY_IDX+offset;
-      const x=tideWeatherAt(st,p,i,S.t),dir=has(x.direction.value)?dirName16(x.direction.value):'—',val=(o,u,n=1)=>has(o.value)?o.value.toFixed(n)+u:'—';
-      return `<tr${i===S.day?' class="selected"':''}><th><button type="button" data-weather-day="${i}" aria-label="${d.date} 날씨 선택" aria-pressed="${i===S.day}">${d.date.slice(5).replace('-','/')}</button></th><td title="${weatherSource(x.speed)}">${dir}<small>${val(x.speed,'m/s')}</small></td><td title="${weatherSource(x.wave)}">${val(x.wave,'m')}</td><td title="${weatherSource(x.sst)}">${val(x.sst,'℃')}<small>${x.ob?'관측':'모델'}</small></td><td title="${weatherSource(x.humidity)}">${val(x.humidity,'%',0)}</td><td title="${weatherSource(x.current)}">${has(x.current.value)?(x.current.value*1.943844).toFixed(1)+'kn':'—'}<small>${x.current.nc?'KHOA':'해류모델'}</small></td></tr>`;
-    }).join('');
-  }
   return w;
 }
-
-$('weekWeatherBody').addEventListener('click',e=>{const button=e.target.closest('[data-weather-day]');if(button)setDay(+button.dataset.weatherDay);});

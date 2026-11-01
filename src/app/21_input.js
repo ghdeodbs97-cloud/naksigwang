@@ -150,7 +150,6 @@ $('coordForm').addEventListener('submit', e => {
   navigateSearchPoint(f.p.lat,f.p.lon,2500,f.p.name,()=>{
     selectPoint(j,false,true);S.pin=f.pt?null:[f.p.mx,f.p.my];
     $('coordMsg').textContent=f.pt?'':`${f.p.name}: 개별 선택 포인트가 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
-    $('kakaoLink').href=`https://map.kakao.com/link/map/${encodeURIComponent(f.p.name)},${f.p.lat.toFixed(6)},${f.p.lon.toFixed(6)}`;
   });
 });
 $('toSec').addEventListener('click', () => {

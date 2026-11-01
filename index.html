@@ -337,7 +337,6 @@ body{line-height:1.65}
 .fish .bestH{font-size:11.5px}
 .biteScoreHeading{display:flex;flex-direction:column;gap:3px;min-width:0}
 .fish .biteScoreHeading b{font-family:var(--font-ui);font-size:18px;line-height:1.4}
-.scoreValue{font-family:var(--font-data);font-size:11px;color:var(--muted)}
 .fish .bestH{font-family:var(--font-ui);font-size:12px;line-height:1.6;color:var(--fg);padding:3px 0 5px}
 .fish .fp{gap:8px;align-items:center}
 .fishEcology{font-size:12.5px;line-height:1.6}
@@ -434,7 +433,7 @@ body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adju
 .logForm{gap:10px;margin:10px 0}.logForm input,.logForm select{font-size:13px;padding:8px}.sources{font-size:12px;line-height:1.65}.sourcePanel{padding:13px}
 .fishGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:10px;align-items:start}
 .fish{padding:7px;gap:5px;min-width:0}.fish .fn{font-size:13px;gap:3px}.fish .lt{font-size:10px}.fish .biteScoreHeading b{font-size:12px}
-.fish .fp{flex-wrap:wrap;gap:4px}.scoreValue{font-size:10px}.fish .lv{font-size:10px;padding:1px 5px}.fish .bestH{font-size:10px;line-height:1.4}
+.fish .fp{flex-wrap:wrap;gap:4px}.fish .lv{font-size:10px;padding:1px 5px}.fish .bestH{font-size:10px;line-height:1.4}
 .fishEcology{display:none}.fish.expanded{grid-column:1/-1}.fish.expanded .fishEcology{display:block}
 .fish.expanded .pic{width:110px}.cardDetails{font-size:11px;padding-top:5px}.cardDetails>summary{min-height:32px;display:flex;align-items:center}
 .weatherHeader{display:flex;align-items:baseline;gap:7px;justify-content:space-between;flex-wrap:wrap;margin:10px 0 7px}.weatherHeader h3{font-size:15px;margin:0}
@@ -443,19 +442,15 @@ body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adju
 .weatherMetric dt{font-size:11px;color:var(--muted)}.weatherMetric dd{margin:3px 0 0;font-family:var(--font-data);font-size:17px;font-weight:600;white-space:nowrap}
 .weatherMetric small{display:block;font-size:10px;line-height:1.4;margin-top:4px;color:var(--muted);overflow-wrap:anywhere}
 #windCompass{display:inline-block;font-family:var(--font-ui);color:var(--cyan);margin-right:3px}
-.weekWeather{width:100%;table-layout:fixed;border-collapse:collapse;font-size:11px;margin-top:8px}
-.weekWeather th,.weekWeather td{padding:7px 2px;text-align:center;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
-.weekWeather thead{color:var(--muted)}.weekWeather th:first-child{width:14%}.weekWeather td:nth-child(2){width:21%}.weekWeather small{display:block;color:var(--muted);font-size:9px;line-height:1.3}
-.weekWeather button{font:inherit;color:var(--fg);background:transparent;border:0;min-height:40px;padding:2px;cursor:pointer}.weekWeather .selected{background:rgba(138,219,208,.1)}
 .weatherFootnote{font-size:10.5px;line-height:1.5;color:var(--muted);margin:7px 0}
 @media(max-width:600px){
  .panel{padding:10px}.view{gap:10px}.ph h2{font-size:16px}.fishGrid{gap:5px}
  .fish{padding:5px;gap:4px}.fish .fn{font-size:11px;display:block;line-height:1.35;overflow-wrap:anywhere}.fish .lt{display:none}
- .fish .pic{aspect-ratio:1.25}.fish .fp{display:block}.fish .biteScoreHeading b{font-size:10px;white-space:nowrap}.scoreValue{font-size:9px}
+ .fish .pic{aspect-ratio:1.25}.fish .fp{display:block}.fish .biteScoreHeading b{font-size:10px;white-space:nowrap}
  .fish .lv{display:inline-block;margin-top:3px}.fish .bestH{font-size:9.5px}.cardDetails{font-size:10px}.fish.expanded{padding:12px}
  .fish.expanded .fn{font-size:15px}.fish.expanded .lt{display:inline}.fish.expanded .bestH{font-size:12px}
  .tdFacts dd{font-size:15px}.tdFacts>div{padding:9px 7px}.ph h2 small{font-size:11px}.logForm{gap:8px}
- .weatherMetric dd{font-size:15px}.weatherMetric{padding:8px 6px}.weatherMetric small{font-size:9px}.weekWeather{font-size:10px}
+ .weatherMetric dd{font-size:15px}.weatherMetric{padding:8px 6px}.weatherMetric small{font-size:9px}
 }
 @media(min-width:900px){.fishGrid{grid-template-columns:repeat(6,minmax(0,1fr))}.weatherDashboard{grid-template-columns:repeat(6,minmax(0,1fr))}.weatherMetric dd{font-size:18px}}
 </style>
@@ -508,7 +503,6 @@ body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adju
       <button class="btn" type="button" data-go="map">지도에서 보기</button>
       <button class="btn ghost" type="button" data-go="tide">물때 자세히</button>
       <button class="btn ghost" type="button" data-go="bite">어종별 지수</button>
-      <a class="btn ghost" id="kakaoLink" href="https://map.kakao.com/" target="_blank" rel="noopener" title="새 창에서 카카오맵이 열립니다. 오른쪽 위 스카이뷰를 누르면 위성사진으로 볼 수 있습니다">카카오맵에서 보기 ↗</a>
     </div>
     <p class="note" id="tdNote">‘입질 확률’은 조건을 종합한 참고 지수이며 실제 포획 확률은 아닙니다. <b id="dataTime2">—</b></p>
   </section>
@@ -644,8 +638,7 @@ body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adju
           <div class="weatherMetric"><dt>물 흐름</dt><dd id="weatherCurrent">—</dd><small id="weatherCurrentNote">—</small></div>
         </dl>
         <p class="weatherFootnote" id="wxSlot">—</p>
-        <table class="weekWeather" aria-label="선택한 시각 기준 7일 출조 날씨 비교"><thead><tr><th>날짜</th><th>바람</th><th>파고</th><th>수온</th><th>습도</th><th>흐름</th></tr></thead><tbody id="weekWeatherBody"></tbody></table>
-        <p class="weatherFootnote">날짜를 누르면 해당 날로 이동합니다. 기상청 단기예보를 우선하고, 없는 항목은 7일 모델 예측으로 보완합니다. 미래 수온은 관측값이 아닙니다. 해류 모델은 연안 약 8 km 격자의 참고값이며 갯바위·방파제 주변의 정밀 조류나 출항 안전을 보장하지 않습니다.</p>
+        <p class="weatherFootnote">위에서 날짜와 시각을 선택하세요. 기상청 단기예보를 우선하고, 없는 항목은 7일 모델 예측으로 보완합니다. 미래 수온은 관측값이 아닙니다. 해류 모델은 연안 약 8 km 격자의 참고값이며 갯바위·방파제 주변의 정밀 조류나 출항 안전을 보장하지 않습니다.</p>
       </section>
       <canvas id="tideChart" aria-label="하루 조석 곡선. 눌러서 시각 선택"></canvas>
       <div class="evs" id="dayEvents"></div>
@@ -2220,7 +2213,6 @@ function selectPoint(j, zoom, navigationCommitted=false) {
   $('ptInfo').innerHTML = p.kind === 'rock' ? rockInfoHTML(p) : `<p class="note">${p.portSource||'기본 어항 자료의 대표 위치'} · 조석은 가까운 예보 지점, 바람·파고는 이 위치의 예보 격자를 참고합니다.</p>`;
   if (zoom&&!navigationCommitted) fitGround(p.lat, p.lon, 9000);
   if (S.lock) { if(!navigationCommitted)fitGround(p.lat, p.lon, TD_MAP_W); exampleSection(p.lon, p.lat); }   // 오늘 탭 지도: 새 포인트로 옮기고 앞바다 단면
-  $('kakaoLink').href = `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
   dirty = true; renderDays(); renderBite();
   setTimeout(requestWeekForecast,0);
 }
@@ -2330,7 +2322,7 @@ function biteLayerScores(factors){
 }
 function combineBiteScores(habitat,dynamic,personal=1){return clamp((.45*habitat+.55*dynamic)*personal,0,99);}
 // 13d_week_forecast.js — 선택 포인트의 7일 보완 예보와 물때 날씨 요약 (입질·지도 계산과 분리)
-const WEEK_FORECAST = { cache:new Map(), revision:0, tableKey:'' };
+const WEEK_FORECAST = { cache:new Map(), revision:0 };
 const WEEK_FIELDS = { air:['wind_speed_10m','wind_direction_10m','relative_humidity_2m'], sea:['wave_height','sea_surface_temperature','ocean_current_velocity','ocean_current_direction'] };
 const weekPointKey = p => p.lat.toFixed(3)+','+p.lon.toFixed(3);
 function parseWeekForecast(raw, kind, point) {
@@ -2412,19 +2404,8 @@ function updateWeatherDashboard(st,p) {
   const localSource=w.kma?w.kma.from:!wxCell(p.lat,p.lon)?'기상청 예보 격자 자료 없음':'선택한 시각의 기상청 예보 없음';
   const extraState=w.extra.status==='loading'?'7일 보완 예보 불러오는 중…':w.extra.status==='error'?'보완 예보 연결 실패':w.extra.status==='partial'?'일부 보완 예보만 사용':'7일 모델 보완 · 예보는 바뀔 수 있습니다';
   setText('wxSlot',localSource+' · '+extraState);
-  const key=[p.lat,p.lon,S.day,Math.floor(S.t),WEEK_FORECAST.revision,CR.ready].join('|');
-  if(key!==WEEK_FORECAST.tableKey){
-    WEEK_FORECAST.tableKey=key;
-    $('weekWeatherBody').innerHTML=st.days.slice(TODAY_IDX,NDAYS).map((d,offset)=>{
-      const i=TODAY_IDX+offset;
-      const x=tideWeatherAt(st,p,i,S.t),dir=has(x.direction.value)?dirName16(x.direction.value):'—',val=(o,u,n=1)=>has(o.value)?o.value.toFixed(n)+u:'—';
-      return `<tr${i===S.day?' class="selected"':''}><th><button type="button" data-weather-day="${i}" aria-label="${d.date} 날씨 선택" aria-pressed="${i===S.day}">${d.date.slice(5).replace('-','/')}</button></th><td title="${weatherSource(x.speed)}">${dir}<small>${val(x.speed,'m/s')}</small></td><td title="${weatherSource(x.wave)}">${val(x.wave,'m')}</td><td title="${weatherSource(x.sst)}">${val(x.sst,'℃')}<small>${x.ob?'관측':'모델'}</small></td><td title="${weatherSource(x.humidity)}">${val(x.humidity,'%',0)}</td><td title="${weatherSource(x.current)}">${has(x.current.value)?(x.current.value*1.943844).toFixed(1)+'kn':'—'}<small>${x.current.nc?'KHOA':'해류모델'}</small></td></tr>`;
-    }).join('');
-  }
   return w;
 }
-
-$('weekWeatherBody').addEventListener('click',e=>{const button=e.target.closest('[data-weather-day]');if(button)setDay(+button.dataset.weatherDay);});
 // 14_bite.js — 시간별 입질 지수
 // 규칙 기반 조건점수와 자료 신뢰도를 별도로 계산한다.
 // 조차가 작은 바다는 조석 추정의 비중만 줄이고 실제 환경 차이는 유지한다.
@@ -2537,7 +2518,7 @@ function renderBite() {
   $('biteWin').textContent = `해 뜸 ${fmtH(sr)} · 해 짐 ${fmtH(ss)} · ` + (top.length ? '오늘 "높음"이 나오는 시간: ' + top.slice(0, 4).map(r => `${r.f.n} ${String(r.best).padStart(2, '0')}시`).join(', ') : '오늘은 "높음"이 나오는 시간이 없습니다.');
   $('fishGrid').innerHTML = rows.map(({ f, i, arr, p, best, ev }) => {
     const [lv, cls] = level(p);
-    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><div class="biteScoreHeading"><b>입질 확률</b><small class="scoreValue">조건점수 ${p}점</small></div><span class="lv ${cls}">${lv}</span></div>${scoreProgress(p, f.n)}<div class="bestH" title="이 시간 조건점수 ${arr[best]}점">${biteBestTime(best)}</div><div class="fishEcology"><p><span class="ecologyLabel">주 서식지</span><span class="habitatSummary">${f.habitatSummary}</span></p><p><span class="ecologyLabel">잘 잡히는 곳</span><span class="catchSpotSummary">${f.catchSpotSummary}</span></p></div><details class="cardDetails"><summary>현재 조건</summary><p class="biteReasons">${biteReasons(ev)}</p></details></div>`;
+    return `<div class="fish ${cls}"><div class="pic">${fishPicture(f, 'bite' + i)}</div><div class="fn">${f.n}<span class="lt">${ecologyLightName(f)}</span></div><div class="fp"><div class="biteScoreHeading"><b>입질 확률</b></div><span class="lv ${cls}">${lv}</span></div>${scoreProgress(p, f.n)}<div class="bestH">${biteBestTime(best)}</div><div class="fishEcology"><p><span class="ecologyLabel">주 서식지</span><span class="habitatSummary">${f.habitatSummary}</span></p><p><span class="ecologyLabel">잘 잡히는 곳</span><span class="catchSpotSummary">${f.catchSpotSummary}</span></p></div><details class="cardDetails"><summary>현재 조건</summary><p class="biteReasons">${biteReasons(ev)}</p></details></div>`;
   }).join('') + FISH.filter(f => !fishHasBiteModel(f)).map((f, i) => `<div class="fish provisional"><div class="pic">${fishPicture(f, 'new' + i)}</div><div class="fn">${f.n}</div><div class="fp"><b>—</b><span class="lv">미설정</span></div><p class="fishModelNote">입질 계산 기준 미설정 · 추천 순위 제외${f.aliasOf ? `<br>${f.aliasOf}과 같은 어종` : ''}</p></div>`).join('');
   if (pt && pt.kind === 'rock') $('rockInfo').innerHTML = rockInfoHTML(pt); else $('rockInfo').innerHTML = '';
   if (typeof renderBasis === 'function') renderBasis();
@@ -4538,7 +4519,6 @@ $('coordForm').addEventListener('submit', e => {
   navigateSearchPoint(f.p.lat,f.p.lon,2500,f.p.name,()=>{
     selectPoint(j,false,true);S.pin=f.pt?null:[f.p.mx,f.p.my];
     $('coordMsg').textContent=f.pt?'':`${f.p.name}: 개별 선택 포인트가 없어 가까운 '${POINTS[j].name}' 기준으로 조석·조과를 보여줍니다.`;
-    $('kakaoLink').href=`https://map.kakao.com/link/map/${encodeURIComponent(f.p.name)},${f.p.lat.toFixed(6)},${f.p.lon.toFixed(6)}`;
   });
 });
 $('toSec').addEventListener('click', () => {

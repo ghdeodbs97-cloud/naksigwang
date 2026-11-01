@@ -330,7 +330,6 @@ body{line-height:1.65}
 .fish .bestH{font-size:11.5px}
 .biteScoreHeading{display:flex;flex-direction:column;gap:3px;min-width:0}
 .fish .biteScoreHeading b{font-family:var(--font-ui);font-size:18px;line-height:1.4}
-.scoreValue{font-family:var(--font-data);font-size:11px;color:var(--muted)}
 .fish .bestH{font-family:var(--font-ui);font-size:12px;line-height:1.6;color:var(--fg);padding:3px 0 5px}
 .fish .fp{gap:8px;align-items:center}
 .fishEcology{font-size:12.5px;line-height:1.6}
@@ -427,7 +426,7 @@ body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adju
 .logForm{gap:10px;margin:10px 0}.logForm input,.logForm select{font-size:13px;padding:8px}.sources{font-size:12px;line-height:1.65}.sourcePanel{padding:13px}
 .fishGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:10px;align-items:start}
 .fish{padding:7px;gap:5px;min-width:0}.fish .fn{font-size:13px;gap:3px}.fish .lt{font-size:10px}.fish .biteScoreHeading b{font-size:12px}
-.fish .fp{flex-wrap:wrap;gap:4px}.scoreValue{font-size:10px}.fish .lv{font-size:10px;padding:1px 5px}.fish .bestH{font-size:10px;line-height:1.4}
+.fish .fp{flex-wrap:wrap;gap:4px}.fish .lv{font-size:10px;padding:1px 5px}.fish .bestH{font-size:10px;line-height:1.4}
 .fishEcology{display:none}.fish.expanded{grid-column:1/-1}.fish.expanded .fishEcology{display:block}
 .fish.expanded .pic{width:110px}.cardDetails{font-size:11px;padding-top:5px}.cardDetails>summary{min-height:32px;display:flex;align-items:center}
 .weatherHeader{display:flex;align-items:baseline;gap:7px;justify-content:space-between;flex-wrap:wrap;margin:10px 0 7px}.weatherHeader h3{font-size:15px;margin:0}
@@ -436,19 +435,15 @@ body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adju
 .weatherMetric dt{font-size:11px;color:var(--muted)}.weatherMetric dd{margin:3px 0 0;font-family:var(--font-data);font-size:17px;font-weight:600;white-space:nowrap}
 .weatherMetric small{display:block;font-size:10px;line-height:1.4;margin-top:4px;color:var(--muted);overflow-wrap:anywhere}
 #windCompass{display:inline-block;font-family:var(--font-ui);color:var(--cyan);margin-right:3px}
-.weekWeather{width:100%;table-layout:fixed;border-collapse:collapse;font-size:11px;margin-top:8px}
-.weekWeather th,.weekWeather td{padding:7px 2px;text-align:center;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
-.weekWeather thead{color:var(--muted)}.weekWeather th:first-child{width:14%}.weekWeather td:nth-child(2){width:21%}.weekWeather small{display:block;color:var(--muted);font-size:9px;line-height:1.3}
-.weekWeather button{font:inherit;color:var(--fg);background:transparent;border:0;min-height:40px;padding:2px;cursor:pointer}.weekWeather .selected{background:rgba(138,219,208,.1)}
 .weatherFootnote{font-size:10.5px;line-height:1.5;color:var(--muted);margin:7px 0}
 @media(max-width:600px){
  .panel{padding:10px}.view{gap:10px}.ph h2{font-size:16px}.fishGrid{gap:5px}
  .fish{padding:5px;gap:4px}.fish .fn{font-size:11px;display:block;line-height:1.35;overflow-wrap:anywhere}.fish .lt{display:none}
- .fish .pic{aspect-ratio:1.25}.fish .fp{display:block}.fish .biteScoreHeading b{font-size:10px;white-space:nowrap}.scoreValue{font-size:9px}
+ .fish .pic{aspect-ratio:1.25}.fish .fp{display:block}.fish .biteScoreHeading b{font-size:10px;white-space:nowrap}
  .fish .lv{display:inline-block;margin-top:3px}.fish .bestH{font-size:9.5px}.cardDetails{font-size:10px}.fish.expanded{padding:12px}
  .fish.expanded .fn{font-size:15px}.fish.expanded .lt{display:inline}.fish.expanded .bestH{font-size:12px}
  .tdFacts dd{font-size:15px}.tdFacts>div{padding:9px 7px}.ph h2 small{font-size:11px}.logForm{gap:8px}
- .weatherMetric dd{font-size:15px}.weatherMetric{padding:8px 6px}.weatherMetric small{font-size:9px}.weekWeather{font-size:10px}
+ .weatherMetric dd{font-size:15px}.weatherMetric{padding:8px 6px}.weatherMetric small{font-size:9px}
 }
 @media(min-width:900px){.fishGrid{grid-template-columns:repeat(6,minmax(0,1fr))}.weatherDashboard{grid-template-columns:repeat(6,minmax(0,1fr))}.weatherMetric dd{font-size:18px}}
 </style>
@@ -501,7 +496,6 @@ body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adju
       <button class="btn" type="button" data-go="map">지도에서 보기</button>
       <button class="btn ghost" type="button" data-go="tide">물때 자세히</button>
       <button class="btn ghost" type="button" data-go="bite">어종별 지수</button>
-      <a class="btn ghost" id="kakaoLink" href="https://map.kakao.com/" target="_blank" rel="noopener" title="새 창에서 카카오맵이 열립니다. 오른쪽 위 스카이뷰를 누르면 위성사진으로 볼 수 있습니다">카카오맵에서 보기 ↗</a>
     </div>
     <p class="note" id="tdNote">‘입질 확률’은 조건을 종합한 참고 지수이며 실제 포획 확률은 아닙니다. <b id="dataTime2">—</b></p>
   </section>
@@ -637,8 +631,7 @@ body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adju
           <div class="weatherMetric"><dt>물 흐름</dt><dd id="weatherCurrent">—</dd><small id="weatherCurrentNote">—</small></div>
         </dl>
         <p class="weatherFootnote" id="wxSlot">—</p>
-        <table class="weekWeather" aria-label="선택한 시각 기준 7일 출조 날씨 비교"><thead><tr><th>날짜</th><th>바람</th><th>파고</th><th>수온</th><th>습도</th><th>흐름</th></tr></thead><tbody id="weekWeatherBody"></tbody></table>
-        <p class="weatherFootnote">날짜를 누르면 해당 날로 이동합니다. 기상청 단기예보를 우선하고, 없는 항목은 7일 모델 예측으로 보완합니다. 미래 수온은 관측값이 아닙니다. 해류 모델은 연안 약 8 km 격자의 참고값이며 갯바위·방파제 주변의 정밀 조류나 출항 안전을 보장하지 않습니다.</p>
+        <p class="weatherFootnote">위에서 날짜와 시각을 선택하세요. 기상청 단기예보를 우선하고, 없는 항목은 7일 모델 예측으로 보완합니다. 미래 수온은 관측값이 아닙니다. 해류 모델은 연안 약 8 km 격자의 참고값이며 갯바위·방파제 주변의 정밀 조류나 출항 안전을 보장하지 않습니다.</p>
       </section>
       <canvas id="tideChart" aria-label="하루 조석 곡선. 눌러서 시각 선택"></canvas>
       <div class="evs" id="dayEvents"></div>
