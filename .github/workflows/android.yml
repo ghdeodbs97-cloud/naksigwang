@@ -1,0 +1,45 @@
+name: Android APK
+on:
+  pull_request:
+    paths: ['android/**', '.github/workflows/android.yml']
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: 단위 검사 · Android lint · 테스트 APK
+        working-directory: android
+        run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
+      - name: APK 서명 · 앱 정보 · 체크섬 확인
+        run: |
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | head -n 8
+          mkdir -p apk-output
+          cp "$APK" apk-output/naksigwang-debug.apk
+          cd apk-output
+          sha256sum naksigwang-debug.apk > SHA256SUMS
+          echo "commit=${{ github.event.pull_request.head.sha || github.sha }}" > BUILD.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: naksigwang-debug-${{ github.event.pull_request.head.sha || github.sha }}
+          path: apk-output/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-test-reports
+          path: |
+            android/app/build/reports/tests/
+            android/app/build/reports/lint-results-debug.html
