@@ -46,15 +46,17 @@ function realField(tA) {
 }
 
 /* ── 조류 입자 ─────────────────────────────────────────── */
-const NP = 900; const P = { x: new Float32Array(NP), y: new Float32Array(NP), age: new Float32Array(NP), max: new Float32Array(NP) };
+const NP = 480; let PARTICLE_BUDGET = innerWidth<560 ? 180 : 360, flowSlowFrames=0; const P = { x: new Float32Array(NP), y: new Float32Array(NP), age: new Float32Array(NP), max: new Float32Array(NP) };
 function spawn(k) { for (let t = 0; t < 25; t++) { const x = Math.random() * cw, y = Math.random() * ch; if (isSea(x | 0, y | 0)) { P.x[k] = x; P.y[k] = y; P.age[k] = 0; P.max[k] = 50 + Math.random() * 110; return; } } P.age[k] = 1e9; }
-// 지도를 끌거나 확대·축소하는 동안에는 입자를 숨겼다가, 손을 떼고 0.3초 뒤 새 화면에 맞춰 다시 뿌린다.
+// 지도를 끌거나 확대·축소하는 동안 입자를 숨기고 최종 viewport 복구 뒤 한 번 다시 뿌린다.
 // (예전에는 움직이는 동안 매 프레임 입자를 새로 뿌려서, 휴대폰에서 누르면 조류가 아주 빨리 흐르는 것처럼 보였다)
 let flowStale = true, flowHidden = false;
 function stepParticles(tide, dt) {
-  const moving = ptrs.size > 0 || performance.now() - VIEW_T < 300;
+  const moving = PROVIDER_MAP.providerMoving || document.hidden || ptrs.size > 0 || (!PROVIDER_MAP.active && performance.now()-VIEW_T<300);
   if (moving) { if (!flowHidden) { fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowHidden = true; } return; }
-  if (flowStale) { buildFlowField(); for (let k = 0; k < NP; k++) spawn(k); fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowStale = false; }
+  if(!S.layers.flow)return;
+  if(RENDER.workMs>20){if(++flowSlowFrames>=4&&PARTICLE_BUDGET>120){PARTICLE_BUDGET=Math.max(120,Math.floor(PARTICLE_BUDGET*.75));PERF.particleReductions++;flowSlowFrames=0;}}else flowSlowFrames=Math.max(0,flowSlowFrames-1);
+  if (flowStale) { buildFlowField();perfCount('particleRespawn'); for (let k = 0; k < PARTICLE_BUDGET; k++) spawn(k); fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.clearRect(0, 0, flow.width, flow.height); flowStale = false; }
   flowHidden = false;
   fctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
   fctx.globalCompositeOperation = 'destination-out'; fctx.fillStyle = 'rgba(0,0,0,.09)'; fctx.fillRect(0, 0, cw, ch);
@@ -62,7 +64,7 @@ function stepParticles(tide, dt) {
   if (!S.layers.flow || !FF) return;
   const sc = 1.4 * dt * 60, rf = realField(tide.tA);
   fctx.strokeStyle = 'rgba(205,255,250,.55)'; fctx.lineWidth = 1; fctx.beginPath();
-  for (let k = 0; k < NP; k++) {
+  for (let k = 0; k < PARTICLE_BUDGET; k++) {
     if (P.age[k] > P.max[k]) { spawn(k); continue; }
     const fi = (Math.min(FFh - 1, (P.y[k] >> 1) / FC | 0) * FFw + Math.min(FFw - 1, (P.x[k] >> 1) / FC | 0)) * 2;
     let vx = FF[fi] * tide.u, vy = FF[fi + 1] * tide.u;
@@ -84,28 +86,28 @@ function stepParticles(tide, dt) {
 
 // 조류 예보 지점 화살표: 그 시각 유향·유속 (길이 ∝ 유속)
 const crColor = kn => kn < .5 ? '#9ec9cf' : kn < 1.5 ? '#5ff0a8' : kn < 3 ? '#ffb84d' : '#ff7a6e';
-function drawCrnt(tide) {
+function drawCrnt(tide, context=uctx) {
   if (!S.layers.flow || !CR.ready) return;
-  const r = DPR(); uctx.setTransform(r, 0, 0, r, 0, 0);
+  const r = DPR(); context.setTransform(r, 0, 0, r, 0, 0);
   const gw = cw / pxPerGround(), showName = gw < 60000, big = gw < 400000;
-  uctx.font = '600 10.5px JetBrains Mono, monospace'; uctx.textBaseline = 'middle';
+  context.font = '600 10.5px JetBrains Mono, monospace'; context.textBaseline = 'middle';
   for (const c of CR.st) {
     const [x, y] = toS(c.mx, c.my); if (x < -30 || y < -30 || x > cw + 30 || y > ch + 30) continue;
     const q = crntAt(c, tide.tA); if (!q) continue;
     const kn = q.sp * KN, col = crColor(kn);
-    uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.fillStyle = col;
-    if (kn < .2) { uctx.strokeStyle = col; uctx.lineWidth = 1.5; uctx.beginPath(); uctx.arc(x, y, big ? 4 : 3, 0, 7); uctx.stroke(); }   // 물돌이: 속 빈 고리 (항 아이콘과 구분)
+    context.lineWidth = 1.5; context.strokeStyle = 'rgba(6,15,19,.9)'; context.fillStyle = col;
+    if (kn < .2) { context.strokeStyle = col; context.lineWidth = 1.5; context.beginPath(); context.arc(x, y, big ? 4 : 3, 0, 7); context.stroke(); }   // 물돌이: 속 빈 고리 (항 아이콘과 구분)
     else {
       const L = (big ? 10 : 6) + Math.min(big ? 30 : 14, kn * (big ? 8 : 4)), a = q.dir * D2R, dx = Math.sin(a), dy = -Math.cos(a);
       const x0 = x - dx * L / 2, y0 = y - dy * L / 2, x1 = x + dx * L / 2, y1 = y + dy * L / 2, hw = big ? 5 : 3.5, hl = big ? 8 : 5;
-      uctx.beginPath(); uctx.moveTo(x0, y0); uctx.lineTo(x1 - dx * hl * .6, y1 - dy * hl * .6);
-      uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.lineWidth = 5; uctx.stroke(); uctx.strokeStyle = col; uctx.lineWidth = 2.5; uctx.stroke();
-      uctx.beginPath(); uctx.moveTo(x1, y1); uctx.lineTo(x1 - dx * hl - dy * hw, y1 - dy * hl + dx * hw); uctx.lineTo(x1 - dx * hl + dy * hw, y1 - dy * hl - dx * hw); uctx.closePath();
-      uctx.lineWidth = 1.5; uctx.strokeStyle = 'rgba(6,15,19,.9)'; uctx.stroke(); uctx.fill();
+      context.beginPath(); context.moveTo(x0, y0); context.lineTo(x1 - dx * hl * .6, y1 - dy * hl * .6);
+      context.strokeStyle = 'rgba(6,15,19,.9)'; context.lineWidth = 5; context.stroke(); context.strokeStyle = col; context.lineWidth = 2.5; context.stroke();
+      context.beginPath(); context.moveTo(x1, y1); context.lineTo(x1 - dx * hl - dy * hw, y1 - dy * hl + dx * hw); context.lineTo(x1 - dx * hl + dy * hw, y1 - dy * hl - dx * hw); context.closePath();
+      context.lineWidth = 1.5; context.strokeStyle = 'rgba(6,15,19,.9)'; context.stroke(); context.fill();
     }
     if (gw < 150000 && (kn >= .2 || gw < 40000)) {   // 글자는 150 km 폭 안에서만, 「물돌이」 글자는 40 km 안에서만 (넓게 볼 때 어지럽지 않게)
       const t = (kn < .2 ? '물돌이' : kn.toFixed(1) + 'kn') + (showName ? ' ' + c.name : '');
-      uctx.lineWidth = 3; uctx.strokeStyle = 'rgba(6,15,19,.85)'; uctx.strokeText(t, x + 9, y + 9); uctx.fillStyle = col; uctx.fillText(t, x + 9, y + 9);
+      context.lineWidth = 3; context.strokeStyle = 'rgba(6,15,19,.85)'; context.strokeText(t, x + 9, y + 9); context.fillStyle = col; context.fillText(t, x + 9, y + 9);
     }
   }
 }

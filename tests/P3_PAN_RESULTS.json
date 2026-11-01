@@ -1,0 +1,1296 @@
+{
+  "summary": {
+    "scope": "headless SDK mock; 실 NAVER native pan은 사용자 localhost 재검증 대기",
+    "baseHead": "f8dda0cf7bb990c78514ad866c360d7e5a60d2bb",
+    "createdAt": "2026-10-24T06:19:25.147770+00:00",
+    "combinations": 16,
+    "panChecks": 21840,
+    "driftPans": 8000,
+    "maxMarkerRasterErrorPx": 0.46505573418775364,
+    "maxABDrawCommandErrorPx": 0.017032797207793885,
+    "maxABRasterErrorPx": 0.9013878188659974,
+    "maxPerfMarkerErrorPx": 0.44687800704855685,
+    "maxLatencyMs": {
+      "pointerup": 183.39999985694885,
+      "dragend": 183,
+      "idle": 183
+    },
+    "maxP95LatencyMs": {
+      "pointerup": 111.60000014305115,
+      "dragend": 112,
+      "idle": 112.10000014305115
+    },
+    "staleVisibleFrames": 0,
+    "permanentHidden": 0,
+    "fallbacks": 0,
+    "movingHeavy": 0,
+    "movingDepthPrepare": 0,
+    "fpsRange": [
+      50.41354864119732,
+      60.10970020394705
+    ],
+    "navigationSuccessCommands": 3304,
+    "jangRepeats": 400,
+    "noopRepeats": 400,
+    "tests": {
+      "legacy": 12,
+      "provider": 32,
+      "performance": 12,
+      "health": 6,
+      "stress": 16,
+      "navigation": 4,
+      "finalNavigationFocus": 4,
+      "pan": 16
+    },
+    "baselineRegenerated": false,
+    "protectedDepthAndDataChanged": false,
+    "parallelTimingFailure": {
+      "maxMs": 653.7,
+      "status": "초기 병렬 실행 실패; 위 수치는 최종 직렬 실행 결과"
+    },
+    "naturalSettleTimeoutMaxMs": 313,
+    "nativeMissingEndMaxMs": 292.2000000476837,
+    "sourceHashes": {
+      "index.html": "4d5b1f18d7230827559313a2269848c3143b16720c57ffa5aa7ccecde21b7b4a",
+      "src/app/15b_map_provider.js": "b49c600ceeca8b8e92065c06ae8463881bae2b1306ade920e0f91ff57ab908e3",
+      "src/app/15d_render_state.js": "65566aa5823e50d3bf7fd7886c76a0d521347ea99c1e0a5b50eafe52f2cf4750",
+      "src/app/21_input.js": "9ec5af1b49c09d870315058d07818a9622e0e6fb23eeb997ca748243b5e7ed7d",
+      "src/app/23_main.js": "d53eceb76c7425a6bc983c3900e793d735b6c8b9fd45b8a5b42bae869c93420c",
+      "tests/p3_pan_checks.js": "de826c37904759eea34fcb89f9a5e5000b736e1f81805c9851c597033042b466"
+    }
+  },
+  "matrix": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABDrawErrorPx": 0.017032797207793885,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 183.39999985694885,
+        "dragend": 183,
+        "idle": 183
+      },
+      "latencyP95Ms": {
+        "pointerup": 93.59999990463257,
+        "dragend": 93.60000014305115,
+        "idle": 93.70000004768372
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 183.39999985694885,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 183,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 183,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.25,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0.4468780070485442,
+      "maxABDrawErrorPx": 0.017032797207793885,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 149.70000004768372,
+        "dragend": 149.20000004768372,
+        "idle": 149.29999995231628
+      },
+      "latencyP95Ms": {
+        "pointerup": 93.20000004768372,
+        "dragend": 93.39999985694885,
+        "idle": 93.39999985694885
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 149.70000004768372,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 149.29999995231628,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 149.20000004768372,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0.4468780070485442,
+        "firstHalfMean": 0.3937650108669496,
+        "secondHalfMean": 0.3932894241670055
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.5,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0.23570226039554265,
+      "maxABDrawErrorPx": 0.017032797207793885,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 155.90000009536743,
+        "dragend": 155.40000009536743,
+        "idle": 155.40000009536743
+      },
+      "latencyP95Ms": {
+        "pointerup": 92.89999985694885,
+        "dragend": 92.70000004768372,
+        "idle": 93
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 155.90000009536743,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 155.40000009536743,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 155.40000009536743,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABDrawErrorPx": 0.017032797207793885,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 129.30000019073486,
+        "dragend": 126,
+        "idle": 129.20000004768372
+      },
+      "latencyP95Ms": {
+        "pointerup": 92.5,
+        "dragend": 92.5,
+        "idle": 92.5
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 129.30000019073486,
+          "kind": "late-dragend",
+          "phase": "lateDragend",
+          "blockedReveals": 0
+        },
+        "idle": {
+          "ms": 129.20000004768372,
+          "kind": "late-dragend",
+          "phase": "lateDragend",
+          "blockedReveals": 0
+        },
+        "dragend": {
+          "ms": 126,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABDrawErrorPx": 0.01703279538873321,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 150.69999980926514,
+        "dragend": 150.69999980926514,
+        "idle": 150.69999980926514
+      },
+      "latencyP95Ms": {
+        "pointerup": 106.29999995231628,
+        "dragend": 106.5,
+        "idle": 106.59999990463257
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 150.69999980926514,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 150.69999980926514,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 150.69999980926514,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1.25,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0.4470110187115347,
+      "maxABDrawErrorPx": 0.01703279538873321,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 140.09999990463257,
+        "dragend": 139.59999990463257,
+        "idle": 139.59999990463257
+      },
+      "latencyP95Ms": {
+        "pointerup": 105.89999985694885,
+        "dragend": 106.59999990463257,
+        "idle": 106.59999990463257
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 140.09999990463257,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 139.59999990463257,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 139.59999990463257,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0.3997734994337634,
+        "firstHalfMean": 0.2719592533028514,
+        "secondHalfMean": 0.27149602349001406
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1.5,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0.23570226039554265,
+      "maxABDrawErrorPx": 0.01703279538873321,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 136.59999990463257,
+        "dragend": 136.39999985694885,
+        "idle": 136.39999985694885
+      },
+      "latencyP95Ms": {
+        "pointerup": 104.20000004768372,
+        "dragend": 104.89999985694885,
+        "idle": 104.90000009536743
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 136.59999990463257,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 136.39999985694885,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 136.39999985694885,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 2,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABDrawErrorPx": 0.01703279538873321,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 143.90000009536743,
+        "dragend": 143.70000004768372,
+        "idle": 143.70000004768372
+      },
+      "latencyP95Ms": {
+        "pointerup": 101.40000009536743,
+        "dragend": 102.09999990463257,
+        "idle": 102.20000004768372
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 143.90000009536743,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 143.70000004768372,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 143.70000004768372,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABDrawErrorPx": 0.014582354165056322,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 177.40000009536743,
+        "dragend": 176.90000009536743,
+        "idle": 177
+      },
+      "latencyP95Ms": {
+        "pointerup": 109.30000019073486,
+        "dragend": 109.70000004768372,
+        "idle": 109.70000004768372
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 177.40000009536743,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 177,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 176.90000009536743,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.25,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0.44914405846615907,
+      "maxABDrawErrorPx": 0.014582354165056322,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 158.20000004768372,
+        "dragend": 158,
+        "idle": 158
+      },
+      "latencyP95Ms": {
+        "pointerup": 106.70000004768372,
+        "dragend": 107.5,
+        "idle": 108
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 158.20000004768372,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 158,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 158,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0.2836064109181642,
+        "firstHalfMean": 0.1708736811249787,
+        "secondHalfMean": 0.1720081067686514
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.5,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0.23570226039554265,
+      "maxABDrawErrorPx": 0.014582354165056322,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 124.39999985694885,
+        "dragend": 124.39999985694885,
+        "idle": 124.39999985694885
+      },
+      "latencyP95Ms": {
+        "pointerup": 105.60000014305115,
+        "dragend": 106.59999990463257,
+        "idle": 106.59999990463257
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 124.39999985694885,
+          "kind": "no-dragstart",
+          "phase": "drift500",
+          "blockedReveals": 0
+        },
+        "idle": {
+          "ms": 124.39999985694885,
+          "kind": "no-dragstart",
+          "phase": "drift500",
+          "blockedReveals": 0
+        },
+        "dragend": {
+          "ms": 124.39999985694885,
+          "kind": "no-dragstart",
+          "phase": "drift500",
+          "blockedReveals": 0
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABDrawErrorPx": 0.014582354165056322,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 180.09999990463257,
+        "dragend": 179.90000009536743,
+        "idle": 179.90000009536743
+      },
+      "latencyP95Ms": {
+        "pointerup": 105.69999980926514,
+        "dragend": 106.20000004768372,
+        "idle": 106.20000004768372
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 180.09999990463257,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 179.90000009536743,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 179.90000009536743,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 5.684341886080802e-14,
+      "maxABDrawErrorPx": 0.014582354021707263,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 149.10000014305115,
+        "dragend": 148.60000014305115,
+        "idle": 148.70000004768372
+      },
+      "latencyP95Ms": {
+        "pointerup": 111.60000014305115,
+        "dragend": 112,
+        "idle": 112.10000014305115
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 149.10000014305115,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 148.70000004768372,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 148.60000014305115,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.25,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0.46505573418775364,
+      "maxABDrawErrorPx": 0.014582354021707263,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 141.30000019073486,
+        "dragend": 141.10000014305115,
+        "idle": 141.10000014305115
+      },
+      "latencyP95Ms": {
+        "pointerup": 109.70000004768372,
+        "dragend": 110.20000004768372,
+        "idle": 110.20000004768372
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 141.30000019073486,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 141.10000014305115,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 141.10000014305115,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0.28300303450603853,
+        "firstHalfMean": 0.17072404377477124,
+        "secondHalfMean": 0.1718560559127954
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.5,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 0.37015352158868176,
+      "maxABDrawErrorPx": 0.014582354021707263,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 146.90000009536743,
+        "dragend": 146.70000004768372,
+        "idle": 146.70000004768372
+      },
+      "latencyP95Ms": {
+        "pointerup": 107.70000004768372,
+        "dragend": 108.09999990463257,
+        "idle": 108.20000004768372
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 146.90000009536743,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 146.70000004768372,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 146.70000004768372,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0.33318465655668206,
+        "firstHalfMean": 0.25088670829619514,
+        "secondHalfMean": 0.24955932203392922
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "counts": {
+        "pan": 100,
+        "noDragstart": 50,
+        "noIdle": 50,
+        "earlyIdle": 50,
+        "lateDragend": 50,
+        "idleWithoutDragend": 50,
+        "timeout": 10,
+        "panPan": 100,
+        "panZoom": 50,
+        "zoomPan": 50,
+        "panJang": 50,
+        "jangPan": 50,
+        "drift500": 500
+      },
+      "total": 1365,
+      "staleOverlayVisibleFrames": 0,
+      "permanentHidden": 0,
+      "fallbacks": 0,
+      "maxMarkerErrorPx": 5.684341886080802e-14,
+      "maxABDrawErrorPx": 0.014582354021707263,
+      "movingHeavy": 0,
+      "movingDepthPrepare": 0,
+      "basePerFinal": [
+        1,
+        1
+      ],
+      "uiPerFinal": [
+        1,
+        1
+      ],
+      "maxLatencyMs": {
+        "pointerup": 166.89999985694885,
+        "dragend": 166.79999995231628,
+        "idle": 166.79999995231628
+      },
+      "latencyP95Ms": {
+        "pointerup": 106.20000004768372,
+        "dragend": 106.20000004768372,
+        "idle": 106.29999995231628
+      },
+      "latencyWorst": {
+        "pointerup": {
+          "ms": 166.89999985694885,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "idle": {
+          "ms": 166.79999995231628,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        },
+        "dragend": {
+          "ms": 166.79999995231628,
+          "kind": "no-dragstart",
+          "phase": "stampRace",
+          "blockedReveals": 1
+        }
+      },
+      "drift": {
+        "count": 500,
+        "max": 0,
+        "firstHalfMean": 0,
+        "secondHalfMean": 0
+      },
+      "blockedReveals": 1,
+      "repair": "repaired",
+      "noZoomAfterPan": true
+    }
+  ]
+}

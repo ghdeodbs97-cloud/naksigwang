@@ -1,0 +1,3626 @@
+{
+  "scope": "Windows Chromium headless SDK mock. 실 NAVER·사용자 장치 체감 성능과 별도.",
+  "beforeRef": "1ea95e6e9b81530172add863ed925ed1800d51f9",
+  "comparison": {
+    "before": [
+      {
+        "viewport": [
+          390,
+          844
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 954,
+          "fps": 62.893081761006286,
+          "averageFrameMs": 15.9,
+          "p95FrameMs": 18,
+          "longFrames": 0,
+          "counts": {
+            "providerSync": 60,
+            "updateHover": 60,
+            "drawUI": 60,
+            "drawCrnt": 60,
+            "stepParticles": 60,
+            "drawSection": 60
+          },
+          "perSecond": {
+            "providerSync": 62.893081761006286,
+            "updateHover": 62.893081761006286,
+            "drawUI": 62.893081761006286,
+            "drawCrnt": 62.893081761006286,
+            "stepParticles": 62.893081761006286,
+            "drawSection": 62.893081761006286
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 1896,
+          "fps": 31.645569620253166,
+          "averageFrameMs": 31.6,
+          "p95FrameMs": 34,
+          "longFrames": 1,
+          "counts": {
+            "providerSync": 60,
+            "updateHover": 60,
+            "drawUI": 60,
+            "drawCrnt": 60,
+            "stepParticles": 60,
+            "drawSection": 60,
+            "providerCheck": 59,
+            "providerAlignment": 59,
+            "renderBase": 59,
+            "drawStations": 59,
+            "getImageData": 59
+          },
+          "perSecond": {
+            "providerSync": 31.645569620253166,
+            "updateHover": 31.645569620253166,
+            "drawUI": 31.645569620253166,
+            "drawCrnt": 31.645569620253166,
+            "stepParticles": 31.645569620253166,
+            "drawSection": 31.645569620253166,
+            "providerCheck": 31.11814345991561,
+            "providerAlignment": 31.11814345991561,
+            "renderBase": 31.11814345991561,
+            "drawStations": 31.11814345991561,
+            "getImageData": 31.11814345991561
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 12,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "updateHover": 12,
+            "drawUI": 12,
+            "drawCrnt": 12,
+            "stepParticles": 12,
+            "drawSection": 12
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 900,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1280,
+          900
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 961,
+          "fps": 62.43496357960458,
+          "averageFrameMs": 16.016666666666666,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "providerSync": 60,
+            "updateHover": 60,
+            "drawUI": 60,
+            "drawCrnt": 60,
+            "stepParticles": 60,
+            "drawSection": 60
+          },
+          "perSecond": {
+            "providerSync": 62.43496357960458,
+            "updateHover": 62.43496357960458,
+            "drawUI": 62.43496357960458,
+            "drawCrnt": 62.43496357960458,
+            "stepParticles": 62.43496357960458,
+            "drawSection": 62.43496357960458
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 2855,
+          "fps": 21.015761821366024,
+          "averageFrameMs": 47.583333333333336,
+          "p95FrameMs": 52,
+          "longFrames": 9,
+          "counts": {
+            "providerSync": 60,
+            "updateHover": 60,
+            "drawUI": 60,
+            "drawCrnt": 60,
+            "stepParticles": 60,
+            "drawSection": 60,
+            "providerCheck": 59,
+            "providerAlignment": 59,
+            "renderBase": 59,
+            "drawStations": 59,
+            "getImageData": 59
+          },
+          "perSecond": {
+            "providerSync": 21.015761821366024,
+            "updateHover": 21.015761821366024,
+            "drawUI": 21.015761821366024,
+            "drawCrnt": 21.015761821366024,
+            "stepParticles": 21.015761821366024,
+            "drawSection": 21.015761821366024,
+            "providerCheck": 20.665499124343256,
+            "providerAlignment": 20.665499124343256,
+            "renderBase": 20.665499124343256,
+            "drawStations": 20.665499124343256,
+            "getImageData": 20.665499124343256
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 12,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "updateHover": 12,
+            "drawUI": 12,
+            "drawCrnt": 12,
+            "stepParticles": 12,
+            "drawSection": 12
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 900,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1920,
+          1080
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "providerSync": 60,
+            "updateHover": 60,
+            "drawUI": 60,
+            "drawCrnt": 60,
+            "stepParticles": 60,
+            "drawSection": 60
+          },
+          "perSecond": {
+            "providerSync": 62.56517205422315,
+            "updateHover": 62.56517205422315,
+            "drawUI": 62.56517205422315,
+            "drawCrnt": 62.56517205422315,
+            "stepParticles": 62.56517205422315,
+            "drawSection": 62.56517205422315
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 2885,
+          "fps": 20.797227036395146,
+          "averageFrameMs": 48.083333333333336,
+          "p95FrameMs": 54,
+          "longFrames": 13,
+          "counts": {
+            "providerSync": 60,
+            "updateHover": 60,
+            "drawUI": 60,
+            "drawCrnt": 60,
+            "stepParticles": 60,
+            "drawSection": 60,
+            "providerCheck": 59,
+            "providerAlignment": 59,
+            "renderBase": 59,
+            "drawStations": 59,
+            "getImageData": 59
+          },
+          "perSecond": {
+            "providerSync": 20.797227036395146,
+            "updateHover": 20.797227036395146,
+            "drawUI": 20.797227036395146,
+            "drawCrnt": 20.797227036395146,
+            "stepParticles": 20.797227036395146,
+            "drawSection": 20.797227036395146,
+            "providerCheck": 20.450606585788563,
+            "providerAlignment": 20.450606585788563,
+            "renderBase": 20.450606585788563,
+            "drawStations": 20.450606585788563,
+            "getImageData": 20.450606585788563
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 12,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "updateHover": 12,
+            "drawUI": 12,
+            "drawCrnt": 12,
+            "stepParticles": 12,
+            "drawSection": 12
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 900,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      }
+    ],
+    "after": [
+      {
+        "viewport": [
+          390,
+          844
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 948,
+          "fps": 63.29113924050633,
+          "averageFrameMs": 15.8,
+          "p95FrameMs": 19,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 15
+          },
+          "perSecond": {
+            "stepParticles": 15.822784810126583
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 961,
+          "fps": 62.43496357960458,
+          "averageFrameMs": 16.016666666666666,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 1
+          },
+          "perSecond": {
+            "stepParticles": 1.0405827263267429
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 3
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 180,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1280,
+          900
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 961,
+          "fps": 62.43496357960458,
+          "averageFrameMs": 16.016666666666666,
+          "p95FrameMs": 17,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 20
+          },
+          "perSecond": {
+            "stepParticles": 20.81165452653486
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 21,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 1
+          },
+          "perSecond": {
+            "stepParticles": 1.0427528675703859
+          }
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      },
+      {
+        "viewport": [
+          1920,
+          1080
+        ],
+        "stationary": {
+          "frames": 60,
+          "elapsedMs": 950,
+          "fps": 63.1578947368421,
+          "averageFrameMs": 15.833333333333334,
+          "p95FrameMs": 22,
+          "longFrames": 0,
+          "counts": {
+            "stepParticles": 20
+          },
+          "perSecond": {
+            "stepParticles": 21.05263157894737
+          }
+        },
+        "pan": {
+          "frames": 60,
+          "elapsedMs": 959,
+          "fps": 62.56517205422315,
+          "averageFrameMs": 15.983333333333333,
+          "p95FrameMs": 18,
+          "longFrames": 0,
+          "counts": {},
+          "perSecond": {}
+        },
+        "afterPan": {
+          "counts": {
+            "providerSync": 1,
+            "providerCheck": 1,
+            "providerAlignment": 1,
+            "renderBase": 1,
+            "drawStations": 1,
+            "getImageData": 1,
+            "drawUI": 1,
+            "drawCrnt": 1,
+            "stepParticles": 4
+          },
+          "moving": false,
+          "heavyHidden": false
+        },
+        "particles": 360,
+        "scope": "headless mock; 실 NAVER/사용자 PC 성능 아님"
+      }
+    ]
+  },
+  "stress": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "stationary": {
+        "fps": 62.5,
+        "p95FrameMs": 17,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 15,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        62.06329634196465,
+        62.57744733581165
+      ],
+      "maxP95FrameMs": 17,
+      "maxP95WorkMs": 6,
+      "maxIdleRecoveryMs": 72,
+      "longFrameCount": 0,
+      "longTask100msCount": 0,
+      "maxBaseMs": 24,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.5590169943749475,
+      "coordinateDrift": false,
+      "particles": 180,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 0,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 113686,
+          "newProjectCalls": 109324
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36877,
+          "newProjectCalls": 1605
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36545,
+          "newProjectCalls": 451
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 258
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 79234,
+          "newProjectCalls": 61892
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36553,
+          "newProjectCalls": 1383
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36503,
+          "newProjectCalls": 177
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 90
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 126671,
+          "newProjectCalls": 123694
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 40873,
+          "newProjectCalls": 4301
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36621,
+          "newProjectCalls": 355
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 63
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 62.5,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.5590169943749475
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 62.47422680412371,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.5590169943749475
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 62.57744733581165,
+          "p95FrameMs": 17,
+          "p95WorkMs": 6,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.5590169943749475
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 62.06329634196465,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 90,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.5590169943749475
+        }
+      ]
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.25,
+      "stationary": {
+        "fps": 62.5,
+        "p95FrameMs": 17,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 15,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        62.33659006467593,
+        62.59037388969221
+      ],
+      "maxP95FrameMs": 20,
+      "maxP95WorkMs": 5,
+      "maxIdleRecoveryMs": 71,
+      "longFrameCount": 0,
+      "longTask100msCount": 0,
+      "maxBaseMs": 22,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 0.44687800704855685,
+      "maxABErrorPx": 0.3535533905932738,
+      "coordinateDrift": false,
+      "particles": 180,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0.3996247654784213,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 0.1779712593269096,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 0.1779712593269096,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 0.1779712593269096,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 113686,
+          "newProjectCalls": 109324
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36877,
+          "newProjectCalls": 1605
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36545,
+          "newProjectCalls": 451
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 258
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 79234,
+          "newProjectCalls": 61892
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36553,
+          "newProjectCalls": 1383
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36503,
+          "newProjectCalls": 177
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 90
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 126671,
+          "newProjectCalls": 123694
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 40873,
+          "newProjectCalls": 4301
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36621,
+          "newProjectCalls": 355
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 63
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 62.5,
+          "p95FrameMs": 20,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 62.46134817563389,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 62.59037388969221,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 62.33659006467593,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 90,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.3535533905932738
+        }
+      ]
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.5,
+      "stationary": {
+        "fps": 62.56517205422315,
+        "p95FrameMs": 17,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 15,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        62.230437461491064,
+        62.48275862068966
+      ],
+      "maxP95FrameMs": 20,
+      "maxP95WorkMs": 5,
+      "maxIdleRecoveryMs": 56,
+      "longFrameCount": 0,
+      "longTask100msCount": 0,
+      "maxBaseMs": 24,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.3535533905932738,
+      "coordinateDrift": false,
+      "particles": 180,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 1.6572562045795678e-13,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 1.6572562045795678e-13,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 1.6572562045795678e-13,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 113686,
+          "newProjectCalls": 109324
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36877,
+          "newProjectCalls": 1605
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36545,
+          "newProjectCalls": 451
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 258
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 79234,
+          "newProjectCalls": 61892
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36553,
+          "newProjectCalls": 1383
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36503,
+          "newProjectCalls": 177
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 90
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 126671,
+          "newProjectCalls": 123694
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 40873,
+          "newProjectCalls": 4301
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36621,
+          "newProjectCalls": 355
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 63
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 62.29440789473684,
+          "p95FrameMs": 20,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 62.46134817563389,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 62.230437461491064,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 62.48275862068966,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 90,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.3535533905932738
+        }
+      ]
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "stationary": {
+        "fps": 62.5,
+        "p95FrameMs": 17,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 15,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        62.281603288797534,
+        62.59037388969221
+      ],
+      "maxP95FrameMs": 17,
+      "maxP95WorkMs": 5,
+      "maxIdleRecoveryMs": 58,
+      "longFrameCount": 0,
+      "longTask100msCount": 0,
+      "maxBaseMs": 9,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 2.842170943040401e-14,
+      "maxABErrorPx": 0.25,
+      "coordinateDrift": false,
+      "particles": 180,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 0,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 113686,
+          "newProjectCalls": 109324
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36877,
+          "newProjectCalls": 1605
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36545,
+          "newProjectCalls": 451
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 258
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 79234,
+          "newProjectCalls": 61892
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36553,
+          "newProjectCalls": 1383
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36503,
+          "newProjectCalls": 177
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 90
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 126671,
+          "newProjectCalls": 123694
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 40873,
+          "newProjectCalls": 4301
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36621,
+          "newProjectCalls": 355
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 63
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 62.281603288797534,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.25
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 62.487110744483395,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.25
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 62.59037388969221,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.25
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 62.50862425831379,
+          "p95FrameMs": 17,
+          "p95WorkMs": 5,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 90,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.25
+        }
+      ]
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "stationary": {
+        "fps": 62.56517205422315,
+        "p95FrameMs": 17,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 20,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        61.88725490196079,
+        62.46134817563389
+      ],
+      "maxP95FrameMs": 18,
+      "maxP95WorkMs": 9,
+      "maxIdleRecoveryMs": 63,
+      "longFrameCount": 0,
+      "longTask100msCount": 0,
+      "maxBaseMs": 19,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.7071067811865476,
+      "coordinateDrift": false,
+      "particles": 360,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 0,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 61702,
+          "newProjectCalls": 44123
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36706,
+          "newProjectCalls": 1200
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100162,
+          "newProjectCalls": 822
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 244
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 119347,
+          "newProjectCalls": 117404
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36548,
+          "newProjectCalls": 1148
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 295
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 82
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 116612,
+          "newProjectCalls": 114518
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 39505,
+          "newProjectCalls": 2852
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100008,
+          "newProjectCalls": 302
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 66
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 61.88725490196079,
+          "p95FrameMs": 18,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 63,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.7071067811865476
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 62.46134817563389,
+          "p95FrameMs": 17,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 60,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.7071067811865476
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 62.35850998147767,
+          "p95FrameMs": 17,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 61,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.7071067811865476
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 62.25092758004672,
+          "p95FrameMs": 18,
+          "p95WorkMs": 8,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 93,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.7071067811865476
+        }
+      ]
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.25,
+      "stationary": {
+        "fps": 62.5,
+        "p95FrameMs": 21,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 21,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        59.16813122437024,
+        61.162696810658055
+      ],
+      "maxP95FrameMs": 22,
+      "maxP95WorkMs": 11,
+      "maxIdleRecoveryMs": 71,
+      "longFrameCount": 4,
+      "longTask100msCount": 0,
+      "maxBaseMs": 23,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 0.2808883999276688,
+      "maxABErrorPx": 0.25,
+      "coordinateDrift": false,
+      "particles": 360,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0.021117571875573088,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 0.22159638103687485,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 0.22159638103687485,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 0.22159638103687485,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 61702,
+          "newProjectCalls": 44123
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36706,
+          "newProjectCalls": 1200
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100162,
+          "newProjectCalls": 822
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 244
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 119347,
+          "newProjectCalls": 117404
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36548,
+          "newProjectCalls": 1148
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 295
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 82
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 116612,
+          "newProjectCalls": 114518
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 39505,
+          "newProjectCalls": 2852
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100008,
+          "newProjectCalls": 302
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 66
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 59.16813122437024,
+          "p95FrameMs": 22,
+          "p95WorkMs": 11,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 76,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.25
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 60.97806399678004,
+          "p95FrameMs": 18,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 68,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.25
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 61.162696810658055,
+          "p95FrameMs": 18,
+          "p95WorkMs": 8,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 66,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.25
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 59.801980198019805,
+          "p95FrameMs": 18,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 107,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.25
+        }
+      ]
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.5,
+      "stationary": {
+        "fps": 62.56517205422315,
+        "p95FrameMs": 18,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 20,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        57.56079027355623,
+        62.51289457396328
+      ],
+      "maxP95FrameMs": 35,
+      "maxP95WorkMs": 23,
+      "maxIdleRecoveryMs": 72,
+      "longFrameCount": 15,
+      "longTask100msCount": 0,
+      "maxBaseMs": 36,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.3535533905932738,
+      "coordinateDrift": false,
+      "particles": 360,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 2.8421709430404007e-13,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 2.8421709430404007e-13,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 2.8421709430404007e-13,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 61702,
+          "newProjectCalls": 44123
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36706,
+          "newProjectCalls": 1200
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100162,
+          "newProjectCalls": 822
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 244
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 119347,
+          "newProjectCalls": 117404
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36548,
+          "newProjectCalls": 1148
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 295
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 82
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 116612,
+          "newProjectCalls": 114518
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 39505,
+          "newProjectCalls": 2852
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100008,
+          "newProjectCalls": 302
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 66
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 57.56079027355623,
+          "p95FrameMs": 35,
+          "p95WorkMs": 23,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 79,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 62.268803945745994,
+          "p95FrameMs": 18,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 63,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 62.51289457396328,
+          "p95FrameMs": 18,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 65,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 57.847018260758524,
+          "p95FrameMs": 31,
+          "p95WorkMs": 18,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 115,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.3535533905932738
+        }
+      ]
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "stationary": {
+        "fps": 62.63048016701461,
+        "p95FrameMs": 20,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 20,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        57.91284403669725,
+        60.91984938138784
+      ],
+      "maxP95FrameMs": 25,
+      "maxP95WorkMs": 10,
+      "maxIdleRecoveryMs": 67,
+      "longFrameCount": 10,
+      "longTask100msCount": 0,
+      "maxBaseMs": 23,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.5590169943749475,
+      "coordinateDrift": false,
+      "particles": 360,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 0,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 61702,
+          "newProjectCalls": 44123
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36706,
+          "newProjectCalls": 1200
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100162,
+          "newProjectCalls": 822
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 244
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 119347,
+          "newProjectCalls": 117404
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36548,
+          "newProjectCalls": 1148
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 295
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 82
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 116612,
+          "newProjectCalls": 114518
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 39505,
+          "newProjectCalls": 2852
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100008,
+          "newProjectCalls": 302
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 66
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 57.91284403669725,
+          "p95FrameMs": 25,
+          "p95WorkMs": 10,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 75,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.5590169943749475
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 59.49342234439427,
+          "p95FrameMs": 21,
+          "p95WorkMs": 10,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 73,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.5590169943749475
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 59.96437759746685,
+          "p95FrameMs": 20,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 71,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.5590169943749475
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 60.91984938138784,
+          "p95FrameMs": 22,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 110,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.5590169943749475
+        }
+      ]
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "stationary": {
+        "fps": 62.5,
+        "p95FrameMs": 18,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 20,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        57.53892897835169,
+        58.86174636174636
+      ],
+      "maxP95FrameMs": 32,
+      "maxP95WorkMs": 20,
+      "maxIdleRecoveryMs": 71,
+      "longFrameCount": 3,
+      "longTask100msCount": 0,
+      "maxBaseMs": 25,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.9013878188659974,
+      "coordinateDrift": false,
+      "particles": 360,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 6.122223575328581e-13,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 6.122223575328581e-13,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 6.122223575328581e-13,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 97665,
+          "newProjectCalls": 92335
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36820,
+          "newProjectCalls": 1396
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100162,
+          "newProjectCalls": 864
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 267
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 121568,
+          "newProjectCalls": 120426
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36553,
+          "newProjectCalls": 1275
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 323
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 85
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 121735,
+          "newProjectCalls": 120972
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 40540,
+          "newProjectCalls": 3460
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100033,
+          "newProjectCalls": 405
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 73
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 57.53892897835169,
+          "p95FrameMs": 31,
+          "p95WorkMs": 17,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 76,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.9013878188659974
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 58.35901386748844,
+          "p95FrameMs": 31,
+          "p95WorkMs": 20,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 76,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.9013878188659974
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 58.13507290867229,
+          "p95FrameMs": 32,
+          "p95WorkMs": 18,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 78,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.9013878188659974
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 58.86174636174636,
+          "p95FrameMs": 18,
+          "p95WorkMs": 14,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 112,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.9013878188659974
+        }
+      ]
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.25,
+      "stationary": {
+        "fps": 62.76150627615063,
+        "p95FrameMs": 17,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 20,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        57.7582920320244,
+        59.254414650098106
+      ],
+      "maxP95FrameMs": 32,
+      "maxP95WorkMs": 21,
+      "maxIdleRecoveryMs": 70,
+      "longFrameCount": 10,
+      "longTask100msCount": 0,
+      "maxBaseMs": 24,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 0.27961908270946945,
+      "maxABErrorPx": 0.3535533905932738,
+      "coordinateDrift": false,
+      "particles": 360,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 0.24795912593269998,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 0.24795912593269998,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 0.24795912593269998,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 97665,
+          "newProjectCalls": 92335
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36820,
+          "newProjectCalls": 1396
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100162,
+          "newProjectCalls": 864
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 267
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 121568,
+          "newProjectCalls": 120426
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36553,
+          "newProjectCalls": 1275
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 323
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 85
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 121735,
+          "newProjectCalls": 120972
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 40540,
+          "newProjectCalls": 3460
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100033,
+          "newProjectCalls": 405
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 73
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 57.7582920320244,
+          "p95FrameMs": 32,
+          "p95WorkMs": 21,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 80,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 58.74369910818147,
+          "p95FrameMs": 31,
+          "p95WorkMs": 16,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 77,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 59.20281359906213,
+          "p95FrameMs": 18,
+          "p95WorkMs": 10,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 72,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 59.254414650098106,
+          "p95FrameMs": 18,
+          "p95WorkMs": 10,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 111,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.3535533905932738
+        }
+      ]
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.5,
+      "stationary": {
+        "fps": 62.5,
+        "p95FrameMs": 17,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 20,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        58.49420849420849,
+        59.19124829068178
+      ],
+      "maxP95FrameMs": 32,
+      "maxP95WorkMs": 18,
+      "maxIdleRecoveryMs": 71,
+      "longFrameCount": 9,
+      "longTask100msCount": 0,
+      "maxBaseMs": 24,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 0.33318465655668206,
+      "maxABErrorPx": 0.3535533905932738,
+      "coordinateDrift": false,
+      "particles": 360,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0.33318465655668206,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 0.16605468590910277,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 0.16605468590910277,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 0.16605468590910277,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 97665,
+          "newProjectCalls": 92335
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36820,
+          "newProjectCalls": 1396
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100162,
+          "newProjectCalls": 864
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 267
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 121568,
+          "newProjectCalls": 120426
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36553,
+          "newProjectCalls": 1275
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 323
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 85
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 121735,
+          "newProjectCalls": 120972
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 40540,
+          "newProjectCalls": 3460
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100033,
+          "newProjectCalls": 405
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 73
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 59.19124829068178,
+          "p95FrameMs": 22,
+          "p95WorkMs": 12,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 76,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 58.56204097410127,
+          "p95FrameMs": 32,
+          "p95WorkMs": 17,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 76,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 58.49420849420849,
+          "p95FrameMs": 31,
+          "p95WorkMs": 18,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 77,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.3535533905932738
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 58.640776699029125,
+          "p95FrameMs": 31,
+          "p95WorkMs": 17,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 117,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.3535533905932738
+        }
+      ]
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "stationary": {
+        "fps": 62.63048016701461,
+        "p95FrameMs": 21,
+        "counts": {
+          "frame": 60,
+          "providerSync": 0,
+          "providerViewportKey": 0,
+          "providerCheck": 0,
+          "providerAlignment": 0,
+          "renderBase": 0,
+          "coastPath": 0,
+          "structPath": 0,
+          "updateHover": 0,
+          "drawUI": 0,
+          "drawCrnt": 0,
+          "stepParticles": 20,
+          "drawSection": 0,
+          "stationRedraw": 0,
+          "maskRebuild": 0,
+          "getImageData": 0,
+          "buildFlowField": 0,
+          "particleRespawn": 0
+        }
+      },
+      "fpsRange": [
+        57.20218991882197,
+        61.45706145706146
+      ],
+      "maxP95FrameMs": 26,
+      "maxP95WorkMs": 11,
+      "maxIdleRecoveryMs": 66,
+      "longFrameCount": 9,
+      "longTask100msCount": 0,
+      "maxBaseMs": 25,
+      "movingHeavy": 0,
+      "maxMarkerErrorPx": 0,
+      "maxABErrorPx": 0.5590169943749475,
+      "coordinateDrift": false,
+      "particles": 360,
+      "remote": [
+        {
+          "name": "속초",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "포항",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "주문진",
+          "errorPx": 0,
+          "status": "settled"
+        },
+        {
+          "name": "홍원",
+          "errorPx": 0,
+          "status": "settled"
+        }
+      ],
+      "pathValidation": [
+        {
+          "name": "속초",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 97665,
+          "newProjectCalls": 92335
+        },
+        {
+          "name": "속초",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36820,
+          "newProjectCalls": 1396
+        },
+        {
+          "name": "속초",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100162,
+          "newProjectCalls": 864
+        },
+        {
+          "name": "속초",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100029,
+          "newProjectCalls": 267
+        },
+        {
+          "name": "포항",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 121568,
+          "newProjectCalls": 120426
+        },
+        {
+          "name": "포항",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 36553,
+          "newProjectCalls": 1275
+        },
+        {
+          "name": "포항",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 323
+        },
+        {
+          "name": "포항",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 85
+        },
+        {
+          "name": "홍원",
+          "width": 600000,
+          "changedPixels": 0,
+          "oldProjectCalls": 121735,
+          "newProjectCalls": 120972
+        },
+        {
+          "name": "홍원",
+          "width": 60000,
+          "changedPixels": 0,
+          "oldProjectCalls": 40540,
+          "newProjectCalls": 3460
+        },
+        {
+          "name": "홍원",
+          "width": 10000,
+          "changedPixels": 0,
+          "oldProjectCalls": 100033,
+          "newProjectCalls": 405
+        },
+        {
+          "name": "홍원",
+          "width": 2000,
+          "changedPixels": 0,
+          "oldProjectCalls": 99991,
+          "newProjectCalls": 73
+        }
+      ],
+      "phases": [
+        {
+          "kind": "horizontal",
+          "count": 20,
+          "fps": 58.93794981521105,
+          "p95FrameMs": 22,
+          "p95WorkMs": 10,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 22,
+            "drawCrnt": 20,
+            "stepParticles": 78,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.5590169943749475
+        },
+        {
+          "kind": "vertical",
+          "count": 20,
+          "fps": 57.20218991882197,
+          "p95FrameMs": 26,
+          "p95WorkMs": 11,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 77,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.5590169943749475
+        },
+        {
+          "kind": "zoom",
+          "count": 20,
+          "fps": 61.34845110346224,
+          "p95FrameMs": 23,
+          "p95WorkMs": 10,
+          "counts": {
+            "frame": 303,
+            "providerSync": 20,
+            "providerViewportKey": 60,
+            "providerCheck": 20,
+            "providerAlignment": 20,
+            "renderBase": 20,
+            "coastPath": 20,
+            "structPath": 20,
+            "updateHover": 0,
+            "drawUI": 20,
+            "drawCrnt": 20,
+            "stepParticles": 76,
+            "drawSection": 0,
+            "stationRedraw": 20,
+            "maskRebuild": 20,
+            "getImageData": 200,
+            "buildFlowField": 20,
+            "particleRespawn": 20
+          },
+          "abErrorPx": 0.5590169943749475
+        },
+        {
+          "kind": "mixed",
+          "count": 30,
+          "fps": 61.45706145706146,
+          "p95FrameMs": 23,
+          "p95WorkMs": 9,
+          "counts": {
+            "frame": 453,
+            "providerSync": 30,
+            "providerViewportKey": 90,
+            "providerCheck": 30,
+            "providerAlignment": 30,
+            "renderBase": 30,
+            "coastPath": 30,
+            "structPath": 30,
+            "updateHover": 0,
+            "drawUI": 30,
+            "drawCrnt": 30,
+            "stepParticles": 111,
+            "drawSection": 0,
+            "stationRedraw": 30,
+            "maskRebuild": 30,
+            "getImageData": 300,
+            "buildFlowField": 30,
+            "particleRespawn": 30
+          },
+          "abErrorPx": 0.5590169943749475
+        }
+      ]
+    }
+  ]
+}

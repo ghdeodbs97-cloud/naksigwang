@@ -1,0 +1,885 @@
+{
+  "tabs": {
+    "today": true,
+    "map": true,
+    "tide": true,
+    "bite": true,
+    "log": true
+  },
+  "zoom": true,
+  "pan": true,
+  "readout": "35.85301°N, 129.10840°E · 육지·구조물 · 표고 약 90 m (GEBCO) · 해안까지 20 km+",
+  "depths": [
+    {
+      "name": "거진",
+      "lon": 128.45633,
+      "lat": 38.44264,
+      "samples": [
+        {
+          "distance": 0,
+          "land": false,
+          "result": {
+            "depth": 1.201335340860884,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 500,
+          "land": false,
+          "result": {
+            "depth": 4.098888517858633,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 1000,
+          "land": false,
+          "result": {
+            "depth": 9.07261048172275,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "아야진",
+      "lon": 128.55765,
+      "lat": 38.27216,
+      "samples": [
+        {
+          "distance": 0,
+          "land": false,
+          "result": {
+            "depth": 0.6037416955884534,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 500,
+          "land": false,
+          "result": {
+            "depth": 5.4649500313335935,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 1000,
+          "land": false,
+          "result": {
+            "depth": 12.211733288077028,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "봉포",
+      "lon": 128.56922096620318,
+      "lat": 38.252767,
+      "samples": [
+        {
+          "distance": 0,
+          "land": false,
+          "result": {
+            "depth": 0.5256097811988469,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 500,
+          "land": false,
+          "result": {
+            "depth": 4.976758649169187,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 1000,
+          "land": false,
+          "result": {
+            "depth": 2.419475105400841,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "속초",
+      "lon": 128.5947,
+      "lat": 38.20854,
+      "samples": [
+        {
+          "distance": 0,
+          "land": false,
+          "result": {
+            "depth": 0.3610976550511724,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 500,
+          "land": false,
+          "result": {
+            "depth": 3.077062061052934,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 1000,
+          "land": false,
+          "result": {
+            "depth": 5.179475576973914,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "대포",
+      "lon": 128.61112538238595,
+      "lat": 38.17376,
+      "samples": [
+        {
+          "distance": 0,
+          "land": false,
+          "result": {
+            "depth": 0.8097258348343239,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 500,
+          "land": false,
+          "result": {
+            "depth": 9.083994459048848,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 1000,
+          "land": false,
+          "result": {
+            "depth": 17.01845395315989,
+            "type": "gebco",
+            "label": "GEBCO 2026",
+            "res": 460,
+            "dist": null,
+            "conf": "낮음",
+            "interp": true,
+            "verticalDatum": "MSL_assumed",
+            "estimated": true,
+            "sourceType": "gebco",
+            "source": "GEBCO 2026",
+            "resolution": 460,
+            "distanceToSource": null,
+            "interpolated": true,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다.",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "문암",
+      "lon": 128.5504663136096,
+      "lat": 38.296859,
+      "samples": [
+        {
+          "distance": 0,
+          "land": false,
+          "result": {
+            "depth": 0.6717277254629928,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 500,
+          "land": false,
+          "result": {
+            "depth": 6.506040625766287,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 1000,
+          "land": false,
+          "result": {
+            "depth": 13.511881361578487,
+            "type": "gebco",
+            "label": "GEBCO 2026",
+            "res": 460,
+            "dist": null,
+            "conf": "낮음",
+            "interp": true,
+            "verticalDatum": "MSL_assumed",
+            "estimated": true,
+            "sourceType": "gebco",
+            "source": "GEBCO 2026",
+            "resolution": 460,
+            "distanceToSource": null,
+            "interpolated": true,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다.",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "남애",
+      "lon": 128.7888,
+      "lat": 37.94162,
+      "samples": [
+        {
+          "distance": 0,
+          "land": false,
+          "result": {
+            "depth": 1.1884898506640273,
+            "type": "est",
+            "label": "해안거리 기반 추정",
+            "res": null,
+            "dist": null,
+            "conf": "낮음",
+            "interp": false,
+            "estimated": true,
+            "sourceType": "model_estimate",
+            "source": "해안거리 기반 추정",
+            "resolution": null,
+            "distanceToSource": null,
+            "interpolated": false,
+            "confidence": "낮음",
+            "confidenceReason": "저해상도 격자 또는 경사 가정으로 세부 지형을 알 수 없습니다. 바닷물 높이 기준면 미확인.",
+            "verticalDatum": "unknown",
+            "surveyYear": null,
+            "measurementCount": 0
+          }
+        },
+        {
+          "distance": 500,
+          "land": false,
+          "result": {
+            "depth": 14.567407403059056,
+            "type": "bada",
+            "label": "국립해양조사원 자연과학용 수심정보",
+            "res": 150,
+            "dist": 57.887362847235195,
+            "n": 6,
+            "conf": "중간",
+            "interp": true,
+            "src": "국립해양조사원 자연과학용 수심정보",
+            "yr": null,
+            "verticalDatum": "평균해면하",
+            "datasetId": "khoa-jumunjin-namae-20261011-0",
+            "sourceType": "khoa",
+            "estimated": true,
+            "contributingSources": [
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 57.887362847235195,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 87.31425250671008,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 159.69734708318927,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 164.78962852867124,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 164.79995496626728,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 180.66442690017345,
+                "interpolated": false
+              }
+            ],
+            "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+            "source": "국립해양조사원 자연과학용 수심정보",
+            "resolution": 150,
+            "distanceToSource": 57.887362847235195,
+            "interpolated": true,
+            "confidence": "중간",
+            "surveyYear": null,
+            "measurementCount": 6
+          }
+        },
+        {
+          "distance": 1000,
+          "land": false,
+          "result": {
+            "depth": 20.474036160786536,
+            "type": "bada",
+            "label": "국립해양조사원 자연과학용 수심정보",
+            "res": 150,
+            "dist": 81.35982102270262,
+            "n": 6,
+            "conf": "중간",
+            "interp": true,
+            "src": "국립해양조사원 자연과학용 수심정보",
+            "yr": null,
+            "verticalDatum": "평균해면하",
+            "datasetId": "khoa-jumunjin-namae-20261011-0",
+            "sourceType": "khoa",
+            "estimated": true,
+            "contributingSources": [
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 81.35982102270262,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 87.09817420595623,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 126.62587932306064,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 130.38705759201414,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 211.0174442732337,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 212.61790404535316,
+                "interpolated": false
+              }
+            ],
+            "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+            "source": "국립해양조사원 자연과학용 수심정보",
+            "resolution": 150,
+            "distanceToSource": 81.35982102270262,
+            "interpolated": true,
+            "confidence": "중간",
+            "surveyYear": null,
+            "measurementCount": 6
+          }
+        }
+      ]
+    },
+    {
+      "name": "주문진",
+      "lon": 128.8312883028771,
+      "lat": 37.89192,
+      "samples": [
+        {
+          "distance": 0,
+          "land": false,
+          "result": {
+            "depth": 4.807596266821545,
+            "type": "bada",
+            "label": "국립해양조사원 자연과학용 수심정보",
+            "res": 150,
+            "dist": 11.8104427576719,
+            "n": 4,
+            "conf": "중간",
+            "interp": true,
+            "src": "국립해양조사원 자연과학용 수심정보",
+            "yr": null,
+            "verticalDatum": "평균해면하",
+            "datasetId": "khoa-jumunjin-namae-20261011-0",
+            "sourceType": "khoa",
+            "estimated": true,
+            "contributingSources": [
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 11.8104427576719,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 147.14503642297097,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 153.81807418438166,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 208.91841882131888,
+                "interpolated": false
+              }
+            ],
+            "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+            "source": "국립해양조사원 자연과학용 수심정보",
+            "resolution": 150,
+            "distanceToSource": 11.8104427576719,
+            "interpolated": true,
+            "confidence": "중간",
+            "surveyYear": null,
+            "measurementCount": 4
+          }
+        },
+        {
+          "distance": 500,
+          "land": false,
+          "result": {
+            "depth": 11.158854932979823,
+            "type": "bada",
+            "label": "국립해양조사원 자연과학용 수심정보",
+            "res": 150,
+            "dist": 59.76348623421534,
+            "n": 6,
+            "conf": "중간",
+            "interp": true,
+            "src": "국립해양조사원 자연과학용 수심정보",
+            "yr": null,
+            "verticalDatum": "평균해면하",
+            "datasetId": "khoa-jumunjin-namae-20261011-0",
+            "sourceType": "khoa",
+            "estimated": true,
+            "contributingSources": [
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 59.76348623421534,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 89.65078552071178,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 158.61337186504673,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 164.82275309032454,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 181.71161749077788,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 182.4389906679754,
+                "interpolated": false
+              }
+            ],
+            "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+            "source": "국립해양조사원 자연과학용 수심정보",
+            "resolution": 150,
+            "distanceToSource": 59.76348623421534,
+            "interpolated": true,
+            "confidence": "중간",
+            "surveyYear": null,
+            "measurementCount": 6
+          }
+        },
+        {
+          "distance": 1000,
+          "land": false,
+          "result": {
+            "depth": 19.335210981983064,
+            "type": "bada",
+            "label": "국립해양조사원 자연과학용 수심정보",
+            "res": 150,
+            "dist": 39.957618473866816,
+            "n": 6,
+            "conf": "중간",
+            "interp": true,
+            "src": "국립해양조사원 자연과학용 수심정보",
+            "yr": null,
+            "verticalDatum": "평균해면하",
+            "datasetId": "khoa-jumunjin-namae-20261011-0",
+            "sourceType": "khoa",
+            "estimated": true,
+            "contributingSources": [
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 39.957618473866816,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 111.70877682066566,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 149.86813339831627,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 162.4960668565236,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 175.7617380966277,
+                "interpolated": false
+              },
+              {
+                "source": "국립해양조사원 자연과학용 수심정보",
+                "surveyYear": null,
+                "resolution": 150,
+                "distance": 187.4801961845726,
+                "interpolated": false
+              }
+            ],
+            "confidenceReason": "약 150 m 간격의 해양수치모델용 격자자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다.",
+            "source": "국립해양조사원 자연과학용 수심정보",
+            "resolution": 150,
+            "distanceToSource": 39.957618473866816,
+            "interpolated": true,
+            "confidence": "중간",
+            "surveyYear": null,
+            "measurementCount": 6
+          }
+        }
+      ]
+    }
+  ],
+  "section": {
+    "A": [
+      14351445.209614642,
+      4550439.211606459
+    ],
+    "B": [
+      14350858.306398032,
+      4550763.855532873
+    ],
+    "samples": 301,
+    "sha256": "b682794bd45b25bda79f78ec05e290948b07bb75338bc7c076da4746a36db6af"
+  },
+  "consoleErrors": 0
+}

@@ -1,0 +1,238 @@
+{
+  "summary": {
+    "combinations": 16,
+    "pans": 1600,
+    "maxMarkerRasterErrorPx": 0.5052560047203467,
+    "maxABDrawErrorPx": 0.016495148939788783,
+    "oldRawErrorPx": 47.6920459830109,
+    "oldBuildFirstPanErrorPx": 37.375000000152596,
+    "oldBuild": "5456d322a1a49a6708ad9b8e05e537727f7d67ca"
+  },
+  "measurement": "실제 NaverMapAdapter + pan 때 내부 DOM pane 이동/zoom 때 원점 리셋하는 SDK mock. 실 NAVER 측정 아님.",
+  "results": [
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.17677669529665696,
+      "maxABErrorPx": 0.015270493907950914,
+      "oldRawErrorPx": 47.69204598255735,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.25,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.5052560047203467,
+      "maxABErrorPx": 0.015270493907950914,
+      "oldRawErrorPx": 47.69204598255735,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1.5,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.05892556509886557,
+      "maxABErrorPx": 0.015270493907950914,
+      "oldRawErrorPx": 47.69204598255735,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 2,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.17677669529665696,
+      "maxABErrorPx": 0.015270493907950914,
+      "oldRawErrorPx": 47.69204598255735,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.1767766952966369,
+      "maxABErrorPx": 0.015303441536080875,
+      "oldRawErrorPx": 47.692045982582165,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1.25,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.40055442932205726,
+      "maxABErrorPx": 0.015303441536080875,
+      "oldRawErrorPx": 47.692045982582165,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 1.5,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.06230232592345881,
+      "maxABErrorPx": 0.015303441536080875,
+      "oldRawErrorPx": 47.692045982582165,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        768,
+        1024
+      ],
+      "dpr": 2,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.18410210537926536,
+      "maxABErrorPx": 0.015303441536080875,
+      "oldRawErrorPx": 47.692045982582165,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.1767766952966369,
+      "maxABErrorPx": 0.016495148441850786,
+      "oldRawErrorPx": 47.6920459830109,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.25,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.2731004443995669,
+      "maxABErrorPx": 0.016495148441850786,
+      "oldRawErrorPx": 47.6920459830109,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 1.5,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.06230232592345881,
+      "maxABErrorPx": 0.016495148441850786,
+      "oldRawErrorPx": 47.6920459830109,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "dpr": 2,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.18410210537926536,
+      "maxABErrorPx": 0.016495148441850786,
+      "oldRawErrorPx": 47.6920459830109,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.29276703556878364,
+      "maxABErrorPx": 0.016495148939788783,
+      "oldRawErrorPx": 47.69204598263178,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.25,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.21307505639548488,
+      "maxABErrorPx": 0.016495148939788783,
+      "oldRawErrorPx": 47.69204598263178,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 1.5,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.36539556215745433,
+      "maxABErrorPx": 0.016495148939788783,
+      "oldRawErrorPx": 47.69204598263178,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    },
+    {
+      "viewport": [
+        1920,
+        1080
+      ],
+      "dpr": 2,
+      "pans": 100,
+      "visible": 100,
+      "maxErrorPx": 0.18410210537926536,
+      "maxABErrorPx": 0.016495148939788783,
+      "oldRawErrorPx": 47.69204598263178,
+      "maxRoundtripM": 0,
+      "zoomResetsOrigin": true
+    }
+  ]
+}

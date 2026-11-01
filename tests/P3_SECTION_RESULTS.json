@@ -1,0 +1,266 @@
+{
+  "baselineCommit": "626488970a88adac06761bf5416aa79085b70de9",
+  "previousFailure": "바다→갯바위→바다 rock_exposed sample 115 실제 water",
+  "legacySectionHash": "b682794bd45b25bda79f78ec05e290948b07bb75338bc7c076da4746a36db6af",
+  "sampleCount": 301,
+  "sampleCountPolicyUnchanged": true,
+  "sourceHashesLF": {
+    "src/app/17b_section_surface.js": "16d7debfb3c1b9bfeb192ff353c4cd08f5107d03e4e4571817fd026d1610391f",
+    "src/app/18_section.js": "1f290023c5427690e6974fb6ef22e9e9cf9f65d28a974eb1ed030e4b15fb01cf",
+    "src/app/20_readouts.js": "432cdd65624cc57a9d991dcbed647b442324855ea2cf78880b21e005b4336d0c",
+    "tests/section_state_checks.js": "c7f7113b36ae059c87d654abeebdff6fff55d2e679877349d5580c2cba8c9238",
+    "tests/test_section_states.py": "bc6f5d748b0209b8e1cf3d09f337a668021241bf87471692eb27e553765a6fd9"
+  },
+  "results": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "cases": [
+        {
+          "name": "전부 바다",
+          "states": [
+            "water"
+          ],
+          "samples": 301,
+          "waterStrokes": 1
+        },
+        {
+          "name": "바다→육지",
+          "states": [
+            "water",
+            "land"
+          ],
+          "samples": 301,
+          "waterStrokes": 1
+        },
+        {
+          "name": "바다→갯바위→바다",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "바다→방파제→바다",
+          "states": [
+            "water",
+            "breakwater"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "육지→바다→육지",
+          "states": [
+            "land",
+            "water"
+          ],
+          "samples": 301,
+          "waterStrokes": 1
+        },
+        {
+          "name": "샘플 사이 20cm 암반",
+          "states": [
+            "water"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "갯바위 포인트 최소 범위",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "암초 노출 여부 미확인",
+          "states": [
+            "water",
+            "unknown"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "다각형 구멍",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 3
+        },
+        {
+          "name": "겹친 지형 우선순위",
+          "states": [
+            "water",
+            "land",
+            "rock_exposed",
+            "breakwater"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "암반 경계와 나란한 단면",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "비스듬한 단면의 거리축",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "수심 자료 없음",
+          "states": [
+            "unknown"
+          ],
+          "samples": 301,
+          "waterStrokes": 0
+        }
+      ],
+      "pureWaterGoldenEqual": true
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "cases": [
+        {
+          "name": "전부 바다",
+          "states": [
+            "water"
+          ],
+          "samples": 301,
+          "waterStrokes": 1
+        },
+        {
+          "name": "바다→육지",
+          "states": [
+            "water",
+            "land"
+          ],
+          "samples": 301,
+          "waterStrokes": 1
+        },
+        {
+          "name": "바다→갯바위→바다",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "바다→방파제→바다",
+          "states": [
+            "water",
+            "breakwater"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "육지→바다→육지",
+          "states": [
+            "land",
+            "water"
+          ],
+          "samples": 301,
+          "waterStrokes": 1
+        },
+        {
+          "name": "샘플 사이 20cm 암반",
+          "states": [
+            "water"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "갯바위 포인트 최소 범위",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "암초 노출 여부 미확인",
+          "states": [
+            "water",
+            "unknown"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "다각형 구멍",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 3
+        },
+        {
+          "name": "겹친 지형 우선순위",
+          "states": [
+            "water",
+            "land",
+            "rock_exposed",
+            "breakwater"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "암반 경계와 나란한 단면",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "비스듬한 단면의 거리축",
+          "states": [
+            "water",
+            "rock_exposed"
+          ],
+          "samples": 301,
+          "waterStrokes": 2
+        },
+        {
+          "name": "수심 자료 없음",
+          "states": [
+            "unknown"
+          ],
+          "samples": 301,
+          "waterStrokes": 0
+        }
+      ],
+      "pureWaterGoldenEqual": true
+    }
+  ]
+}
