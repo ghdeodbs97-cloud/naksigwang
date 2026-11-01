@@ -7,6 +7,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
 import android.webkit.SslErrorHandler;
@@ -20,6 +23,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -39,6 +43,14 @@ public final class MainActivity extends ComponentActivity {
     private ProgressBar progress;
     private LinearLayout errorPanel;
     private boolean pageFailed;
+    private ImageView startupImage;
+    private StartupGate startupGate;
+    private boolean startupReady;
+    private boolean pageFinished;
+    private boolean checkingStartup;
+    private int startupNavigation;
+    private final Handler startupHandler = new Handler(Looper.getMainLooper());
+    private final Runnable startupTick = this::checkStartup;
     private ValueCallback<Uri[]> fileResult;
     private final ActivityResultLauncher<Intent> filePicker = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -92,7 +104,18 @@ public final class MainActivity extends ComponentActivity {
         errorPanel.addView(browser);
         errorPanel.setVisibility(View.GONE);
         root.addView(errorPanel, new FrameLayout.LayoutParams(-1, -1));
+        startupImage = new ImageView(this);
+        startupImage.setImageResource(R.drawable.startup_art);
+        startupImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        startupImage.setBackgroundColor(Color.rgb(11, 20, 32));
+        startupImage.setContentDescription(getString(R.string.startup_picture));
+        startupImage.setClickable(true);
+        root.addView(startupImage, new FrameLayout.LayoutParams(-1, -1));
         setContentView(root);
+        startupImage.post(() -> {
+            startupGate = new StartupGate(SystemClock.uptimeMillis());
+            startupHandler.post(startupTick);
+        });
         configureWeb();
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override public void handleOnBackPressed() {
@@ -128,11 +151,16 @@ public final class MainActivity extends ComponentActivity {
             }
             @Override public void onPageStarted(WebView view, String url, android.graphics.Bitmap icon) {
                 pageFailed = false;
+                pageFinished = false;
+                startupReady = false;
+                checkingStartup = false;
+                startupNavigation++;
                 errorPanel.setVisibility(View.GONE);
                 progress.setVisibility(View.VISIBLE);
             }
             @Override public void onPageFinished(WebView view, String url) {
                 progress.setVisibility(View.GONE);
+                pageFinished = true;
             }
             @Override public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 if (request.isForMainFrame()) showConnectionError();
@@ -165,6 +193,38 @@ public final class MainActivity extends ComponentActivity {
         });
     }
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
+    private void checkStartup() {
+        if (startupImage.getVisibility() != View.VISIBLE || isDestroyed()) return;
+        StartupGate.Decision decision = startupGate.decide(SystemClock.uptimeMillis(), startupReady, pageFailed);
+        if (decision != StartupGate.Decision.WAIT) {
+            startupImage.setVisibility(View.GONE);
+            startupImage.setImageDrawable(null);
+            if (decision == StartupGate.Decision.ERROR) {
+                web.stopLoading();
+                showConnectionError();
+            }
+            return;
+        }
+        /* 문서 로드만으로 완료 처리하지 않는다. 비동기 자료와 탭 초기화 후 실제 그리기를 기다린다. */
+        if (pageFinished && !pageFailed && !startupReady && !checkingStartup
+                && AppUrls.route(web.getUrl()) == AppUrls.Route.INTERNAL) {
+            checkingStartup = true;
+            int navigation = startupNavigation;
+            web.evaluateJavascript("(()=>{const n=document.getElementById('stName');return document.readyState==='complete'&&!!document.querySelector('#tabbar [aria-current=\"page\"]')&&!!n&&!!n.textContent.trim()&&n.textContent.trim()!=='—';})()",
+                    value -> {
+                        if (navigation != startupNavigation || isDestroyed()) return;
+                        if (!"true".equals(value) || pageFailed) { checkingStartup = false; return; }
+                        web.postVisualStateCallback(navigation, new WebView.VisualStateCallback() {
+                            @Override public void onComplete(long requestId) {
+                                if (navigation != startupNavigation || isDestroyed()) return;
+                                checkingStartup = false;
+                                if (!pageFailed) startupReady = true;
+                            }
+                        });
+                    });
+        }
+        startupHandler.postDelayed(startupTick, 100);
+    }
     private void showConnectionError() {
         pageFailed = true;
         progress.setVisibility(View.GONE);
@@ -183,6 +243,7 @@ public final class MainActivity extends ComponentActivity {
     @Override protected void onPause() { web.onPause(); super.onPause(); }
     @Override protected void onResume() { super.onResume(); if (web != null) web.onResume(); }
     @Override protected void onDestroy() {
+        startupHandler.removeCallbacksAndMessages(null);
         if (fileResult != null) { fileResult.onReceiveValue(null); fileResult = null; }
         web.stopLoading();
         web.destroy();
