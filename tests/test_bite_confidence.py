@@ -40,7 +40,7 @@ window.__p1ExpirySnapshot = () => {
   const cards = [...$('fishGrid').children];
   return { calls: refreshCalls, t: S.t, evaluations, matches: evaluations.every(({ name, ev }) => {
     const card = cards.find(c => c.querySelector('.fn').firstChild.textContent === name);
-    return card.querySelector('.fp b').textContent === ev.score + '점'
+    return card.querySelector('.scoreValue').textContent === '조건점수 ' + ev.score + '점'
       && !card.querySelector('.biteConfidence') && !card.querySelector('.biteScores') && Number.isFinite(ev.habitatScore) && Number.isFinite(ev.dynamicScore)
       && card.querySelector('.biteReasons').textContent === biteReasons(ev);
   }) };

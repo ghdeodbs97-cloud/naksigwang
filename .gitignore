@@ -1,5 +1,6 @@
 .test-deps/
 __pycache__/
 test-output/
+_site/
 tools/depth-data/raw/*
 !tools/depth-data/raw/README.md

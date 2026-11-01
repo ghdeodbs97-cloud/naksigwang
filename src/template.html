@@ -1,5 +1,6 @@
 <title>낚시광</title>
 <meta name="naver-map-key-id" content="">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -327,6 +328,11 @@ body{line-height:1.65}
 .fish .lt{font-size:11px;line-height:1.5}
 .fish .fp b{font-size:22px}
 .fish .bestH{font-size:11.5px}
+.biteScoreHeading{display:flex;flex-direction:column;gap:3px;min-width:0}
+.fish .biteScoreHeading b{font-family:var(--font-ui);font-size:18px;line-height:1.4}
+.scoreValue{font-family:var(--font-data);font-size:11px;color:var(--muted)}
+.fish .bestH{font-family:var(--font-ui);font-size:12px;line-height:1.6;color:var(--fg);padding:3px 0 5px}
+.fish .fp{gap:8px;align-items:center}
 .fishEcology{font-size:12.5px;line-height:1.6}
 .fishEcology p{margin:4px 0 10px}
 .ecologyLabel{font-size:11px;margin-bottom:3px}
@@ -627,6 +633,7 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
       <p class="note" id="biteWin"></p>
       <div id="rockInfo"></div>
     </details>
+    <p class="note">‘입질 확률’은 조건을 종합한 참고 점수이며, 실제로 잡힐 확률을 뜻하지 않습니다.</p>
     <div class="fishGrid" id="fishGrid"></div>
       <details class="basis">
       <summary>입질 지수는 어떻게 계산하나요?</summary>
