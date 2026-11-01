@@ -2,9 +2,10 @@
 /* ── 조석: 국립해양조사원 조석예보(고, 저조) 예보지점 166곳, 오늘부터 15일 ─
    물때 이름은 음력 날짜로 정한다 (서해 7물때식: 음력 1일 = 7물, 그 밖 8물때식: 음력 1일 = 8물).
    물때 세기(%)는 그 지점의 15일(사리~조금 한 주기) 중 하루 조차가 가장 큰 날을 100으로 본 그날 조차 비율. */
-const DAY0 = TIDE.from, NDAYS = Math.min(7, Object.keys(TIDE.lunar).length);
+const DAY0 = TIDE.from;
 const KST_NOW = new Date(Date.now() + 9 * 36e5), TODAY = KST_NOW.toISOString().slice(0, 10);
 const TODAY_IDX = Math.max(0, Math.round((new Date(TODAY + 'T12:00:00Z') - new Date(DAY0 + 'T12:00:00Z')) / 864e5));   // 새벽 갱신 전이면 1
+const NDAYS = Math.min(TODAY_IDX+7, Object.keys(TIDE.lunar).length);
 const dateAdd = (d, n) => { const x = new Date(d + 'T12:00:00+09:00'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
 const regionOf = (lat, lon) => (lon > 129.15 && lat > 35.3) || (lat > 35.9 && lon > 128.3) || lon > 130 ? '동해'
   : lat < 33.75 || (lat < 34.05 && lon > 126.1 && lon < 126.45) ? '제주' : (lat > 34.6 && lon < 126.95) || lon < 126 ? '서해' : '남해';

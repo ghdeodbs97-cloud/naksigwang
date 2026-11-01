@@ -411,6 +411,46 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
 #todayNow:disabled{opacity:.45;cursor:default}
 .todayTimeSlider{width:100%;min-width:0;margin:0;height:24px;accent-color:var(--cyan)}
 
+/* 전체 화면 밀도: 지도 좌표계는 유지하고 글자·여백만 정돈한다. */
+body{font-size:13px;line-height:1.5;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+:root{--nav-h:56px}
+.top{padding:7px 12px 6px}.topRow{gap:8px}.brand h1{font-size:19px}
+.ptPick select,.top .coord input{font-size:13px;padding:6px 9px}.top .coord{margin-top:5px}
+.panel{padding:13px;border-radius:9px}.view{gap:11px}.ph{margin-bottom:10px}.ph h2,#v-today .tdH{font-size:16px}
+.note,.hint,.uiDetails{font-size:11.5px;line-height:1.55}.uiDetails{padding-top:8px;margin-top:8px}.uiDetails[open]>summary{margin-bottom:8px}
+.tdFacts>div{padding:10px 8px}.tdFacts dd{font-size:16px}.tdFacts dd small{font-size:10.5px;line-height:1.4}
+.tdName{font-size:23px}.tdState{font-size:34px}.tdNext{font-size:13px}.tdNow{padding:13px}
+.tdBest li{padding:6px 8px;gap:7px;grid-template-columns:46px 1fr auto}.tdBest .pc{font-family:var(--font-ui);font-size:12px}
+#v-tide .stName{font-size:21px}#v-tide .ctrl{max-width:none}.ctrl{gap:10px}#v-tide dl.read{font-size:12px;gap:7px 10px}#v-tide dl.read dd{font-size:12px}
+.clock .t{font-size:25px}#v-tide .sub{margin-top:9px;padding-top:9px}.days{grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.days button{min-height:44px;padding:5px 2px}.days button .dd,.days button .mm{font-size:10px}
+#v-map .tools{gap:5px;margin-bottom:9px}.seg button{font-size:12px;padding:7px 9px}.stats{font-size:11px}
+.logForm{gap:10px;margin:10px 0}.logForm input,.logForm select{font-size:13px;padding:8px}.sources{font-size:12px;line-height:1.65}.sourcePanel{padding:13px}
+.fishGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:10px;align-items:start}
+.fish{padding:7px;gap:5px;min-width:0}.fish .fn{font-size:13px;gap:3px}.fish .lt{font-size:10px}.fish .biteScoreHeading b{font-size:12px}
+.fish .fp{flex-wrap:wrap;gap:4px}.scoreValue{font-size:10px}.fish .lv{font-size:10px;padding:1px 5px}.fish .bestH{font-size:10px;line-height:1.4}
+.fishEcology{display:none}.fish.expanded{grid-column:1/-1}.fish.expanded .fishEcology{display:block}
+.fish.expanded .pic{width:110px}.cardDetails{font-size:11px;padding-top:5px}.cardDetails>summary{min-height:32px;display:flex;align-items:center}
+.weatherHeader{display:flex;align-items:baseline;gap:7px;justify-content:space-between;flex-wrap:wrap;margin:10px 0 7px}.weatherHeader h3{font-size:15px;margin:0}
+.weatherDashboard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0}
+.weatherMetric{min-width:0;padding:9px 7px;background:var(--input);border:1px solid var(--line);border-radius:8px}
+.weatherMetric dt{font-size:11px;color:var(--muted)}.weatherMetric dd{margin:3px 0 0;font-family:var(--font-data);font-size:17px;font-weight:600;white-space:nowrap}
+.weatherMetric small{display:block;font-size:10px;line-height:1.4;margin-top:4px;color:var(--muted);overflow-wrap:anywhere}
+#windCompass{display:inline-block;font-family:var(--font-ui);color:var(--cyan);margin-right:3px}
+.weekWeather{width:100%;table-layout:fixed;border-collapse:collapse;font-size:11px;margin-top:8px}
+.weekWeather th,.weekWeather td{padding:7px 2px;text-align:center;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.weekWeather thead{color:var(--muted)}.weekWeather th:first-child{width:14%}.weekWeather td:nth-child(2){width:21%}.weekWeather small{display:block;color:var(--muted);font-size:9px;line-height:1.3}
+.weekWeather button{font:inherit;color:var(--fg);background:transparent;border:0;min-height:40px;padding:2px;cursor:pointer}.weekWeather .selected{background:rgba(138,219,208,.1)}
+.weatherFootnote{font-size:10.5px;line-height:1.5;color:var(--muted);margin:7px 0}
+@media(max-width:600px){
+ .panel{padding:10px}.view{gap:10px}.ph h2{font-size:16px}.fishGrid{gap:5px}
+ .fish{padding:5px;gap:4px}.fish .fn{font-size:11px;display:block;line-height:1.35;overflow-wrap:anywhere}.fish .lt{display:none}
+ .fish .pic{aspect-ratio:1.25}.fish .fp{display:block}.fish .biteScoreHeading b{font-size:10px;white-space:nowrap}.scoreValue{font-size:9px}
+ .fish .lv{display:inline-block;margin-top:3px}.fish .bestH{font-size:9.5px}.cardDetails{font-size:10px}.fish.expanded{padding:12px}
+ .fish.expanded .fn{font-size:15px}.fish.expanded .lt{display:inline}.fish.expanded .bestH{font-size:12px}
+ .tdFacts dd{font-size:15px}.tdFacts>div{padding:9px 7px}.ph h2 small{font-size:11px}.logForm{gap:8px}
+ .weatherMetric dd{font-size:15px}.weatherMetric{padding:8px 6px}.weatherMetric small{font-size:9px}.weekWeather{font-size:10px}
+}
+@media(min-width:900px){.fishGrid{grid-template-columns:repeat(6,minmax(0,1fr))}.weatherDashboard{grid-template-columns:repeat(6,minmax(0,1fr))}.weatherMetric dd{font-size:18px}}
 </style>
 
 <div class="app">
@@ -463,7 +503,7 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
       <button class="btn ghost" type="button" data-go="bite">어종별 지수</button>
       <a class="btn ghost" id="kakaoLink" href="https://map.kakao.com/" target="_blank" rel="noopener" title="새 창에서 카카오맵이 열립니다. 오른쪽 위 스카이뷰를 누르면 위성사진으로 볼 수 있습니다">카카오맵에서 보기 ↗</a>
     </div>
-    <p class="note" id="tdNote">입질 점수는 추정값입니다. <b id="dataTime2">—</b></p>
+    <p class="note" id="tdNote">‘입질 확률’은 조건을 종합한 참고 지수이며 실제 포획 확률은 아닙니다. <b id="dataTime2">—</b></p>
   </section>
 
   <section class="view" id="v-map" aria-label="지도">
@@ -586,6 +626,20 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
       </div>
       <details class="uiDetails pointDetails"><summary>포인트 정보</summary><p class="hint" id="stReg"></p><div id="ptInfo"></div></details>
       <div class="days" id="dayStrip" role="tablist" aria-label="날짜 선택"></div>
+      <section aria-label="선택한 날의 낚시 날씨">
+        <div class="weatherHeader"><h3>출조 날씨 한눈에</h3><span class="hint" id="weatherWhen">—</span></div>
+        <dl class="weatherDashboard">
+          <div class="weatherMetric"><dt>풍향</dt><dd><span id="windCompass" aria-hidden="true" title="바람이 향하는 방향">↑</span><span id="wxDirection">—</span></dd><small id="wxDirectionNote">—</small></div>
+          <div class="weatherMetric"><dt>풍속</dt><dd id="wxWind">—</dd><small id="wxWindNote">—</small></div>
+          <div class="weatherMetric"><dt>파고</dt><dd id="wxWave">—</dd><small id="wxWaveNote">—</small></div>
+          <div class="weatherMetric"><dt id="wxSstLabel">수온</dt><dd id="wxSst">—</dd><small id="wxSstNote">—</small></div>
+          <div class="weatherMetric"><dt>습도</dt><dd id="wxHumidity">—</dd><small id="wxHumidityNote">—</small></div>
+          <div class="weatherMetric"><dt>물 흐름</dt><dd id="weatherCurrent">—</dd><small id="weatherCurrentNote">—</small></div>
+        </dl>
+        <p class="weatherFootnote" id="wxSlot">—</p>
+        <table class="weekWeather" aria-label="선택한 시각 기준 7일 출조 날씨 비교"><thead><tr><th>날짜</th><th>바람</th><th>파고</th><th>수온</th><th>습도</th><th>흐름</th></tr></thead><tbody id="weekWeatherBody"></tbody></table>
+        <p class="weatherFootnote">날짜를 누르면 해당 날로 이동합니다. 기상청 단기예보를 우선하고, 없는 항목은 7일 모델 예측으로 보완합니다. 미래 수온은 관측값이 아닙니다. 해류 모델은 연안 약 8 km 격자의 참고값이며 갯바위·방파제 주변의 정밀 조류나 출항 안전을 보장하지 않습니다.</p>
+      </section>
       <canvas id="tideChart" aria-label="하루 조석 곡선. 눌러서 시각 선택"></canvas>
       <div class="evs" id="dayEvents"></div>
       <div class="clock">
@@ -609,14 +663,8 @@ body{min-height:100vh;background:radial-gradient(ellipse 900px 560px at 90% 0,rg
         <dt>지금 흐름</dt><dd id="crNow">—</dd>
         <dt>이날 물돌이 · 최강</dt><dd id="crDay">—</dd>
       </dl>
-      <div class="sub">예보 <small id="wxSlot" class="hint">—</small></div>
-      <dl class="read">
-        <dt>풍향 · 풍속</dt><dd id="wxWind">—</dd>
-        <dt>파고</dt><dd id="wxWave">—</dd>
-        <dt>현재 수온</dt><dd id="wxSst">—</dd>
-      </dl>
-      <details class="api"><summary>예보 기준·자료 출처</summary><p class="note">바닷물 높이는 기본수준면(대략 가장 낮은 간조면)에서 잰 높이입니다.</p><p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
-      <p class="note">조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」(공공데이터포털 Open API, 2026년 10월 4일 내려받음, 199개 지점). 지점별 물돌이(전류)·최강 유속 시각과 유향·유속이며, 그 사이 유속은 사인 곡선으로 보간했습니다. 관측 조류를 조화분석한 천문 예측이라 바람·파도·하천 유량의 영향은 빠져 있고, 조류는 수로·곶마다 크게 달라 예보 지점에서 멀수록 세기와 방향이 어긋납니다. 15 km 안에 지점이 없으면(동해안 대부분) 바닷물 높이 변화 속도로 추정합니다. 지도 화살표는 예보 지점의 그 시각 흐름이고, 흐름 입자는 예보 지점 근처에서는 그 방향을, 해안 가까이에서는 해안선을 따르도록 그린 그림이라 실제 유선은 아닙니다. 파고 예보가 없는 곳은 조과 지수에 파고를 반영하지 않습니다.</p></details>
+      <details class="api"><summary>예보 기준·자료 출처</summary><p class="note">바닷물 높이는 기본수준면(대략 가장 낮은 간조면)에서 잰 높이입니다.</p><p class="note">조석: 국립해양조사원 조석예보(고·저조, 예보지점 166곳) · 풍향/풍속/파고/습도: 기상청 단기예보(5 km 격자) · 수온: 국립해양조사원 조위관측소 실측. 하루 2번(05:25·17:25) 자동으로 새로 받습니다 · <b id="dataTime">—</b>. 공식 예보는 <a href="https://www.weather.go.kr/w/ocean/forecast/daily-forecast.do" target="_blank" rel="noopener">기상청 해상예보</a>에서 확인하세요.</p>
+      <p class="note">조류 예보: 국립해양조사원 「조류예보 최강창낙조 및 전류」(공공데이터포털 Open API, 2026년 10월 4일 내려받음, 199개 지점). 지점별 물돌이(전류)·최강 유속 시각과 유향·유속이며, 그 사이 유속은 사인 곡선으로 보간했습니다. 관측 조류를 조화분석한 천문 예측이라 바람·파도·하천 유량의 영향은 빠져 있고, 조류는 수로·곶마다 크게 달라 예보 지점에서 멀수록 세기와 방향이 어긋납니다. 15 km 안에 지점이 없으면(동해안 대부분) 기존 지도 흐름·조건점수는 바닷물 높이 변화 속도로 추정합니다. 날씨 카드에서 별도로 표시하는 해류 모델은 이 지도 흐름 계산과 구분합니다. 지도 화살표는 예보 지점의 그 시각 흐름이고, 흐름 입자는 예보 지점 근처에서는 그 방향을, 해안 가까이에서는 해안선을 따르도록 그린 그림이라 실제 유선은 아닙니다. 파고 예보가 없는 곳은 조과 지수에 파고를 반영하지 않습니다.</p></details>
     </div>
   </section>
 
@@ -737,6 +785,7 @@ out geom;</pre>
     <p><a href="https://www.data.go.kr/data/15142498/openapi.do" target="_blank" rel="noopener">국립해양조사원 자연과학용 수심정보</a>(공공누리 제1유형): 2026년 10월 11일 주문진·남애 등 기존 자료를 보존하고 거진부터 울산까지 검증된 일부 연안 범위를 확대해 35,982점을 제공합니다. 대진·양양 및 포항·울산 일부에는 미탑재 범위가 있으며 동해 전체를 포함하지 않습니다. 약 150 m 간격의 해양수치모델용 자료이며 원본 측심점이나 수직 정확도 보증이 아닙니다. 기준면은 조회 화면의 ‘평균해면하’ 표기를 보존하며 조사연도는 미확인입니다. <a href="https://www.data.go.kr/data/15059725/fileData.do" target="_blank" rel="noopener">연안해역기본도</a>는 원본 미확보, <a href="https://www.data.go.kr/data/15148924/fileData.do" target="_blank" rel="noopener">해수부 수심분포도</a>는 공개 CSV에 수심값이 없어 미탑재입니다.</p>
     <p>지형(육지 표고·해저 수심)은 <a href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" rel="noopener">GEBCO Compilation Group (2026) GEBCO 2026 Grid</a>(공공 영역, 15초 격자)를 썼습니다. '기본' 지도에서 바다 색은 해안선에서의 실제 거리입니다. 측면도의 수심과 지도 위 흐름 입자는 모식값이므로 실제 출조 판단에는 국립해양조사원 조석·조류 예보와 해도를 확인하세요.</p>
     <p>조류 예보는 <a href="https://www.data.go.kr/data/15156025/openapi.do" target="_blank" rel="noopener">해양수산부 국립해양조사원_조류예보 최강창낙조 및 전류</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다.</p>
+    <p>7일 보완 기상·파고·해수면 수온·해류 모델: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> 및 기상·해양 모델 제공기관, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. 선택한 포인트 좌표로 공개 API를 조회합니다. 자료가 없거나 연결에 실패하면 해당 값은 표시하지 않으며, 현재 수온 관측을 미래 예보로 복사하지 않습니다.</p>
     <p>조석·수온은 해양수산부 국립해양조사원(<a href="https://www.data.go.kr/data/15156018/openapi.do" target="_blank" rel="noopener">조석예보(고, 저조)</a>, <a href="https://www.data.go.kr/data/15155508/openapi.do" target="_blank" rel="noopener">조위관측소 최신 관측데이터</a>), 풍향·풍속·파고는 <a href="https://www.data.go.kr/data/15084084/openapi.do" target="_blank" rel="noopener">기상청 단기예보 조회서비스</a>(공공데이터포털, 공공누리 제1유형: 출처표시)를 썼습니다. 음력 날짜는 korean_lunar_calendar(한국천문연구원 음양력 기준)로 계산했습니다.</p>
   </div>
     </details>

@@ -27,7 +27,9 @@ window.p3Baseline=async()=>{
   await Promise.all([...OFFICIAL_DEPTH.pending.values()]);clearTimeout(OFFICIAL_DEPTH.timer);
   exampleSection(128.93,37.8);clearTimeout(OFFICIAL_DEPTH.timer);
   await depthPrepareAreas([[128.8,37.7,129,37.9]]);analyzeSection();clearTimeout(OFFICIAL_DEPTH.timer);
-  hoverAt=[cw/2,ch/2];dirtyHover=true;updateHover();
+  // 화면 밀도/여백이 달라져도 기존 baseline과 같은 경위도의 hover를 비교한다.
+  // 화면 중앙은 viewport 폭에 따라 다른 지점을 가리키므로 수심 회귀의 고정 입력이 될 수 없다.
+  hoverAt=toS(mxOf(129.10840),myOf(35.85301));dirtyHover=true;updateHover();
   return {tabs,zoom,pan,readout:$('cursorRead').textContent,depths:window.p3DepthSnapshot(),
     section:{A:S.A,B:S.B,pts:SEC.pts,prof:SEC.prof},consoleErrors:0};
 };

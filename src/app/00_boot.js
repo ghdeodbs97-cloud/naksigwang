@@ -24,7 +24,7 @@ function validBootData(name, data) {
     (Array.isArray(o.sst) && Number.isFinite(o.sst[0]) && typeof o.sst[1] === 'string')));
   if (name === 'wx') return typeof data.base === 'string' && obj(data.cells) && Object.keys(data.cells).length > 0 &&
     (!data.bases || (obj(data.bases) && Object.values(data.bases).every(v => typeof v === 'string'))) && Object.values(data.cells).every(c =>
-    obj(c) && Object.keys(c).length > 0 && Object.values(c).every(v => Array.isArray(v) && v.length === 3 && v.every(x => x === null || Number.isFinite(x))));
+    obj(c) && Object.keys(c).length > 0 && Object.values(c).every(v => Array.isArray(v) && [3,4].includes(v.length) && v.every(x => x === null || Number.isFinite(x))));
   if (name === 'tide') {
     if (typeof data.from !== 'string' || !Number.isFinite(Date.parse(data.from)) || !obj(data.lunar) || !obj(data.st)) return false;
     const dates = Object.keys(data.lunar).sort();
