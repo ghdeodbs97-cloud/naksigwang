@@ -1,13 +1,20 @@
 {
- "errors": [],
+ "errors": [
+  "tide DT_0004 20261118: RuntimeError",
+  "tide DT_0013 20261119: RuntimeError",
+  "tide SO_1255 20261120: RuntimeError",
+  "tide DT_0057 20261120: RuntimeError",
+  "tide SO_1265 20261120: RuntimeError",
+  "tide SO_1268 20261108: RuntimeError"
+ ],
  "tide.json": {
-  "fresh": 2656,
-  "fallback": 0,
+  "fresh": 2650,
+  "fallback": 6,
   "requested": 2656,
   "unrecovered": 0,
-  "fresh_ratio": 1.0,
-  "error": 0,
-  "status": "fresh"
+  "fresh_ratio": 0.9977,
+  "error": 6,
+  "status": "merged_fallback"
  },
  "obs.json": {
   "fresh": 55,
@@ -27,7 +34,7 @@
   "error": 0,
   "status": "fresh"
  },
- "generated": "2026-11-06T09:59+09:00",
- "seconds": 233,
- "error_count": 0
+ "generated": "2026-11-07T00:59+09:00",
+ "seconds": 691,
+ "error_count": 6
 }
