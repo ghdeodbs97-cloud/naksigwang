@@ -1,56 +1,13 @@
 {
- "errors": [
-  "tide DT_0001 20261118: RuntimeError",
-  "tide DT_0014 20261121: RuntimeError",
-  "tide DT_0006 20261126: RuntimeError",
-  "tide DT_0017 20261121: RuntimeError",
-  "tide SO_0699 20261128: RuntimeError",
-  "tide SO_0705 20261123: RuntimeError",
-  "tide DT_0903 20261119: RuntimeError",
-  "tide DT_0903 20261128: RuntimeError",
-  "tide SO_0737 20261117: RuntimeError",
-  "tide SO_0737 20261116: RuntimeError",
-  "tide SO_0754 20261120: RuntimeError",
-  "tide DT_0903 20261117: RuntimeError",
-  "tide SO_0752 20261115: RuntimeError",
-  "tide SO_0758 20261115: RuntimeError",
-  "tide SO_0760 20261127: RuntimeError",
-  "tide SO_1248 20261122: RuntimeError",
-  "tide SO_1249 20261129: RuntimeError",
-  "tide SO_0758 20261120: RuntimeError",
-  "tide SO_0758 20261121: RuntimeError",
-  "tide SO_1248 20261127: RuntimeError",
-  "tide DT_0061 20261126: RuntimeError",
-  "tide DT_0062 20261115: RuntimeError",
-  "tide SO_1251 20261128: RuntimeError",
-  "tide DT_0061 20261116: RuntimeError",
-  "tide SO_1251 20261118: RuntimeError",
-  "tide DT_0064 20261115: RuntimeError",
-  "tide SO_1256 20261117: RuntimeError",
-  "tide SO_1256 20261119: RuntimeError",
-  "tide SO_1268 20261115: RuntimeError",
-  "tide SO_1266 20261125: RuntimeError",
-  "tide SO_0538 20261130: RuntimeError",
-  "tide SO_1272 20261130: RuntimeError",
-  "tide SO_1270 20261117: RuntimeError",
-  "tide SO_1270 20261116: RuntimeError",
-  "tide SO_1276 20261123: RuntimeError",
-  "tide SO_0550 20261120: RuntimeError",
-  "tide SO_1276 20261128: RuntimeError",
-  "tide SO_1274 20261121: RuntimeError",
-  "tide SO_1277 20261120: RuntimeError",
-  "tide.json: 신선 데이터 2617/2656 (98.5%) — 기준 90% 또는 자료 완전성 미달로 이전 파일 유지",
-  "obs DT_0093 20261116: RuntimeError"
- ],
+ "errors": [],
  "tide.json": {
-  "fresh": 2617,
-  "fallback": 37,
+  "fresh": 2656,
+  "fallback": 0,
   "requested": 2656,
-  "unrecovered": 2,
-  "fresh_ratio": 0.9853,
-  "error": 39,
-  "status": "kept_previous_incomplete",
-  "minimum_ratio": 0.9
+  "unrecovered": 0,
+  "fresh_ratio": 1.0,
+  "error": 0,
+  "status": "fresh"
  },
  "obs.json": {
   "fresh": 55,
@@ -58,7 +15,7 @@
   "requested": 55,
   "unrecovered": 0,
   "fresh_ratio": 1.0,
-  "error": 1,
+  "error": 0,
   "status": "fresh"
  },
  "wx.json": {
@@ -70,7 +27,7 @@
   "error": 0,
   "status": "fresh"
  },
- "generated": "2026-11-16T00:42+09:00",
- "seconds": 1053,
- "error_count": 41
+ "generated": "2026-11-16T09:00+09:00",
+ "seconds": 215,
+ "error_count": 0
 }
