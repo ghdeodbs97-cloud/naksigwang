@@ -1,35 +1,44 @@
 {
  "errors": [
-  "tide DT_0032 20261125: RuntimeError"
+  "tide DT_0001 20261121: RuntimeError",
+  "tide SO_0752 20261122: RuntimeError",
+  "tide SO_0552 20261126: RuntimeError",
+  "obs DT_0001 20261120: RuntimeError",
+  "obs DT_0001 20261119: RuntimeError",
+  "obs DT_0001: ValueError",
+  "wx 21,132: RuntimeError",
+  "wx 47,72: RuntimeError",
+  "wx 52,116: RuntimeError",
+  "wx 69,59: RuntimeError"
  ],
  "tide.json": {
-  "fresh": 2655,
-  "fallback": 1,
+  "fresh": 2653,
+  "fallback": 3,
   "requested": 2656,
   "unrecovered": 0,
-  "fresh_ratio": 0.9996,
-  "error": 1,
+  "fresh_ratio": 0.9989,
+  "error": 3,
   "status": "merged_fallback"
  },
  "obs.json": {
-  "fresh": 55,
-  "fallback": 0,
+  "fresh": 54,
+  "fallback": 1,
   "requested": 55,
   "unrecovered": 0,
-  "fresh_ratio": 1.0,
-  "error": 0,
-  "status": "fresh"
+  "fresh_ratio": 0.9818,
+  "error": 3,
+  "status": "merged_fallback"
  },
  "wx.json": {
-  "fresh": 628,
-  "fallback": 0,
+  "fresh": 624,
+  "fallback": 4,
   "requested": 628,
   "unrecovered": 0,
-  "fresh_ratio": 1.0,
-  "error": 0,
-  "status": "fresh"
+  "fresh_ratio": 0.9936,
+  "error": 4,
+  "status": "merged_fallback"
  },
- "generated": "2026-11-20T02:26+09:00",
- "seconds": 277,
- "error_count": 1
+ "generated": "2026-11-20T10:48+09:00",
+ "seconds": 344,
+ "error_count": 10
 }
