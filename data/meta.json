@@ -1,44 +1,39 @@
 {
  "errors": [
-  "tide DT_0001 20261121: RuntimeError",
-  "tide SO_0752 20261122: RuntimeError",
-  "tide SO_0552 20261126: RuntimeError",
-  "obs DT_0001 20261120: RuntimeError",
-  "obs DT_0001 20261119: RuntimeError",
-  "obs DT_0001: ValueError",
-  "wx 21,132: RuntimeError",
-  "wx 47,72: RuntimeError",
-  "wx 52,116: RuntimeError",
-  "wx 69,59: RuntimeError"
+  "tide SO_0548 20261205: RuntimeError",
+  "tide SO_1273 20261125: RuntimeError",
+  "tide SO_1273 20261127: RuntimeError",
+  "tide.json: 신선 데이터 2653/2656 (99.9%) — 기준 90% 또는 자료 완전성 미달로 이전 파일 유지"
  ],
  "tide.json": {
   "fresh": 2653,
-  "fallback": 3,
+  "fallback": 2,
   "requested": 2656,
-  "unrecovered": 0,
+  "unrecovered": 1,
   "fresh_ratio": 0.9989,
   "error": 3,
-  "status": "merged_fallback"
+  "status": "kept_previous_incomplete",
+  "minimum_ratio": 0.9
  },
  "obs.json": {
-  "fresh": 54,
-  "fallback": 1,
+  "fresh": 55,
+  "fallback": 0,
   "requested": 55,
   "unrecovered": 0,
-  "fresh_ratio": 0.9818,
-  "error": 3,
-  "status": "merged_fallback"
+  "fresh_ratio": 1.0,
+  "error": 0,
+  "status": "fresh"
  },
  "wx.json": {
-  "fresh": 624,
-  "fallback": 4,
+  "fresh": 628,
+  "fallback": 0,
   "requested": 628,
   "unrecovered": 0,
-  "fresh_ratio": 0.9936,
-  "error": 4,
-  "status": "merged_fallback"
+  "fresh_ratio": 1.0,
+  "error": 0,
+  "status": "fresh"
  },
- "generated": "2026-11-20T10:48+09:00",
- "seconds": 344,
- "error_count": 10
+ "generated": "2026-11-21T02:01+09:00",
+ "seconds": 332,
+ "error_count": 4
 }
