@@ -1,48 +1,13 @@
 {
- "errors": [
-  "tide SO_1279 20261203: RuntimeError",
-  "tide SO_1279 20261202: RuntimeError",
-  "tide SO_1279 20261204: RuntimeError",
-  "tide SO_1279 20261205: RuntimeError",
-  "tide SO_1279 20261207: RuntimeError",
-  "tide SO_1279 20261208: RuntimeError",
-  "tide SO_0562 20261123: RuntimeError",
-  "tide SO_1279 20261206: RuntimeError",
-  "tide SO_0562 20261126: RuntimeError",
-  "tide SO_0562 20261125: RuntimeError",
-  "tide SO_0562 20261127: RuntimeError",
-  "tide SO_0562 20261124: RuntimeError",
-  "tide SO_0562 20261128: RuntimeError",
-  "tide SO_0562 20261129: RuntimeError",
-  "tide SO_0562 20261130: RuntimeError",
-  "tide SO_0562 20261201: RuntimeError",
-  "tide SO_0562 20261202: RuntimeError",
-  "tide SO_0562 20261203: RuntimeError",
-  "tide SO_0562 20261205: RuntimeError",
-  "tide SO_0562 20261204: RuntimeError",
-  "tide SO_0562 20261206: RuntimeError",
-  "tide SO_0562 20261207: RuntimeError",
-  "tide SO_0562 20261208: RuntimeError",
-  "tide SO_1280 20261123: RuntimeError",
-  "tide SO_1280 20261126: RuntimeError",
-  "tide SO_1280 20261125: RuntimeError",
-  "tide SO_1280 20261124: RuntimeError",
-  "tide SO_1280 20261127: RuntimeError",
-  "tide SO_1280 20261129: RuntimeError",
-  "tide SO_1280 20261128: RuntimeError",
-  "tide SO_1280 20261130: RuntimeError",
-  "tide SO_1280 20261201: RuntimeError",
-  "tide.json: 신선 데이터 2624/2656 (98.8%) — 기준 90% 또는 자료 완전성 미달로 이전 파일 유지"
- ],
+ "errors": [],
  "tide.json": {
-  "fresh": 2624,
-  "fallback": 30,
+  "fresh": 2656,
+  "fallback": 0,
   "requested": 2656,
-  "unrecovered": 2,
-  "fresh_ratio": 0.988,
-  "error": 32,
-  "status": "kept_previous_incomplete",
-  "minimum_ratio": 0.9
+  "unrecovered": 0,
+  "fresh_ratio": 1.0,
+  "error": 0,
+  "status": "fresh"
  },
  "obs.json": {
   "fresh": 55,
@@ -62,7 +27,7 @@
   "error": 0,
   "status": "fresh"
  },
- "generated": "2026-11-24T05:19+09:00",
- "seconds": 301,
- "error_count": 33
+ "generated": "2026-11-24T13:50+09:00",
+ "seconds": 192,
+ "error_count": 0
 }
